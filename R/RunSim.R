@@ -70,18 +70,50 @@ RunSim <- function(trt_list=c("int","noint"),
                    ipd = TRUE,
                    debug = FALSE){
 
-  # Not needed?
-  # if (is.null(psa_bool)) {
-  #   warning("psa_bool not defined in RunSim.")
-  # }
 
-  registerDoParallel(ncores)
+# Set-up basics -----------------------------------------------------------
 
-  trt_list <- trt_list
+  if (debug==FALSE) {
+    registerDoParallel(ncores)
+  }
+  
+  if (ncores>1 & debug==TRUE) {
+    warning("Number of cores selected >1 but engine (debug) is single-core.")
+  }
+  
+  trt_list <- trt_list #this is done as otherwise there are problems passing arguments from function to function
+  
+  #get cost/utility categories
+  categories_costs_ongoing <- unlist(unique(lapply(names(cost_ongoing_list), function(n) cost_ongoing_list[[n]][["category"]])))
+  categories_costs_instant <- unlist(unique(lapply(names(cost_instant_list), function(n) cost_instant_list[[n]][["category"]])))
+  categories_costs_cycle   <- unlist(unique(lapply(names(cost_cycle_list), function(n) cost_cycle_list[[n]][["category"]])))
 
+  categories_utilities_ongoing <- unlist(unique(lapply(names(util_ongoing_list), function(n) util_ongoing_list[[n]][["category"]])))
+  categories_utilities_instant <- unlist(unique(lapply(names(util_instant_list), function(n) util_instant_list[[n]][["category"]])))
+  categories_utilities_cycle   <- unlist(unique(lapply(names(util_cycle_list), function(n) util_cycle_list[[n]][["category"]])))
+  
+  categories_for_export <-c("categories_costs_ongoing",
+                            "categories_costs_instant",
+                            "categories_costs_cycle",
+                            "categories_utilities_ongoing",
+                            "categories_utilities_instant",
+                            "categories_utilities_cycle"
+                            )
+  
+  #Remove NULL values
+  categories_for_export <- c(if(!is.null(categories_costs_ongoing)){paste(categories_costs_ongoing,c("ongoing","ongoing_undisc"),sep="_")},
+                             if(!is.null(categories_costs_instant)){paste(categories_costs_instant,c("instant","instant_undisc"),sep="_")},
+                             if(!is.null(categories_costs_cycle)){paste(categories_costs_cycle,c("cycle","cycle_undisc"),sep="_")},
+                             if(!is.null(categories_utilities_ongoing)){paste(categories_utilities_ongoing,c("ongoing","ongoing_undisc"),sep="_")},
+                             if(!is.null(categories_utilities_instant)){paste(categories_utilities_instant,c("instant","instant_undisc"),sep="_")},
+                             if(!is.null(categories_utilities_cycle)){paste(categories_utilities_cycle,c("cycle","cycle_undisc"),sep="_")}
+                            )
   output_psa <- list()
 
   start_time_simulations <-  proc.time()
+
+# Simulation loop ---------------------------------------------------------
+
   for (simulation in 1:n_sim) {
 
     print(paste0("Simulation number: ",simulation))
@@ -97,8 +129,22 @@ RunSim <- function(trt_list=c("int","noint"),
                                        util_cycle_list = util_cycle_list,
                                        cost_ongoing_list = cost_ongoing_list,
                                        cost_instant_list = cost_instant_list,
-                                       cost_cycle_list = cost_cycle_list),
-                       input_out = input_out,
+                                       cost_cycle_list = cost_cycle_list,
+                                       cost_categories_ongoing = categories_costs_ongoing,
+                                       l_cost_categories_ongoing = length(categories_costs_ongoing),
+                                       cost_categories_instant = categories_costs_instant,
+                                       l_cost_categories_instant = length(categories_costs_instant),
+                                       cost_categories_cycle = categories_costs_cycle,
+                                       l_cost_categories_cycle = length(categories_costs_cycle),
+                                       util_categories_ongoing = categories_utilities_ongoing,
+                                       l_util_categories_ongoing = length(categories_utilities_ongoing),
+                                       util_categories_instant = categories_utilities_instant,
+                                       l_util_categories_instant = length(categories_utilities_instant),
+                                       util_categories_cycle = categories_utilities_cycle,
+                                       l_util_categories_cycle = length(categories_utilities_cycle)
+                                       ),
+                       input_out = unique(c(input_out,categories_for_export)),
+                       categories_for_export = categories_for_export,
                        ipd = ipd,
                        trt_list = trt_list,
                        simulation = simulation,
@@ -107,7 +153,7 @@ RunSim <- function(trt_list=c("int","noint"),
 
     )
 
-    #5.3 Draw Common parameters  -------------------------------
+    # Draw Common parameters  -------------------------------
     if(!is.null(common_all_inputs)){
       for (inp in 1:length(common_all_inputs)) {
         set.seed(simulation)
@@ -124,9 +170,7 @@ RunSim <- function(trt_list=c("int","noint"),
     if (sum(duplic)>0) { warning("Duplicated items detected, using the last one added")  }
     input_list <- input_list[!duplic]
 
-    #5.5 Run engine ----------------------------------------------------------
-
-    #Run engine
+    # Run engine ----------------------------------------------------------
 
     if (debug==TRUE) {
       final_output <- RunEngine_debug(trt_list=trt_list,
@@ -145,18 +189,12 @@ RunSim <- function(trt_list=c("int","noint"),
       final_output$merged_df$simulation <- simulation
     }
 
-
     output_psa[[simulation]] <- final_output
-
-
-
 
 
     print(paste0("Time to run iteration ", simulation,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
   }
   print(paste0("Total time to run: ",  round(proc.time()[3]- start_time_simulations[3] , 2), "s"))
-
-
 
 
   # Export results ----------------------------------------------------------

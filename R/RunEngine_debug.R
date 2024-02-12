@@ -21,7 +21,7 @@ RunEngine_debug <- function(trt_list,
                             common_pt_inputs=NULL,
                             unique_pt_inputs=NULL,
                             input_list = NULL){
-  # Create treatment list --------------------------
+  # Initial set-up --------------------------
   trt_list <- trt_list
   simulation <- input_list$simulation
   n_sim <- input_list$n_sim
@@ -36,9 +36,9 @@ RunEngine_debug <- function(trt_list,
 
     #Create empty pat data for each trt
     this.PatData <- list()
-
     input_list_pt <- c(input_list,list(i=i))
-    #extract the natural death time for the patient across treatments
+    
+    #Extract the inputs that are common for each patient across interventions
     if(!is.null(common_pt_inputs)){
       for (inp in 1:length(common_pt_inputs)) {
         list.common_pt_inputs <- lapply(common_pt_inputs[inp],function(x) eval(x, input_list_pt))
@@ -57,8 +57,17 @@ RunEngine_debug <- function(trt_list,
     #2 Loop per treatment ------------------------------------------------------
 
     for (trt in trt_list) {
-      # current time,  LYS, QALYs and costs for this patient
-      output_list <- list(curtime = 0, thslys = 0, thsqalys = 0, thscosts = 0, itemlys = 0, itemqalys = 0, itemcosts = 0)
+      # Initialize values to prevent errors
+      output_list <- list(curtime = 0, thslys = 0, thsqalys = 0, thscosts = 0, itemlys = 0, itemqalys = 0, itemcosts = 0,
+                          thslys_undisc = 0, thsqalys_undisc = 0, thscosts_undisc = 0, itemlys_undisc = 0, itemqalys_undisc = 0, itemcosts_undisc = 0)
+      this.PatData[[trt]][["thslys"]] <- 0
+      this.PatData[[trt]][["thsqalys"]]<- 0
+      this.PatData[[trt]][["thscosts"]]<- 0
+      this.PatData[[trt]][["thslys_undisc"]] <- 0
+      this.PatData[[trt]][["thsqalys_undisc"]]<- 0
+      this.PatData[[trt]][["thscosts_undisc"]]<- 0
+      
+      #Extract the inputs that are unique for each patient-intervention
       input_list_trt <- NULL
       input_list_trt <- c(input_list_pt,list(trt=trt))
       if(!is.null(unique_pt_inputs)){
@@ -89,7 +98,7 @@ RunEngine_debug <- function(trt_list,
       input_list_trt <- c(input_list_trt,evt_list$time_data,evt_list["cur_evtlist"])
 
       # 3 Loop per event --------------------------------------------------------
-
+      #Main environment of reference is this one
       list_env <- list(list_env = environment())
 
       input_list_trt <- c(input_list_trt, list_env)
@@ -107,41 +116,56 @@ RunEngine_debug <- function(trt_list,
         n_evt <- n_evt +1
 
 
-        if (is.null(Evt)==F){
-
+        if (is.null(Evt)==F){  
+          
+          #Evalaute event
           input_list_trt <- ReactEvt(Evt, trt, input_list_trt)
-          #Save actual event list and times
+          
+          #Get extra objects to be exported
+          extra_data <- input_list_trt[input_list_trt$input_out]
+          extra_data <- extra_data[!sapply(extra_data,is.null)]
+          
+          if (length(extra_data)==0) { #if no extra data needs to be saved, omit that step
+              this.PatData[[trt]]$evtlist[[n_evt]] <-   list(evtname = Evt$evt ,
+                                                             evttime = Evt$evttime,
+                                                             pat_id = i,
+                                                             trt = trt,
+                                                             cost = input_list_trt[['itemcosts']],
+                                                             cost_undisc = input_list_trt[['itemcosts_undisc']],
+                                                             qaly = input_list_trt[['itemqalys']],
+                                                             qaly_undisc = input_list_trt[['itemqalys_undisc']],
+                                                             ly = input_list_trt[['itemlys']],
+                                                             ly_undisc = input_list_trt[['itemlys_undisc']]
+              )
+              
+            } else{
+              this.PatData[[trt]]$evtlist[[n_evt]] <- c(evtname = Evt$evt ,
+                                                        evttime = Evt$evttime,
+                                                        pat_id = i,
+                                                        trt = trt,
+                                                        cost = input_list_trt[['itemcosts']],
+                                                        cost_undisc = input_list_trt[['itemcosts_undisc']],
+                                                        qaly = input_list_trt[['itemqalys']],
+                                                        qaly_undisc = input_list_trt[['itemqalys_undisc']],
+                                                        ly = input_list_trt[['itemlys']],
+                                                        ly_undisc = input_list_trt[['itemlys_undisc']],
+                                                        extra_data
+              )
+            }
+          
+          #Accumulate total lys,costs and qalys
+          this.PatData[[trt]][["thslys"]]   <- this.PatData[[trt]][["thslys"]] + input_list_trt[['itemlys']]
+          this.PatData[[trt]][["thsqalys"]] <- this.PatData[[trt]][["thsqalys"]] + input_list_trt[['itemqalys']]
+          this.PatData[[trt]][["thscosts"]] <- this.PatData[[trt]][["thscosts"]]  + input_list_trt[['itemcosts']]
+          this.PatData[[trt]][["thslys_undisc"]]   <- this.PatData[[trt]][["thslys_undisc"]] + input_list_trt[['itemlys_undisc']]
+          this.PatData[[trt]][["thsqalys_undisc"]] <- this.PatData[[trt]][["thsqalys_undisc"]] + input_list_trt[['itemqalys_undisc']]
+          this.PatData[[trt]][["thscosts_undisc"]] <- this.PatData[[trt]][["thscosts_undisc"]]  + input_list_trt[['itemcosts_undisc']]
+          
 
-
-          extra_data <- input_list_trt[which(names(input_list_trt) %in% input_list_trt$input_out )]
-          if (length(extra_data)==0) {
-            this.PatData[[trt]]$evtlist[[n_evt]] <-   list(evtname = Evt$evt ,
-                                                           evttime = Evt$evttime,
-                                                           cost = input_list_trt[['itemcosts']],
-                                                           qaly = input_list_trt[['itemqalys']],
-                                                           ly = input_list_trt[['itemlys']],
-                                                           pat_id = i,
-                                                           trt = trt
-            )
-
-          } else{
-            this.PatData[[trt]]$evtlist[[n_evt]] <- c(evtname = Evt$evt ,
-                                                      evttime = Evt$evttime,
-                                                      cost = input_list_trt[['itemcosts']],
-                                                      qaly = input_list_trt[['itemqalys']],
-                                                      ly = input_list_trt[['itemlys']],
-                                                      pat_id = i,
-                                                      trt = trt,
-                                                      input_list_trt[which(names(input_list_trt) %in% input_list_trt$input_out )]
-            )
-          }
-
-
-        } else {input_list_trt$curtime <- Inf}
-
-        this.PatData[[trt]]$thslys <- input_list_trt$thslys
-        this.PatData[[trt]]$thsqalys <- input_list_trt$thsqalys
-        this.PatData[[trt]]$thscosts <- input_list_trt$thscosts
+        } else {input_list_trt$curtime <- Inf} #if no events, stop
+        
+        
+        
       }
 
     }
@@ -153,29 +177,25 @@ RunEngine_debug <- function(trt_list,
   # Organize and create output -----------------------------------------------------------
 
   final_output <- list()
-  #Create total measures from IPD
+  
+  #Create total outputs and user-defined costs/utilities from IPD
+  vector_total_outputs <- c("total_lys_","total_qalys_","total_costs_","total_lys_undisc_","total_qalys_undisc_","total_costs_undisc_")
+  vector_total_outputs_search <- c("thslys","thsqalys","thscosts","thslys_undisc","thsqalys_undisc","thscosts_undisc")
+  
+  vector_other_outputs <- input_list$categories_for_export
   for (trt in trt_list) {
-    assign(paste0("lys.",trt), sum(unlist(map(map(PatData,trt),"thslys")))/npats)
-    assign(paste0("qalys.",trt), sum(unlist(map(map(PatData,trt),"thsqalys")))/npats)
-    assign(paste0("costs.",trt), sum(unlist(map(map(PatData,trt),"thscosts")))/npats)
-
-
-  }
-
-  counter <- 0
-  for (trt in trt_list) {
-    for (element in c("lys.","qalys.","costs."
-    )) {
-      counter <- counter +1
-
-      final_output <- append(final_output,get(paste0(element,trt)))
-      names(final_output)[counter] <-paste0(element,trt)
-
+    for (output_i in 1:length(vector_total_outputs)) {
+      final_output[[paste0(vector_total_outputs[output_i],trt)]] <- sum(unlist(map(map(PatData,trt),vector_total_outputs_search[output_i])))/npats
+    }
+    
+    for (output_i in 1:length(vector_other_outputs)) {
+      final_output[[paste0(vector_other_outputs[output_i],"_",trt)]] <- sum(unlist(map_depth(map(map(PatData,trt),"evtlist"),2,vector_other_outputs[output_i])))/npats
     }
   }
-
+  
   final_output$trt_list <- trt_list
-  #If we want to export the IPD of last iteration as well
+  
+  #Exports IPD values
   if (input_list$ipd==TRUE) {
     merged_df <- NULL
     for (trt in trt_list) {
@@ -186,12 +206,21 @@ RunEngine_debug <- function(trt_list,
       thscosts_pat <- map_dbl(map(PatData,trt_ch),"thscosts")
       thslys_pat <- map_dbl(map(PatData,trt_ch),"thslys")
       thsqalys_pat <- map_dbl(map(PatData,trt_ch),"thsqalys")
+      thscosts_pat_undisc <- map_dbl(map(PatData,trt_ch),"thscosts_undisc")
+      thslys_pat_undisc <- map_dbl(map(PatData,trt_ch),"thslys_undisc")
+      thsqalys_pat_undisc <- map_dbl(map(PatData,trt_ch),"thsqalys_undisc")
       names(thscosts_pat) <- 1:npats
       names(thsqalys_pat) <- 1:npats
       names(thslys_pat) <- 1:npats
+      names(thscosts_pat_undisc) <- 1:npats
+      names(thsqalys_pat_undisc) <- 1:npats
+      names(thslys_pat_undisc) <- 1:npats
       merged_df[trt==trt_ch,total_costs:= thscosts_pat[match(merged_df[trt==trt_ch,pat_id],names(thscosts_pat))]]
+      merged_df[trt==trt_ch,total_costs_undisc:= thscosts_pat_undisc[match(merged_df[trt==trt_ch,pat_id],names(thscosts_pat_undisc))]]
       merged_df[trt==trt_ch,total_qalys:= thsqalys_pat[match(merged_df[trt==trt_ch,pat_id],names(thsqalys_pat))]]
+      merged_df[trt==trt_ch,total_qalys_undisc:= thsqalys_pat_undisc[match(merged_df[trt==trt_ch,pat_id],names(thsqalys_pat_undisc))]]
       merged_df[trt==trt_ch,total_lys:= thslys_pat[match(merged_df[trt==trt_ch,pat_id],names(thslys_pat))]]
+      merged_df[trt==trt_ch,total_lys_undisc:= thslys_pat_undisc[match(merged_df[trt==trt_ch,pat_id],names(thslys_pat_undisc))]]
     }
 
     final_output$merged_df <- merged_df

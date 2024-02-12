@@ -16,7 +16,7 @@
 
 InitEventList <- function(trt_name,input_list_trt){
   position <- which(trt_name==names(input_list_trt$init_event_list))
-  # time_data <- eval(init_event_list[[position]][["expr"]],input_list_trt)
+
   time_data <- local({
     evts_v <- input_list_trt$init_event_list[[position]][["evts"]]
     othert_v <- input_list_trt$init_event_list[[position]][["other_inp"]]
@@ -80,6 +80,7 @@ GetNxtEvt <- function(evt_list){                  # This function identifies whi
 #' @noRd
 
 ReactEvt <- function(thisevt,trt,input_list_trt=NULL){      # This function processes the next event (as identified in the GetNextEvt function)
+  # Initial set-up --------------------------
   evt <- thisevt$evt                  # Identify event type
   prevtime <- input_list_trt$curtime                 # Identify time of previous event
   curtime <- thisevt$evttime         # Identify time of next event
@@ -92,24 +93,74 @@ ReactEvt <- function(thisevt,trt,input_list_trt=NULL){      # This function proc
   # Create costs and utilities for event --------------------------------------------------
   evt_trt <- paste(evt,trt,sep = "_")
   
-  input_list_trt[c("cost_ongoing", "cost_instant", "cost_cycle", "cycle_l", "cycle_starttime", 
-                   "utilmlt", "util_instant", "util_cycle", "util_cycle_l", "util_cycle_starttime")] <- lapply(list(
-                     cost_ongoing         = get_input(input_list_trt$uc_lists$cost_ongoing_list,ifnull=0,type="cost",evt_trt_i=evt_trt,input_list_trt_i=input_list_trt),
-                     cost_instant         = get_input(input_list_trt$uc_lists$cost_instant_list,ifnull=0,type="cost",evt_trt_i=evt_trt,input_list_trt_i=input_list_trt),
-                     cost_cycle           = get_input(input_list_trt$uc_lists$cost_cycle_list,ifnull=0,type="cost",evt_trt_i=evt_trt,input_list_trt_i=input_list_trt),  #can be a vector
-                     cycle_l              = get_input(input_list_trt$uc_lists$cost_cycle_list,ifnull=1,type="cycle_l",evt_trt_i=evt_trt,input_list_trt_i=input_list_trt), #can be a vector
-                     cycle_starttime      = get_input(input_list_trt$uc_lists$cost_cycle_list,ifnull=0,type="cycle_starttime",evt_trt_i=evt_trt,input_list_trt_i=input_list_trt), #can be a vector
-                     utilmlt              = get_input(input_list_trt$uc_lists$util_ongoing_list,ifnull=0,type="util",evt_trt_i=evt_trt,input_list_trt_i=input_list_trt), 
-                     util_instant         = get_input(input_list_trt$uc_lists$util_instant_list,ifnull=0,type="util",evt_trt_i=evt_trt,input_list_trt_i=input_list_trt),
-                     util_cycle           = get_input(input_list_trt$uc_lists$util_cycle_list,ifnull=0,type="util",evt_trt_i=evt_trt,input_list_trt_i=input_list_trt),    #can be a vector
-                     util_cycle_l         = get_input(input_list_trt$uc_lists$util_cycle_list,ifnull=1,type="cycle_l",evt_trt_i=evt_trt,input_list_trt_i=input_list_trt), 
-                     util_cycle_starttime = get_input(input_list_trt$uc_lists$util_cycle_list,ifnull=0,type="cycle_starttime",evt_trt_i=evt_trt,input_list_trt_i=input_list_trt) #can be a vector
-                   ),unname)
+  #For each cost/utility category, evaluate the relevant equation and get the raw inputs for ongoing/instant/cycle
+  # Costs -------------------------------------------------------------------
+  for (cost_cat in input_list_trt$uc_lists$cost_categories_ongoing) {
+    input_list_trt[paste0(cost_cat,"_","ongoing")] <- get_input(input_list_trt$uc_lists$cost_ongoing_list,
+                                                                ifnull=0,
+                                                                type="cost",
+                                                                evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
+                                                                input_list_trt_i=input_list_trt)
+  }
+  for (cost_cat in input_list_trt$uc_lists$cost_categories_instant) {
+    input_list_trt[paste0(cost_cat,"_","instant")] <- get_input(input_list_trt$uc_lists$cost_instant_list,
+                                                                ifnull=0,
+                                                                type="cost",
+                                                                evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
+                                                                input_list_trt_i=input_list_trt)
+  }
+  for (cost_cat in input_list_trt$uc_lists$cost_categories_cycle) {
+    input_list_trt[paste0(cost_cat,"_","cycle")] <- get_input(input_list_trt$uc_lists$cost_cycle_list,
+                                                              ifnull=0,
+                                                              type="cost",evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
+                                                              input_list_trt_i=input_list_trt)
+    input_list_trt[paste0(cost_cat,"_","cycle_l")] <- get_input(input_list_trt$uc_lists$cost_cycle_list,
+                                                                ifnull=1,
+                                                                type="cycle_l",
+                                                                evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
+                                                                input_list_trt_i=input_list_trt)
+    input_list_trt[paste0(cost_cat,"_","cycle_starttime")] <- get_input(input_list_trt$uc_lists$cost_cycle_list,
+                                                                        ifnull=0,
+                                                                        type="cycle_starttime",
+                                                                        evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
+                                                                        st_trt_i=input_list_trt)
+  }
   
-  
-  # Evaluate event ------------------------------------------------------------------------------------------------------------------------------------------
+  # Utilities -------------------------------------------------------------------
+  for (util_cat in input_list_trt$uc_lists$util_categories_ongoing) {
+    input_list_trt[paste0(util_cat,"_","ongoing")] <- get_input(input_list_trt$uc_lists$util_ongoing_list,
+                                                                ifnull=0,
+                                                                type="util",
+                                                                evt_trt_i=paste(evt_trt,util_cat,sep="_"),
+                                                                input_list_trt_i=input_list_trt)
+  }
+  for (util_cat in input_list_trt$uc_lists$util_categories_instant) {
+    input_list_trt[paste0(util_cat,"_","instant")] <- get_input(input_list_trt$uc_lists$util_instant_list,
+                                                                ifnull=0,
+                                                                type="util",evt_trt_i=paste(evt_trt,util_cat,sep="_"),
+                                                                input_list_trt_i=input_list_trt)
+  }
+  for (util_cat in input_list_trt$uc_lists$util_categories_cycle) {
+    input_list_trt[paste0(util_cat,"_","cycle")] <- get_input(input_list_trt$uc_lists$util_cycle_list,ifnull=0,
+                                                              type="util",
+                                                              evt_trt_i=paste(evt_trt,util_cat,sep="_"),
+                                                              input_list_trt_i=input_list_trt)
+    input_list_trt[paste0(util_cat,"_","cycle_l")] <- get_input(input_list_trt$uc_lists$util_cycle_list,
+                                                                ifnull=1,
+                                                                type="cycle_l",
+                                                                evt_trt_i=paste(evt_trt,util_cat,sep="_"),
+                                                                input_list_trt_i=input_list_trt)
+    input_list_trt[paste0(util_cat,"_","cycle_starttime")] <- get_input(input_list_trt$uc_lists$util_cycle_list,
+                                                                        ifnull=0,
+                                                                        type="cycle_starttime",
+                                                                        evt_trt_i=paste(evt_trt,util_cat,sep="_"),
+                                                                        sinput_list_trt_i=input_list_trt)
+  }
+
+  #Evaluate the reaction to the event
   input_list_trt <- eval_reactevt(input_list_trt$evt_react_list, evt,input_list_trt)
   
+
   return(input_list_trt)
 
 }
@@ -118,7 +169,7 @@ ReactEvt <- function(thisevt,trt,input_list_trt=NULL){      # This function proc
 # Evaluate event ------------------------------------------------------------------------------------------------------------------------------------------
 
 
-#' Calculates the expression which has been defined in the reaction of the event
+#' Calculates the expression which has been defined in the reaction of the event and computes discounting
 #'
 #' @param x The evt_react_list from the input_list_trt object. It contains the reactions to events.
 #' @param evt_name The current event being processed
@@ -133,25 +184,145 @@ ReactEvt <- function(thisevt,trt,input_list_trt=NULL){      # This function proc
 #' @noRd
 
 eval_reactevt <-  function(x,evt_name,input_list_trt=NULL){
+  # Initial set-up --------------------------
+
   position <- which(evt_name==names(x))
   pos_l <- length(position)
   if (pos_l==0 | pos_l>1 ) {
     stop("Reaction to event ", evt_name, " not recognised or more than one reaction found. Make sure that only one reaction has been defined for the event")    
-  } else{
-    #compute outputs
-    input_list_trt <- compute_outputs(cost_ongoing_i = input_list_trt[["cost_ongoing"]],
-                                      cost_instant_i =input_list_trt[["cost_instant"]],
-                                      cost_cycle_i=input_list_trt[["cost_cycle"]],
-                                      util_cycle_i=input_list_trt[["util_cycle"]],
-                                      util_instant_i=input_list_trt[["util_instant"]],
-                                      utilmlt_i=input_list_trt[["utilmlt"]],
-                                      cycle_l_i = input_list_trt[["cycle_l"]],
-                                      util_cycle_l_i = input_list_trt[["util_cycle_l"]],
-                                      prevtime_i=input_list_trt[["prevtime"]],
-                                      curtime_i=input_list_trt[["curtime"]],
-                                      starttime_i=input_list_trt[["cycle_starttime"]],
-                                      util_starttime_i=input_list_trt[["util_cycle_starttime"]],
-                                      input_list_trt = input_list_trt)
+  }
+    
+    #Set up values for easier access
+    drq <- input_list_trt[["drq"]]
+    drc <- input_list_trt[["drc"]]
+    prevtime <- input_list_trt[["prevtime"]]
+    curtime <- input_list_trt[["curtime"]]
+    
+    #For each cost/utility category, get the undiscounted/discounted outcomes and get the inputs for ongoing/instant/cycle
+    #We do undiscounted first as the discounted value will be overwritten to save some writing time
+    
+    # Costs -------------------------------------------------------------------
+    
+    for (cost_cat in input_list_trt$uc_lists$cost_categories_ongoing) {
+      input_list_trt[paste0(cost_cat,"_","ongoing_undisc")] <- AddOngoing(lcldr=0,
+                                                                          lclprvtime=prevtime,
+                                                                          lclcurtime=curtime,
+                                                                          lclval=input_list_trt[[paste0(cost_cat,"_","ongoing")]])
+      input_list_trt[paste0(cost_cat,"_","ongoing")] <- AddOngoing(lcldr=drc,
+                                                                   lclprvtime=prevtime,
+                                                                   lclcurtime=curtime,
+                                                                   lclval=input_list_trt[[paste0(cost_cat,"_","ongoing")]])
+
+      input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","ongoing")]]
+      input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","ongoing_undisc")]]
+      
+    }
+    
+    for (cost_cat in input_list_trt$uc_lists$cost_categories_instant) {
+      input_list_trt[paste0(cost_cat,"_","instant_undisc")] <- AddInstant(lcldr=0,
+                                                                          lclcurtime=curtime,
+                                                                          lclval=input_list_trt[[paste0(cost_cat,"_","instant")]])
+      input_list_trt[paste0(cost_cat,"_","instant")] <- AddInstant(lcldr=drc,
+                                                                   lclcurtime=curtime,
+                                                                   lclval=input_list_trt[[paste0(cost_cat,"_","instant")]])
+      
+      input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","instant")]]
+      input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","instant_undisc")]]
+    }
+    
+    for (cost_cat in input_list_trt$uc_lists$cost_categories_cycle) {
+      if (length(input_list_trt[paste0(cost_cat,"_","cycle")])==1 & input_list_trt[[paste0(cost_cat,"_","cycle")]]==0) {
+        input_list_trt[paste0(cost_cat,"_","cycle")] <- list(addcycle=0)
+        input_list_trt[paste0(cost_cat,"_","cycle_undisc")] <- list(addcycle=0)
+        
+        input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","cycle")]]
+        input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","cycle_undisc")]]
+      } else{
+        input_list_trt[paste0(cost_cat,"_","cycle_undisc")] <- AddCycle(lcldr=0,
+                                                                        lclprvtime=prevtime,
+                                                                        cyclelength = input_list_trt[[paste0(cost_cat,"_","cycle_l")]],
+                                                                        lclcurtime=curtime,
+                                                                        lclval= input_list_trt[[paste0(cost_cat,"_","cycle")]],
+                                                                        starttime = input_list_trt[[paste0(cost_cat,"_","cycle_starttime")]]) #cycles of 1 week
+        input_list_trt[paste0(cost_cat,"_","cycle")] <- AddCycle(lcldr=drc,
+                                                                 lclprvtime=prevtime,
+                                                                 cyclelength = input_list_trt[[paste0(cost_cat,"_","cycle_l")]],
+                                                                 lclcurtime=curtime,
+                                                                 lclval= input_list_trt[[paste0(cost_cat,"_","cycle")]],
+                                                                 starttime = input_list_trt[[paste0(cost_cat,"_","cycle_starttime")]]) #cycles of 1 week
+        
+        input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","cycle")]]
+        input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","cycle_undisc")]]
+      }
+    }
+
+    # Utilities ----------------------------------------------------------
+    
+    for (util_cat in input_list_trt$uc_lists$util_categories_ongoing) {
+      input_list_trt[paste0(util_cat,"_","ongoing_undisc")] <- AddOngoing(lcldr=0,
+                                                                          lclprvtime=prevtime,
+                                                                          lclcurtime=curtime,
+                                                                          lclval=input_list_trt[[paste0(util_cat,"_","ongoing")]])
+      input_list_trt[paste0(util_cat,"_","ongoing")] <- AddOngoing(lcldr=drq,
+                                                                   lclprvtime=prevtime,
+                                                                   lclcurtime=curtime,
+                                                                   lclval=input_list_trt[[paste0(util_cat,"_","ongoing")]])
+      
+      input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","ongoing")]]
+      input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","ongoing_undisc")]]
+      
+    }
+    
+    for (util_cat in input_list_trt$uc_lists$util_categories_instant) {
+      input_list_trt[paste0(util_cat,"_","instant_undisc")] <- AddInstant(lcldr=0,
+                                                                          lclcurtime=curtime,
+                                                                          lclval=input_list_trt[[paste0(util_cat,"_","instant")]])
+      input_list_trt[paste0(util_cat,"_","instant")] <- AddInstant(lcldr=drq,
+                                                                   lclcurtime=curtime,
+                                                                   lclval=input_list_trt[[paste0(util_cat,"_","instant")]])
+      
+      input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","instant")]]
+      input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","instant_undisc")]]
+    }
+    
+    for (util_cat in input_list_trt$uc_lists$util_categories_cycle) {
+      if (length(input_list_trt[[paste0(util_cat,"_","cycle")]])==1 & input_list_trt[[paste0(util_cat,"_","cycle")]]==0) {
+        input_list_trt[paste0(util_cat,"_","cycle")] <- list(addcycle=0)
+        input_list_trt[paste0(util_cat,"_","cycle_undisc")] <- list(addcycle=0)
+        
+        input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","cycle")]]
+        input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","cycle_undisc")]]
+      } else{
+        input_list_trt[paste0(util_cat,"_","cycle_undisc")] <- AddCycle(lcldr=0, 
+                                                                        lclprvtime=prevtime, 
+                                                                        cyclelength = input_list_trt[p[aste0(util_cat,"_","cycle_l")]],
+                                                                        lclcurtime=curtime,
+                                                                        lclval= input_list_trt[[paste0(util_cat,"_","cycle")]],
+                                                                        starttime = input_list_trt[[paste0(util_cat,"_","cycle_starttime")]]) #cycles of 1 week
+        input_list_trt[paste0(util_cat,"_","cycle")] <- AddCycle(lcldr=drq,
+                                                                 lclprvtime=prevtime,
+                                                                 cyclelength = input_list_trt[p[aste0(util_cat,"_","cycle_l")]],
+                                                                 lclcurtime=curtime,
+                                                                 lclval= input_list_trt[[paste0(util_cat,"_","cycle")]],
+                                                                 starttime = input_list_trt[[paste0(util_cat,"_","cycle_starttime")]]) #cycles of 1 week
+        
+        input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","cycle")]]
+        input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","cycle_undisc")]]
+      }
+    }
+    
+    additional_ly <- AddOngoing(lcldr=drq,
+                                lclprvtime=prevtime, 
+                                lclcurtime=curtime,
+                                lclval=1)
+    additional_ly_undisc <- AddOngoing(lcldr=0,
+                                       lclprvtime=prevtime,
+                                       lclcurtime=curtime,
+                                       lclval=1)
+    
+    input_list_trt[["itemlys"]] <- additional_ly
+    input_list_trt[["itemlys_undisc"]] <- additional_ly_undisc
+    
     
     #evaluate reaction
     
@@ -163,7 +334,7 @@ eval_reactevt <-  function(x,evt_name,input_list_trt=NULL){
     
     
     
-  }
+  
   return(input_list_trt)
   
 
@@ -223,72 +394,6 @@ get_input <-  function(x,ifnull=0,type,evt_trt_i =evt_trt, input_list_trt_i=inpu
 }
 
 
-# Compute outputs -----------------------------------------------------------------------------------------------------------------------------------------
-
-
-#' Computes the discounted costs/qalys/lys using the evaluated expressions from get_input
-#'
-#' @param cost_ongoing_i A numeric with the continuous cost to be processed and discounted
-#' @param cost_instant_i A numeric with the instantaneous cost to be processed and discounted
-#' @param cost_cycle_i A numeric with the cycled cost to be processed and discounted
-#' @param util_cycle_i A numeric with the cycled utility to be processed and discounted
-#' @param util_instant_i A numeric with the instantaneous cost to be processed and discounted
-#' @param utilmlt_i A numeric with the continuous utility to be processed and discounted
-#' @param cycle_l_i A numeric vector with the cycle lengths to be used for the costs
-#' @param util_cycle_l_i A numeric vector with the cycle lengths to be used for the utility
-#' @param prevtime_i A numeric with the time of the previous event
-#' @param curtime_i A numeric with the time of the current event
-#' @param starttime_i A numeric vector with the starting times of the cycled costs. This is used to understand what is the corresponding time of the cycle for the current event.
-#' @param util_starttime_i A numeric vector with the starting times of the cycled utilities. This is used to understand what is the corresponding time of the cycle for the current event.
-#' @param input_list_trt The list with all the inputs stored
-#'
-#' @return The modified input list with the updated discounted outputs
-#'
-#' @examples
-#' compute_outputs(cost_ongoing_i = 10, cost_instant_i = 0, cost_cycle_i = 0,util_cycle_i = 0, util_instant_i = 0, utilmlt_i = 0.7, cycle_l_i = 1, util_cycle_l_i = 0,prevtime_i = 0,curtime_i = 1,starttime_i = 0,=util_starttime_i = 0,input_list_trt = input_list_trt)
-#'
-#' @keywords internal
-#' @noRd
-
-compute_outputs <- function(cost_ongoing_i = cost_ongoing,
-                            cost_instant_i =cost_instant,
-                            cost_cycle_i=cost_cycle,
-                            util_cycle_i=util_cycle,
-                            util_instant_i=util_instant,
-                            utilmlt_i=utilmlt,
-                            cycle_l_i = cycle_l,
-                            util_cycle_l_i = util_cycle_l,
-                            prevtime_i=prevtime,
-                            curtime_i=curtime,
-                            starttime_i=cycle_starttime,
-                            util_starttime_i=util_cycle_starttime,
-                            input_list_trt = input_list_trt){
-  drq <- input_list_trt$drq
-  drc <- input_list_trt$drc
-  additionals <-     AddOngoing(lcldrq=drq, lcldrc=drc,lclprvtime=prevtime_i, lclcurtime=curtime_i, lclvalq=utilmlt_i, 
-                                lclvalc= cost_ongoing_i)
-  instadditionals <- AddInstant(lcldrq=drq, lcldrc=drc,lclcurtime=curtime_i, lclvalq=util_instant_i,lclvalc=cost_instant_i)
-  
-  #Cycle costs and utilities
-  if (length(cost_cycle_i)==1 & length(util_cycle_i)==1 & util_cycle_i==0 & cost_cycle_i==0) {
-    cycleadditionals <- list(addcycleqalys=0, addcyclecosts=0)
-  } else{
-    cycleadditionals <- AddCycle(lcldrq=drq, lcldrc=drc,lclprvtime=prevtime_i, cyclelength = cycle_l_i,lclcurtime=curtime_i, lclvalq=0, lclvalc= cost_cycle_i,starttime = starttime_i) #cycles of 1 week
-    cycleadditionals$addcycleqalys <- AddCycle(lcldrq=drq, lcldrc=drc,lclprvtime=prevtime_i, cyclelength = util_cycle_l_i,lclcurtime=curtime_i, lclvalq=util_cycle_i, lclvalc= 0,starttime = util_starttime_i)$addcycleqalys #cycles of 1 week
-  }
-  additional_ly <- AddOngoing(lcldrq=drq, lcldrc=drc,lclprvtime=prevtime_i, lclcurtime=curtime_i, lclvalq=1,lclvalc=0)$addqalys
-  
-  input_list_trt[["thsqalys"]] <-  input_list_trt$thsqalys + additionals$addqalys + instadditionals$addinstqalys + cycleadditionals$addcycleqalys
-  input_list_trt[["thscosts"]] <- input_list_trt$thscosts + additionals$addcosts + instadditionals$addinstcosts + cycleadditionals$addcyclecosts
-  input_list_trt[["thslys"]] <- input_list_trt$thslys + additional_ly
-  input_list_trt[["itemlys"]] <- additional_ly
-  input_list_trt[["itemcosts"]] <- additionals$addcosts + instadditionals$addinstcosts + cycleadditionals$addcyclecosts
-  input_list_trt[["itemqalys"]] <- additionals$addqalys + instadditionals$addinstqalys + cycleadditionals$addcycleqalys
-  
-  return(input_list_trt)
-  
-}
-
 # Helper function to create mean and 95% interval -------------------------
 
 #' Calculate mean and 95% CI from samples
@@ -320,162 +425,3 @@ interval_out <- function(x, element, trt,round_digit=2) {
 }
 
 
-# Continuous and instantaneous discounting ----------------------------------------------------------------------------------------------------------------
-
-#' Calculate discounted costs and qalys between events
-#'
-#' @param lcldrq The discount rate for clinical outcomes
-#' @param lcldrc The discount rate for cost outcomes
-#' @param lclprvtime The time of the previous event in the simulation
-#' @param lclcurtime The time of the current event in the simulation
-#' @param lclvalq The LY/QALY value to be discounted
-#' @param lclvalc The cost value to be discounted
-#'
-#' @return A list of additional costs and qalys based on continuous time discounting
-#'
-#' @examples AddOngoing(lcldrq=0.035, lcldrc=0.035, lclprvtime=0.5, lclcurtime=3, lclvalq=0.75, lclvalc=2500)
-#'
-#' @keywords internal
-#' @noRd
-
-AddOngoing <- function(lcldrq=0.035, lcldrc=0.035, lclprvtime, lclcurtime, lclvalq, lclvalc){
-
-  Instantdrq <- log(1+lcldrq)
-  Instantdrc <- log(1+lcldrc)
-
-  # calculate additional qalys
-
-  if (lcldrq==0) {
-    addqalys <- lclvalq*(lclcurtime - lclprvtime)
-  } else{
-    addqalys <- ((lclvalq)/(0 - Instantdrq)) * (exp(lclcurtime * ( 0 - Instantdrq)) - exp(lclprvtime * (0 - Instantdrq)))
-
-  }
-
-  # calculate additional costs
-
-  if (lcldrc==0) {
-    addcosts <- lclvalc*(lclcurtime - lclprvtime)
-  } else{
-    addcosts <- ((lclvalc)/(0 - Instantdrc)) * (exp(lclcurtime * ( 0 - Instantdrc)) - exp(lclprvtime * (0 - Instantdrc)))
-
-  }
-
-  # combine additional costs and additional qalys in a list
-  output <- list(addqalys=addqalys, addcosts=addcosts)
-
-  return(output)
-}
-
-
-#' Calculate instantaneous discounted costs or qalys
-#'
-#' @param lcldrq The discount rate for clinical outcomes
-#' @param lcldrc The discount rate for cost outcomes
-#' @param lclcurtime The time of the current event in the simulation
-#' @param lclvalq The LY/QALY value to be discounted
-#' @param lclvalc The cost value to be discounted
-#'
-#' @return A list of additional costs and qalys based on discrete time discounting
-#'
-#' @examples AddInstant(lcldrq=0.035, lcldrc=0.035, lclcurtime=3, lclvalq=0.75, lclvalc=2500)
-#'
-#' @keywords internal
-#' @noRd
-
-AddInstant <- function(lcldrq=0.035, lcldrc=0.035, lclcurtime, lclvalq, lclvalc){
-
-
-  addinstqalys <- lclvalq * ((1+lcldrq)^(-lclcurtime))          # Note use of DISCRETE TIME discounting for instantaneous costs and benefits
-  addinstcosts <- lclvalc * ((1+lcldrc)^(-lclcurtime))
-  # combine additional costs and additional qalys in a list
-  output <- list(addinstqalys=addinstqalys, addinstcosts=addinstcosts)
-
-  return(output)
-}
-
-# Cycle discounting -------------------------------------------------------
-
-#' Cycle discounting
-#'
-#' @param lcldrq The discount rate for clinical outcomes
-#' @param lcldrc The discount rate for cost outcomes
-#' @param lclprvtime The time of the previous event in the simulation
-#' @param cyclelength The cycle length
-#' @param lclcurtime The time of the current event in the simulation
-#' @param lclvalq The LY/QALY value to be discounted
-#' @param lclvalc The cost value to be discounted
-#' @param starttime The start time for accrual of cycle costs (if not 0)
-#'
-#' @return A list of additional costs and qalys based on cycle discounting
-#'
-#' @examples
-#'
-#' @keywords internal
-#' @noRd
-
-AddCycle <- function(lcldrq=0.035, lcldrc=0.035,lclprvtime=0, cyclelength,lclcurtime, lclvalq, lclvalc,starttime=0){
-
-  addcycleqalys <- 0
-  addcyclecosts <- 0
-
-  #Note this makes the cycle utilities work weird, so do not use cycle utilities for now!
-  for (i in 1:length(lclvalc)) {
-    lclvalc_i <- lclvalc[i]
-    lclvalq_i <- lclvalq[i]
-    starttime_i <- starttime[i]
-    cyclelength_i <- cyclelength[i]
-
-    # cycles <- lclcurtime %/% cyclelength
-    # cycles.done <- lclprvtime %/% cyclelength
-
-    if (lclvalq_i==0 & lclvalc_i==0) {
-      addcycleqalys <- sum(addcycleqalys,0)
-      addcyclecosts <- sum(addcyclecosts,0)
-
-    } else{
-
-      cycle.time.total <- ifelse(starttime_i>= lclcurtime,0,seq(from=starttime_i, to = lclcurtime , by= cyclelength_i)) #all cycles that happened until current time of event
-
-      # cycle.time.total <- seq(from=starttime, to = lclcurtime , by= cyclelength) #all cycles that happened until current time of event
-
-      #If the cost starts at the selected starttime or at time 0, then include that time, otherwise exclude it
-      if (lclprvtime==0) {
-        cycle.time <- cycle.time.total[cycle.time.total >= lclprvtime]  #times at which the cycles take place during this event, put this condition to count also time 0
-        n_cycles <- length(cycle.time)
-        s <- (1+lcldrq)^cyclelength_i -1
-        addcycleqalys <- sum(addcycleqalys,lclvalq_i * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1) )
-        s <- (1+lcldrc)^cyclelength_i -1
-        addcyclecosts <- sum(addcyclecosts,lclvalc_i * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1) )
-
-      } else{
-        if (starttime_i ==lclprvtime) {
-          cycle.time <- cycle.time.total[cycle.time.total >= lclprvtime]  #times at which the cycles take place during this event, put this condition to count also time 0
-        } else{
-          cycle.time <- cycle.time.total[cycle.time.total > lclprvtime]  #times at which the cycles take place during this event
-        }
-        n_cycles_remaining <- length(cycle.time)
-        d <- lclprvtime/cyclelength_i
-        s <- (1+lcldrq)^cyclelength_i -1
-        addcycleqalys <- sum(addcycleqalys, lclvalq_i * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d)) )
-        s <- (1+lcldrc)^cyclelength_i -1
-        addcyclecosts <- sum(addcyclecosts, lclvalc_i * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d)) )
-      }
-
-      # addcyclecosts <- sum( unlist( sapply(cycle.time,  function(x)  lclvalc * ((1+lcldrc)^(-x)) ) ) )#for each cycle, apply and discount cost
-      # addcyclecosts <- sum( unlist( sapply(cycle.time,  function(x)  lclvalc * ((1+lcldrc)^(-x)) ) ) )#for each cycle, apply and discount cost
-      #If starting from 0, can be changed substituting interest rate such that s = (1+r)^cyclelength - 1, and using the formula that lclvalq * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1)
-      #If starting from time t, then compute transformed time as d = t/cyclelength and use lclvalq * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d-1)), where
-      #n_cycles_remaining is the n_cycles - d (so the remaining cycles to be considered), e.g. if 13 cycles (From t=0), and delay 6 periods, then n_cycles_remaining = 7 and d=6
-
-      # combine additional costs and additional qalys in a list
-
-    }
-
-  }
-
-
-  output <- list(addcycleqalys=addcycleqalys, addcyclecosts=addcyclecosts)
-
-  return(output)
-}

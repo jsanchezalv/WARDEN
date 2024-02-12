@@ -42,6 +42,7 @@ library(tidyr)
 
 ```{r main_opt, results='hide', message=FALSE}
 options(scipen = 999)
+options(digits=3)
 options(tibble.print_max = 50)
 ```
 
