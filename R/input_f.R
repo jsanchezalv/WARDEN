@@ -365,3 +365,133 @@ add_tte <- function(.data=NULL,trt, evts, other_inp = NULL,input){
 
   return(data_list)
 }
+
+
+
+# Continuous and instantaneous discounting ----------------------------------------------------------------------------------------------------------------
+
+#' Calculate discounted costs and qalys between events
+#'
+#' @param lcldr The discount rate 
+#' @param lclprvtime The time of the previous event in the simulation
+#' @param lclcurtime The time of the current event in the simulation
+#' @param lclval The value to be discounted
+#'
+#' @return Double based on continuous time discounting
+#'
+#' @examples AddOngoing(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
+#'
+#' @export
+#' @details
+
+AddOngoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
+  
+  Instantdr <- log(1+lcldr)
+  
+  # calculate additional qalys
+  if (lclprvtime==lclcurtime | is.null(lclval)) {
+    add <- 0
+  } else if(lcldr==0) {
+    add <- lclval*(lclcurtime - lclprvtime)
+  } else{
+    add <- ((lclval)/(0 - Instantdr)) * (exp(lclcurtime * ( 0 - Instantdr)) - exp(lclprvtime * (0 - Instantdr)))
+    
+  }
+  
+  return(add)
+}
+
+
+#' Calculate instantaneous discounted costs or qalys
+#'
+#' @param lcldr The discount rate
+#' @param lclcurtime The time of the current event in the simulation
+#' @param lclval The value to be discounted
+#'
+#' @return Double based on discrete time discounting
+#'
+#' @examples AddInstant(lcldr=0.035, lclcurtime=3, lclval=2500)
+#'
+#' @export
+#' 
+AddInstant <- function(lcldr=0.035, lclcurtime, lclval){
+  
+  if (is.null(lclval)) {
+    addinst <- 0
+  } else{
+    addinst <- lclval * ((1+lcldr)^(-lclcurtime))    
+  }# Note use of DISCRETE TIME discounting for instantaneous costs and benefits
+  
+  return(addinst)
+}
+
+
+# Cycle discounting -------------------------------------------------------
+
+#' Cycle discounting
+#'
+#' @param lcldr The discount rate
+#' @param lclprvtime The time of the previous event in the simulation
+#' @param cyclelength The cycle length
+#' @param lclcurtime The time of the current event in the simulation
+#' @param lclval The  value to be discounted
+#' @param starttime The start time for accrual of cycle costs (if not 0)
+#'
+#' @return Double based on cycle discounting
+#'
+#' @examples AddCycle(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
+#'
+#' @export
+
+AddCycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval,starttime=0){
+  
+  addcycle <- 0
+  
+  if (is.null(lclval)) {
+    addcycle <- 0
+  } else{
+    
+    #Note this makes the cycle utilities work weird, so do not use cycle utilities for now!
+    for (i in 1:length(lclval)) {
+      lclval_i <- lclval[i]
+      starttime_i <- starttime[i]
+      cyclelength_i <- cyclelength[i]
+      
+      
+      if (lclval_i==0 ) {} else{
+        
+        cycle.time.total <- if(starttime_i>= lclcurtime){0}else{seq(from=starttime_i, to = lclcurtime , by= cyclelength_i)} #all cycles that happened until current time of event
+        
+        # cycle.time.total <- seq(from=starttime, to = lclcurtime , by= cyclelength) #all cycles that happened until current time of event
+        
+        #If the cost starts at the selected starttime or at time 0, then include that time, otherwise exclude it
+        if (lclprvtime==0) {
+          cycle.time <- c(0,cycle.time.total[cycle.time.total >= lclprvtime])  #times at which the cycles take place during this event, put this condition to count also time 0
+          n_cycles <- length(cycle.time)
+          s <- (1+lcldr)^cyclelength_i -1
+          addcycle <- sum(addcycle,lclval_i * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1) )
+          
+        } else{
+          if (starttime_i ==lclprvtime) {
+            cycle.time <- cycle.time.total[cycle.time.total >= lclprvtime]  #times at which the cycles take place during this event, put this condition to count also time of the previous event
+          } else{
+            cycle.time <- cycle.time.total[cycle.time.total > lclprvtime]  #times at which the cycles take place during this event
+          }
+          n_cycles_remaining <- length(cycle.time)
+          d <- lclprvtime/cyclelength_i
+          s <- (1+lcldr)^cyclelength_i -1
+          addcycle <- sum(addcycle, lclval_i * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d)) )
+        }
+        
+        #If starting from 0, can be changed substituting interest rate such that s = (1+r)^cyclelength - 1, and using the formula that lclvalq * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1)
+        #If starting from time t, then compute transformed time as d = t/cyclelength and use lclvalq * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d-1)), where
+        #n_cycles_remaining is the n_cycles - d (so the remaining cycles to be considered), e.g. if 13 cycles (From t=0), and delay 6 periods, then n_cycles_remaining = 7 and d=6
+        
+        # combine additional costs and additional quantity in a list
+        
+      }
+      
+    }
+  }
+  return(addcycle)
+}
