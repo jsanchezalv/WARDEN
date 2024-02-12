@@ -132,7 +132,7 @@ common_all_inputs <- add_item( #utilities
     cost.ae = cost_v[["cost.ae"]]
     )
 #Put objects here that do not change as we loop through interventions for a patient
-common_pt_inputs <- add_item(sex_pt = ifelse(rbernoulli(1,p=0.01),"male","female"),
+common_pt_inputs <- add_item(sex_pt = ifelse(rbinom(1,1,p=0.01),"male","female"),
                              nat.os.s = draw_resgompertz(1,
                                                      shape=if(sex_pt=="male"){0.102}else{0.115},
                                                      rate=if(sex_pt=="male"){0.000016}else{0.0000041},
@@ -149,7 +149,7 @@ unique_pt_inputs <- add_item(
   fl.mbcs                  = 0,
   fl.mbcs_2ndline          = 0,
   fl.recurrence            = 0,
-  fl.remission             = rbernoulli(1,0.8) #80% probability of going into remission
+  fl.remission             = rbinom(1,1,0.8) #80% probability of going into remission
 )
 ```
 

@@ -19,16 +19,22 @@
 #' @examples
 #' add_cost(evt = c("start","idfs","ttot"),trt = "int",cost = cost.int*fl.int + cost.idfs)
 #'
-add_cost <- function(.data=NULL,cost,evt,trt,cycle_l=NULL,cycle_starttime=0){
-
+add_cost <- function(.data=NULL,cost,evt,trt,category="default",cycle_l=NULL,cycle_starttime=0){
+  
+  if (category=="default") {
+    warning("No cost category name assigned, used 'default'")
+  }
+  category <- paste0("cost_",category)
+  
   data_list <- .data
   for (trt_item in trt) {
     for (event_item in evt) {
 
       cost_item <- list(list(cost=substitute(cost),
                              cycle_l = substitute(cycle_l),
-                             cycle_starttime = substitute(cycle_starttime)))
-      names(cost_item) <- paste(event_item,trt_item,sep="_")
+                             cycle_starttime = substitute(cycle_starttime),
+                             category=category))
+      names(cost_item) <- paste(event_item,trt_item,category,sep="_")
 
       if (is.null(data_list)) {
         data_list <- cost_item
@@ -65,8 +71,12 @@ add_cost <- function(.data=NULL,cost,evt,trt,cycle_l=NULL,cycle_starttime=0){
 #' trt = c("int", "noint"),
 #' util = util.idfs.ontx * fl.idfs.ontx + util.idfs.offtx * (1-fl.idfs.ontx))
 
-add_util <- function(.data=NULL,util,evt,trt,cycle_l=NULL,cycle_starttime=0){
+add_util <- function(.data=NULL,util,evt,trt,category="default",cycle_l=NULL,cycle_starttime=0){
 
+  if (category=="default") {
+    warning("No utility category name assigned, used 'default'")
+  }
+  category <- paste0("qaly_",category)
   data_list <- .data
   for (trt_item in trt) {
 
@@ -74,8 +84,9 @@ add_util <- function(.data=NULL,util,evt,trt,cycle_l=NULL,cycle_starttime=0){
 
       util_item <- list(list(util=substitute(util),
                              cycle_l = substitute(cycle_l),
-                             cycle_starttime = substitute(cycle_starttime)))
-      names(util_item) <- paste(event_item,trt_item,sep="_")
+                             cycle_starttime = substitute(cycle_starttime),
+                             category = category))
+      names(util_item) <- paste(event_item,trt_item,category,sep="_")
 
       if (is.null(data_list)) {
         data_list <- util_item
@@ -274,29 +285,11 @@ modify_item <- function(list_item, env_ch = NULL){
 
 add_reactevt <- function(.data=NULL,name_evt,input){
 
-  out_calc <-  list(react=substitute(
-    compute_outputs(
-      cost_ongoing_i = cost_ongoing,
-      cost_instant_i =cost_instant,
-      cost_cycle_i=cost_cycle,
-      util_cycle_i=util_cycle,
-      util_instant_i=util_instant,
-      utilmlt_i=utilmlt,
-      cycle_l_i = cycle_l,
-      util_cycle_l_i = util_cycle_l,
-      prevtime_i=prevtime,
-      curtime_i=curtime,
-      starttime_i=cycle_starttime,
-      util_starttime_i=util_cycle_starttime,
-      input_list_trt = input_list_trt
-    )
-  ))[[1]]
 
   data_list <- .data
 
-  evt_r <- list(list(react=substitute(input),
-                     comp_out = out_calc
-  ))
+  evt_r <- list(list(react=substitute(input)))
+  
   names(evt_r) <- paste(name_evt)
 
   if (is.null(data_list)) {
