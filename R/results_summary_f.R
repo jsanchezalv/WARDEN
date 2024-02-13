@@ -104,7 +104,7 @@ data <- data.frame()
 
 #' Summary of PSA outputs for a treatment
 #'
-#' @param out The output_psa data frame from the list object returned by `RunSim()`
+#' @param out The output_sim data frame from the list object returned by `RunSim()`
 #' @param trt The reference treatment for calculation of incremental outcomes
 #'
 #' @return A data frame with mean and 95% CI of absolute costs, LYs, QALYs, ICER and ICUR for each intervention from the PSA samples
@@ -112,10 +112,10 @@ data <- data.frame()
 #'
 #' @examples
 #' \dontrun{
-#' summary_results_psa(results$output_psa, trt="int")
+#' summary_results_psa(results$output_sim, trt="int")
 #' }
 
-summary_results_psa <- function(out = output_psa, trt=NULL){
+summary_results_psa <- function(out = output_sim, trt=NULL){
 
   trt <- ifelse(is.null(trt),out[[1]]$trt_list[1],trt)
 
@@ -210,7 +210,7 @@ summary_results_psa <- function(out = output_psa, trt=NULL){
 
 #' Extract PSA results from a treatment
 #'
-#' @param x The output_psa data frame from the list object returned by `RunSim()`
+#' @param x The output_sim data frame from the list object returned by `RunSim()`
 #' @param element Variable for which PSA results are being extracted (single string)
 #' @param trt Intervention for which PSA results are being extracted (single string)
 #'
@@ -219,7 +219,7 @@ summary_results_psa <- function(out = output_psa, trt=NULL){
 #'
 #' @examples
 #' \dontrun{
-#' extract_psa_result(results$output_psa,"costs","int")
+#' extract_psa_result(results$output_sim,"costs","int")
 #' }
 
 extract_psa_result <- function(x, element,trt) {
@@ -259,7 +259,7 @@ ceac_des <- function(wtp, results, interventions = NULL) {
   for (comparator in interventions) {
 
      nmb_i <- data.frame(
-       t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_psa,"total_qalys",comparator)$value - extract_psa_result(results$output_psa,"total_costs",comparator)$value))),
+       t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim,"total_qalys",comparator)$value - extract_psa_result(results$output_sim,"total_costs",comparator)$value))),
        stringsAsFactors = FALSE)
 
      names(nmb_i) <- format(wtp, scientific=F)
@@ -312,7 +312,7 @@ evpi_des <- function(wtp, results, interventions = NULL) {
   for (comparator in interventions) {
 
     nmb_i <- data.frame(
-      t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_psa,"total_qalys",comparator)$value - extract_psa_result(results$output_psa,"total_costs",comparator)$value))),
+      t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim,"total_qalys",comparator)$value - extract_psa_result(results$output_sim,"total_costs",comparator)$value))),
       stringsAsFactors = FALSE)
 
     names(nmb_i) <- format(wtp, scientific=F)

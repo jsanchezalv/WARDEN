@@ -393,12 +393,12 @@ for (sample_size in sample_sizes) {
   )) 
 
   #We're extracting the overall ICER/ICUR and also costs/qalys/lys for the "noint" intervention
-  loop_df <- rbind(extract_psa_result(results$output_psa,"costs","noint"),
-                   extract_psa_result(results$output_psa,"lys","noint"),
-                   extract_psa_result(results$output_psa,"qalys","noint"),
-                   extract_psa_result(results$output_psa,"costs","int"),
-                   extract_psa_result(results$output_psa,"lys","int"),
-                   extract_psa_result(results$output_psa,"qalys","int"))
+  loop_df <- rbind(extract_psa_result(results$output_sim,"costs","noint"),
+                   extract_psa_result(results$output_sim,"lys","noint"),
+                   extract_psa_result(results$output_sim,"qalys","noint"),
+                   extract_psa_result(results$output_sim,"costs","int"),
+                   extract_psa_result(results$output_sim,"lys","int"),
+                   extract_psa_result(results$output_sim,"qalys","int"))
   
     loop_df <- rbind(loop_df, loop_df %>%
                      spread(trt,value) %>%
@@ -488,12 +488,12 @@ for (sample_size in sample_sizes) {
   ))
 
   #We're extracting the overall ICER/ICUR and also costs/qalys/lys for the "noint" intervention
-  loop_psa_df <- rbind(extract_psa_result(results$output_psa,"costs","noint"),
-                   extract_psa_result(results$output_psa,"lys","noint"),
-                   extract_psa_result(results$output_psa,"qalys","noint"),
-                   extract_psa_result(results$output_psa,"costs","int"),
-                   extract_psa_result(results$output_psa,"lys","int"),
-                   extract_psa_result(results$output_psa,"qalys","int"))
+  loop_psa_df <- rbind(extract_psa_result(results$output_sim[[1]],"costs","noint"),
+                   extract_psa_result(results$output_sim[[1]],"lys","noint"),
+                   extract_psa_result(results$output_sim[[1]],"qalys","noint"),
+                   extract_psa_result(results$output_sim[[1]],"costs","int"),
+                   extract_psa_result(results$output_sim[[1]],"lys","int"),
+                   extract_psa_result(results$output_sim[[1]],"qalys","int"))
   
     loop_psa_df <- rbind(loop_psa_df, loop_psa_df %>%
                      spread(trt,value) %>%
