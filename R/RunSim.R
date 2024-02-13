@@ -1,6 +1,7 @@
 #' Run the simulation
 #'
 #' @param trt_list A vector of the names of the interventions evaluated in the simulation
+#' @param sensitivity_inputs A list of sensitivity inputs that do not change within a sensitivity in a similar fashion to common_all_inputs, etc
 #' @param common_all_inputs A list of inputs common across patients that do not change within a simulation
 #' @param common_pt_inputs A list of inputs that change across patients but are not affected by the intervention
 #' @param unique_pt_inputs A list of inputs that change across each intervention
@@ -12,9 +13,12 @@
 #' @param cost_ongoing_list A list of costs that are accrued at an ongoing basis
 #' @param cost_instant_list A list of costs that are accrued instantaneously at an event
 #' @param cost_cycle_list A list of costs that are accrued in cycles
-#' @param npats The number of patients to be simulated
-#' @param n_sim The number of simulations to run per patient
+#' @param npats The number of patients to be simulated (it will simulate npats * length(trt_list))
+#' @param n_sim The number of simulations to run per sensitivity
 #' @param psa_bool A boolean to determine if PSA should be conducted. If n_sim > 1 and psa_bool = FALSE, the differences between simulations will be due to sampling
+#' @param sensitivity_bool A boolean to determine if Scenarios/DSA should be conducted. 
+#' @param sensitivity_names A vector of scenario/DSA names that can be used to select the right sensitivity (e.g., c("Scenario_1", "Scenario_2")). The parameter "sens_name_used" is created from it which corresponds to the one being used for each iteration.
+#' @param n_sensitivity Number of sensitivity analysis (DSA or Scenarios) to run. It will be interacted with sensitivity_names argument if not null (n_sensitivityitivity = n_sensitivity * length(sensitivity_names)). For DSA, it should be as many parameters as there are. For scenario, it should be 1.
 #' @param ncores The number of cores to use for parallel computing
 #' @param drc The discount rate for costs
 #' @param drq The discount rate for LYs/QALYs
@@ -49,6 +53,7 @@
 #' }
 
 RunSim <- function(trt_list=c("int","noint"),
+                   sensitivity_inputs=NULL,
                    common_all_inputs=NULL,
                    common_pt_inputs=NULL,
                    unique_pt_inputs=NULL,
@@ -63,6 +68,9 @@ RunSim <- function(trt_list=c("int","noint"),
                    npats=500,
                    n_sim=1,
                    psa_bool = NULL,
+                   sensitivity_bool = FALSE,
+                   sensitivity_names = NULL,
+                   n_sensitivity = 1,
                    ncores=1,
                    drc=0.035,
                    drq=0.035,
@@ -108,17 +116,33 @@ RunSim <- function(trt_list=c("int","noint"),
                              if(!is.null(categories_utilities_instant)){paste(categories_utilities_instant,c("instant","instant_undisc"),sep="_")},
                              if(!is.null(categories_utilities_cycle)){paste(categories_utilities_cycle,c("cycle","cycle_undisc"),sep="_")}
                             )
-  output_psa <- list()
+  output_sim <- list()
 
   start_time_simulations <-  proc.time()
-
-# Simulation loop ---------------------------------------------------------
-
-  for (simulation in 1:n_sim) {
-
-    print(paste0("Simulation number: ",simulation))
+  
+# Sensitivity loop ---------------------------------------------------------
+  
+  if (is.null(sensitivity_names)) {
+    length_sensitivities <- n_sensitivity
+  } else{
+    length_sensitivities <- n_sensitivity * length(sensitivity_names)
+  }
+  
+  #Need to figure out how to distinguish DSA (as many sensitivities as parameters) and Scenarios (as many sensivities as scenarios)
+  for (sens in 1:length_sensitivities) {
+    print(paste0("Sensitivity number: ",sens))
     start_time <-  proc.time()
 
+    output_sim[[sens]] <- list() #initialize sensitivity lists
+    
+    #e.g., if length_sensitivities is 50 (25 param x 2 DSAs) then take at each iteration the divisor to see which name should be applied
+    if (!is.null(sensitivity_names)) {
+    sens_name_used <- sensitivity_names[ceiling(sens/n_sensitivity)] 
+    } else{
+    sens_name_used <- NULL
+    }
+    
+    
     input_list <- list(drc = drc,
                        drq = drq,
                        psa_bool = psa_bool,
@@ -142,57 +166,88 @@ RunSim <- function(trt_list=c("int","noint"),
                                        l_util_categories_instant = length(categories_utilities_instant),
                                        util_categories_cycle = categories_utilities_cycle,
                                        l_util_categories_cycle = length(categories_utilities_cycle)
-                                       ),
+                       ),
                        input_out = unique(c(input_out,categories_for_export)),
                        categories_for_export = categories_for_export,
                        ipd = ipd,
                        trt_list = trt_list,
-                       simulation = simulation,
                        npats = npats,
-                       n_sim = n_sim
-
-    )
-
+                       n_sim = n_sim,
+                       n_sensitivity = n_sensitivity,
+                       sens = sens,
+                       sensitivity_names = sensitivity_names,
+                       sens_name_used = sens_name_used
+                      )
+    
     # Draw Common parameters  -------------------------------
-    if(!is.null(common_all_inputs)){
-      for (inp in 1:length(common_all_inputs)) {
-        set.seed(simulation)
-        list.common_all_inputs <- lapply(common_all_inputs[inp],function(x) eval(x, input_list))
-        if (!is.null(names(list.common_all_inputs[[1]]))) {
-          warning("Item ", names(list.common_all_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model")
+    if(!is.null(sensitivity_inputs)){
+      for (inp in 1:length(sensitivity_inputs)) {
+        set.seed(sens)
+        list.sensitivity_inputs <- lapply(sensitivity_inputs[inp],function(x) eval(x, input_list))
+        if (!is.null(names(list.sensitivity_inputs[[1]]))) {
+          warning("Item ", names(list.sensitivity_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
         }
-        input_list <- c(input_list,list.common_all_inputs)
+        input_list <- c(input_list,list.sensitivity_inputs)
       }
     }
 
-    #Make sure there are no duplicated inputs in the model, if so, take the last one
-    duplic <- duplicated(names(input_list),fromLast = T)
-    if (sum(duplic)>0) { warning("Duplicated items detected, using the last one added")  }
-    input_list <- input_list[!duplic]
+# Simulation loop ---------------------------------------------------------
 
-    # Run engine ----------------------------------------------------------
 
-    if (debug==TRUE) {
-      final_output <- RunEngine_debug(trt_list=trt_list,
-                                      common_pt_inputs=common_pt_inputs,
-                                      unique_pt_inputs=unique_pt_inputs,
-                                      input_list = input_list)                    # run simulation
-    } else{
-      final_output <- RunEngine(trt_list=trt_list,
-                                common_pt_inputs=common_pt_inputs,
-                                unique_pt_inputs=unique_pt_inputs,
-                                input_list = input_list)                    # run simulation
+    for (simulation in 1:n_sim) {
+  
+      print(paste0("Simulation number: ",simulation))
+      input_list <- c(input_list,
+                      simulation = simulation)
+  
+      # Draw Common parameters  -------------------------------
+      if(!is.null(common_all_inputs)){
+        for (inp in 1:length(common_all_inputs)) {
+          set.seed(simulation)
+          list.common_all_inputs <- lapply(common_all_inputs[inp],function(x) eval(x, input_list))
+          if (!is.null(names(list.common_all_inputs[[1]]))) {
+            warning("Item ", names(list.common_all_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
+          }
+          input_list <- c(input_list,list.common_all_inputs)
+        }
+      }
+  
+      #Make sure there are no duplicated inputs in the model, if so, take the last one
+      duplic <- duplicated(names(input_list),fromLast = T)
+      if (sum(duplic)>0) { warning("Duplicated items detected, using the last one added")  }
+      input_list <- input_list[!duplic]
+  
+      # Run engine ----------------------------------------------------------
+  
+      if (debug==TRUE) {
+        final_output <- RunEngine_debug(trt_list=trt_list,
+                                        common_pt_inputs=common_pt_inputs,
+                                        unique_pt_inputs=unique_pt_inputs,
+                                        input_list = input_list)                    # run simulation
+      } else{
+        final_output <- RunEngine(trt_list=trt_list,
+                                  common_pt_inputs=common_pt_inputs,
+                                  unique_pt_inputs=unique_pt_inputs,
+                                  input_list = input_list)                    # run simulation
+        
+        #clean parallel computing as it can cause issues
+        rm(list=ls(name=foreach:::.foreachGlobals), pos=foreach:::.foreachGlobals) 
+      }
+  
+      if (input_list$ipd==TRUE) {
+  
+        final_output$merged_df$simulation <- simulation
+        final_output$merged_df$sensitivity <- sens
+      }
+  
+      output_sim[[sens]][[simulation]] <- final_output
+  
+  
+      print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
     }
-
-    if (input_list$ipd==TRUE) {
-
-      final_output$merged_df$simulation <- simulation
-    }
-
-    output_psa[[simulation]] <- final_output
-
-
-    print(paste0("Time to run iteration ", simulation,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
+    
+    print(paste0("Time to run sensitivity ", sens,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
+    
   }
   print(paste0("Total time to run: ",  round(proc.time()[3]- start_time_simulations[3] , 2), "s"))
 
@@ -200,7 +255,7 @@ RunSim <- function(trt_list=c("int","noint"),
   # Export results ----------------------------------------------------------
 
 
-  results <- list(final_output=final_output,output_psa=output_psa)
+  results <- list(final_output=final_output,output_sim=output_sim)
 
   return(results)
 

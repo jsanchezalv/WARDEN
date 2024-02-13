@@ -1,3 +1,128 @@
+# Select which values to apply --------------------------------------------------------
+#' Select which values should be applied in the corresponding loop for several values (vector or list).
+#'
+#' @param base Value if no PSA/DSA/Scenario
+#' @param psa Value if PSA
+#' @param sens Value if DSA/Scenario
+#' @param psa_ind Boolean whether PSA is active
+#' @param sens_ind Boolean whether Scenario/DSA is active
+#' @param indicator Indicator which checks whether the specific parameter/parameters is/are active in the DSA or Scenario loop 
+#' @param names_out Names to give the output list
+#'
+#' @return List of used for the inputs
+#' @export
+#' 
+#' @details
+#' This function can be used with vectors or lists, but will always return a list. Lists should be used when correlated variables are introduced to make sure the selector knows how to choose among those
+#'
+#' @examples
+#' \dontrun{
+#' pick_val_v(base = c(0,0),
+#'            psa =c(rnorm(1,0,0.1),rnorm(1,0,0.1)),
+#'            sens = c(2,3),
+#'            psa_ind = TRUE,
+#'            sens_ind = FALSE,
+#'            indicator=c(1,0)
+#'            )
+#' 
+#' pick_val_v(base = c(c(2,3),list(c(1,2))),
+#'             psa =sapply(1:3,
+#'                         function(x) eval(call(
+#'                           c("rnorm","rnorm","mvrnorm")[[x]],
+#'                           1,
+#'                           c(c(2,3),list(c(1,2)))[[x]],
+#'                           c(c(0.1,0.1),list(matrix(c(1,0.1,0.1,1),2,2)))[[x]]
+#'                         ))),
+#'             sens = c(c(2,3),list(c(1,2))),
+#'             psa_ind = TRUE,
+#'             sens_ind = FALSE,
+#'             indicator=c(1,0,0),
+#'             names_out=c("util","util2","correlated_vector")
+#'            )
+#' 
+#' pick_val_v(base        = df_par[,"base_value"],
+#'            psa         = sapply(1:nrow(df_par), function(x) eval(call(df_par[x,"PSA_dist"],1,df_par[x,"a"],df_par[x,"b"]))),
+#'            sens        = df_par[,sensitivity_names[sens_sel]],
+#'            psa_ind     = TRUE, sens_ind = FALSE,
+#'            indicator   = indicators,
+#'            names_out   = df_par[,"parameter_name"]
+#'            )
+#' }
+pick_val_v <- function(base,
+                     psa,
+                     sens,
+                     psa_ind = psa_bool,
+                     sens_ind = sens_bool,
+                     indicator,
+                     names_out=NULL
+){
+
+
+  output <- list()
+    #if the parameter is out of the dsa/scenario specific iteration, or not in DSA/scenario, use PSA/normal. 
+  for (it in 1:length(indicator)) {
+    output[it] <-  if (indicator[it]==0 | sens_ind==F ) { 
+                    if (psa_ind==T) {
+                      psa[it]
+                    } else {
+                      base[it]
+                    }
+                  } else { #If active, use DSA if DSA and scenario if scenario
+                    sens[it]
+                  } 
+  }
+  
+  if (!is.null(names_out)) {
+    names(output) <- names_out
+  }
+    
+  return(output)
+}
+
+# Select which value to apply --------------------------------------------------------
+#' Select which value should be applied in the corresponding loop
+#'
+#' @param base Value if no PSA/DSA/Scenario
+#' @param psa Value if PSA
+#' @param sens Value if sensitivity (DSA/Scenario)
+#' @param psa_ind Boolean whether PSA is active
+#' @param sens_ind Boolean whether Scenario/DSA is active
+#' @param indicator Indicator which checks whether the specific parameter is active in the DSA or Scenario loop 
+#'
+#' @return Value used for the inputs
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' pick_val(base = 0, psa =rnorm(1,0,0.1), sens = 5,psa_ind = TRUE, sens_ind = FALSE, indicator=1)
+#'}
+#'
+pick_val <- function(base,
+                     psa,
+                     sens,
+                     psa_ind = psa_bool,
+                     sens_ind = sens_bool,
+                     indicator =0
+                     ){
+  
+  
+  #if the parameter is out of the dsa/scenario specific iteration, or not in DSA/scenario, use PSA/normal. 
+  output <-   if (indicator==0 | sens_ind==F ) { 
+                if (psa_ind==T) {
+                  psa
+                } else {
+                  base
+                }
+              } else { #If active, use DSA if DSA and scenario if scenario
+                sens
+              }
+   
+  
+  return(output)
+}
+
+
+
 # Add cost to list --------------------------------------------------------
 #' Defining costs for events and intervention
 #'
@@ -17,7 +142,7 @@
 #' This function accepts the use of pipes (%>%) to define multiple costs.
 #'
 #' @examples
-#' add_cost(evt = c("start","idfs","ttot"),trt = "int",cost = cost.int*fl.int + cost.idfs)
+#' \dontrun{add_cost(evt = c("start","idfs","ttot"),trt = "int",cost = cost.int*fl.int + cost.idfs)}
 #'
 add_cost <- function(.data=NULL,cost,evt,trt,category="default",cycle_l=NULL,cycle_starttime=0){
   
@@ -67,9 +192,11 @@ add_cost <- function(.data=NULL,cost,evt,trt,category="default",cycle_l=NULL,cyc
 #' This function accepts the use of pipes (%>%) to define multiple utilities.
 #'
 #' @examples
+#' \dontrun{
 #' add_util(evt = c("start","idfs","ttot"),
 #' trt = c("int", "noint"),
 #' util = util.idfs.ontx * fl.idfs.ontx + util.idfs.offtx * (1-fl.idfs.ontx))
+#' }
 
 add_util <- function(.data=NULL,util,evt,trt,category="default",cycle_l=NULL,cycle_starttime=0){
 
@@ -114,8 +241,10 @@ add_util <- function(.data=NULL,util,evt,trt,category="default",cycle_l=NULL,cyc
 #' So rather than use two `add_item` with a list of one element, it's better to group them into a single `add_item` with a list of two elements.
 #'
 #' @examples
+#' \dontrun{
 #' add_item(fl.idfs = 0)
 #' add_item(util_idfs = if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}, util.mbc = 0.6, cost_idfs = 2500)
+#' }
 #'
 
 add_item <- function(.data=NULL,...){
@@ -280,8 +409,10 @@ modify_item <- function(list_item, env_ch = NULL){
 #' The model will run until `curtime` is set to `Inf`, so the event that terminates the model should modify `curtime` and set it to `Inf`.
 #'
 #' @examples
+#' \dontrun{
 #' add_reactevt(name_evt = "start",input = {})
 #' add_reactevt(name_evt = "idfs",input = {modify_item(list("fl.idfs"= 0))})
+#' }
 
 add_reactevt <- function(.data=NULL,name_evt,input){
 
@@ -323,6 +454,7 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 #' For each event that is defined in this list, the user needs to add a reaction to the event using the `add_reactevt()` function which will determine what calculations will happen at an event.
 #'
 #' @examples
+#' \dontrun{
 #' add_tte(trt="int",evts = c("start","ttot","idfs","os"),
 #' input={
 #' start <- 0
@@ -330,6 +462,7 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 #' ttot <- min(draw_tte(1,'lnorm',coef1=1, coef2=4),idfs)
 #' os <- draw_tte(1,'lnorm',coef1=0.8, coef2=0.2)
 #' })
+#' }
 #'
 add_tte <- function(.data=NULL,trt, evts, other_inp = NULL,input){
   data_list <- .data
@@ -379,7 +512,9 @@ add_tte <- function(.data=NULL,trt, evts, other_inp = NULL,input){
 #'
 #' @return Double based on continuous time discounting
 #'
-#' @examples AddOngoing(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
+#' @examples \dontrun{
+#' AddOngoing(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
+#' }
 #'
 #' @export
 #' @details
@@ -410,7 +545,9 @@ AddOngoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
 #'
 #' @return Double based on discrete time discounting
 #'
-#' @examples AddInstant(lcldr=0.035, lclcurtime=3, lclval=2500)
+#' @examples \dontrun{
+#' AddInstant(lcldr=0.035, lclcurtime=3, lclval=2500)
+#' }
 #'
 #' @export
 #' 
@@ -439,7 +576,9 @@ AddInstant <- function(lcldr=0.035, lclcurtime, lclval){
 #'
 #' @return Double based on cycle discounting
 #'
-#' @examples AddCycle(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
+#' @examples \dontrun{
+#' AddCycle(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
+#' }
 #'
 #' @export
 

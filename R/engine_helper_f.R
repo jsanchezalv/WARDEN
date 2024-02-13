@@ -19,17 +19,25 @@ InitEventList <- function(trt_name,input_list_trt){
 
   time_data <- local({
     evts_v <- input_list_trt$init_event_list[[position]][["evts"]]
+    
     othert_v <- input_list_trt$init_event_list[[position]][["other_inp"]]
+    
     list2env(mget(c(evts_v,othert_v),ifnotfound=Inf), envir=environment()) #initialize
+    
     eval(input_list_trt$init_event_list[[position]][["expr"]]) #run script
+    
     evttime <- lapply(mget(evts_v,ifnotfound=Inf),unname) #get event times and make sure they are unnamed
+    
     othertime <- if(!is.null(othert_v)){mget(othert_v,ifnotfound=Inf)} else{NULL}  #get other inputs times
+    
     out <- list(evttime=evttime, othertime=othertime)
   },input_list_trt)
 
   #Event data
   cur_evtlist <- unlist(time_data$evttime)
+  
   cur_evtlist <- sort(cur_evtlist)
+  
   return(list(cur_evtlist = cur_evtlist, time_data = unlist(time_data$othertime)))
 }
 
@@ -123,7 +131,7 @@ ReactEvt <- function(thisevt,trt,input_list_trt=NULL){      # This function proc
                                                                         ifnull=0,
                                                                         type="cycle_starttime",
                                                                         evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
-                                                                        st_trt_i=input_list_trt)
+                                                                        input_list_trt_i=input_list_trt)
   }
   
   # Utilities -------------------------------------------------------------------
@@ -154,7 +162,7 @@ ReactEvt <- function(thisevt,trt,input_list_trt=NULL){      # This function proc
                                                                         ifnull=0,
                                                                         type="cycle_starttime",
                                                                         evt_trt_i=paste(evt_trt,util_cat,sep="_"),
-                                                                        sinput_list_trt_i=input_list_trt)
+                                                                        input_list_trt_i=input_list_trt)
   }
 
   #Evaluate the reaction to the event

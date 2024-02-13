@@ -238,9 +238,9 @@ Once the model has been run, we can use the results and summarize them using the
 
 summary_results_det(results$final_output) #will print the last simulation!
 
-psa_ipd_simple <- bind_rows(map(results$output_psa, "merged_df")) %>% select(-trace) %>% distinct() 
+psa_ipd_simple <- bind_rows(map(results$output_sim[[1]], "merged_df")) %>% select(-trace) %>% distinct() 
 
-psa_ipd <- bind_rows(map(results$output_psa, "merged_df")) 
+psa_ipd <- bind_rows(map(results$output_sim[[1]], "merged_df")) 
 
 trace_t <- psa_ipd %>% mutate(state = rep(seq(1:4),62)) %>% select(trt,trace,state,evttime) 
 

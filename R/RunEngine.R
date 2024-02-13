@@ -11,7 +11,8 @@
 #' @importFrom foreach %dopar% foreach
 #' @importFrom purrr map map_dbl
 #' @importFrom data.table rbindlist :=
-#'
+#' @importFrom doParallel stopImplicitCluster
+#' 
 #' @keywords internal
 
 
