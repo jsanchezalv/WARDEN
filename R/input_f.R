@@ -1,3 +1,38 @@
+# Replicate profiles --------------------------------------------------------
+#' Replicate profiles data.frame
+#'
+#' @param profiles data.frame of profiles
+#' @param replications integer, final number of observations
+#' @param probabilities vector of probabilities with the same length as the number of rows of profiles. Does not need to add up to 1 (are reweighted)
+#' @param replacement Boolean whether replacement is used
+#' @param seed_used Integer with the seed to be used for consistent results
+#'
+#' @return Resampled data.frame of profiles
+#' @export
+#' 
+#'
+#' @examples
+#' \dontrun{
+#' replicate_profiles(profiles=data.frame(id=1:100,age=rnorm(100,60,5)),replications=200,probabilities=rep(1,100))
+#' }
+replicate_profiles <- function(profiles,
+                               replications,
+                               probabilities = NULL,
+                               replacement = TRUE,
+                               seed_used = NULL
+){
+  
+  if (!is.null(seed_used)) {
+    set.seed(seed_used)
+  }
+  
+  rows_sampled <- sample.int(nrow(profiles),size=replications,prob=probabilities,replace=replacement)
+  output <- profiles[rows_sampled,]
+  rownames(output) <- NULL  
+  
+  return(output)
+}
+
 # Select which values to apply --------------------------------------------------------
 #' Select which values should be applied in the corresponding loop for several values (vector or list).
 #'
