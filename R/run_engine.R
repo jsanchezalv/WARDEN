@@ -170,7 +170,6 @@ run_engine <- function(trt_list,
                        return(list(this_patient))
                      }
   
-stopImplicitCluster() #stop parallel computing
   # Organize and create output -----------------------------------------------------------
 
 final_output <- list()

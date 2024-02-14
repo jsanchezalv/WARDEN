@@ -26,7 +26,7 @@ This document runs a discrete event simulation model in the context of early bre
 
 ## Main options
 ```{r setup}
-library(descem)
+library(RDICE)
 
 library(dplyr)
 library(purrr)

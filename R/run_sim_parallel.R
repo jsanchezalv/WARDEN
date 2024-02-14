@@ -1,4 +1,4 @@
-#' Run the simulation
+#' Run simulations in parallel mode (at the simulation level)
 #'
 #' @param trt_list A vector of the names of the interventions evaluated in the simulation
 #' @param sensitivity_inputs A list of sensitivity inputs that do not change within a sensitivity in a similar fashion to common_all_inputs, etc
@@ -24,21 +24,20 @@
 #' @param drq The discount rate for LYs/QALYs
 #' @param input_out A vector of variables to be returned in the output data frame
 #' @param ipd A boolean to determine if individual patient data should be returned. If set to false, only the main aggregated outputs will be returned (slightly speeds up code)
-#' @param debug A boolean to determine if non-parallel run_engine function should be used, which facilitates debugging. Setting this option to true will ignore the value of ncores
 #'
-#' @return A list of data frames with the simulation results
+#' @return A list of lists with the analysis results
 #' @importFrom doParallel registerDoParallel
 #'
 #' @export
-#' @details This function is slightly different from `run_sim_parallel`.
-#' `run_sim_parallel` only runs multiple-core at the simulation level.
-#' `run_sim` allows to use single or multiple-core at the patient level.
-#' `run_sim` can be more efficient if using only one simulation (e.g., deterministic) for a large number of patients,
-#'  while `run_sim_parallel` will be more efficient if the number of simulations is >1 (e.g., PSA). 
-#'
+#' 
+#' @details This function is slightly different from `run_sim`.
+#' `run_sim` allows to run single-core (`debug=TRUE`) or parallel at the patient level (`run_engine`). 
+#' `run_sim_parallel` allows to use multiple-core at the simulation level,
+#' making it more efficient for a large number of simulations relative to `run_sim`.
+#' 
 #' @examples
 #' \dontrun{
-#' run_sim(trt_list=c("int","noint"),
+#' run_sim_parallel(trt_list=c("int","noint"),
 #' common_all_inputs = common_all_inputs,
 #' common_pt_inputs = common_pt_inputs,
 #' unique_pt_inputs = unique_pt_inputs,
@@ -51,13 +50,13 @@
 #' npats = 500,
 #' n_sim = 1,
 #' psa_bool = FALSE,
-#' ncores = 1,
+#' ncores = 3,
 #' drc = 0.035,
 #' drq = 0.035,
 #' ipd = TRUE)
 #' }
 
-run_sim <- function(trt_list=c("int","noint"),
+run_sim_parallel <- function(trt_list=c("int","noint"),
                    sensitivity_inputs=NULL,
                    common_all_inputs=NULL,
                    common_pt_inputs=NULL,
@@ -80,19 +79,12 @@ run_sim <- function(trt_list=c("int","noint"),
                    drc=0.035,
                    drq=0.035,
                    input_out = NULL,
-                   ipd = TRUE,
-                   debug = FALSE){
+                   ipd = TRUE){
 
 
 # Set-up basics -----------------------------------------------------------
 
-  if (debug==FALSE) {
-    registerDoParallel(ncores)
-  }
-  
-  if (ncores>1 & debug==TRUE) {
-    warning("Number of cores selected >1 but engine (debug) is single-core.")
-  }
+  registerDoParallel(ncores)
   
   trt_list <- trt_list #this is done as otherwise there are problems passing arguments from function to function
   
@@ -133,7 +125,6 @@ run_sim <- function(trt_list=c("int","noint"),
     length_sensitivities <- n_sensitivity * length(sensitivity_names)
   }
   
-  #Need to figure out how to distinguish DSA (as many sensitivities as parameters) and Scenarios (as many sensivities as scenarios)
   for (sens in 1:length_sensitivities) {
     print(paste0("Sensitivity number: ",sens))
     start_time <-  proc.time()
@@ -198,9 +189,13 @@ run_sim <- function(trt_list=c("int","noint"),
 
 # Simulation loop ---------------------------------------------------------
 
+    output_sim[[sens]] <- vector("list", length=n_sim) # empty list with n_sim elements
+    # Outer loop, repeat for each patient
+    output_sim[[sens]] <- foreach(simulation = 1:n_sim,
+                         .packages = (.packages()),
+                         .export = unique(c("input_list",ls(.GlobalEnv),ls(parent.env(environment())),ls(environment()))),
+                         .combine = 'c') %dopar% {
 
-    for (simulation in 1:n_sim) {
-  
       print(paste0("Simulation number: ",simulation))
       input_list <- c(input_list,
                       simulation = simulation)
@@ -224,20 +219,11 @@ run_sim <- function(trt_list=c("int","noint"),
   
       # Run engine ----------------------------------------------------------
   
-      if (debug==TRUE) {
         final_output <- run_engine_debug(trt_list=trt_list,
                                         common_pt_inputs=common_pt_inputs,
                                         unique_pt_inputs=unique_pt_inputs,
                                         input_list = input_list)                    # run simulation
-      } else{
-        final_output <- run_engine(trt_list=trt_list,
-                                  common_pt_inputs=common_pt_inputs,
-                                  unique_pt_inputs=unique_pt_inputs,
-                                  input_list = input_list)                    # run simulation
-        
-        #clean parallel computing as it can cause issues
-        rm(list=ls(name=foreach:::.foreachGlobals), pos=foreach:::.foreachGlobals) 
-      }
+      
   
       if (input_list$ipd==TRUE) {
   
@@ -245,22 +231,24 @@ run_sim <- function(trt_list=c("int","noint"),
         final_output$merged_df$sensitivity <- sens
       }
   
-      output_sim[[sens]][[simulation]] <- final_output
+      # output_sim[[sens]][[simulation]] <- final_output
   
-  
+      return(list(final_output))
+      
       print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
     }
     
-    print(paste0("Time to run sensitivity ", sens,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
+    print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
     
   }
   print(paste0("Total time to run: ",  round(proc.time()[3]- start_time_simulations[3] , 2), "s"))
-
+  rm(list=ls(name=foreach:::.foreachGlobals), pos=foreach:::.foreachGlobals) 
+  
 
   # Export results ----------------------------------------------------------
 
 
-  results <- list(final_output=final_output,output_sim=output_sim)
+  results <- list(output_sim=output_sim)
 
   return(results)
 

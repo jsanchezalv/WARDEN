@@ -28,7 +28,7 @@ This document runs a discrete event simulation model in the context of a simple 
 ## Main options
 
 ```{r setup}
-library(descem)
+library(RDICE)
 
 library(dplyr)
 library(flexsurv)

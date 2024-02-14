@@ -27,7 +27,7 @@ This document runs a discrete event simulation model using simulated individual 
 # Packages and main options
 
 ```{r setup,message=FALSE}
-library(descem)
+library(RDICE)
 library(dplyr)
 library(tidyr)
 library(survival)

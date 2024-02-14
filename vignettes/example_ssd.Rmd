@@ -29,7 +29,7 @@ When running a DES, it's important to consider speed. Simulation based models ca
 ## Main options
 
 ```{r setup}
-library(descem)
+library(RDICE)
 
 library(dplyr)
 library(flexsurv)
@@ -345,6 +345,46 @@ results <- run_sim(
 )
 
 ```
+
+## Check results
+We briefly check below that indeed the engine has been changing the corresponding parameter value.
+```{r dsa_check}
+
+data_sensitivity <- bind_rows(map_depth(results$output_sim,2, "merged_df"))
+
+#Check mean value across iterations as PSA is off
+data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
+
+```
+
+## Model Execution with PSA
+The model is executed as before, just activating the psa_bool option and using the `run_sim_parallel` function to have multiple-cores working at the simulation level, making this implementation faster than the single-core or multiple-core one using `run_sim`. 
+
+```{r run_dsa_psa}
+results <- run_sim_parallel(  
+  npats=100,                               # number of patients to be simulated
+  n_sim=5,                                  # number of simulations to run
+  psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
+  trt_list = c("int", "noint"),             # intervention list
+  common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
+  common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
+  unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
+  init_event_list = init_event_list,        # initial event list
+  evt_react_list = evt_react_list,          # reaction of events
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  ncores = 6,                               # number of cores to use, recommended not to use all
+  drc = 0.035,                              # discount rate for costs
+  drq = 0.035,
+  sensitivity_inputs = sensitivity_inputs,
+  sensitivity_names = c("DSA_min","DSA_max"),
+  sensitivity_bool = TRUE,
+  n_sensitivity = nrow(df_par),
+  input_out = c(df_par[,"parameter_name"])
+)
+
+```
+
 
 ## Check results
 We briefly check below that indeed the engine has been changing the corresponding parameter value.
