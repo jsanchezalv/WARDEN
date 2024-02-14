@@ -60,12 +60,12 @@ run_engine_debug <- function(trt_list,
       # Initialize values to prevent errors
       output_list <- list(curtime = 0, thslys = 0, thsqalys = 0, thscosts = 0, itemlys = 0, itemqalys = 0, itemcosts = 0,
                           thslys_undisc = 0, thsqalys_undisc = 0, thscosts_undisc = 0, itemlys_undisc = 0, itemqalys_undisc = 0, itemcosts_undisc = 0)
-      this_patient[[trt]][["thslys"]] <- 0
-      this_patient[[trt]][["thsqalys"]]<- 0
-      this_patient[[trt]][["thscosts"]]<- 0
-      this_patient[[trt]][["thslys_undisc"]] <- 0
-      this_patient[[trt]][["thsqalys_undisc"]]<- 0
-      this_patient[[trt]][["thscosts_undisc"]]<- 0
+      # this_patient[[trt]][["thslys"]] <- 0
+      # this_patient[[trt]][["thsqalys"]]<- 0
+      # this_patient[[trt]][["thscosts"]]<- 0
+      # this_patient[[trt]][["thslys_undisc"]] <- 0
+      # this_patient[[trt]][["thsqalys_undisc"]]<- 0
+      # this_patient[[trt]][["thscosts_undisc"]]<- 0
       
       #Extract the inputs that are unique for each patient-intervention
       input_list_trt <- NULL
@@ -131,12 +131,12 @@ run_engine_debug <- function(trt_list,
                                                              evttime = Evt$evttime,
                                                              pat_id = i,
                                                              trt = trt,
-                                                             cost = input_list_trt[['itemcosts']],
-                                                             cost_undisc = input_list_trt[['itemcosts_undisc']],
-                                                             qaly = input_list_trt[['itemqalys']],
-                                                             qaly_undisc = input_list_trt[['itemqalys_undisc']],
-                                                             ly = input_list_trt[['itemlys']],
-                                                             ly_undisc = input_list_trt[['itemlys_undisc']]
+                                                             # cost = input_list_trt[['itemcosts']],
+                                                             # cost_undisc = input_list_trt[['itemcosts_undisc']],
+                                                             # qaly = input_list_trt[['itemqalys']],
+                                                             # qaly_undisc = input_list_trt[['itemqalys_undisc']],
+                                                             # ly = input_list_trt[['itemlys']],
+                                                             # ly_undisc = input_list_trt[['itemlys_undisc']]
               )
               
             } else{
@@ -144,23 +144,23 @@ run_engine_debug <- function(trt_list,
                                                         evttime = Evt$evttime,
                                                         pat_id = i,
                                                         trt = trt,
-                                                        cost = input_list_trt[['itemcosts']],
-                                                        cost_undisc = input_list_trt[['itemcosts_undisc']],
-                                                        qaly = input_list_trt[['itemqalys']],
-                                                        qaly_undisc = input_list_trt[['itemqalys_undisc']],
-                                                        ly = input_list_trt[['itemlys']],
-                                                        ly_undisc = input_list_trt[['itemlys_undisc']],
+                                                        # cost = input_list_trt[['itemcosts']],
+                                                        # cost_undisc = input_list_trt[['itemcosts_undisc']],
+                                                        # qaly = input_list_trt[['itemqalys']],
+                                                        # qaly_undisc = input_list_trt[['itemqalys_undisc']],
+                                                        # ly = input_list_trt[['itemlys']],
+                                                        # ly_undisc = input_list_trt[['itemlys_undisc']],
                                                         extra_data
               )
             }
           
-          #Accumulate total lys,costs and qalys
-          this_patient[[trt]][["thslys"]]   <- this_patient[[trt]][["thslys"]] + input_list_trt[['itemlys']]
-          this_patient[[trt]][["thsqalys"]] <- this_patient[[trt]][["thsqalys"]] + input_list_trt[['itemqalys']]
-          this_patient[[trt]][["thscosts"]] <- this_patient[[trt]][["thscosts"]]  + input_list_trt[['itemcosts']]
-          this_patient[[trt]][["thslys_undisc"]]   <- this_patient[[trt]][["thslys_undisc"]] + input_list_trt[['itemlys_undisc']]
-          this_patient[[trt]][["thsqalys_undisc"]] <- this_patient[[trt]][["thsqalys_undisc"]] + input_list_trt[['itemqalys_undisc']]
-          this_patient[[trt]][["thscosts_undisc"]] <- this_patient[[trt]][["thscosts_undisc"]]  + input_list_trt[['itemcosts_undisc']]
+          # #Accumulate total lys,costs and qalys
+          # this_patient[[trt]][["thslys"]]   <- this_patient[[trt]][["thslys"]] + input_list_trt[['itemlys']]
+          # this_patient[[trt]][["thsqalys"]] <- this_patient[[trt]][["thsqalys"]] + input_list_trt[['itemqalys']]
+          # this_patient[[trt]][["thscosts"]] <- this_patient[[trt]][["thscosts"]]  + input_list_trt[['itemcosts']]
+          # this_patient[[trt]][["thslys_undisc"]]   <- this_patient[[trt]][["thslys_undisc"]] + input_list_trt[['itemlys_undisc']]
+          # this_patient[[trt]][["thsqalys_undisc"]] <- this_patient[[trt]][["thsqalys_undisc"]] + input_list_trt[['itemqalys_undisc']]
+          # this_patient[[trt]][["thscosts_undisc"]] <- this_patient[[trt]][["thscosts_undisc"]]  + input_list_trt[['itemcosts_undisc']]
           
 
         } else {input_list_trt$curtime <- Inf} #if no events, stop
@@ -175,6 +175,144 @@ run_engine_debug <- function(trt_list,
   }
 
 
+  
+  patdata_inv <- NULL
+  for (trt in trt_list) {
+    patdata_inv <- rbindlist(list(patdata_inv,rbindlist(unlist(map(map(patdata,trt),"evtlist"), recursive = FALSE))))
+  }  
+  patdata_inv[,prevtime:=shift(evttime,fill=0)]
+  patdata_inv[,prevtime:=ifelse(prevtime>evttime,0,prevtime)]
+  cols_init <- c("thslys",
+                 "thsqalys",
+                 "thscosts",
+                 "thslys_undisc",
+                 "thsqalys_undisc",
+                 "thscosts_undisc",
+                 "itemlys",
+                 "itemqalys",
+                 "itemcosts",
+                 "itemlys_undisc",
+                 "itemqalys_undisc",
+                 "itemcosts_undisc")
+  patdata_inv[,(cols_init):=0]
+  
+  for (cost_cat in input_list$uc_lists$cost_categories_ongoing) {
+    patdata_inv[,paste0(cost_cat,"_","ongoing_undisc") := disc_ongoing_v(lcldr=0,
+                                                                        lclprvtime=prevtime,
+                                                                        lclcurtime=evttime,
+                                                                        lclval=get(paste0(cost_cat,"_","ongoing")))]
+
+    patdata_inv[,paste0(cost_cat,"_","ongoing") := disc_ongoing_v(lcldr=input_list$drc,
+                                                                 lclprvtime=prevtime,
+                                                                 lclcurtime=evttime,
+                                                                 lclval=get(paste0(cost_cat,"_","ongoing")))]
+
+    patdata_inv[, "itemcosts" := itemcosts+ get(paste0(cost_cat,"_","ongoing"))]
+    patdata_inv[, "itemcosts_undisc" := itemcosts_undisc + get(paste0(cost_cat,"_","ongoing_undisc"))]
+    
+  }
+
+  for (cost_cat in input_list$uc_lists$cost_categories_instant) {
+    patdata_inv[,paste0(cost_cat,"_","instant_undisc") := disc_instant_v(lcldr=0,
+                                                                        lclcurtime=evttime,
+                                                                        lclval=get(paste0(cost_cat,"_","instant")))]
+
+    patdata_inv[,paste0(cost_cat,"_","instant") := isc_instant_v(lcldr=input_list$drc,
+                                                                 lclcurtime=evttime,
+                                                                 lclval=get(paste0(cost_cat,"_","instant")))]
+
+    patdata_inv[,"itemcosts" := itemcosts + get(paste0(cost_cat,"_","instant"))]
+
+    patdata_inv[,"itemcosts_undisc" := itemcosts_undisc + get(paste0(cost_cat,"_","instant_undisc"))]
+  }
+
+  for (cost_cat in input_list$uc_lists$cost_categories_cycle) {
+    patdata_inv[,paste0(cost_cat,"_","cycle_undisc") := disc_cycle_v(lcldr=0,
+                                                                      lclprvtime=prevtime,
+                                                                      cyclelength = get(paste0(cost_cat,"_","cycle_l")),
+                                                                      lclcurtime=evttime,
+                                                                      lclval= get(paste0(cost_cat,"_","cycle")),
+                                                                      starttime = get(paste0(cost_cat,"_","cycle_starttime")))] #cycles of 1 week
+
+    patdata_inv[,paste0(cost_cat,"_","cycle") := disc_cycle_v(lcldr=input_list$drc,
+                                                               lclprvtime=prevtime,
+                                                               cyclelength = get(paste0(cost_cat,"_","cycle_l")),
+                                                               lclcurtime=evttime,
+                                                               lclval= get(paste0(cost_cat,"_","cycle")),
+                                                               starttime = get(paste0(cost_cat,"_","cycle_starttime")))] #cycles of 1 week
+
+    patdata_inv[,"itemcosts" := itemcosts + get(paste0(cost_cat,"_","cycle"))]
+
+    patdata_inv[,"itemcosts_undisc" := itemcosts_undisc + get(paste0(cost_cat,"_","cycle_undisc"))]
+    
+  }
+
+  # Utilities ----------------------------------------------------------
+
+  for (util_cat in input_list$uc_lists$util_categories_ongoing) {
+    patdata_inv[,paste0(util_cat,"_","ongoing_undisc") := disc_ongoing_v(lcldr=0,
+                                                                         lclprvtime=prevtime,
+                                                                         lclcurtime=evttime,
+                                                                         lclval=get(paste0(util_cat,"_","ongoing")))]
+    
+    patdata_inv[,paste0(util_cat,"_","ongoing") := disc_ongoing_v(lcldr=input_list$drc,
+                                                                  lclprvtime=prevtime,
+                                                                  lclcurtime=evttime,
+                                                                  lclval=get(paste0(util_cat,"_","ongoing")))]
+    
+    patdata_inv[, "itemqalys" := itemqalys+ get(paste0(util_cat,"_","ongoing"))]
+    patdata_inv[, "itemqalys_undisc" := itemqalys_undisc + get(paste0(util_cat,"_","ongoing_undisc"))]
+    
+  }
+  
+  for (util_cat in input_list$uc_lists$util_categories_instant) {
+    patdata_inv[,paste0(util_cat,"_","instant_undisc") := disc_instant_v(lcldr=0,
+                                                                         lclcurtime=evttime,
+                                                                         lclval=get(paste0(util_cat,"_","instant")))]
+    
+    patdata_inv[,paste0(util_cat,"_","instant") := isc_instant_v(lcldr=input_list$drc,
+                                                                 lclcurtime=evttime,
+                                                                 lclval=get(paste0(util_cat,"_","instant")))]
+    
+    patdata_inv[,"itemqalys" := itemqalys + get(paste0(util_cat,"_","instant"))]
+    
+    patdata_inv[,"itemqalys_undisc" := itemqalys_undisc + get(paste0(util_cat,"_","instant_undisc"))]
+  }
+  
+  for (util_cat in input_list$uc_lists$util_categories_cycle) {
+    patdata_inv[,paste0(util_cat,"_","cycle_undisc") := disc_cycle_v(lcldr=0,
+                                                                     lclprvtime=prevtime,
+                                                                     cyclelength = get(paste0(util_cat,"_","cycle_l")),
+                                                                     lclcurtime=evttime,
+                                                                     lclval= get(paste0(util_cat,"_","cycle")),
+                                                                     starttime = get(paste0(util_cat,"_","cycle_starttime")))] #cycles of 1 week
+    
+    patdata_inv[,paste0(util_cat,"_","cycle") := disc_cycle_v(lcldr=input_list$drc,
+                                                              lclprvtime=prevtime,
+                                                              cyclelength = get(paste0(util_cat,"_","cycle_l")),
+                                                              lclcurtime=evttime,
+                                                              lclval= get(paste0(util_cat,"_","cycle")),
+                                                              starttime = get(paste0(util_cat,"_","cycle_starttime")))] #cycles of 1 week
+    
+    patdata_inv[,"itemqalys" := itemqalys + get(paste0(util_cat,"_","cycle"))]
+    
+    patdata_inv[,"itemqalys_undisc" := itemqalys_undisc + get(paste0(util_cat,"_","cycle_undisc"))]
+    
+  }
+  #LYs
+  patdata_inv[,"itemlys" := disc_ongoing_v(lcldr=input_list$drq,
+                                           lclprvtime=prevtime,
+                                           lclcurtime=evttime,
+                                           lclval=1)]
+
+  patdata_inv[,"itemlys_undisc" := disc_ongoing_v(lcldr=0,
+                                                lclprvtime=prevtime,
+                                                lclcurtime=evttime,
+                                                lclval=1)]
+  
+  browser()
+  
+  
   # Organize and create output -----------------------------------------------------------
 
   final_output <- list()

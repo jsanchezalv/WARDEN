@@ -205,154 +205,154 @@ eval_reactevt <-  function(x,evt_name,input_list_trt=NULL){
     prevtime <- input_list_trt[["prevtime"]]
     curtime <- input_list_trt[["curtime"]]
     #Reset values per event (LYs don't need to be reset)
-    input_list_trt[["itemqalys"]]<- 0
-    input_list_trt[["itemcosts"]]<- 0
-    input_list_trt[["itemqalys_undisc"]]<- 0
-    input_list_trt[["itemcosts_undisc"]]<- 0
-    
-    #For each cost/utility category, get the undiscounted/discounted outcomes and get the inputs for ongoing/instant/cycle
-    #We do undiscounted first as the discounted value will be overwritten to save some writing time
-    
-    # Costs -------------------------------------------------------------------
-    
-    for (cost_cat in input_list_trt$uc_lists$cost_categories_ongoing) {
-      input_list_trt[paste0(cost_cat,"_","ongoing_undisc")] <- disc_ongoing(lcldr=0,
-                                                                          lclprvtime=prevtime,
-                                                                          lclcurtime=curtime,
-                                                                          lclval=input_list_trt[[paste0(cost_cat,"_","ongoing")]])
-      
-      input_list_trt[paste0(cost_cat,"_","ongoing")] <- disc_ongoing(lcldr=drc,
-                                                                   lclprvtime=prevtime,
-                                                                   lclcurtime=curtime,
-                                                                   lclval=input_list_trt[[paste0(cost_cat,"_","ongoing")]])
-
-      input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","ongoing")]]
-      
-      input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","ongoing_undisc")]]
-      
-    }
-    
-    for (cost_cat in input_list_trt$uc_lists$cost_categories_instant) {
-      input_list_trt[paste0(cost_cat,"_","instant_undisc")] <- disc_instant(lcldr=0,
-                                                                          lclcurtime=curtime,
-                                                                          lclval=input_list_trt[[paste0(cost_cat,"_","instant")]])
-      
-      input_list_trt[paste0(cost_cat,"_","instant")] <- disc_instant(lcldr=drc,
-                                                                   lclcurtime=curtime,
-                                                                   lclval=input_list_trt[[paste0(cost_cat,"_","instant")]])
-      
-      input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","instant")]]
-      
-      input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","instant_undisc")]]
-    }
-    
-    for (cost_cat in input_list_trt$uc_lists$cost_categories_cycle) {
-      if (length(input_list_trt[paste0(cost_cat,"_","cycle")])==1 & input_list_trt[[paste0(cost_cat,"_","cycle")]]==0) {
-        input_list_trt[paste0(cost_cat,"_","cycle")] <- list(addcycle=0)
-        
-        input_list_trt[paste0(cost_cat,"_","cycle_undisc")] <- list(addcycle=0)
-        
-        input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","cycle")]]
-        
-        input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","cycle_undisc")]]
-      } else{
-        input_list_trt[paste0(cost_cat,"_","cycle_undisc")] <- disc_cycle(lcldr=0,
-                                                                        lclprvtime=prevtime,
-                                                                        cyclelength = input_list_trt[[paste0(cost_cat,"_","cycle_l")]],
-                                                                        lclcurtime=curtime,
-                                                                        lclval= input_list_trt[[paste0(cost_cat,"_","cycle")]],
-                                                                        starttime = input_list_trt[[paste0(cost_cat,"_","cycle_starttime")]]) #cycles of 1 week
-        
-        input_list_trt[paste0(cost_cat,"_","cycle")] <- disc_cycle(lcldr=drc,
-                                                                 lclprvtime=prevtime,
-                                                                 cyclelength = input_list_trt[[paste0(cost_cat,"_","cycle_l")]],
-                                                                 lclcurtime=curtime,
-                                                                 lclval= input_list_trt[[paste0(cost_cat,"_","cycle")]],
-                                                                 starttime = input_list_trt[[paste0(cost_cat,"_","cycle_starttime")]]) #cycles of 1 week
-        
-        input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","cycle")]]
-        
-        input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","cycle_undisc")]]
-      }
-    }
-
-    # Utilities ----------------------------------------------------------
-    
-    for (util_cat in input_list_trt$uc_lists$util_categories_ongoing) {
-      input_list_trt[paste0(util_cat,"_","ongoing_undisc")] <- disc_ongoing(lcldr=0,
-                                                                          lclprvtime=prevtime,
-                                                                          lclcurtime=curtime,
-                                                                          lclval=input_list_trt[[paste0(util_cat,"_","ongoing")]])
-      
-      input_list_trt[paste0(util_cat,"_","ongoing")] <- disc_ongoing(lcldr=drq,
-                                                                   lclprvtime=prevtime,
-                                                                   lclcurtime=curtime,
-                                                                   lclval=input_list_trt[[paste0(util_cat,"_","ongoing")]])
-      
-      input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","ongoing")]]
-      
-      input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","ongoing_undisc")]]
-      
-    }
-    
-    for (util_cat in input_list_trt$uc_lists$util_categories_instant) {
-      input_list_trt[paste0(util_cat,"_","instant_undisc")] <- disc_instant(lcldr=0,
-                                                                          lclcurtime=curtime,
-                                                                          lclval=input_list_trt[[paste0(util_cat,"_","instant")]])
-      
-      input_list_trt[paste0(util_cat,"_","instant")] <- disc_instant(lcldr=drq,
-                                                                   lclcurtime=curtime,
-                                                                   lclval=input_list_trt[[paste0(util_cat,"_","instant")]])
-      
-      input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","instant")]]
-      
-      input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","instant_undisc")]]
-    }
-    
-    for (util_cat in input_list_trt$uc_lists$util_categories_cycle) {
-      if (length(input_list_trt[[paste0(util_cat,"_","cycle")]])==1 & input_list_trt[[paste0(util_cat,"_","cycle")]]==0) {
-        input_list_trt[paste0(util_cat,"_","cycle")] <- list(addcycle=0)
-        
-        input_list_trt[paste0(util_cat,"_","cycle_undisc")] <- list(addcycle=0)
-        
-        input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","cycle")]]
-        
-        input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","cycle_undisc")]]
-      } else{
-        input_list_trt[paste0(util_cat,"_","cycle_undisc")] <- disc_cycle(lcldr=0, 
-                                                                        lclprvtime=prevtime, 
-                                                                        cyclelength = input_list_trt[p[aste0(util_cat,"_","cycle_l")]],
-                                                                        lclcurtime=curtime,
-                                                                        lclval= input_list_trt[[paste0(util_cat,"_","cycle")]],
-                                                                        starttime = input_list_trt[[paste0(util_cat,"_","cycle_starttime")]]) #cycles of 1 week
-        
-        input_list_trt[paste0(util_cat,"_","cycle")] <- disc_cycle(lcldr=drq,
-                                                                 lclprvtime=prevtime,
-                                                                 cyclelength = input_list_trt[p[aste0(util_cat,"_","cycle_l")]],
-                                                                 lclcurtime=curtime,
-                                                                 lclval= input_list_trt[[paste0(util_cat,"_","cycle")]],
-                                                                 starttime = input_list_trt[[paste0(util_cat,"_","cycle_starttime")]]) #cycles of 1 week
-        
-        input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","cycle")]]
-        
-        input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","cycle_undisc")]]
-      }
-    }
-    
-    #LYs
-    additional_ly <- disc_ongoing(lcldr=drq,
-                                lclprvtime=prevtime, 
-                                lclcurtime=curtime,
-                                lclval=1)
-    
-    additional_ly_undisc <- disc_ongoing(lcldr=0,
-                                       lclprvtime=prevtime,
-                                       lclcurtime=curtime,
-                                       lclval=1)
-    
-    input_list_trt[["itemlys"]] <- additional_ly
-    
-    input_list_trt[["itemlys_undisc"]] <- additional_ly_undisc
+    # input_list_trt[["itemqalys"]]<- 0
+    # input_list_trt[["itemcosts"]]<- 0
+    # input_list_trt[["itemqalys_undisc"]]<- 0
+    # input_list_trt[["itemcosts_undisc"]]<- 0
+    # 
+    # #For each cost/utility category, get the undiscounted/discounted outcomes and get the inputs for ongoing/instant/cycle
+    # #We do undiscounted first as the discounted value will be overwritten to save some writing time
+    # 
+    # # Costs -------------------------------------------------------------------
+    # 
+    # for (cost_cat in input_list_trt$uc_lists$cost_categories_ongoing) {
+    #   input_list_trt[paste0(cost_cat,"_","ongoing_undisc")] <- disc_ongoing(lcldr=0,
+    #                                                                       lclprvtime=prevtime,
+    #                                                                       lclcurtime=curtime,
+    #                                                                       lclval=input_list_trt[[paste0(cost_cat,"_","ongoing")]])
+    #   
+    #   input_list_trt[paste0(cost_cat,"_","ongoing")] <- disc_ongoing(lcldr=drc,
+    #                                                                lclprvtime=prevtime,
+    #                                                                lclcurtime=curtime,
+    #                                                                lclval=input_list_trt[[paste0(cost_cat,"_","ongoing")]])
+    # 
+    #   input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","ongoing")]]
+    #   
+    #   input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","ongoing_undisc")]]
+    #   
+    # }
+    # 
+    # for (cost_cat in input_list_trt$uc_lists$cost_categories_instant) {
+    #   input_list_trt[paste0(cost_cat,"_","instant_undisc")] <- disc_instant(lcldr=0,
+    #                                                                       lclcurtime=curtime,
+    #                                                                       lclval=input_list_trt[[paste0(cost_cat,"_","instant")]])
+    #   
+    #   input_list_trt[paste0(cost_cat,"_","instant")] <- disc_instant(lcldr=drc,
+    #                                                                lclcurtime=curtime,
+    #                                                                lclval=input_list_trt[[paste0(cost_cat,"_","instant")]])
+    #   
+    #   input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","instant")]]
+    #   
+    #   input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","instant_undisc")]]
+    # }
+    # 
+    # for (cost_cat in input_list_trt$uc_lists$cost_categories_cycle) {
+    #   if (length(input_list_trt[paste0(cost_cat,"_","cycle")])==1 & input_list_trt[[paste0(cost_cat,"_","cycle")]]==0) {
+    #     input_list_trt[paste0(cost_cat,"_","cycle")] <- list(addcycle=0)
+    #     
+    #     input_list_trt[paste0(cost_cat,"_","cycle_undisc")] <- list(addcycle=0)
+    #     
+    #     input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","cycle")]]
+    #     
+    #     input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","cycle_undisc")]]
+    #   } else{
+    #     input_list_trt[paste0(cost_cat,"_","cycle_undisc")] <- disc_cycle(lcldr=0,
+    #                                                                     lclprvtime=prevtime,
+    #                                                                     cyclelength = input_list_trt[[paste0(cost_cat,"_","cycle_l")]],
+    #                                                                     lclcurtime=curtime,
+    #                                                                     lclval= input_list_trt[[paste0(cost_cat,"_","cycle")]],
+    #                                                                     starttime = input_list_trt[[paste0(cost_cat,"_","cycle_starttime")]]) #cycles of 1 week
+    #     
+    #     input_list_trt[paste0(cost_cat,"_","cycle")] <- disc_cycle(lcldr=drc,
+    #                                                              lclprvtime=prevtime,
+    #                                                              cyclelength = input_list_trt[[paste0(cost_cat,"_","cycle_l")]],
+    #                                                              lclcurtime=curtime,
+    #                                                              lclval= input_list_trt[[paste0(cost_cat,"_","cycle")]],
+    #                                                              starttime = input_list_trt[[paste0(cost_cat,"_","cycle_starttime")]]) #cycles of 1 week
+    #     
+    #     input_list_trt[["itemcosts"]] <- input_list_trt[["itemcosts"]] + input_list_trt[[paste0(cost_cat,"_","cycle")]]
+    #     
+    #     input_list_trt[["itemcosts_undisc"]] <- input_list_trt[["itemcosts_undisc"]] + input_list_trt[[paste0(cost_cat,"_","cycle_undisc")]]
+    #   }
+    # }
+    # 
+    # # Utilities ----------------------------------------------------------
+    # 
+    # for (util_cat in input_list_trt$uc_lists$util_categories_ongoing) {
+    #   input_list_trt[paste0(util_cat,"_","ongoing_undisc")] <- disc_ongoing(lcldr=0,
+    #                                                                       lclprvtime=prevtime,
+    #                                                                       lclcurtime=curtime,
+    #                                                                       lclval=input_list_trt[[paste0(util_cat,"_","ongoing")]])
+    #   
+    #   input_list_trt[paste0(util_cat,"_","ongoing")] <- disc_ongoing(lcldr=drq,
+    #                                                                lclprvtime=prevtime,
+    #                                                                lclcurtime=curtime,
+    #                                                                lclval=input_list_trt[[paste0(util_cat,"_","ongoing")]])
+    #   
+    #   input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","ongoing")]]
+    #   
+    #   input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","ongoing_undisc")]]
+    #   
+    # }
+    # 
+    # for (util_cat in input_list_trt$uc_lists$util_categories_instant) {
+    #   input_list_trt[paste0(util_cat,"_","instant_undisc")] <- disc_instant(lcldr=0,
+    #                                                                       lclcurtime=curtime,
+    #                                                                       lclval=input_list_trt[[paste0(util_cat,"_","instant")]])
+    #   
+    #   input_list_trt[paste0(util_cat,"_","instant")] <- disc_instant(lcldr=drq,
+    #                                                                lclcurtime=curtime,
+    #                                                                lclval=input_list_trt[[paste0(util_cat,"_","instant")]])
+    #   
+    #   input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","instant")]]
+    #   
+    #   input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","instant_undisc")]]
+    # }
+    # 
+    # for (util_cat in input_list_trt$uc_lists$util_categories_cycle) {
+    #   if (length(input_list_trt[[paste0(util_cat,"_","cycle")]])==1 & input_list_trt[[paste0(util_cat,"_","cycle")]]==0) {
+    #     input_list_trt[paste0(util_cat,"_","cycle")] <- list(addcycle=0)
+    #     
+    #     input_list_trt[paste0(util_cat,"_","cycle_undisc")] <- list(addcycle=0)
+    #     
+    #     input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","cycle")]]
+    #     
+    #     input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","cycle_undisc")]]
+    #   } else{
+    #     input_list_trt[paste0(util_cat,"_","cycle_undisc")] <- disc_cycle(lcldr=0, 
+    #                                                                     lclprvtime=prevtime, 
+    #                                                                     cyclelength = input_list_trt[p[aste0(util_cat,"_","cycle_l")]],
+    #                                                                     lclcurtime=curtime,
+    #                                                                     lclval= input_list_trt[[paste0(util_cat,"_","cycle")]],
+    #                                                                     starttime = input_list_trt[[paste0(util_cat,"_","cycle_starttime")]]) #cycles of 1 week
+    #     
+    #     input_list_trt[paste0(util_cat,"_","cycle")] <- disc_cycle(lcldr=drq,
+    #                                                              lclprvtime=prevtime,
+    #                                                              cyclelength = input_list_trt[p[aste0(util_cat,"_","cycle_l")]],
+    #                                                              lclcurtime=curtime,
+    #                                                              lclval= input_list_trt[[paste0(util_cat,"_","cycle")]],
+    #                                                              starttime = input_list_trt[[paste0(util_cat,"_","cycle_starttime")]]) #cycles of 1 week
+    #     
+    #     input_list_trt[["itemqalys"]] <- input_list_trt[["itemqalys"]] + input_list_trt[[paste0(util_cat,"_","cycle")]]
+    #     
+    #     input_list_trt[["itemqalys_undisc"]] <- input_list_trt[["itemqalys_undisc"]] + input_list_trt[[paste0(util_cat,"_","cycle_undisc")]]
+    #   }
+    # }
+    # 
+    # #LYs
+    # additional_ly <- disc_ongoing(lcldr=drq,
+    #                             lclprvtime=prevtime, 
+    #                             lclcurtime=curtime,
+    #                             lclval=1)
+    # 
+    # additional_ly_undisc <- disc_ongoing(lcldr=0,
+    #                                    lclprvtime=prevtime,
+    #                                    lclcurtime=curtime,
+    #                                    lclval=1)
+    # 
+    # input_list_trt[["itemlys"]] <- additional_ly
+    # 
+    # input_list_trt[["itemlys_undisc"]] <- additional_ly_undisc
     
     
 
