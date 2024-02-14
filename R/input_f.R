@@ -330,8 +330,6 @@ new_event <- function(evt, env_ch = NULL){
   evtlist_temp <- list(cur_evtlist = c(input_list_trt$cur_evtlist,
                                   new_evt))
   
-  evtlist_temp$cur_evtlist <- sort(evtlist_temp$cur_evtlist) 
-  
   input_list_trt[["cur_evtlist"]] <- evtlist_temp$cur_evtlist
   
   list2env(input_list_trt["cur_evtlist"],envir = parent.frame())
@@ -373,8 +371,6 @@ modify_event <- function(evt, env_ch = NULL){
   matched <- which(names_obj_temp %in% names_found)
   
   input_list_trt[["cur_evtlist"]][matched] <- unlist(evt[names_obj_temp[names_obj_temp %in% names_found]])
-  
-  input_list_trt[["cur_evtlist"]] <- sort(input_list_trt[["cur_evtlist"]])
   
   list2env(input_list_trt["cur_evtlist"],envir = parent.frame())
   assign("input_list_trt",input_list_trt, envir = parent.frame())

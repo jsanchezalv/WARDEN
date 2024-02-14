@@ -108,6 +108,7 @@ run_engine_debug <- function(trt_list,
 
       n_evt <- 0
       while(input_list_trt$curtime < Inf){
+
         # Get next event, process, repeat
         output_nxtevt <- get_next_evt(input_list_trt[["cur_evtlist"]])
         Evt <- output_nxtevt$out
