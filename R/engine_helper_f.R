@@ -36,8 +36,6 @@ initiate_evt <- function(trt_name,input_list_trt){
   #Event data
   cur_evtlist <- unlist(time_data$evttime)
   
-  cur_evtlist <- sort(cur_evtlist)
-  
   return(list(cur_evtlist = cur_evtlist, time_data = unlist(time_data$othertime)))
 }
 
@@ -60,7 +58,8 @@ initiate_evt <- function(trt_name,input_list_trt){
 get_next_evt <- function(evt_list){                  # This function identifies which event is to be processed next for each patient, depending on intervention
 
   if (length(evt_list)>0) {
-    cur_evtlist <- list(out = list(evt = names(evt_list[1]), evttime = evt_list[[1]]), evt_list = evt_list[-1])
+    min_evt <- which.min(unlist(evt_list)) #select the position in the vector that has the minimum time
+    cur_evtlist <- list(out = list(evt = names(evt_list[min_evt]), evttime = evt_list[[min_evt]]), evt_list = evt_list[-min_evt])
   } else {
     cur_evtlist <- NULL
   }
@@ -205,6 +204,11 @@ eval_reactevt <-  function(x,evt_name,input_list_trt=NULL){
     drc <- input_list_trt[["drc"]]
     prevtime <- input_list_trt[["prevtime"]]
     curtime <- input_list_trt[["curtime"]]
+    #Reset values per event (LYs don't need to be reset)
+    input_list_trt[["itemqalys"]]<- 0
+    input_list_trt[["itemcosts"]]<- 0
+    input_list_trt[["itemqalys_undisc"]]<- 0
+    input_list_trt[["itemcosts_undisc"]]<- 0
     
     #For each cost/utility category, get the undiscounted/discounted outcomes and get the inputs for ongoing/instant/cycle
     #We do undiscounted first as the discounted value will be overwritten to save some writing time
