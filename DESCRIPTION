@@ -1,6 +1,6 @@
-Package: descem
+Package: RDICE
 Title: Discrete Event Simulation for Cost-Effectiveness Modelling
-Version: 0.1.2
+Version: 0.2
 Authors@R: 
     c(person(given = "Valerie",
            family = "Aponte Ribero",
@@ -12,14 +12,14 @@ Authors@R:
            role = c("aut"),
            email = "javier.sanchez_alvarez@roche.com ",
            comment = ""),
-           person("F. Hoffmann La Roche Ltd", role = c("cph"))
+           person("Evidera", role = c("cph"))
            )
 Description: A package designed to perform discrete event simulation for cost-effectiveness modelling.
 License: Apache License (>= 2)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Suggests: 
     flexsurv,
     dplyr,

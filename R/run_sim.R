@@ -24,7 +24,7 @@
 #' @param drq The discount rate for LYs/QALYs
 #' @param input_out A vector of variables to be returned in the output data frame
 #' @param ipd A boolean to determine if individual patient data should be returned. If set to false, only the main aggregated outputs will be returned (slightly speeds up code)
-#' @param debug A boolean to determine if non-parallel RunEngine function should be used, which facilitates debugging. Setting this option to true will ignore the value of ncores
+#' @param debug A boolean to determine if non-parallel run_engine function should be used, which facilitates debugging. Setting this option to true will ignore the value of ncores
 #'
 #' @return A list of data frames with the simulation results
 #' @importFrom doParallel registerDoParallel
@@ -33,7 +33,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' RunSim(trt_list=c("int","noint"),
+#' run_sim(trt_list=c("int","noint"),
 #' common_all_inputs = common_all_inputs,
 #' common_pt_inputs = common_pt_inputs,
 #' unique_pt_inputs = unique_pt_inputs,
@@ -52,7 +52,7 @@
 #' ipd = TRUE)
 #' }
 
-RunSim <- function(trt_list=c("int","noint"),
+run_sim <- function(trt_list=c("int","noint"),
                    sensitivity_inputs=NULL,
                    common_all_inputs=NULL,
                    common_pt_inputs=NULL,
@@ -220,12 +220,12 @@ RunSim <- function(trt_list=c("int","noint"),
       # Run engine ----------------------------------------------------------
   
       if (debug==TRUE) {
-        final_output <- RunEngine_debug(trt_list=trt_list,
+        final_output <- run_engine_debug(trt_list=trt_list,
                                         common_pt_inputs=common_pt_inputs,
                                         unique_pt_inputs=unique_pt_inputs,
                                         input_list = input_list)                    # run simulation
       } else{
-        final_output <- RunEngine(trt_list=trt_list,
+        final_output <- run_engine(trt_list=trt_list,
                                   common_pt_inputs=common_pt_inputs,
                                   unique_pt_inputs=unique_pt_inputs,
                                   input_list = input_list)                    # run simulation

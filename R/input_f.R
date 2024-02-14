@@ -548,13 +548,12 @@ add_tte <- function(.data=NULL,trt, evts, other_inp = NULL,input){
 #' @return Double based on continuous time discounting
 #'
 #' @examples \dontrun{
-#' AddOngoing(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
+#' disc_ongoing(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
 #' }
 #'
 #' @export
-#' @details
 
-AddOngoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
+disc_ongoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
   
   Instantdr <- log(1+lcldr)
   
@@ -581,12 +580,12 @@ AddOngoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
 #' @return Double based on discrete time discounting
 #'
 #' @examples \dontrun{
-#' AddInstant(lcldr=0.035, lclcurtime=3, lclval=2500)
+#' disc_instant(lcldr=0.035, lclcurtime=3, lclval=2500)
 #' }
 #'
 #' @export
 #' 
-AddInstant <- function(lcldr=0.035, lclcurtime, lclval){
+disc_instant <- function(lcldr=0.035, lclcurtime, lclval){
   
   if (is.null(lclval)) {
     addinst <- 0
@@ -612,12 +611,12 @@ AddInstant <- function(lcldr=0.035, lclcurtime, lclval){
 #' @return Double based on cycle discounting
 #'
 #' @examples \dontrun{
-#' AddCycle(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
+#' disc_cycle(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
 #' }
 #'
 #' @export
 
-AddCycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval,starttime=0){
+disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval,starttime=0){
   
   addcycle <- 0
   

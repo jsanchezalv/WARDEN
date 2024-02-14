@@ -317,7 +317,7 @@ The model is executed with the event reactions and inputs previously defined for
 
 ```{r model_run}
 #Logic is: per patient, per intervention, per event, react to that event.
-results <- RunSim(  
+results <- run_sim(  
   npats=as.numeric(nrow(IPD)),              # Simulating the number of patients for which we have IPD
   n_sim=1,                                  # We run all patients once (per treatment)
   psa_bool = FALSE,                         # No PSA for this example

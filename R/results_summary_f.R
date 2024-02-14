@@ -2,7 +2,7 @@
 
 #' Deterministic results for a specific treatment
 #'
-#' @param out The final_output data frame from the list object returned by `RunSim()`
+#' @param out The final_output data frame from the list object returned by `run_sim()`
 #' @param trt The reference treatment for calculation of incremental outcomes
 #'
 #' @return A dataframe with absolute costs, LYs, QALYs, and ICER and ICUR for each intervention
@@ -104,7 +104,7 @@ data <- data.frame()
 
 #' Summary of PSA outputs for a treatment
 #'
-#' @param out The output_sim data frame from the list object returned by `RunSim()`
+#' @param out The output_sim data frame from the list object returned by `run_sim()`
 #' @param trt The reference treatment for calculation of incremental outcomes
 #'
 #' @return A data frame with mean and 95% CI of absolute costs, LYs, QALYs, ICER and ICUR for each intervention from the PSA samples
@@ -112,10 +112,10 @@ data <- data.frame()
 #'
 #' @examples
 #' \dontrun{
-#' summary_results_psa(results$output_sim, trt="int")
+#' summary_results_sim(results$output_sim, trt="int")
 #' }
 
-summary_results_psa <- function(out = output_sim, trt=NULL){
+summary_results_sim <- function(out = results$output_sim[[1]], trt=NULL){
 
   trt <- ifelse(is.null(trt),out[[1]]$trt_list[1],trt)
 
@@ -210,7 +210,7 @@ summary_results_psa <- function(out = output_sim, trt=NULL){
 
 #' Extract PSA results from a treatment
 #'
-#' @param x The output_sim data frame from the list object returned by `RunSim()`
+#' @param x The output_sim data frame from the list object returned by `run_sim()`
 #' @param element Variable for which PSA results are being extracted (single string)
 #' @param trt Intervention for which PSA results are being extracted (single string)
 #'
@@ -238,8 +238,9 @@ extract_psa_result <- function(x, element,trt) {
 #' Calculate the cost-effectiveness acceptability curve (CEAC) for a DES model with a PSA result
 #'
 #' @param wtp Vector of length >=1 with the willingness to pay
-#' @param results The list object returned by `RunSim()`
+#' @param results The list object returned by `run_sim()`
 #' @param interventions A character vector with the names of the interventions to be used for the analysis
+#' @param sensitivity_used Integer signaling which sensitivity analysis to use
 #'
 #' @return A data frame with the CEAC results
 #' @export
@@ -249,7 +250,7 @@ extract_psa_result <- function(x, element,trt) {
 #' ceac_des(seq(from=10000,to=500000,by=10000),results)
 #' }
 
-ceac_des <- function(wtp, results, interventions = NULL) {
+ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 
   if (is.null(interventions)) {
     interventions <- results$final_output$trt_list
@@ -259,7 +260,7 @@ ceac_des <- function(wtp, results, interventions = NULL) {
   for (comparator in interventions) {
 
      nmb_i <- data.frame(
-       t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim,"total_qalys",comparator)$value - extract_psa_result(results$output_sim,"total_costs",comparator)$value))),
+       as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results$output_sim[[sensitivity_used]],"total_costs",comparator)$value)),
        stringsAsFactors = FALSE)
 
      names(nmb_i) <- format(wtp, scientific=F)
@@ -290,8 +291,9 @@ ceac_des <- function(wtp, results, interventions = NULL) {
 #' Calculate the Expected Value of Perfect Information (EVPI) for a DES model with a PSA result
 #'
 #' @param wtp Vector of length >=1 with the willingness to pay
-#' @param results The list object returned by `RunSim()`
+#' @param results The list object returned by `run_sim()`
 #' @param interventions A character vector with the names of the interventions to be used for the analysis
+#' @param sensitivity_used Integer signaling which sensitivity analysis to use
 #'
 #' @return A data frame with the EVPI results
 #' @export
@@ -301,7 +303,7 @@ ceac_des <- function(wtp, results, interventions = NULL) {
 #' evpi_des(seq(from=10000,to=500000,by=10000),results)
 #' }
 
-evpi_des <- function(wtp, results, interventions = NULL) {
+evpi_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 
   if (is.null(interventions)) {
     interventions <- results$final_output$trt_list
@@ -312,7 +314,7 @@ evpi_des <- function(wtp, results, interventions = NULL) {
   for (comparator in interventions) {
 
     nmb_i <- data.frame(
-      t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim,"total_qalys",comparator)$value - extract_psa_result(results$output_sim,"total_costs",comparator)$value))),
+    as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results$output_sim[[sensitivity_used]],"total_costs",comparator)$value)),
       stringsAsFactors = FALSE)
 
     names(nmb_i) <- format(wtp, scientific=F)

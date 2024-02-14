@@ -1,20 +1,11 @@
 destination: docs
 
+url: ~
 template:
-  includes:
-    in_header: |
-       <!-- Global site tag (gtag.js) - Google Analytics -->
-       <script async src="https://www.googletagmanager.com/gtag/js?id=G-SGZFXJEC6X"#' ></script>
-       <script>
-         window.dataLayer = window.dataLayer || [];
-         function gtag(){dataLayer.push(arguments);}
-         gtag('js', new Date());
-         
-         gtag('config', 'G-SGZFXJEC6X');
-       </script>
+  bootstrap: 5
 
 navbar:
-  title: "descem"
+  title: "RDICE"
   left:
     - icon: fa-home
       href: index.html
@@ -32,20 +23,7 @@ navbar:
           href: articles/example_uncertainty.html
         - text: "Example for Individual Patient Data"
           href: articles/example_ipd.html
-    - text: "Other Packages"
-      menu:
-        - text: "Global-HTA-Evidence-Open"
-          href: https://roche.github.io/Global-HTA-Evidence-Open/index.html
-        - text: "flexsurvPlus"
-          href: https://roche.github.io/flexsurvPlus/index.html          
-        - text: "gemtcPlus"
-          href: https://roche.github.io/gemtcPlus/index.html
-        - text: "MAIC"
-          href: https://roche.github.io/MAIC/index.html          
-        - text: "rpsftmPlus"
-          href: https://roche.github.io/rpsftmPlus/index.html
-        - text: "descem"
-          href: https://roche.github.io/descem/index.html
+
   right:
     - icon: fa-github
-      href: https://github.com/Roche/descem
+      href: https://github.com/javiersanchezalvarezevidera/RDICE

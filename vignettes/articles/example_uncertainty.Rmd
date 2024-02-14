@@ -368,14 +368,14 @@ To do this test, we set `psa_bool = FALSE` and (optional) we set `ipd = FALSE`. 
 
 ```{r struct_uncertainty, message=FALSE, results="hide"}
 
-sample_sizes <- c(100,1000,2000,5000)
+sample_sizes <- c(10,100,500,1000)
 
 sim_size_df <- NULL
 for (sample_size in sample_sizes) {
   results <- suppressWarnings( #run without warnings
-      RunSim(  
+      run_sim(  
     npats=sample_size,                        # number of patients to be simulated
-    n_sim=50,                                # number of simulations to run
+    n_sim=20,                                # number of simulations to run
     psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
     trt_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
@@ -386,25 +386,25 @@ for (sample_size in sample_sizes) {
     util_ongoing_list = util_ongoing,
     cost_ongoing_list = cost_ongoing,
     cost_instant_list = cost_instant,
-    ncores = min(parallel::detectCores() -1,30), # number of cores to use, recommended not to use all
+    ncores = 6, # number of cores to use, recommended not to use all
     drc = 0.035,                              # discount rate for costs
     drq = 0.035,                              # discount rate for qalys
     ipd=FALSE                                 # Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower
   )) 
 
   #We're extracting the overall ICER/ICUR and also costs/qalys/lys for the "noint" intervention
-  loop_df <- rbind(extract_psa_result(results$output_sim,"costs","noint"),
-                   extract_psa_result(results$output_sim,"lys","noint"),
-                   extract_psa_result(results$output_sim,"qalys","noint"),
-                   extract_psa_result(results$output_sim,"costs","int"),
-                   extract_psa_result(results$output_sim,"lys","int"),
-                   extract_psa_result(results$output_sim,"qalys","int"))
+  loop_df <- rbind(extract_psa_result(results$output_sim[[1]],"total_costs","noint"),
+                   extract_psa_result(results$output_sim[[1]],"total_lys","noint"),
+                   extract_psa_result(results$output_sim[[1]],"total_qalys","noint"),
+                   extract_psa_result(results$output_sim[[1]],"total_costs","int"),
+                   extract_psa_result(results$output_sim[[1]],"total_lys","int"),
+                   extract_psa_result(results$output_sim[[1]],"total_qalys","int"))
   
     loop_df <- rbind(loop_df, loop_df %>%
                      spread(trt,value) %>%
                      mutate(dif = int - noint) %>%
                      group_by(simulation) %>%
-                     transmute(value = dif[element=="costs"]/dif[element=="qalys"],element = "ICUR", trt="noint") %>%
+                     transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", trt="noint") %>%
                      relocate(element, trt) %>%
                      ungroup() %>%
                      distinct())
@@ -468,9 +468,9 @@ sample_sizes <- 1000
 
 sim_size_psa_df <- NULL
 for (sample_size in sample_sizes) {
-  results <- suppressWarnings(RunSim(  
+  results <- suppressWarnings(run_sim(  
     npats=sample_size,                        # number of patients to be simulated
-    n_sim=50,                                # number of simulations to run
+    n_sim=20,                                # number of simulations to run
     psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
     trt_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
@@ -481,25 +481,25 @@ for (sample_size in sample_sizes) {
     util_ongoing_list = util_ongoing,
     cost_ongoing_list = cost_ongoing,
     cost_instant_list = cost_instant,
-    ncores = min(parallel::detectCores() -1,30),      # number of cores to use, recommended not to use all
+    ncores = 6,      # number of cores to use, recommended not to use all
     drc = 0.035,                              # discount rate for costs
     drq = 0.035,                              # discount rate for qalys
     ipd=FALSE                                 # Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower
   ))
 
   #We're extracting the overall ICER/ICUR and also costs/qalys/lys for the "noint" intervention
-  loop_psa_df <- rbind(extract_psa_result(results$output_sim[[1]],"costs","noint"),
-                   extract_psa_result(results$output_sim[[1]],"lys","noint"),
-                   extract_psa_result(results$output_sim[[1]],"qalys","noint"),
-                   extract_psa_result(results$output_sim[[1]],"costs","int"),
-                   extract_psa_result(results$output_sim[[1]],"lys","int"),
-                   extract_psa_result(results$output_sim[[1]],"qalys","int"))
+  loop_psa_df <- rbind(extract_psa_result(results$output_sim[[1]],"total_costs","noint"),
+                   extract_psa_result(results$output_sim[[1]],"total_lys","noint"),
+                   extract_psa_result(results$output_sim[[1]],"total_qalys","noint"),
+                   extract_psa_result(results$output_sim[[1]],"total_costs","int"),
+                   extract_psa_result(results$output_sim[[1]],"total_lys","int"),
+                   extract_psa_result(results$output_sim[[1]],"total_qalys","int"))
   
     loop_psa_df <- rbind(loop_psa_df, loop_psa_df %>%
                      spread(trt,value) %>%
                      mutate(dif = int - noint) %>%
                      group_by(simulation) %>%
-                     transmute(value = dif[element=="costs"]/dif[element=="qalys"],element = "ICUR", trt="noint") %>%
+                     transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", trt="noint") %>%
                      relocate(element, trt) %>%
                      ungroup() %>%
                      distinct())
@@ -532,7 +532,7 @@ When a PSA is run, additional analyses can be performed to understand the import
 
 ```{r psa_unc5 , message=FALSE, results="hide"}
 
-  results <- suppressWarnings(RunSim(  
+  results <- suppressWarnings(run_sim(  
     npats=2000,                        # number of patients to be simulated
     n_sim=100,                                # number of simulations to run
     psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
@@ -545,7 +545,7 @@ When a PSA is run, additional analyses can be performed to understand the import
     util_ongoing_list = util_ongoing,
     cost_ongoing_list = cost_ongoing,
     cost_instant_list = cost_instant,
-    ncores = min(parallel::detectCores() -1,30),      # number of cores to use, recommended not to use all
+    ncores = 6,      # number of cores to use, recommended not to use all
     drc = 0.035,                              # discount rate for costs
     drq = 0.035,                              # discount rate for qalys
     ipd=FALSE                                 # Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower
