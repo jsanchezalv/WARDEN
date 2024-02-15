@@ -31,9 +31,9 @@
 #' @export
 #' 
 #' @details This function is slightly different from `run_sim`.
-#' `run_sim` allows to run single-core (`debug=TRUE`) or parallel at the patient level (`run_engine`). 
+#' `run_sim` allows to run single-core.
 #' `run_sim_parallel` allows to use multiple-core at the simulation level,
-#' making it more efficient for a large number of simulations relative to `run_sim`.
+#' making it more efficient for a large number of simulations relative to `run_sim` (e.g., for  PSA).
 #' 
 #' @examples
 #' \dontrun{
@@ -180,7 +180,7 @@ run_sim_parallel <- function(trt_list=c("int","noint"),
       for (inp in 1:length(sensitivity_inputs)) {
         set.seed(sens)
         list.sensitivity_inputs <- lapply(sensitivity_inputs[inp],function(x) eval(x, input_list))
-        if (!is.null(names(list.sensitivity_inputs[[1]]))) {
+        if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
           warning("Item ", names(list.sensitivity_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
         }
         input_list <- c(input_list,list.sensitivity_inputs)
@@ -205,7 +205,7 @@ run_sim_parallel <- function(trt_list=c("int","noint"),
         for (inp in 1:length(common_all_inputs)) {
           set.seed(simulation)
           list.common_all_inputs <- lapply(common_all_inputs[inp],function(x) eval(x, input_list))
-          if (!is.null(names(list.common_all_inputs[[1]]))) {
+          if ((!is.null(names(list.common_all_inputs[[1]]))) & simulation==1 & sens==1) {
             warning("Item ", names(list.common_all_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
           }
           input_list <- c(input_list,list.common_all_inputs)
@@ -214,7 +214,7 @@ run_sim_parallel <- function(trt_list=c("int","noint"),
   
       #Make sure there are no duplicated inputs in the model, if so, take the last one
       duplic <- duplicated(names(input_list),fromLast = T)
-      if (sum(duplic)>0) { warning("Duplicated items detected, using the last one added")  }
+      if (sum(duplic)>0 & simulation==1 & sens==1) { warning("Duplicated items detected, using the last one added")  }
       input_list <- input_list[!duplic]
   
       # Run engine ----------------------------------------------------------

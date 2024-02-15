@@ -368,14 +368,14 @@ To do this test, we set `psa_bool = FALSE` and (optional) we set `ipd = FALSE`. 
 
 ```{r struct_uncertainty, message=FALSE, results="hide"}
 
-sample_sizes <- c(10,100,500,1000)
+sample_sizes <- c(10,100,500)
 
 sim_size_df <- NULL
 for (sample_size in sample_sizes) {
   results <- suppressWarnings( #run without warnings
-      run_sim(  
+      run_sim_parallel(  
     npats=sample_size,                        # number of patients to be simulated
-    n_sim=20,                                # number of simulations to run
+    n_sim=6,                                # number of simulations to run
     psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
     trt_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
@@ -468,9 +468,9 @@ sample_sizes <- 1000
 
 sim_size_psa_df <- NULL
 for (sample_size in sample_sizes) {
-  results <- suppressWarnings(run_sim(  
+  results <- suppressWarnings(run_sim_parallel(  
     npats=sample_size,                        # number of patients to be simulated
-    n_sim=20,                                # number of simulations to run
+    n_sim=6,                                # number of simulations to run
     psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
     trt_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
@@ -532,9 +532,9 @@ When a PSA is run, additional analyses can be performed to understand the import
 
 ```{r psa_unc5 , message=FALSE, results="hide"}
 
-  results <- suppressWarnings(run_sim(  
+  results <- suppressWarnings(run_sim_parallel(  
     npats=2000,                        # number of patients to be simulated
-    n_sim=100,                                # number of simulations to run
+    n_sim=12,                                # number of simulations to run
     psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
     trt_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation

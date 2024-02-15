@@ -165,6 +165,7 @@ pick_val <- function(base,
 #' @param cost Value or expression to calculate the cost estimate
 #' @param evt Vector of events for which this cost is applicable
 #' @param trt Vector of interventions for which this cost is applicable
+#' @param category Name of the cost category. If not defined, will be set as default.
 #' @param cycle_l Cycle length; only needed if costs are calculated per cycle
 #' @param cycle_starttime Cycle when costs start being accrued; only needed if costs are calculated per cycle
 #'
@@ -215,6 +216,7 @@ add_cost <- function(.data=NULL,cost,evt,trt,category="default",cycle_l=NULL,cyc
 #' @param util Value or expression to calculate the utility estimate
 #' @param evt Events for which this utility is applicable
 #' @param trt Interventions for which this utility is applicable
+#' @param category Name of the utility category. If not defined, will be set as default.
 #' @param cycle_l Cycle length; only needed if utilities are calculated per cycle
 #' @param cycle_starttime Cycle when utilities start being accrued; only needed if utilities are calculated per cycle
 #'

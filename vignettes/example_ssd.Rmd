@@ -194,7 +194,6 @@ results <- run_sim(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  ncores = 2,                               # number of cores to use, recommended not to use all
   drc = 0.035,                              # discount rate for costs
   drq = 0.035                               # discount rate for qaly/lys
 )
@@ -207,7 +206,7 @@ Once the model has been run, we can use the results and summarize them using the
 ```{r post-processing_summary}
 
 
-summary_results_det(results$final_output) #will print the last simulation!
+summary_results_det(results$output_sim[[1]][[1]]) #will print the last simulation!
 
 summary_results_sim(results$output_sim[[1]])
 
@@ -236,7 +235,7 @@ We now use the data output to plot the histograms/densities of the simulation.
 
 ```{r post-processing_plots1, fig.width=10, fig.height=8}
 
-data_plot <- results$final_output$merged_df %>%
+data_plot <- results$output_sim[[1]][[1]]$merged_df %>%
   filter(evtname != "sick") %>%
   group_by(trt,evtname,simulation) %>%
   mutate(median = median(evttime)) %>%
@@ -298,6 +297,9 @@ rownames(df_par) <- df_par$parameter_name
 sensitivity_inputs <-add_item(
             pos_indicator = sens - n_sensitivity*floor((sens-1)/n_sensitivity), # which position to use to put the value 1 in indicator
             indicators = append(rep(0, length(df_par))[-pos_indicator],1,pos_indicator-1), #vector of indicators, value 0 everywhere except at sens, where it takes value 1
+                              )
+
+common_all_inputs <-add_item(
             par_used = pick_val_v(base        = df_par[,"base_value"],
                                   psa         = sapply(1:nrow(df_par), function(x) eval(call(df_par[x,"PSA_dist"],1,df_par[x,"a"],df_par[x,"b"]))),
                                   sens        = df_par[,sens_name_used],
@@ -305,10 +307,7 @@ sensitivity_inputs <-add_item(
                                   sens_ind    = sensitivity_bool,
                                   indicator   = indicators,
                                   names_out   = df_par[,"parameter_name"]
-                                  )
-                              )
-
-common_all_inputs <-add_item(
+                                  ),
   util.sick = par_used[["util.sick"]],
   util.sicker = par_used[["util.sicker"]],
   cost.sick = par_used[["cost.sick"]],
@@ -334,7 +333,6 @@ results <- run_sim(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  ncores = 6,                               # number of cores to use, recommended not to use all
   drc = 0.035,                              # discount rate for costs
   drq = 0.035,
   sensitivity_inputs = sensitivity_inputs,
@@ -363,7 +361,7 @@ The model is executed as before, just activating the psa_bool option and using t
 ```{r run_dsa_psa}
 results <- run_sim_parallel(  
   npats=100,                               # number of patients to be simulated
-  n_sim=5,                                  # number of simulations to run
+  n_sim=6,                                  # number of simulations to run
   psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
   trt_list = c("int", "noint"),             # intervention list
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
@@ -388,7 +386,7 @@ results <- run_sim_parallel(
 
 ## Check results
 We briefly check below that indeed the engine has been changing the corresponding parameter value.
-```{r dsa_check}
+```{r dsa_check_psa}
 
 data_sensitivity <- bind_rows(map_depth(results$output_sim,2, "merged_df"))
 

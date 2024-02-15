@@ -129,7 +129,7 @@ summary_results_sim <- function(out = results$output_sim[[1]], trt=NULL){
   
   other_outputs <- names(out[[1]])[!names(out[[1]])%in% remove_outputs_list]
   other_outputs <- unique(sub("_[^_]+$", "", other_outputs)) #remove treatment indicator
-  
+  other_outputs <- other_outputs[!other_outputs=="extradata"]
   
   for (sim in 1:length(out)) {
 
@@ -253,14 +253,14 @@ extract_psa_result <- function(x, element,trt) {
 ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 
   if (is.null(interventions)) {
-    interventions <- results$final_output$trt_list
+    interventions <- results$output_sim[[sensitivity_used]][[1]]$trt_list
   }
 
   nmb <- data.frame()
   for (comparator in interventions) {
 
      nmb_i <- data.frame(
-       as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results$output_sim[[sensitivity_used]],"total_costs",comparator)$value)),
+       t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results$output_sim[[sensitivity_used]],"total_costs",comparator)$value))),
        stringsAsFactors = FALSE)
 
      names(nmb_i) <- format(wtp, scientific=F)
@@ -306,7 +306,7 @@ ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 evpi_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 
   if (is.null(interventions)) {
-    interventions <- results$final_output$trt_list
+    interventions <- results$output_sim[[sensitivity_used]][[1]]$trt_list
   }
 
 
@@ -314,7 +314,7 @@ evpi_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
   for (comparator in interventions) {
 
     nmb_i <- data.frame(
-    as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results$output_sim[[sensitivity_used]],"total_costs",comparator)$value)),
+    t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results$output_sim[[sensitivity_used]],"total_costs",comparator)$value))),
       stringsAsFactors = FALSE)
 
     names(nmb_i) <- format(wtp, scientific=F)
