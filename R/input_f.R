@@ -84,12 +84,12 @@ replicate_profiles <- function(profiles,
 #'            )
 #' }
 pick_val_v <- function(base,
-                     psa,
-                     sens,
-                     psa_ind = psa_bool,
-                     sens_ind = sens_bool,
-                     indicator,
-                     names_out=NULL
+                       psa,
+                       sens,
+                       psa_ind = psa_bool,
+                       sens_ind = sens_bool,
+                       indicator,
+                       names_out=NULL
 ){
 
 
@@ -164,7 +164,8 @@ pick_val <- function(base,
 #' @param .data Existing cost data
 #' @param cost Value or expression to calculate the cost estimate
 #' @param evt Vector of events for which this cost is applicable
-#' @param trt Vector of interventions for which this cost is applicable
+#' @param arm Vector of interventions for which this cost is applicable
+#' @param category Name of the cost category. If not defined, will be set as default.
 #' @param cycle_l Cycle length; only needed if costs are calculated per cycle
 #' @param cycle_starttime Cycle when costs start being accrued; only needed if costs are calculated per cycle
 #'
@@ -177,9 +178,9 @@ pick_val <- function(base,
 #' This function accepts the use of pipes (%>%) to define multiple costs.
 #'
 #' @examples
-#' \dontrun{add_cost(evt = c("start","idfs","ttot"),trt = "int",cost = cost.int*fl.int + cost.idfs)}
+#' \dontrun{add_cost(evt = c("start","idfs","ttot"),arm = "int",cost = cost.int*fl.int + cost.idfs)}
 #'
-add_cost <- function(.data=NULL,cost,evt,trt,category="default",cycle_l=NULL,cycle_starttime=0){
+add_cost <- function(.data=NULL,cost,evt,arm,category="default",cycle_l=NULL,cycle_starttime=0){
   
   if (category=="default") {
     warning("No cost category name assigned, used 'default'")
@@ -187,14 +188,14 @@ add_cost <- function(.data=NULL,cost,evt,trt,category="default",cycle_l=NULL,cyc
   category <- paste0("cost_",category)
   
   data_list <- .data
-  for (trt_item in trt) {
+  for (arm_item in arm) {
     for (event_item in evt) {
 
       cost_item <- list(list(cost=substitute(cost),
                              cycle_l = substitute(cycle_l),
                              cycle_starttime = substitute(cycle_starttime),
                              category=category))
-      names(cost_item) <- paste(event_item,trt_item,category,sep="_")
+      names(cost_item) <- paste(event_item,arm_item,category,sep="_")
 
       if (is.null(data_list)) {
         data_list <- cost_item
@@ -214,7 +215,8 @@ add_cost <- function(.data=NULL,cost,evt,trt,category="default",cycle_l=NULL,cyc
 #' @param .data Existing utility data
 #' @param util Value or expression to calculate the utility estimate
 #' @param evt Events for which this utility is applicable
-#' @param trt Interventions for which this utility is applicable
+#' @param arm Interventions for which this utility is applicable
+#' @param category Name of the utility category. If not defined, will be set as default.
 #' @param cycle_l Cycle length; only needed if utilities are calculated per cycle
 #' @param cycle_starttime Cycle when utilities start being accrued; only needed if utilities are calculated per cycle
 #'
@@ -229,18 +231,18 @@ add_cost <- function(.data=NULL,cost,evt,trt,category="default",cycle_l=NULL,cyc
 #' @examples
 #' \dontrun{
 #' add_util(evt = c("start","idfs","ttot"),
-#' trt = c("int", "noint"),
+#' arm = c("int", "noint"),
 #' util = util.idfs.ontx * fl.idfs.ontx + util.idfs.offtx * (1-fl.idfs.ontx))
 #' }
 
-add_util <- function(.data=NULL,util,evt,trt,category="default",cycle_l=NULL,cycle_starttime=0){
+add_util <- function(.data=NULL,util,evt,arm,category="default",cycle_l=NULL,cycle_starttime=0){
 
   if (category=="default") {
     warning("No utility category name assigned, used 'default'")
   }
   category <- paste0("qaly_",category)
   data_list <- .data
-  for (trt_item in trt) {
+  for (arm_item in arm) {
 
     for (event_item in evt) {
 
@@ -248,7 +250,7 @@ add_util <- function(.data=NULL,util,evt,trt,category="default",cycle_l=NULL,cyc
                              cycle_l = substitute(cycle_l),
                              cycle_starttime = substitute(cycle_starttime),
                              category = category))
-      names(util_item) <- paste(event_item,trt_item,category,sep="_")
+      names(util_item) <- paste(event_item,arm_item,category,sep="_")
 
       if (is.null(data_list)) {
         data_list <- util_item
@@ -325,15 +327,15 @@ new_event <- function(evt, env_ch = NULL){
   new_evt_name <- names(evt)
   new_evt <- setNames(unlist(evt),new_evt_name)
   
-  input_list_trt <- parent.frame()$input_list_trt
+  input_list_arm <- parent.frame()$input_list_arm
   
-  evtlist_temp <- list(cur_evtlist = c(input_list_trt$cur_evtlist,
+  evtlist_temp <- list(cur_evtlist = c(input_list_arm$cur_evtlist,
                                   new_evt))
   
-  input_list_trt[["cur_evtlist"]] <- evtlist_temp$cur_evtlist
+  input_list_arm[["cur_evtlist"]] <- evtlist_temp$cur_evtlist
   
-  list2env(input_list_trt["cur_evtlist"],envir = parent.frame())
-  assign("input_list_trt",input_list_trt, envir = parent.frame())
+  list2env(input_list_arm["cur_evtlist"],envir = parent.frame())
+  assign("input_list_arm",input_list_arm, envir = parent.frame())
 
 }
 
@@ -360,9 +362,9 @@ new_event <- function(evt, env_ch = NULL){
 #' }
 
 modify_event <- function(evt, env_ch = NULL){
-  input_list_trt <- parent.frame()$input_list_trt
+  input_list_arm <- parent.frame()$input_list_arm
   
-  names_obj_temp <- names(input_list_trt$cur_evtlist)
+  names_obj_temp <- names(input_list_arm$cur_evtlist)
   names_evt <- names(evt)
   names_found <- names_evt[names_evt %in% names_obj_temp]
   if (length(names_found)==0) {
@@ -370,10 +372,10 @@ modify_event <- function(evt, env_ch = NULL){
   }
   matched <- which(names_obj_temp %in% names_found)
   
-  input_list_trt[["cur_evtlist"]][matched] <- unlist(evt[names_obj_temp[names_obj_temp %in% names_found]])
+  input_list_arm[["cur_evtlist"]][matched] <- unlist(evt[names_obj_temp[names_obj_temp %in% names_found]])
   
-  list2env(input_list_trt["cur_evtlist"],envir = parent.frame())
-  assign("input_list_trt",input_list_trt, envir = parent.frame())
+  list2env(input_list_arm["cur_evtlist"],envir = parent.frame())
+  assign("input_list_arm",input_list_arm, envir = parent.frame())
   
 
 }
@@ -401,12 +403,12 @@ modify_event <- function(evt, env_ch = NULL){
 #' }
 
 modify_item <- function(list_item, env_ch = NULL){
-  input_list_trt <- parent.frame()$input_list_trt
+  input_list_arm <- parent.frame()$input_list_arm
   
-  input_list_trt[names(list_item)] <- lapply(list_item, unname)
+  input_list_arm[names(list_item)] <- lapply(list_item, unname)
   
   list2env(list_item,envir = parent.frame())
-  assign("input_list_trt",input_list_trt, envir = parent.frame())
+  assign("input_list_arm",input_list_arm, envir = parent.frame())
 }
 
 
@@ -471,7 +473,7 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 #' Define events and the initial event time
 #'
 #' @param .data Existing data for initial event times
-#' @param trt The intervention for which the events and initial event times are defined
+#' @param arm The intervention for which the events and initial event times are defined
 #' @param evts A vector of the names of the events
 #' @param other_inp A vector of other input variables that should be saved during the simulation
 #' @param input The definition of initial event times for the events listed in the evts argument
@@ -486,7 +488,7 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 #'
 #' @examples
 #' \dontrun{
-#' add_tte(trt="int",evts = c("start","ttot","idfs","os"),
+#' add_tte(arm="int",evts = c("start","ttot","idfs","os"),
 #' input={
 #' start <- 0
 #' idfs <- draw_tte(1,'lnorm',coef1=2, coef2=0.5)
@@ -495,17 +497,17 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 #' })
 #' }
 #'
-add_tte <- function(.data=NULL,trt, evts, other_inp = NULL,input){
+add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
   data_list <- .data
 
-  for (trt in trt) {
+  for (arm in arm) {
 
     if (!is.character(other_inp) & !is.null(other_inp)) {
       stop("other_inp argument is required to be a character vector or be set to NULL")
     }
 
     if (!is.character(evts) | length(evts)<2) {
-      stop("evts argument in add_tte for the intervention ", trt, " is required to be a character vector with length >1")
+      stop("evts argument in add_tte for the intervention ", arm, " is required to be a character vector with length >1")
     }
 
 
@@ -513,7 +515,7 @@ add_tte <- function(.data=NULL,trt, evts, other_inp = NULL,input){
                        evts = evts,
                        other_inp = other_inp
     ))
-    names(evt_l) <- paste(trt)
+    names(evt_l) <- paste(arm)
 
     if (is.null(data_list)) {
       data_list <- evt_l
@@ -567,6 +569,58 @@ disc_ongoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
 }
 
 
+#' Calculate discounted costs and qalys between events for vectors
+#'
+#' @param lcldr The discount rate 
+#' @param lclprvtime The time of the previous event in the simulation
+#' @param lclcurtime The time of the current event in the simulation
+#' @param lclval The value to be discounted
+#'
+#' @return Double based on continuous time discounting
+#'
+#' @examples \dontrun{
+#' disc_ongoing_V(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
+#' }
+#'
+#' @export
+
+disc_ongoing_v <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
+  
+  Instantdr <- log(1+lcldr)
+  
+  # calculate additional qalys
+  if(lcldr==0) {
+    add <- lclval*(lclcurtime - lclprvtime)
+  } else{
+    add <- ((lclval)/(0 - Instantdr)) * (exp(lclcurtime * ( 0 - Instantdr)) - exp(lclprvtime * (0 - Instantdr)))
+    
+  }
+  
+  return(add)
+}
+
+#' Calculate instantaneous discounted costs or qalys for vectors
+#'
+#' @param lcldr The discount rate
+#' @param lclcurtime The time of the current event in the simulation
+#' @param lclval The value to be discounted
+#'
+#' @return Double based on discrete time discounting
+#'
+#' @examples \dontrun{
+#' disc_instant_v(lcldr=0.035, lclcurtime=3, lclval=2500)
+#' }
+#'
+#' @export
+#' 
+disc_instant_v <- function(lcldr=0.035, lclcurtime, lclval){
+  
+
+    addinst <- lclval * ((1+lcldr)^(-lclcurtime))    
+
+  return(addinst)
+}
+
 #' Calculate instantaneous discounted costs or qalys
 #'
 #' @param lcldr The discount rate
@@ -591,7 +645,6 @@ disc_instant <- function(lcldr=0.035, lclcurtime, lclval){
   
   return(addinst)
 }
-
 
 # Cycle discounting -------------------------------------------------------
 
@@ -663,4 +716,87 @@ disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval
     }
   }
   return(addcycle)
+}
+
+#' Cycle discounting for vectors
+#'
+#' @param lcldr The discount rate
+#' @param lclprvtime The time of the previous event in the simulation
+#' @param cyclelength The cycle length
+#' @param lclcurtime The time of the current event in the simulation
+#' @param lclval The  value to be discounted
+#' @param starttime The start time for accrual of cycle costs (if not 0)
+#'
+#' @return Double based on cycle discounting
+#'
+#' @examples \dontrun{
+#' disc_cycle_v(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
+#' }
+#'
+#' @export
+
+disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval,starttime=0){
+  
+  addcycle <- rep(0,length(lclval))
+  
+  #Note this makes the cycle utilities work weird, so do not use cycle utilities for now!
+  for (i in 1:length(lclval)) {
+    lclval_i <- lclval[i]
+    starttime_i <- starttime[i]
+    cyclelength_i <- cyclelength[i]
+    
+    
+    if (lclval_i==0 ) {} else{
+      
+      cycle.time.total <- if(starttime_i>= lclcurtime){0}else{seq(from=starttime_i, to = lclcurtime , by= cyclelength_i)} #all cycles that happened until current time of event
+      
+      # cycle.time.total <- seq(from=starttime, to = lclcurtime , by= cyclelength) #all cycles that happened until current time of event
+      
+      #If the cost starts at the selected starttime or at time 0, then include that time, otherwise exclude it
+      if (lclprvtime==0) {
+        cycle.time <- c(0,cycle.time.total[cycle.time.total >= lclprvtime])  #times at which the cycles take place during this event, put this condition to count also time 0
+        n_cycles <- length(cycle.time)
+        s <- (1+lcldr)^cyclelength_i -1
+        addcycle[i] <- sum(addcycle[i],lclval_i * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1) )
+        
+      } else{
+        if (starttime_i ==lclprvtime) {
+          cycle.time <- cycle.time.total[cycle.time.total >= lclprvtime]  #times at which the cycles take place during this event, put this condition to count also time of the previous event
+        } else{
+          cycle.time <- cycle.time.total[cycle.time.total > lclprvtime]  #times at which the cycles take place during this event
+        }
+        n_cycles_remaining <- length(cycle.time)
+        d <- lclprvtime/cyclelength_i
+        s <- (1+lcldr)^cyclelength_i -1
+        addcycle[i] <- sum(addcycle[i], lclval_i * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d)) )
+      }
+      
+      #If starting from 0, can be changed substituting interest rate such that s = (1+r)^cyclelength - 1, and using the formula that lclvalq * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1)
+      #If starting from time t, then compute transformed time as d = t/cyclelength and use lclvalq * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d-1)), where
+      #n_cycles_remaining is the n_cycles - d (so the remaining cycles to be considered), e.g. if 13 cycles (From t=0), and delay 6 periods, then n_cycles_remaining = 7 and d=6
+      
+      # combine additional costs and additional quantity in a list
+      
+    }
+    
+    
+  }
+  return(addcycle)
+}
+
+
+#' Reverts list
+#'
+#' @param ls List
+#'
+#' @return Reverted list
+#'
+#' @examples \dontrun{
+#' revert_list(ls=list(a=list(ab=1,ac=2),b=list(ab=2,ac=3))
+#' }
+#'
+#' @export
+revert_list <- function(ls) {
+  x <- lapply(ls,`[`, names(ls[[1]]))
+  apply(do.call(rbind, x), 2, as.list)
 }

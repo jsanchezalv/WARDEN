@@ -1,6 +1,6 @@
 #' Run the simulation
 #'
-#' @param trt_list A vector of the names of the interventions evaluated in the simulation
+#' @param arm_list A vector of the names of the interventions evaluated in the simulation
 #' @param sensitivity_inputs A list of sensitivity inputs that do not change within a sensitivity in a similar fashion to common_all_inputs, etc
 #' @param common_all_inputs A list of inputs common across patients that do not change within a simulation
 #' @param common_pt_inputs A list of inputs that change across patients but are not affected by the intervention
@@ -13,32 +13,29 @@
 #' @param cost_ongoing_list A list of costs that are accrued at an ongoing basis
 #' @param cost_instant_list A list of costs that are accrued instantaneously at an event
 #' @param cost_cycle_list A list of costs that are accrued in cycles
-#' @param npats The number of patients to be simulated (it will simulate npats * length(trt_list))
+#' @param npats The number of patients to be simulated (it will simulate npats * length(arm_list))
 #' @param n_sim The number of simulations to run per sensitivity
 #' @param psa_bool A boolean to determine if PSA should be conducted. If n_sim > 1 and psa_bool = FALSE, the differences between simulations will be due to sampling
 #' @param sensitivity_bool A boolean to determine if Scenarios/DSA should be conducted. 
 #' @param sensitivity_names A vector of scenario/DSA names that can be used to select the right sensitivity (e.g., c("Scenario_1", "Scenario_2")). The parameter "sens_name_used" is created from it which corresponds to the one being used for each iteration.
 #' @param n_sensitivity Number of sensitivity analysis (DSA or Scenarios) to run. It will be interacted with sensitivity_names argument if not null (n_sensitivityitivity = n_sensitivity * length(sensitivity_names)). For DSA, it should be as many parameters as there are. For scenario, it should be 1.
-#' @param ncores The number of cores to use for parallel computing
 #' @param drc The discount rate for costs
 #' @param drq The discount rate for LYs/QALYs
 #' @param input_out A vector of variables to be returned in the output data frame
 #' @param ipd A boolean to determine if individual patient data should be returned. If set to false, only the main aggregated outputs will be returned (slightly speeds up code)
-#' @param debug A boolean to determine if non-parallel run_engine function should be used, which facilitates debugging. Setting this option to true will ignore the value of ncores
 #'
 #' @return A list of data frames with the simulation results
-#' @importFrom doParallel registerDoParallel
 #'
 #' @export
 #' @details This function is slightly different from `run_sim_parallel`.
 #' `run_sim_parallel` only runs multiple-core at the simulation level.
-#' `run_sim` allows to use single or multiple-core at the patient level.
-#' `run_sim` can be more efficient if using only one simulation (e.g., deterministic) for a large number of patients,
+#' `run_sim` uses only-single core.
+#' `run_sim` can be more efficient if using only one simulation (e.g., deterministic),
 #'  while `run_sim_parallel` will be more efficient if the number of simulations is >1 (e.g., PSA). 
 #'
 #' @examples
 #' \dontrun{
-#' run_sim(trt_list=c("int","noint"),
+#' run_sim(arm_list=c("int","noint"),
 #' common_all_inputs = common_all_inputs,
 #' common_pt_inputs = common_pt_inputs,
 #' unique_pt_inputs = unique_pt_inputs,
@@ -51,13 +48,12 @@
 #' npats = 500,
 #' n_sim = 1,
 #' psa_bool = FALSE,
-#' ncores = 1,
 #' drc = 0.035,
 #' drq = 0.035,
 #' ipd = TRUE)
 #' }
 
-run_sim <- function(trt_list=c("int","noint"),
+run_sim <- function(arm_list=c("int","noint"),
                    sensitivity_inputs=NULL,
                    common_all_inputs=NULL,
                    common_pt_inputs=NULL,
@@ -76,25 +72,16 @@ run_sim <- function(trt_list=c("int","noint"),
                    sensitivity_bool = FALSE,
                    sensitivity_names = NULL,
                    n_sensitivity = 1,
-                   ncores=1,
                    drc=0.035,
                    drq=0.035,
                    input_out = NULL,
-                   ipd = TRUE,
-                   debug = FALSE){
+                   ipd = TRUE){
 
 
 # Set-up basics -----------------------------------------------------------
 
-  if (debug==FALSE) {
-    registerDoParallel(ncores)
-  }
   
-  if (ncores>1 & debug==TRUE) {
-    warning("Number of cores selected >1 but engine (debug) is single-core.")
-  }
-  
-  trt_list <- trt_list #this is done as otherwise there are problems passing arguments from function to function
+  arm_list <- arm_list #this is done as otherwise there are problems passing arguments from function to function
   
   #get cost/utility categories
   categories_costs_ongoing <- unlist(unique(lapply(names(cost_ongoing_list), function(n) cost_ongoing_list[[n]][["category"]])))
@@ -175,7 +162,7 @@ run_sim <- function(trt_list=c("int","noint"),
                        input_out = unique(c(input_out,categories_for_export)),
                        categories_for_export = categories_for_export,
                        ipd = ipd,
-                       trt_list = trt_list,
+                       arm_list = arm_list,
                        npats = npats,
                        n_sim = n_sim,
                        n_sensitivity = n_sensitivity,
@@ -189,7 +176,7 @@ run_sim <- function(trt_list=c("int","noint"),
       for (inp in 1:length(sensitivity_inputs)) {
         set.seed(sens)
         list.sensitivity_inputs <- lapply(sensitivity_inputs[inp],function(x) eval(x, input_list))
-        if (!is.null(names(list.sensitivity_inputs[[1]]))) {
+        if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
           warning("Item ", names(list.sensitivity_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
         }
         input_list <- c(input_list,list.sensitivity_inputs)
@@ -210,7 +197,7 @@ run_sim <- function(trt_list=c("int","noint"),
         for (inp in 1:length(common_all_inputs)) {
           set.seed(simulation)
           list.common_all_inputs <- lapply(common_all_inputs[inp],function(x) eval(x, input_list))
-          if (!is.null(names(list.common_all_inputs[[1]]))) {
+          if ((!is.null(names(list.common_all_inputs[[1]]))) & simulation==1 & sens==1) {
             warning("Item ", names(list.common_all_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
           }
           input_list <- c(input_list,list.common_all_inputs)
@@ -224,21 +211,10 @@ run_sim <- function(trt_list=c("int","noint"),
   
       # Run engine ----------------------------------------------------------
   
-      if (debug==TRUE) {
-        final_output <- run_engine_debug(trt_list=trt_list,
+        final_output <- run_engine(arm_list=arm_list,
                                         common_pt_inputs=common_pt_inputs,
                                         unique_pt_inputs=unique_pt_inputs,
                                         input_list = input_list)                    # run simulation
-      } else{
-        final_output <- run_engine(trt_list=trt_list,
-                                  common_pt_inputs=common_pt_inputs,
-                                  unique_pt_inputs=unique_pt_inputs,
-                                  input_list = input_list)                    # run simulation
-        
-        #clean parallel computing as it can cause issues
-        rm(list=ls(name=foreach:::.foreachGlobals), pos=foreach:::.foreachGlobals) 
-      }
-  
       if (input_list$ipd==TRUE) {
   
         final_output$merged_df$simulation <- simulation
@@ -260,7 +236,7 @@ run_sim <- function(trt_list=c("int","noint"),
   # Export results ----------------------------------------------------------
 
 
-  results <- list(final_output=final_output,output_sim=output_sim)
+  results <- list(output_sim=output_sim)
 
   return(results)
 

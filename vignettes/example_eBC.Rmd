@@ -114,7 +114,7 @@ common_pt_inputs <- add_item(sex_pt = ifelse(rbinom(1,1,p=0.01),"male","female")
                                                      lower_bound = 50) ) #in years, for a patient who is 50yo
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
-#common across trt but changes per pt could be implemented here (if (trt==)... )
+#common across arm but changes per pt could be implemented here (if (arm==)... )
 unique_pt_inputs <- add_item(
   fl.idfs.ontx             = 1,
   fl.idfs                  = 1,
@@ -140,7 +140,7 @@ Note that in our model, the initial list of events are `start, ttot, ttot.beva, 
 
 ```{r model_evts}
 init_event_list <- 
-  add_tte(trt="int",
+  add_tte(arm="int",
                evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc"),
                other_inp = c("os.early","os.mbc"),
                input={ #intervention
@@ -190,7 +190,7 @@ init_event_list <-
     os <- min(os.mbc,os.early,nat.os.s)
     
 
-  }) %>%  add_tte(trt="noint",
+  }) %>%  add_tte(arm="noint",
                        evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc"),
                        other_inp = c("os.early","os.mbc"),                       
                        input={  #reference strategy
@@ -245,7 +245,7 @@ init_event_list <-
 ## Add Reaction to Those Events
 Once the initial times of the events have been defined, we also need to declare how events react and affect each other. To do so, we use the `evt_react_list` object and the `add_reactevt` function. This function just needs to state which event is affected and the actual reaction (usually setting flags to 1 or 0, or creating new/adjusting events). This example contains the addition of a number of events (e.g. adverse events) based on a Poisson distribution and also the modification of a specific event (e.g. modifying the time to death by subtracting 1.5 months from it for each adverse event).
 
-There are a series of objects that can be used in this context to help with the reactions. Apart from the global objects and flags defined above, we can also use `curtime` for the current event time, `prevtime` for the time of the previous event, `cur_evtlist` for the named vector of events that is yet to happen for that patient, `trt` for the current treatment in the loop, `evt` for the current event being processed, `i` expresses the patient iteration, and `simulation` the specific simulation (relevant when the number of simulations is greater than 1). Furthermore, one can also call any other input/item that has been created before or create new ones. For example, we could even modify a cost/utility item by changing it directly, e.g. through `modify_item(list(cost.idfs.tx=500))`.
+There are a series of objects that can be used in this context to help with the reactions. Apart from the global objects and flags defined above, we can also use `curtime` for the current event time, `prevtime` for the time of the previous event, `cur_evtlist` for the named vector of events that is yet to happen for that patient, `arm` for the current treatment in the loop, `evt` for the current event being processed, `i` expresses the patient iteration, and `simulation` the specific simulation (relevant when the number of simulations is greater than 1). Furthermore, one can also call any other input/item that has been created before or create new ones. For example, we could even modify a cost/utility item by changing it directly, e.g. through `modify_item(list(cost.idfs.tx=500))`.
 
 Item | What does it do 
 ------------ | -------------
@@ -354,7 +354,7 @@ Utilities are defined using pipes with the `add_util` function. The first argume
 ```{r utilities}
 
 util_ongoing <- add_util(evt = c("start","ttot","ttot.beva","progression.mbc","os","idfs","ttot.early","remission","recurrence","start.early.mbc","2ndline_mbc","ae"),
-                              trt = c("int", "noint"),
+                              arm = c("int", "noint"),
                               util = if (fl.idfs==1) {
                                 util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
                               } else if (fl.idfs==0 & fl.mbcs==0) {
@@ -373,25 +373,25 @@ Costs are defined using pipes with the `add_cost` function, in a similar fashion
 cost_ongoing <-
   add_cost(
     evt = c("start","idfs","ttot.early") ,
-    trt = "noint",
+    arm = "noint",
     cost = cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs) %>%
   add_cost(
     evt = c("start","idfs","ttot.early") ,
-    trt = "int",
+    arm = "int",
     cost = (cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs) %>%
   add_cost(
     evt = c("remission","recurrence","start.early.mbc"),
-    trt = c("noint","int"),
+    arm = c("noint","int"),
     cost = cost.recurrence * fl.recurrence) %>%
   add_cost(
     evt = c("ttot","ttot.beva","progression.mbc","os","2ndline_mbc"),
-    trt = c("noint","int"),
+    arm = c("noint","int"),
     cost = cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline  )
 
 
 cost_instant <-  add_cost(
   evt = c("ae"),
-  trt = c("noint","int"),
+  arm = c("noint","int"),
   cost = cost.ae)
 
 
@@ -411,7 +411,7 @@ results <- run_sim(
   npats=2000,                              # number of patients to be simulated
   n_sim=1,                                  # number of simulations to run
   psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
-  trt_list = c("int", "noint"),             # intervention list
+  arm_list = c("int", "noint"),             # intervention list
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
   common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
   unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
@@ -420,7 +420,6 @@ results <- run_sim(
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   cost_instant_list = cost_instant,
-  ncores = 2,                               # number of cores to use, recommended not to use all
   drc = 0.035,                              # discount rate for costs
   drq = 0.035,                              # discount rate for QALYs
   input_out = c(                            # list of additional outputs (Flags, etc) that the user wants to export for each patient and event
@@ -439,7 +438,7 @@ Once the model has been run, we can use the results and summarize them using the
 ```{r post-processing_summary}
 
 
-summary_results_det(results$final_output) #will print the last simulation!
+summary_results_det(results$output_sim[[1]][[1]]) #will print the last simulation!
 
 summary_results_sim(results$output_sim[[1]])
 
@@ -456,7 +455,7 @@ We can also check what has been the absolute number of events per strategy.
 
 ```{r post-processing_analysis,echo=FALSE, message=FALSE}
 
-psa_ipd %>% group_by(trt,evtname) %>% summarise(n=n()) %>% arrange(trt,-n)%>%
+psa_ipd %>% group_by(arm,evtname) %>% summarise(n=n()) %>% arrange(arm,-n)%>%
   kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
@@ -468,18 +467,18 @@ We now use the data output to plot the histograms/densities of the simulation.
 
 ```{r post-processing_plots1, fig.width=7, fig.height=4, fig.align = 'center'}
 
-data_plot <- results$final_output$merged_df %>%
+data_plot <- results$output_sim[[1]][[1]]$merged_df %>%
   # mutate(evttime = ifelse(evttime > 99, NA, evttime)) %>%
   filter(evtname != "start") %>%
-  group_by(trt,evtname,simulation) %>%
+  group_by(arm,evtname,simulation) %>%
   mutate(median = median(evttime)) %>%
   ungroup()
 
 #Density
 ggplot(data_plot) +
-  geom_density(aes(fill = trt, x = evttime),
+  geom_density(aes(fill = arm, x = evttime),
                  alpha = 0.7) +
-  geom_vline(aes(xintercept=median,col=trt)) +
+  geom_vline(aes(xintercept=median,col=arm)) +
   facet_wrap( ~ evtname, scales = "free_y") +
   scale_y_continuous(expand = c(0, 0)) +
   scale_x_continuous(expand = c(0, 0)) +
@@ -493,15 +492,15 @@ We can also plot the patient level QALY/costs. Note that there are several clust
 
 ```{r post-processing_plots, fig.width=5, fig.height=4, message=FALSE, fig.align = 'center'}
 
-data_qaly_cost<- psa_ipd[,.SD[1],by=.(pat_id,trt,simulation)][,.(trt,qaly=total_qalys,cost=total_costs,pat_id,simulation)]
+data_qaly_cost<- psa_ipd[,.SD[1],by=.(pat_id,arm,simulation)][,.(arm,qaly=total_qalys,cost=total_costs,pat_id,simulation)]
 data_qaly_cost[,ps_id:=paste(pat_id,simulation,sep="_")]
 
 
-mean_data_qaly_cost <- data_qaly_cost %>% group_by(trt) %>% summarise(across(where(is.numeric),mean))
+mean_data_qaly_cost <- data_qaly_cost %>% group_by(arm) %>% summarise(across(where(is.numeric),mean))
 
-ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = trt)) + 
+ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = arm)) + 
   geom_point(alpha=0.15,shape = 21) +
-  geom_point(data=mean_data_qaly_cost, aes(x=qaly, y = cost, fill = trt), shape = 21,col="black",size=3) +
+  geom_point(data=mean_data_qaly_cost, aes(x=qaly, y = cost, fill = arm), shape = 21,col="black",size=3) +
   scale_y_continuous(expand = c(0, 0)) +
   scale_x_continuous(expand = c(0, 0)) +
   theme_bw()+

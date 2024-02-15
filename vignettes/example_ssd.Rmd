@@ -82,11 +82,11 @@ We then proceed to generate the actual time to event. We use the `draw_tte()` fu
 
 ```{r model_evts}
 init_event_list <- 
-  add_tte(trt="noint", evts = c("sick","sicker","death") ,input={ #intervention
+  add_tte(arm="noint", evts = c("sick","sicker","death") ,input={ #intervention
     sick <- 0
     sicker <- draw_tte(1,dist="exp", coef1=coef_noint)
     
-  }) %>%  add_tte(trt="int", evts = c("sick","sicker","death") ,input={  
+  }) %>%  add_tte(arm="int", evts = c("sick","sicker","death") ,input={  
     sick <- 0
     sicker <- draw_tte(1,dist="exp", coef1=coef_noint, hr = HR_int)
 
@@ -97,7 +97,7 @@ init_event_list <-
 ## Add Reaction to Those Events
 Once the initial times of the events have been defined, we also need to declare how events react and affect each other. To do so, we use the `evt_react_list` object and the `add_reactevt` function. This function just needs to state which event is affected, and the actual reaction (usually setting flags to 1 or 0, or creating new/adjusting events).
 
-There are a series of objects that can be used in this context to help with the reactions. Apart from the global objects and flags defined above, we can also use `curtime` for the current event time, `prevtime` for the time of the previous event, `cur_evtlist` for the named vector of events that is yet to happen for that patient, `trt` for the current treatment in the loop, `evt` for the current event being processed, `i` expresses the patient iteration, and `simulation` the specific simulation (relevant when the number of simulations is greater than 1). Furthermore, one can also call any other input/item that has been created before or create new ones. For example, we could even modify a cost/utility item by changing it directly, e.g. through `modify_item(list(cost.idfs.tx=500))`.
+There are a series of objects that can be used in this context to help with the reactions. Apart from the global objects and flags defined above, we can also use `curtime` for the current event time, `prevtime` for the time of the previous event, `cur_evtlist` for the named vector of events that is yet to happen for that patient, `arm` for the current treatment in the loop, `evt` for the current event being processed, `i` expresses the patient iteration, and `simulation` the specific simulation (relevant when the number of simulations is greater than 1). Furthermore, one can also call any other input/item that has been created before or create new ones. For example, we could even modify a cost/utility item by changing it directly, e.g. through `modify_item(list(cost.idfs.tx=500))`.
 
 Item | What does it do 
 ------------ | -------------
@@ -148,7 +148,7 @@ Utilities are defined using pipes with the `add_util` function. The first argume
 ```{r utilities}
 
 util_ongoing <- add_util(evt = c("sick", "sicker","death"),
-                              trt = c("int", "noint"),
+                              arm = c("int", "noint"),
                               util = util.sick * fl.sick + util.sicker * (1-fl.sick)
 )
 
@@ -162,11 +162,11 @@ Costs are defined using pipes with the `add_cost` function, in a similar fashion
 cost_ongoing <-
   add_cost(
     evt = c("sick", "sicker","death") ,
-    trt = "noint",
+    arm = "noint",
     cost = cost.sick * fl.sick + cost.sicker * (1-fl.sick) ) %>%
   add_cost(
     evt = c("sick", "sicker","death") ,
-    trt = "int",
+    arm = "int",
     cost = cost.sick * fl.sick + cost.sicker * (1-fl.sick) + cost.int * fl.sick ) 
 
 
@@ -186,7 +186,7 @@ results <- run_sim(
   npats=1000,                               # number of patients to be simulated
   n_sim=1,                                  # number of simulations to run
   psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
-  trt_list = c("int", "noint"),             # intervention list
+  arm_list = c("int", "noint"),             # intervention list
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
   common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
   unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
@@ -194,7 +194,6 @@ results <- run_sim(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  ncores = 2,                               # number of cores to use, recommended not to use all
   drc = 0.035,                              # discount rate for costs
   drq = 0.035                               # discount rate for qaly/lys
 )
@@ -207,7 +206,7 @@ Once the model has been run, we can use the results and summarize them using the
 ```{r post-processing_summary}
 
 
-summary_results_det(results$final_output) #will print the last simulation!
+summary_results_det(results$output_sim[[1]][[1]]) #will print the last simulation!
 
 summary_results_sim(results$output_sim[[1]])
 
@@ -224,7 +223,7 @@ We can also check what has been the absolute number of events per strategy.
 
 ```{r post-processing_analysis,echo=FALSE, message=FALSE}
 
-psa_ipd %>% group_by(trt,evtname) %>% summarise(n=n()) %>% arrange(trt,-n)%>%
+psa_ipd %>% group_by(arm,evtname) %>% summarise(n=n()) %>% arrange(arm,-n)%>%
   kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
@@ -236,16 +235,16 @@ We now use the data output to plot the histograms/densities of the simulation.
 
 ```{r post-processing_plots1, fig.width=10, fig.height=8}
 
-data_plot <- results$final_output$merged_df %>%
+data_plot <- results$output_sim[[1]][[1]]$merged_df %>%
   filter(evtname != "sick") %>%
-  group_by(trt,evtname,simulation) %>%
+  group_by(arm,evtname,simulation) %>%
   mutate(median = median(evttime)) %>%
   ungroup()
 
 ggplot(data_plot) +
-  geom_density(aes(fill = trt, x = evttime),
+  geom_density(aes(fill = arm, x = evttime),
                alpha = 0.7) +
-  geom_vline(aes(xintercept=median,col=trt)) +
+  geom_vline(aes(xintercept=median,col=arm)) +
   facet_wrap( ~ evtname, scales = "free") +
   scale_y_continuous(expand = c(0, 0)) +
   scale_x_continuous(expand = c(0, 0)) +
@@ -257,15 +256,15 @@ We can also plot the patient level incremental QALY/costs. Note that there are s
 
 ```{r post-processing_plots, fig.width=10, fig.height=8, message=FALSE}
 
-data_qaly_cost<- psa_ipd[,.SD[1],by=.(pat_id,trt,simulation)][,.(trt,qaly=total_qalys,cost=total_costs,pat_id,simulation)]
+data_qaly_cost<- psa_ipd[,.SD[1],by=.(pat_id,arm,simulation)][,.(arm,qaly=total_qalys,cost=total_costs,pat_id,simulation)]
 data_qaly_cost[,ps_id:=paste(pat_id,simulation,sep="_")]
 
 
-mean_data_qaly_cost <- data_qaly_cost %>% group_by(trt) %>% summarise(across(where(is.numeric),mean))
+mean_data_qaly_cost <- data_qaly_cost %>% group_by(arm) %>% summarise(across(where(is.numeric),mean))
 
-ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = trt)) + 
+ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = arm)) + 
   geom_point(alpha=0.15,shape = 21) +
-  geom_point(data=mean_data_qaly_cost, aes(x=qaly, y = cost, fill = trt), shape = 21,col="black",size=3) +
+  geom_point(data=mean_data_qaly_cost, aes(x=qaly, y = cost, fill = arm), shape = 21,col="black",size=3) +
   scale_y_continuous(expand = c(0, 0)) +
   scale_x_continuous(expand = c(0, 0)) +
   theme_bw()+
@@ -298,6 +297,9 @@ rownames(df_par) <- df_par$parameter_name
 sensitivity_inputs <-add_item(
             pos_indicator = sens - n_sensitivity*floor((sens-1)/n_sensitivity), # which position to use to put the value 1 in indicator
             indicators = append(rep(0, length(df_par))[-pos_indicator],1,pos_indicator-1), #vector of indicators, value 0 everywhere except at sens, where it takes value 1
+                              )
+
+common_all_inputs <-add_item(
             par_used = pick_val_v(base        = df_par[,"base_value"],
                                   psa         = sapply(1:nrow(df_par), function(x) eval(call(df_par[x,"PSA_dist"],1,df_par[x,"a"],df_par[x,"b"]))),
                                   sens        = df_par[,sens_name_used],
@@ -305,10 +307,7 @@ sensitivity_inputs <-add_item(
                                   sens_ind    = sensitivity_bool,
                                   indicator   = indicators,
                                   names_out   = df_par[,"parameter_name"]
-                                  )
-                              )
-
-common_all_inputs <-add_item(
+                                  ),
   util.sick = par_used[["util.sick"]],
   util.sicker = par_used[["util.sicker"]],
   cost.sick = par_used[["cost.sick"]],
@@ -326,7 +325,7 @@ results <- run_sim(
   npats=100,                               # number of patients to be simulated
   n_sim=1,                                  # number of simulations to run
   psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
-  trt_list = c("int", "noint"),             # intervention list
+  arm_list = c("int", "noint"),             # intervention list
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
   common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
   unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
@@ -334,7 +333,6 @@ results <- run_sim(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  ncores = 6,                               # number of cores to use, recommended not to use all
   drc = 0.035,                              # discount rate for costs
   drq = 0.035,
   sensitivity_inputs = sensitivity_inputs,
@@ -363,9 +361,9 @@ The model is executed as before, just activating the psa_bool option and using t
 ```{r run_dsa_psa}
 results <- run_sim_parallel(  
   npats=100,                               # number of patients to be simulated
-  n_sim=5,                                  # number of simulations to run
+  n_sim=6,                                  # number of simulations to run
   psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
-  trt_list = c("int", "noint"),             # intervention list
+  arm_list = c("int", "noint"),             # intervention list
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
   common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
   unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
@@ -388,7 +386,7 @@ results <- run_sim_parallel(
 
 ## Check results
 We briefly check below that indeed the engine has been changing the corresponding parameter value.
-```{r dsa_check}
+```{r dsa_check_psa}
 
 data_sensitivity <- bind_rows(map_depth(results$output_sim,2, "merged_df"))
 

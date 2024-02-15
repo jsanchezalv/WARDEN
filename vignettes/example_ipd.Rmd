@@ -194,7 +194,7 @@ The seed argument is being used in the `draw_tte()` function which uses the `i` 
 ```{r model_evts}
 init_event_list <- 
   #Events applicable to intervention
-  add_tte(trt="int",
+  add_tte(arm="int",
           evts = c("Start",
                    "TxDisc",
                    "Progression",
@@ -209,7 +209,7 @@ init_event_list <-
   }) %>%  
   
   #Events applicable to reference treatment
-  add_tte(trt="ref",
+  add_tte(arm="ref",
           evts = c("Start", #Events are the same except that there will be no treatment discontinuation
                    "Progression",
                    "PAE",
@@ -231,7 +231,7 @@ Reactions for each individual event are defined in the following using the `add_
 evt_react_list <-
   add_reactevt(name_evt = "Start",
                input = {
-                 modify_item(list(fl.int = ifelse(trt=="int",1,0)))
+                 modify_item(list(fl.int = ifelse(arm=="int",1,0)))
                }) %>%
   add_reactevt(name_evt = "TxDisc",
                input = {
@@ -240,7 +240,7 @@ evt_react_list <-
   add_reactevt(name_evt = "Progression",
                input = {
                  modify_item(list("pfs.time"=curtime,"fl.prog"= 1))
-                 if(trt=="int"){modify_event(list("TxDisc" = curtime))} #Trigger treatment discontinuation at progression
+                 if(arm=="int"){modify_event(list("TxDisc" = curtime))} #Trigger treatment discontinuation at progression
                }) %>%
   add_reactevt(name_evt = "Death",
                input = {
@@ -268,12 +268,12 @@ Utilities relating to progression-free and progressed states are common across a
 ```{r utilities}
 
 util_ongoing <- add_util(evt = c("Start","TxDisc","Progression","Death","PAE"),
-                              trt = c("int", "ref"), #common utility across arms
+                              arm = c("int", "ref"), #common utility across arms
                               util = ifelse(fl.prog == 0, util.PFS, util.PPS)
 )
 
 util_instant <- add_util(evt = c("PAE"),
-                              trt = c("int", "ref"), #common utility across arms
+                              arm = c("int", "ref"), #common utility across arms
                               util = disutil.PAE
 )
 
@@ -288,7 +288,7 @@ cost_ongoing <-
   #Drug costs are specific to each arm
   add_cost(
     evt = c("Start","TxDisc","Progression","Death","PAE"),
-    trt = "int",
+    arm = "int",
     cost = (cost.drug.int + 
             cost.admin.SC * 12 + #Intervention is administered once a month
             cost.ae.int) * fl.ontx +
@@ -296,7 +296,7 @@ cost_ongoing <-
       ) %>%
     add_cost(
     evt = c("Start","TxDisc","Progression","Death","PAE"),
-    trt = "ref",
+    arm = "ref",
     cost = cost.drug.ref + cost.ae.ref + #No ongoing administration cost as reference treatment is oral
       ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS)
     )
@@ -304,7 +304,7 @@ cost_ongoing <-
 #One-off cost only applies to oral administration of reference treatment, applied at start of treatment
 cost_instant <-  add_cost(
   evt = "Start",
-  trt = "ref",
+  arm = "ref",
   cost = cost.admin.oral
 )
 
@@ -321,7 +321,7 @@ results <- run_sim(
   npats=as.numeric(nrow(IPD)),              # Simulating the number of patients for which we have IPD
   n_sim=1,                                  # We run all patients once (per treatment)
   psa_bool = FALSE,                         # No PSA for this example
-  trt_list = c("int", "ref"),             
+  arm_list = c("int", "ref"),             
   common_all_inputs = common_all_inputs,    
   common_pt_inputs = common_pt_inputs,      
   unique_pt_inputs = unique_pt_inputs,      
@@ -330,7 +330,6 @@ results <- run_sim(
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   cost_instant_list = cost_instant,
-  ncores = 2,                              
   drc = 0.035,                              # discount rate for costs
   drq = 0.035,                              # discount rate for QALYs
   input_out = c("BLAge","Sex","nat.death","pfs.time")
@@ -344,7 +343,7 @@ Once the model has been run, we can use the results and summarize them using the
 
 ```{r post-processing_summary}
 
-summary_results_det(results$final_output) #will print the last simulation!
+summary_results_det(results$output_sim[[1]][[1]]) #will print the last simulation!
 
 psa_ipd <- bind_rows(map(results$output_sim[[1]], "merged_df")) 
 
@@ -359,7 +358,7 @@ We can also check what has been the absolute number of events per strategy.
 
 ```{r post-processing_analysis,echo=FALSE, message=FALSE}
 
-psa_ipd %>% group_by(trt,evtname) %>% summarise(n=n()) %>% arrange(trt,-n)%>%
+psa_ipd %>% group_by(arm,evtname) %>% summarise(n=n()) %>% arrange(arm,-n)%>%
   kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
@@ -373,7 +372,7 @@ The simulated progression-free survival curve is lower than the observed due to 
 #Overall survival
 KM.death <- psa_ipd %>% filter(evtname=="Death") %>% mutate(Event = 1)
 
-sim.km.OS <- survfit(Surv(evttime, Event) ~ trt, data = KM.death)
+sim.km.OS <- survfit(Surv(evttime, Event) ~ arm, data = KM.death)
 
 km.comb <- list(
   Observed = km.est.OS,
@@ -392,7 +391,7 @@ km.est.PFS <- survfit(Surv(AVAL_PFS/365.25, Event_PFS) ~ ARMCD, data = IPD)
 KM.PFS.DES <- psa_ipd %>% filter(evtname=="Death") %>% mutate(evttime = ifelse(is.na(pfs.time),evttime,pfs.time),
                                                           Event = 1)
 
-sim.km.PFS <- survfit(Surv(evttime, Event) ~ trt, data = KM.PFS.DES)
+sim.km.PFS <- survfit(Surv(evttime, Event) ~ arm, data = KM.PFS.DES)
 
 km.comb <- list(Observed = km.est.PFS,
                 Predicted = sim.km.PFS)
