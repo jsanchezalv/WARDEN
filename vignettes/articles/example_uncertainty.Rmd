@@ -115,7 +115,7 @@ common_pt_inputs <- add_item(sex_pt = ifelse(rbernoulli(1,p=0.01),"male","female
                                                      lower_bound = 50) ) #in years, for a patient who is 50yo
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
-#common across trt but changes per pt could be implemented here (if (trt==)... )
+#common across arm but changes per pt could be implemented here (if (arm==)... )
 unique_pt_inputs <- add_item(
   fl.idfs.ontx             = 1,
   fl.idfs                  = 1,
@@ -135,7 +135,7 @@ Events are generated as before, the only difference being that the parameters ar
 
 ```{r model_evts}
 init_event_list <- 
-  add_tte(trt="int",
+  add_tte(arm="int",
                evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc"),
                other_inp = c("os.early","os.mbc"),
                input={ #intervention
@@ -185,7 +185,7 @@ init_event_list <-
     os <- min(os.mbc,os.early,nat.os.s)
     
 
-  }) %>%  add_tte(trt="noint",
+  }) %>%  add_tte(arm="noint",
                        evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc"),
                        other_inp = c("os.early","os.mbc"),                       
                        input={  #reference strategy
@@ -319,7 +319,7 @@ Costs and utilities are introduced below.
 ```{r utilities_costs}
 
 util_ongoing <- add_util(evt = c("start","ttot","ttot.beva","progression.mbc","os","idfs","ttot.early","remission","recurrence","start.early.mbc","2ndline_mbc","ae"),
-                              trt = c("int", "noint"),
+                              arm = c("int", "noint"),
                               util = if (fl.idfs==1) {
                                 util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
                               } else if (fl.idfs==0 & fl.mbcs==0) {
@@ -332,25 +332,25 @@ util_ongoing <- add_util(evt = c("start","ttot","ttot.beva","progression.mbc","o
 cost_ongoing <-
   add_cost(
     evt = c("start","idfs","ttot.early") ,
-    trt = "noint",
+    arm = "noint",
     cost = cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs) %>%
   add_cost(
     evt = c("start","idfs","ttot.early") ,
-    trt = "int",
+    arm = "int",
     cost = (cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs) %>%
   add_cost(
     evt = c("remission","recurrence","start.early.mbc"),
-    trt = c("noint","int"),
+    arm = c("noint","int"),
     cost = cost.recurrence * fl.recurrence) %>%
   add_cost(
     evt = c("ttot","ttot.beva","progression.mbc","os","2ndline_mbc"),
-    trt = c("noint","int"),
+    arm = c("noint","int"),
     cost = cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline  )
 
 
 cost_instant <-  add_cost(
   evt = c("ae"),
-  trt = c("noint","int"),
+  arm = c("noint","int"),
   cost = cost.ae)
 
 
@@ -377,7 +377,7 @@ for (sample_size in sample_sizes) {
     npats=sample_size,                        # number of patients to be simulated
     n_sim=6,                                # number of simulations to run
     psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
-    trt_list = c("int", "noint"),             # intervention list
+    arm_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
     common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
     unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
@@ -401,11 +401,11 @@ for (sample_size in sample_sizes) {
                    extract_psa_result(results$output_sim[[1]],"total_qalys","int"))
   
     loop_df <- rbind(loop_df, loop_df %>%
-                     spread(trt,value) %>%
+                     spread(arm,value) %>%
                      mutate(dif = int - noint) %>%
                      group_by(simulation) %>%
-                     transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", trt="noint") %>%
-                     relocate(element, trt) %>%
+                     transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", arm="noint") %>%
+                     relocate(element, arm) %>%
                      ungroup() %>%
                      distinct())
     
@@ -421,7 +421,7 @@ We can then plot the results (in this case, the costs, lys and qalys are for the
 sim_size_df$sample_size <- factor(sim_size_df$sample_size)
 
 
-ggplot(sim_size_df%>% filter(trt=="noint") ,aes(x=sample_size,y=value)) +
+ggplot(sim_size_df%>% filter(arm=="noint") ,aes(x=sample_size,y=value)) +
   geom_violin()+
   geom_jitter(alpha=0.3,size=0.5,width=0.2) +
   geom_boxplot(width=0.25,col="darkred") +
@@ -436,7 +436,7 @@ We can also try to understand what is the relative size of the uncertainty provi
 
 ```{r struct_uncertainty3, echo = FALSE, message=FALSE}
 
-sim_size_df %>% filter(trt=="noint")  %>%
+sim_size_df %>% filter(arm=="noint")  %>%
   group_by(element,sample_size) %>%
   summarise(mean=mean(value),sd=sd(value), `CV (%)` = 100*sd(value)/mean(value)) %>%
   kable(digits =2) %>%
@@ -448,7 +448,7 @@ We can plot the CV to see this more clearly:
 ```{r struct_uncertainty4, echo = FALSE, fig.width=10, fig.height=8, message=FALSE}
 
 ggplot(
-    sim_size_df%>% filter(trt=="noint")  %>%
+    sim_size_df%>% filter(arm=="noint")  %>%
         group_by(element,sample_size) %>%
         summarise(mean=mean(value),sd=sd(value), `CV (%)` = 100*sd(value)/mean(value))) +
     geom_point(aes(x=sample_size,y=`CV (%)`,fill= element),shape=21,size = 2, alpha=0.7) +
@@ -472,7 +472,7 @@ for (sample_size in sample_sizes) {
     npats=sample_size,                        # number of patients to be simulated
     n_sim=6,                                # number of simulations to run
     psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
-    trt_list = c("int", "noint"),             # intervention list
+    arm_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
     common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
     unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
@@ -496,11 +496,11 @@ for (sample_size in sample_sizes) {
                    extract_psa_result(results$output_sim[[1]],"total_qalys","int"))
   
     loop_psa_df <- rbind(loop_psa_df, loop_psa_df %>%
-                     spread(trt,value) %>%
+                     spread(arm,value) %>%
                      mutate(dif = int - noint) %>%
                      group_by(simulation) %>%
-                     transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", trt="noint") %>%
-                     relocate(element, trt) %>%
+                     transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", arm="noint") %>%
+                     relocate(element, arm) %>%
                      ungroup() %>%
                      distinct())
   
@@ -516,9 +516,9 @@ Now the uncertainty is much bigger when compared to the same case with 1,000 ite
 ```{r psa_unc4, echo = FALSE, message=FALSE}
 sim_size_psa_df$sample_size <- factor(sim_size_psa_df$sample_size)
 
-sim_size_psa_df%>% filter(trt=="noint")  %>%
+sim_size_psa_df%>% filter(arm=="noint")  %>%
   mutate(uncertainty = "structural + parameter")%>%
-  bind_rows(sim_size_df %>% filter(sample_size==1000 & trt=="noint") %>% mutate(uncertainty = "structural"))%>%
+  bind_rows(sim_size_df %>% filter(sample_size==1000 & arm=="noint") %>% mutate(uncertainty = "structural"))%>%
   group_by(element,sample_size,uncertainty) %>%
   summarise(mean=mean(value),sd=sd(value), `CV (%)` = 100*sd(value)/mean(value)) %>%
   kable(digits =2) %>%
@@ -536,7 +536,7 @@ When a PSA is run, additional analyses can be performed to understand the import
     npats=2000,                        # number of patients to be simulated
     n_sim=12,                                # number of simulations to run
     psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
-    trt_list = c("int", "noint"),             # intervention list
+    arm_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
     common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
     unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions

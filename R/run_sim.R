@@ -1,6 +1,6 @@
 #' Run the simulation
 #'
-#' @param trt_list A vector of the names of the interventions evaluated in the simulation
+#' @param arm_list A vector of the names of the interventions evaluated in the simulation
 #' @param sensitivity_inputs A list of sensitivity inputs that do not change within a sensitivity in a similar fashion to common_all_inputs, etc
 #' @param common_all_inputs A list of inputs common across patients that do not change within a simulation
 #' @param common_pt_inputs A list of inputs that change across patients but are not affected by the intervention
@@ -13,7 +13,7 @@
 #' @param cost_ongoing_list A list of costs that are accrued at an ongoing basis
 #' @param cost_instant_list A list of costs that are accrued instantaneously at an event
 #' @param cost_cycle_list A list of costs that are accrued in cycles
-#' @param npats The number of patients to be simulated (it will simulate npats * length(trt_list))
+#' @param npats The number of patients to be simulated (it will simulate npats * length(arm_list))
 #' @param n_sim The number of simulations to run per sensitivity
 #' @param psa_bool A boolean to determine if PSA should be conducted. If n_sim > 1 and psa_bool = FALSE, the differences between simulations will be due to sampling
 #' @param sensitivity_bool A boolean to determine if Scenarios/DSA should be conducted. 
@@ -35,7 +35,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' run_sim(trt_list=c("int","noint"),
+#' run_sim(arm_list=c("int","noint"),
 #' common_all_inputs = common_all_inputs,
 #' common_pt_inputs = common_pt_inputs,
 #' unique_pt_inputs = unique_pt_inputs,
@@ -53,7 +53,7 @@
 #' ipd = TRUE)
 #' }
 
-run_sim <- function(trt_list=c("int","noint"),
+run_sim <- function(arm_list=c("int","noint"),
                    sensitivity_inputs=NULL,
                    common_all_inputs=NULL,
                    common_pt_inputs=NULL,
@@ -81,7 +81,7 @@ run_sim <- function(trt_list=c("int","noint"),
 # Set-up basics -----------------------------------------------------------
 
   
-  trt_list <- trt_list #this is done as otherwise there are problems passing arguments from function to function
+  arm_list <- arm_list #this is done as otherwise there are problems passing arguments from function to function
   
   #get cost/utility categories
   categories_costs_ongoing <- unlist(unique(lapply(names(cost_ongoing_list), function(n) cost_ongoing_list[[n]][["category"]])))
@@ -162,7 +162,7 @@ run_sim <- function(trt_list=c("int","noint"),
                        input_out = unique(c(input_out,categories_for_export)),
                        categories_for_export = categories_for_export,
                        ipd = ipd,
-                       trt_list = trt_list,
+                       arm_list = arm_list,
                        npats = npats,
                        n_sim = n_sim,
                        n_sensitivity = n_sensitivity,
@@ -211,7 +211,7 @@ run_sim <- function(trt_list=c("int","noint"),
   
       # Run engine ----------------------------------------------------------
   
-        final_output <- run_engine(trt_list=trt_list,
+        final_output <- run_engine(arm_list=arm_list,
                                         common_pt_inputs=common_pt_inputs,
                                         unique_pt_inputs=unique_pt_inputs,
                                         input_list = input_list)                    # run simulation

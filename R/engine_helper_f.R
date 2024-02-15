@@ -2,36 +2,36 @@
 
 #' Execute the initial time to events and separate the events from other inputs that are stored
 #'
-#' @param trt_name A character string of the name of the intervention
-#' @param input_list_trt A list of simulation inputs
+#' @param arm_name A character string of the name of the intervention
+#' @param input_list_arm A list of simulation inputs
 #'
 #' @return A named vector of initial event times, and a named vector of other inputs to be stored
 #'
 #' @examples
-#' initiate_evt(trt = "int",input_list_trt = input_list_trt)
+#' initiate_evt(arm = "int",input_list_arm = input_list_arm)
 #'
 #' @keywords internal
 #' @noRd
 
 
-initiate_evt <- function(trt_name,input_list_trt){
-  position <- which(trt_name==names(input_list_trt$init_event_list))
+initiate_evt <- function(arm_name,input_list_arm){
+  position <- which(arm_name==names(input_list_arm$init_event_list))
 
   time_data <- local({
-    evts_v <- input_list_trt$init_event_list[[position]][["evts"]]
+    evts_v <- input_list_arm$init_event_list[[position]][["evts"]]
     
-    othert_v <- input_list_trt$init_event_list[[position]][["other_inp"]]
+    othert_v <- input_list_arm$init_event_list[[position]][["other_inp"]]
     
     list2env(mget(c(evts_v,othert_v),ifnotfound=Inf), envir=environment()) #initialize
     
-    eval(input_list_trt$init_event_list[[position]][["expr"]]) #run script
+    eval(input_list_arm$init_event_list[[position]][["expr"]]) #run script
     
     evttime <- lapply(mget(evts_v,ifnotfound=Inf),unname) #get event times and make sure they are unnamed
     
     othertime <- if(!is.null(othert_v)){mget(othert_v,ifnotfound=Inf)} else{NULL}  #get other inputs times
     
     out <- list(evttime=evttime, othertime=othertime)
-  },input_list_trt)
+  },input_list_arm)
 
   #Event data
   cur_evtlist <- unlist(time_data$evttime)
@@ -50,7 +50,7 @@ initiate_evt <- function(trt_name,input_list_trt){
 #' @return Two lists: one containing the name and time of the next event, the other with the remaining events to be processed
 #'
 #' @examples
-#' get_next_evt(evt_list = input_list_trt$cur_evtlist)
+#' get_next_evt(evt_list = input_list_arm$cur_evtlist)
 #'
 #' @keywords internal
 #' @noRd
@@ -75,100 +75,100 @@ get_next_evt <- function(evt_list){                  # This function identifies 
 #' Evaluates the reactions of the event identified by GetNextEvt
 #'
 #' @param thisevt A two element list containing the first list from GetNextEvt: evt and evttime
-#' @param trt A character string of the name of the intervention currently being processed
-#' @param input_list_trt A list of simulation inputs
+#' @param arm A character string of the name of the intervention currently being processed
+#' @param input_list_arm A list of simulation inputs
 #'
 #' @return The updated input list with after the reaction to the event is evaluated
 #'
 #' @examples
-#' react_evt(thisevt="evt1",trt="int",input_list_trt=input_list_trt)
+#' react_evt(thisevt="evt1",arm="int",input_list_arm=input_list_arm)
 #'
 #' @keywords internal
 #' @noRd
 
-react_evt <- function(thisevt,trt,input_list_trt=NULL){      # This function processes the next event (as identified in the GetNextEvt function)
+react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function processes the next event (as identified in the GetNextEvt function)
   # Initial set-up --------------------------
   evt <- thisevt$evt                  # Identify event type
-  prevtime <- input_list_trt$curtime                 # Identify time of previous event
+  prevtime <- input_list_arm$curtime                 # Identify time of previous event
   curtime <- thisevt$evttime         # Identify time of next event
   
-  input_list_trt[["curtime"]] <- curtime
-  input_list_trt[["evt"]] <- evt
-  input_list_trt[["prevtime"]] <- prevtime
-  input_list_trt[["trt"]] <- trt
+  input_list_arm[["curtime"]] <- curtime
+  input_list_arm[["evt"]] <- evt
+  input_list_arm[["prevtime"]] <- prevtime
+  input_list_arm[["arm"]] <- arm
   
   # Create costs and utilities for event --------------------------------------------------
-  evt_trt <- paste(evt,trt,sep = "_")
+  evt_arm <- paste(evt,arm,sep = "_")
   
   #For each cost/utility category, evaluate the relevant equation and get the raw inputs for ongoing/instant/cycle
   # Costs -------------------------------------------------------------------
-  for (cost_cat in input_list_trt$uc_lists$cost_categories_ongoing) {
-    input_list_trt[paste0(cost_cat,"_","ongoing")] <- get_input(input_list_trt$uc_lists$cost_ongoing_list,
+  for (cost_cat in input_list_arm$uc_lists$cost_categories_ongoing) {
+    input_list_arm[paste0(cost_cat,"_","ongoing")] <- get_input(input_list_arm$uc_lists$cost_ongoing_list,
                                                                 ifnull=0,
                                                                 type="cost",
-                                                                evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
-                                                                input_list_trt_i=input_list_trt)
+                                                                evt_arm_i=paste(evt_arm,cost_cat,sep="_"),
+                                                                input_list_arm_i=input_list_arm)
   }
-  for (cost_cat in input_list_trt$uc_lists$cost_categories_instant) {
-    input_list_trt[paste0(cost_cat,"_","instant")] <- get_input(input_list_trt$uc_lists$cost_instant_list,
+  for (cost_cat in input_list_arm$uc_lists$cost_categories_instant) {
+    input_list_arm[paste0(cost_cat,"_","instant")] <- get_input(input_list_arm$uc_lists$cost_instant_list,
                                                                 ifnull=0,
                                                                 type="cost",
-                                                                evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
-                                                                input_list_trt_i=input_list_trt)
+                                                                evt_arm_i=paste(evt_arm,cost_cat,sep="_"),
+                                                                input_list_arm_i=input_list_arm)
   }
-  for (cost_cat in input_list_trt$uc_lists$cost_categories_cycle) {
-    input_list_trt[paste0(cost_cat,"_","cycle")] <- get_input(input_list_trt$uc_lists$cost_cycle_list,
+  for (cost_cat in input_list_arm$uc_lists$cost_categories_cycle) {
+    input_list_arm[paste0(cost_cat,"_","cycle")] <- get_input(input_list_arm$uc_lists$cost_cycle_list,
                                                               ifnull=0,
-                                                              type="cost",evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
-                                                              input_list_trt_i=input_list_trt)
-    input_list_trt[paste0(cost_cat,"_","cycle_l")] <- get_input(input_list_trt$uc_lists$cost_cycle_list,
+                                                              type="cost",evt_arm_i=paste(evt_arm,cost_cat,sep="_"),
+                                                              input_list_arm_i=input_list_arm)
+    input_list_arm[paste0(cost_cat,"_","cycle_l")] <- get_input(input_list_arm$uc_lists$cost_cycle_list,
                                                                 ifnull=1,
                                                                 type="cycle_l",
-                                                                evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
-                                                                input_list_trt_i=input_list_trt)
-    input_list_trt[paste0(cost_cat,"_","cycle_starttime")] <- get_input(input_list_trt$uc_lists$cost_cycle_list,
+                                                                evt_arm_i=paste(evt_arm,cost_cat,sep="_"),
+                                                                input_list_arm_i=input_list_arm)
+    input_list_arm[paste0(cost_cat,"_","cycle_starttime")] <- get_input(input_list_arm$uc_lists$cost_cycle_list,
                                                                         ifnull=0,
                                                                         type="cycle_starttime",
-                                                                        evt_trt_i=paste(evt_trt,cost_cat,sep="_"),
-                                                                        input_list_trt_i=input_list_trt)
+                                                                        evt_arm_i=paste(evt_arm,cost_cat,sep="_"),
+                                                                        input_list_arm_i=input_list_arm)
   }
   
   # Utilities -------------------------------------------------------------------
-  for (util_cat in input_list_trt$uc_lists$util_categories_ongoing) {
-    input_list_trt[paste0(util_cat,"_","ongoing")] <- get_input(input_list_trt$uc_lists$util_ongoing_list,
+  for (util_cat in input_list_arm$uc_lists$util_categories_ongoing) {
+    input_list_arm[paste0(util_cat,"_","ongoing")] <- get_input(input_list_arm$uc_lists$util_ongoing_list,
                                                                 ifnull=0,
                                                                 type="util",
-                                                                evt_trt_i=paste(evt_trt,util_cat,sep="_"),
-                                                                input_list_trt_i=input_list_trt)
+                                                                evt_arm_i=paste(evt_arm,util_cat,sep="_"),
+                                                                input_list_arm_i=input_list_arm)
   }
-  for (util_cat in input_list_trt$uc_lists$util_categories_instant) {
-    input_list_trt[paste0(util_cat,"_","instant")] <- get_input(input_list_trt$uc_lists$util_instant_list,
+  for (util_cat in input_list_arm$uc_lists$util_categories_instant) {
+    input_list_arm[paste0(util_cat,"_","instant")] <- get_input(input_list_arm$uc_lists$util_instant_list,
                                                                 ifnull=0,
-                                                                type="util",evt_trt_i=paste(evt_trt,util_cat,sep="_"),
-                                                                input_list_trt_i=input_list_trt)
+                                                                type="util",evt_arm_i=paste(evt_arm,util_cat,sep="_"),
+                                                                input_list_arm_i=input_list_arm)
   }
-  for (util_cat in input_list_trt$uc_lists$util_categories_cycle) {
-    input_list_trt[paste0(util_cat,"_","cycle")] <- get_input(input_list_trt$uc_lists$util_cycle_list,ifnull=0,
+  for (util_cat in input_list_arm$uc_lists$util_categories_cycle) {
+    input_list_arm[paste0(util_cat,"_","cycle")] <- get_input(input_list_arm$uc_lists$util_cycle_list,ifnull=0,
                                                               type="util",
-                                                              evt_trt_i=paste(evt_trt,util_cat,sep="_"),
-                                                              input_list_trt_i=input_list_trt)
-    input_list_trt[paste0(util_cat,"_","cycle_l")] <- get_input(input_list_trt$uc_lists$util_cycle_list,
+                                                              evt_arm_i=paste(evt_arm,util_cat,sep="_"),
+                                                              input_list_arm_i=input_list_arm)
+    input_list_arm[paste0(util_cat,"_","cycle_l")] <- get_input(input_list_arm$uc_lists$util_cycle_list,
                                                                 ifnull=1,
                                                                 type="cycle_l",
-                                                                evt_trt_i=paste(evt_trt,util_cat,sep="_"),
-                                                                input_list_trt_i=input_list_trt)
-    input_list_trt[paste0(util_cat,"_","cycle_starttime")] <- get_input(input_list_trt$uc_lists$util_cycle_list,
+                                                                evt_arm_i=paste(evt_arm,util_cat,sep="_"),
+                                                                input_list_arm_i=input_list_arm)
+    input_list_arm[paste0(util_cat,"_","cycle_starttime")] <- get_input(input_list_arm$uc_lists$util_cycle_list,
                                                                         ifnull=0,
                                                                         type="cycle_starttime",
-                                                                        evt_trt_i=paste(evt_trt,util_cat,sep="_"),
-                                                                        input_list_trt_i=input_list_trt)
+                                                                        evt_arm_i=paste(evt_arm,util_cat,sep="_"),
+                                                                        input_list_arm_i=input_list_arm)
   }
 
   #Evaluate the reaction to the event
-  input_list_trt <- eval_reactevt(input_list_trt$evt_react_list, evt,input_list_trt)
+  input_list_arm <- eval_reactevt(input_list_arm$evt_react_list, evt,input_list_arm)
   
 
-  return(input_list_trt)
+  return(input_list_arm)
 
 }
 
@@ -178,19 +178,19 @@ react_evt <- function(thisevt,trt,input_list_trt=NULL){      # This function pro
 
 #' Calculates the expression which has been defined in the reaction of the event 
 #'
-#' @param react_list The evt_react_list from the input_list_trt object. It contains the reactions to events.
+#' @param react_list The evt_react_list from the input_list_arm object. It contains the reactions to events.
 #' @param evt_name The current event being processed
-#' @param input_list_trt A list of simulation inputs
+#' @param input_list_arm A list of simulation inputs
 #'
 #' @return The modified input list with the updates after executing the corresponding reactions
 #'
 #' @examples
-#' eval_reactevt(react_list = input_list_trt$evt_react_list,evt_name ="evt1",input_list_trt=input_list_trt)
+#' eval_reactevt(react_list = input_list_arm$evt_react_list,evt_name ="evt1",input_list_arm=input_list_arm)
 #'
 #' @keywords internal
 #' @noRd
 
-eval_reactevt <-  function(react_list,evt_name,input_list_trt=NULL){
+eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
   # Initial set-up --------------------------
 
   position <- which(evt_name==names(react_list))
@@ -203,16 +203,16 @@ eval_reactevt <-  function(react_list,evt_name,input_list_trt=NULL){
 
     
     
-    input_list_trt <- local({
-      input_list_trt <- input_list_trt
-      eval(x[[position]][["react"]]) #run script
-      out <- input_list_trt
-    },input_list_trt)
+    input_list_arm <- local({
+      input_list_arm <- input_list_arm
+      eval(react_list[[position]][["react"]]) #run script
+      out <- input_list_arm
+    },input_list_arm)
     
     
     
   
-  return(input_list_trt)
+  return(input_list_arm)
   
 
 }
@@ -225,20 +225,20 @@ eval_reactevt <-  function(react_list,evt_name,input_list_trt=NULL){
 #' @param x The specific cost/utility and its type (ongoing, instant...) to be used, created through add_cost/add_util
 #' @param ifnull Value to be used if the input has not been defined
 #' @param type Identifies what type of input is being used. Can be "cost", "util", "cycle_l" (cycle length) and "cycle_starttime" (starting time of the cycle)
-#' @param evt_trt_i The event-intervention identifier to understand which specific input to use, separated by an underscore
-#' @param input_list_trt_i  A list of simulation inputs
+#' @param evt_arm_i The event-intervention identifier to understand which specific input to use, separated by an underscore
+#' @param input_list_arm_i  A list of simulation inputs
 #'
 #' @return A numeric vector of evaluated costs/utilities/cycle lengths/starting times for the specific event and intervention defined
 #'
 #' @examples
-#' get_input(x = input_list_trt$uc_lists$cost_ongoing_list,ifnull=0,type="cost",evt_trt_i="evt1_int",input_list_trt_i=input_list_trt)
+#' get_input(x = input_list_arm$uc_lists$cost_ongoing_list,ifnull=0,type="cost",evt_arm_i="evt1_int",input_list_arm_i=input_list_arm)
 #'
 #' @keywords internal
 #' @noRd
 
-get_input <-  function(x,ifnull=0,type,evt_trt_i =evt_trt, input_list_trt_i=input_list_trt){
+get_input <-  function(x,ifnull=0,type,evt_arm_i =evt_arm, input_list_arm_i=input_list_arm){
   out <- NULL
-  items <- x[names(x)==evt_trt_i]
+  items <- x[names(x)==evt_arm_i]
   items_l <- length(items)
   if (items_l==0) {
     out <-  c(out,ifnull)
@@ -249,7 +249,7 @@ get_input <-  function(x,ifnull=0,type,evt_trt_i =evt_trt, input_list_trt_i=inpu
                 if(is.null(items[[1]][[type]])){
                   ifnull
                 } else{
-                  eval(items[[1]][[type]],input_list_trt_i)
+                  eval(items[[1]][[type]],input_list_arm_i)
                 } #lazy eval will give error on null, so just put 0 in that case
       )
       #otherwise do loop per item
@@ -259,7 +259,7 @@ get_input <-  function(x,ifnull=0,type,evt_trt_i =evt_trt, input_list_trt_i=inpu
                   if(is.null(items[[i]][[type]])){
                     ifnull
                   } else{
-                    eval(items[[i]][[type]],input_list_trt_i)
+                    eval(items[[i]][[type]],input_list_arm_i)
                   } #lazy eval will give error on null, so just put 0 in that case
         )
       }
@@ -277,7 +277,7 @@ get_input <-  function(x,ifnull=0,type,evt_trt_i =evt_trt, input_list_trt_i=inpu
 #'
 #' @param output_sim The output_psa data frame from the list object returned by `run_sim()`
 #' @param element Variable for which mean and 95% CIs are computed (single string)
-#' @param trt Treatment for which mean and 95% CIs are computed (single string)
+#' @param arm Treatment for which mean and 95% CIs are computed (single string)
 #' @param round_digit Number of digits to round outputs
 #'
 #' @return Mean and 95% CI from the PSA samples
@@ -285,17 +285,17 @@ get_input <-  function(x,ifnull=0,type,evt_trt_i =evt_trt, input_list_trt_i=inpu
 #' @importFrom stats quantile
 #'
 #' @examples
-#' interval_out(output_sim=results$output_sim[[1]],element="costs.",trt="int",round_digit=3)
+#' interval_out(output_sim=results$output_sim[[1]],element="costs.",arm="int",round_digit=3)
 #'
 #' @keywords internal
 #' @noRd
 
-interval_out <- function(output_sim, element, trt,round_digit=2) {
-  out <- paste0(round(mean(map_dbl(output_sim,paste0(element,trt)),na.rm=TRUE),round_digit),
+interval_out <- function(output_sim, element, arm,round_digit=2) {
+  out <- paste0(round(mean(map_dbl(output_sim,paste0(element,arm)),na.rm=TRUE),round_digit),
                 "(",
-                round(quantile(map_dbl(output_sim,paste0(element,trt)),0.025,na.rm=TRUE),round_digit) ,
+                round(quantile(map_dbl(output_sim,paste0(element,arm)),0.025,na.rm=TRUE),round_digit) ,
                 ", ",
-                round(quantile(map_dbl(output_sim,paste0(element,trt)),0.975,na.rm=TRUE),round_digit),
+                round(quantile(map_dbl(output_sim,paste0(element,arm)),0.975,na.rm=TRUE),round_digit),
                 ")"
   )
   return(out)
@@ -320,7 +320,7 @@ interval_out <- function(output_sim, element, trt,round_digit=2) {
 #' @noRd
 
 compute_outputs <- function(patdata,input_list) {
-  trt_list <- input_list$trt_list
+  arm_list <- input_list$arm_list
   simulation <- input_list$simulation
   sens <- input_list$sens
   n_sim <- input_list$n_sim
@@ -333,8 +333,8 @@ compute_outputs <- function(patdata,input_list) {
   #Split the data as to be exported as a data.table, and the extra data the user described
   data_export_aslist <- names(input_list$input_out[!names(input_list$input_out) %in% input_list$categories_for_export])
   
-  for (trt_i in trt_list) {
-    list_evts <- unlist(map(map(patdata,trt_i),"evtlist"), recursive = FALSE)
+  for (arm_i in arm_list) {
+    list_evts <- unlist(map(map(patdata,arm_i),"evtlist"), recursive = FALSE)
     list_patdata <- c(list_patdata,list_evts)
   }  
   
@@ -482,15 +482,15 @@ compute_outputs <- function(patdata,input_list) {
                                              lclval=1)]
   
   #Calculate total outcomes
-  patdata_dt[,"total_costs" := sum(costs),by=.(pat_id,trt)]
-  patdata_dt[,"total_qalys" := sum(qalys),by=.(pat_id,trt)]
-  patdata_dt[,"total_lys" := sum(lys),by=.(pat_id,trt)]
-  patdata_dt[,"total_costs_undisc" := sum(costs_undisc),by=.(pat_id,trt)]
-  patdata_dt[,"total_qalys_undisc" := sum(qalys_undisc),by=.(pat_id,trt)]
-  patdata_dt[,"total_lys_undisc" := sum(lys_undisc),by=.(pat_id,trt)]
+  patdata_dt[,"total_costs" := sum(costs),by=.(pat_id,arm)]
+  patdata_dt[,"total_qalys" := sum(qalys),by=.(pat_id,arm)]
+  patdata_dt[,"total_lys" := sum(lys),by=.(pat_id,arm)]
+  patdata_dt[,"total_costs_undisc" := sum(costs_undisc),by=.(pat_id,arm)]
+  patdata_dt[,"total_qalys_undisc" := sum(qalys_undisc),by=.(pat_id,arm)]
+  patdata_dt[,"total_lys_undisc" := sum(lys_undisc),by=.(pat_id,arm)]
   
   #Partially order the data
-  data.table::setcolorder(patdata_dt,   c("evtname", "evttime", "prevtime", "pat_id", "trt",
+  data.table::setcolorder(patdata_dt,   c("evtname", "evttime", "prevtime", "pat_id", "arm",
                                           "total_lys","total_qalys","total_costs",
                                           "total_costs_undisc", "total_qalys_undisc", "total_lys_undisc",
                                           "lys","qalys","costs",
@@ -507,16 +507,16 @@ compute_outputs <- function(patdata,input_list) {
   
   #Add to final outputs the total outcomes as well as the cost/utility categories totals
   vector_other_outputs <- input_list$categories_for_export
-  for (trt_i in trt_list) {
+  for (arm_i in arm_list) {
     for (output_i in 1:length(vector_total_outputs)) {
-      final_output[[paste0(vector_total_outputs[output_i],trt_i)]] <- patdata_dt[trt==trt_i,.(out=sum(get(vector_total_outputs_search[output_i]))),by=.(pat_id)][,mean(out)]
+      final_output[[paste0(vector_total_outputs[output_i],arm_i)]] <- patdata_dt[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]))),by=.(pat_id)][,mean(out)]
     }
     for (output_i in 1:length(vector_other_outputs)) {
-      final_output[[paste0(vector_other_outputs[output_i],"_",trt_i)]] <- patdata_dt[trt==trt_i,.(out=sum(get(vector_other_outputs[output_i]))),by=.(pat_id)][,mean(out)]
+      final_output[[paste0(vector_other_outputs[output_i],"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=sum(get(vector_other_outputs[output_i]))),by=.(pat_id)][,mean(out)]
     }
   }
   
-  final_output$trt_list <- trt_list
+  final_output$arm_list <- arm_list
   
   #Exports IPD values
   if (input_list$ipd==TRUE) {
