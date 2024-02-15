@@ -84,12 +84,12 @@ replicate_profiles <- function(profiles,
 #'            )
 #' }
 pick_val_v <- function(base,
-                     psa,
-                     sens,
-                     psa_ind = psa_bool,
-                     sens_ind = sens_bool,
-                     indicator,
-                     names_out=NULL
+                       psa,
+                       sens,
+                       psa_ind = psa_bool,
+                       sens_ind = sens_bool,
+                       indicator,
+                       names_out=NULL
 ){
 
 

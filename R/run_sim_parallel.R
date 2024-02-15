@@ -219,7 +219,7 @@ run_sim_parallel <- function(trt_list=c("int","noint"),
   
       # Run engine ----------------------------------------------------------
   
-        final_output <- run_engine_debug(trt_list=trt_list,
+        final_output <- run_engine(trt_list=trt_list,
                                         common_pt_inputs=common_pt_inputs,
                                         unique_pt_inputs=unique_pt_inputs,
                                         input_list = input_list)                    # run simulation

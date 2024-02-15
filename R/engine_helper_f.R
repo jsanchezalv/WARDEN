@@ -178,22 +178,22 @@ react_evt <- function(thisevt,trt,input_list_trt=NULL){      # This function pro
 
 #' Calculates the expression which has been defined in the reaction of the event 
 #'
-#' @param x The evt_react_list from the input_list_trt object. It contains the reactions to events.
+#' @param react_list The evt_react_list from the input_list_trt object. It contains the reactions to events.
 #' @param evt_name The current event being processed
 #' @param input_list_trt A list of simulation inputs
 #'
 #' @return The modified input list with the updates after executing the corresponding reactions
 #'
 #' @examples
-#' eval_reactevt(x = input_list_trt$evt_react_list,evt_name ="evt1",input_list_trt=input_list_trt)
+#' eval_reactevt(react_list = input_list_trt$evt_react_list,evt_name ="evt1",input_list_trt=input_list_trt)
 #'
 #' @keywords internal
 #' @noRd
 
-eval_reactevt <-  function(x,evt_name,input_list_trt=NULL){
+eval_reactevt <-  function(react_list,evt_name,input_list_trt=NULL){
   # Initial set-up --------------------------
 
-  position <- which(evt_name==names(x))
+  position <- which(evt_name==names(react_list))
   pos_l <- length(position)
   if (pos_l==0 | pos_l>1 ) {
     stop("Reaction to event ", evt_name, " not recognised or more than one reaction found. Make sure that only one reaction has been defined for the event")    
@@ -275,7 +275,7 @@ get_input <-  function(x,ifnull=0,type,evt_trt_i =evt_trt, input_list_trt_i=inpu
 
 #' Calculate mean and 95% CI from samples
 #'
-#' @param x  The output_psa data frame from the list object returned by `run_sim()`
+#' @param output_sim The output_psa data frame from the list object returned by `run_sim()`
 #' @param element Variable for which mean and 95% CIs are computed (single string)
 #' @param trt Treatment for which mean and 95% CIs are computed (single string)
 #' @param round_digit Number of digits to round outputs
@@ -285,17 +285,17 @@ get_input <-  function(x,ifnull=0,type,evt_trt_i =evt_trt, input_list_trt_i=inpu
 #' @importFrom stats quantile
 #'
 #' @examples
-#' interval_out(x=results$output_psa,element="costs.",trt="int",round_digit=3)
+#' interval_out(output_sim=results$output_sim[[1]],element="costs.",trt="int",round_digit=3)
 #'
 #' @keywords internal
 #' @noRd
 
-interval_out <- function(x, element, trt,round_digit=2) {
-  out <- paste0(round(mean(map_dbl(x,paste0(element,trt)),na.rm=TRUE),round_digit),
+interval_out <- function(output_sim, element, trt,round_digit=2) {
+  out <- paste0(round(mean(map_dbl(output_sim,paste0(element,trt)),na.rm=TRUE),round_digit),
                 "(",
-                round(quantile(map_dbl(x,paste0(element,trt)),0.025,na.rm=TRUE),round_digit) ,
+                round(quantile(map_dbl(output_sim,paste0(element,trt)),0.025,na.rm=TRUE),round_digit) ,
                 ", ",
-                round(quantile(map_dbl(x,paste0(element,trt)),0.975,na.rm=TRUE),round_digit),
+                round(quantile(map_dbl(output_sim,paste0(element,trt)),0.975,na.rm=TRUE),round_digit),
                 ")"
   )
   return(out)

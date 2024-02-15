@@ -10,10 +10,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' summary_results_det(results$final_output,trt="int")
+#' summary_results_det(results$output_sim[[1]][[1]],trt="int")
 #' }
 
-summary_results_det <- function(out = final_output, trt=NULL){
+summary_results_det <- function(out = results$output_sim[[1]][[1]], trt=NULL){
   trt <- ifelse(is.null(trt),out$trt_list[1],trt)
 
   other_trt_list <- out$trt_list[out$trt_list!=trt] #For any other treatment that is not the reference one, add the reference trt costs/lys/qalys
@@ -112,7 +112,7 @@ data <- data.frame()
 #'
 #' @examples
 #' \dontrun{
-#' summary_results_sim(results$output_sim, trt="int")
+#' summary_results_sim(results$output_sim[[1]], trt="int")
 #' }
 
 summary_results_sim <- function(out = results$output_sim[[1]], trt=NULL){
@@ -219,7 +219,7 @@ summary_results_sim <- function(out = results$output_sim[[1]], trt=NULL){
 #'
 #' @examples
 #' \dontrun{
-#' extract_psa_result(results$output_sim,"costs","int")
+#' extract_psa_result(results$output_sim[[1]],"costs","int")
 #' }
 
 extract_psa_result <- function(x, element,trt) {
