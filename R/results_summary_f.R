@@ -277,13 +277,13 @@ ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
   }
 
   nmb <- nmb %>%
-    group_by(wtp,iteration) %>%
-    mutate(best_nmb= ifelse(max(nmb)>0,comparator[nmb==max(nmb)],NA))
+    dplyr::group_by(wtp,iteration) %>%
+    dplyr::mutate(best_nmb= ifelse(max(nmb)>0,comparator[nmb==max(nmb)],NA))
 
   ceac <- nmb %>%
-    group_by(wtp,comparator) %>%
-    summarise(prob_best= sum(best_nmb==comparator)/n()) %>%
-    mutate(prob_best = ifelse(is.na(prob_best),0,prob_best))
+    dplyr::group_by(wtp,comparator) %>%
+    dplyr::summarise(prob_best= sum(best_nmb==comparator)/n()) %>%
+    dplyr::mutate(prob_best = ifelse(is.na(prob_best),0,prob_best))
 
 
   return(ceac)
@@ -334,16 +334,16 @@ evpi_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
   }
 
   nmb <-nmb %>%
-    group_by(wtp,comparator) %>%
-    mutate(mean_nmb=mean(nmb)) %>%
-    group_by(wtp,iteration) %>%
-    mutate(max_nmb=max(nmb)) %>%
-    group_by(wtp) %>%
-    mutate(max_mean_nmb = max(mean_nmb),
+    dplyr::group_by(wtp,comparator) %>%
+    dplyr::mutate(mean_nmb=mean(nmb)) %>%
+    dplyr::group_by(wtp,iteration) %>%
+    dplyr::mutate(max_nmb=max(nmb)) %>%
+    dplyr::group_by(wtp) %>%
+    dplyr::mutate(max_mean_nmb = max(mean_nmb),
            mean_max_nmb = mean(max_nmb)) %>%
-    ungroup() %>%
-    mutate(evpi = mean_max_nmb - max_mean_nmb) %>%
-    select(wtp,evpi)
+    dplyr::ungroup() %>%
+    dplyr::mutate(evpi = mean_max_nmb - max_mean_nmb) %>%
+    dplyr::select(wtp,evpi)
 
 
   return(nmb)

@@ -467,7 +467,7 @@ We now use the data output to plot the histograms/densities of the simulation.
 
 ```{r post-processing_plots1, fig.width=7, fig.height=4, fig.align = 'center'}
 
-data_plot <- results$output_sim[[1]][[1]]$merged_df %>%
+data_plot <- results[[1]][[1]]$merged_df %>%
   # mutate(evttime = ifelse(evttime > 99, NA, evttime)) %>%
   filter(evtname != "start") %>%
   group_by(arm,evtname,simulation) %>%

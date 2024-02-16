@@ -4,7 +4,15 @@
 \alias{add_cost}
 \title{Defining costs for events and intervention}
 \usage{
-add_cost(.data = NULL, cost, evt, trt, cycle_l = NULL, cycle_starttime = 0)
+add_cost(
+  .data = NULL,
+  cost,
+  evt,
+  arm,
+  category = "default",
+  cycle_l = NULL,
+  cycle_starttime = 0
+)
 }
 \arguments{
 \item{.data}{Existing cost data}
@@ -13,7 +21,9 @@ add_cost(.data = NULL, cost, evt, trt, cycle_l = NULL, cycle_starttime = 0)
 
 \item{evt}{Vector of events for which this cost is applicable}
 
-\item{trt}{Vector of interventions for which this cost is applicable}
+\item{arm}{Vector of interventions for which this cost is applicable}
+
+\item{category}{Name of the cost category. If not defined, will be set as default.}
 
 \item{cycle_l}{Cycle length; only needed if costs are calculated per cycle}
 
@@ -31,6 +41,6 @@ Costs can be defined by writing expressions and objects in the cost argument who
 This function accepts the use of pipes (\%>\%) to define multiple costs.
 }
 \examples{
-add_cost(evt = c("start","idfs","ttot"),trt = "int",cost = cost.int*fl.int + cost.idfs)
+\dontrun{add_cost(evt = c("start","idfs","ttot"),arm = "int",cost = cost.int*fl.int + cost.idfs)}
 
 }

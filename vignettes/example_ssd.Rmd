@@ -356,10 +356,10 @@ data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.
 ```
 
 ## Model Execution with PSA
-The model is executed as before, just activating the psa_bool option and using the `run_sim_parallel` function to have multiple-cores working at the simulation level, making this implementation faster than the single-core or multiple-core one using `run_sim`. 
+The model is executed as before, just activating the psa_bool option
 
 ```{r run_dsa_psa}
-results <- run_sim_parallel(  
+results <- run_sim(  
   npats=100,                               # number of patients to be simulated
   n_sim=6,                                  # number of simulations to run
   psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
@@ -371,7 +371,6 @@ results <- run_sim_parallel(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  ncores = 6,                               # number of cores to use, recommended not to use all
   drc = 0.035,                              # discount rate for costs
   drq = 0.035,
   sensitivity_inputs = sensitivity_inputs,

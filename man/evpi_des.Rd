@@ -4,14 +4,16 @@
 \alias{evpi_des}
 \title{Calculate the Expected Value of Perfect Information (EVPI) for a DES model with a PSA result}
 \usage{
-evpi_des(wtp, results, interventions = NULL)
+evpi_des(wtp, results, interventions = NULL, sensitivity_used = 1)
 }
 \arguments{
 \item{wtp}{Vector of length >=1 with the willingness to pay}
 
-\item{results}{The list object returned by \code{RunSim()}}
+\item{results}{The list object returned by \code{run_sim()}}
 
 \item{interventions}{A character vector with the names of the interventions to be used for the analysis}
+
+\item{sensitivity_used}{Integer signaling which sensitivity analysis to use}
 }
 \value{
 A data frame with the EVPI results

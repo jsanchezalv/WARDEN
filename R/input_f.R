@@ -13,7 +13,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' replicate_profiles(profiles=data.frame(id=1:100,age=rnorm(100,60,5)),replications=200,probabilities=rep(1,100))
+#' replicate_profiles(profiles=data.frame(id=1:100,age=rnorm(100,60,5)),
+#' replications=200,probabilities=rep(1,100))
 #' }
 replicate_profiles <- function(profiles,
                                replications,
@@ -76,7 +77,8 @@ replicate_profiles <- function(profiles,
 #'            )
 #' 
 #' pick_val_v(base        = df_par[,"base_value"],
-#'            psa         = sapply(1:nrow(df_par), function(x) eval(call(df_par[x,"PSA_dist"],1,df_par[x,"a"],df_par[x,"b"]))),
+#'            psa         = sapply(1:nrow(df_par), function(x)
+#'                            eval(call(df_par[x,"PSA_dist"],1,df_par[x,"a"],df_par[x,"b"]))),
 #'            sens        = df_par[,sensitivity_names[sens_sel]],
 #'            psa_ind     = TRUE, sens_ind = FALSE,
 #'            indicator   = indicators,

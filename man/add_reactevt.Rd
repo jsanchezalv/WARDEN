@@ -35,6 +35,8 @@ Apart from the items defined with add_item(), we can also use standard variables
 The model will run until \code{curtime} is set to \code{Inf}, so the event that terminates the model should modify \code{curtime} and set it to \code{Inf}.
 }
 \examples{
+\dontrun{
 add_reactevt(name_evt = "start",input = {})
 add_reactevt(name_evt = "idfs",input = {modify_item(list("fl.idfs"= 0))})
+}
 }

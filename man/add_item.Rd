@@ -22,7 +22,9 @@ The functions to add/modify events/inputs use lists. Whenever several inputs/eve
 So rather than use two \code{add_item} with a list of one element, it's better to group them into a single \code{add_item} with a list of two elements.
 }
 \examples{
+\dontrun{
 add_item(fl.idfs = 0)
 add_item(util_idfs = if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}, util.mbc = 0.6, cost_idfs = 2500)
+}
 
 }

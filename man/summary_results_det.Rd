@@ -4,12 +4,12 @@
 \alias{summary_results_det}
 \title{Deterministic results for a specific treatment}
 \usage{
-summary_results_det(out = final_output, trt = NULL)
+summary_results_det(out = results[[1]][[1]], arm = NULL)
 }
 \arguments{
-\item{out}{The final_output data frame from the list object returned by \code{RunSim()}}
+\item{out}{The final_output data frame from the list object returned by \code{run_sim()}}
 
-\item{trt}{The reference treatment for calculation of incremental outcomes}
+\item{arm}{The reference treatment for calculation of incremental outcomes}
 }
 \value{
 A dataframe with absolute costs, LYs, QALYs, and ICER and ICUR for each intervention
@@ -19,6 +19,6 @@ Deterministic results for a specific treatment
 }
 \examples{
 \dontrun{
-summary_results_det(results$final_output,trt="int")
+summary_results_det(results[[1]][[1]],arm="int")
 }
 }

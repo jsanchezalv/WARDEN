@@ -4,7 +4,15 @@
 \alias{add_util}
 \title{Defining utilities for events and interventions}
 \usage{
-add_util(.data = NULL, util, evt, trt, cycle_l = NULL, cycle_starttime = 0)
+add_util(
+  .data = NULL,
+  util,
+  evt,
+  arm,
+  category = "default",
+  cycle_l = NULL,
+  cycle_starttime = 0
+)
 }
 \arguments{
 \item{.data}{Existing utility data}
@@ -13,7 +21,9 @@ add_util(.data = NULL, util, evt, trt, cycle_l = NULL, cycle_starttime = 0)
 
 \item{evt}{Events for which this utility is applicable}
 
-\item{trt}{Interventions for which this utility is applicable}
+\item{arm}{Interventions for which this utility is applicable}
+
+\item{category}{Name of the utility category. If not defined, will be set as default.}
 
 \item{cycle_l}{Cycle length; only needed if utilities are calculated per cycle}
 
@@ -31,7 +41,9 @@ Utilities can be defined by writing expressions and objects in the cost argument
 This function accepts the use of pipes (\%>\%) to define multiple utilities.
 }
 \examples{
+\dontrun{
 add_util(evt = c("start","idfs","ttot"),
-trt = c("int", "noint"),
+arm = c("int", "noint"),
 util = util.idfs.ontx * fl.idfs.ontx + util.idfs.offtx * (1-fl.idfs.ontx))
+}
 }

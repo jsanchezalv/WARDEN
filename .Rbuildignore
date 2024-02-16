@@ -6,3 +6,6 @@
 ^README\.Rmd$
 ^\.github$
 ^vignettes/articles$
+^other docs$
+^Rprof.out$
+^update_github_sites.R$

@@ -4,12 +4,12 @@
 \alias{add_tte}
 \title{Define events and the initial event time}
 \usage{
-add_tte(.data = NULL, trt, evts, other_inp = NULL, input)
+add_tte(.data = NULL, arm, evts, other_inp = NULL, input)
 }
 \arguments{
 \item{.data}{Existing data for initial event times}
 
-\item{trt}{The intervention for which the events and initial event times are defined}
+\item{arm}{The intervention for which the events and initial event times are defined}
 
 \item{evts}{A vector of the names of the events}
 
@@ -29,12 +29,14 @@ Events need to be separately defined for each intervention.
 For each event that is defined in this list, the user needs to add a reaction to the event using the \code{add_reactevt()} function which will determine what calculations will happen at an event.
 }
 \examples{
-add_tte(trt="int",evts = c("start","ttot","idfs","os"),
+\dontrun{
+add_tte(arm="int",evts = c("start","ttot","idfs","os"),
 input={
 start <- 0
 idfs <- draw_tte(1,'lnorm',coef1=2, coef2=0.5)
 ttot <- min(draw_tte(1,'lnorm',coef1=1, coef2=4),idfs)
 os <- draw_tte(1,'lnorm',coef1=0.8, coef2=0.2)
 })
+}
 
 }
