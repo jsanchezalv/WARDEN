@@ -206,11 +206,11 @@ Once the model has been run, we can use the results and summarize them using the
 ```{r post-processing_summary}
 
 
-summary_results_det(results$output_sim[[1]][[1]]) #will print the last simulation!
+summary_results_det(results[[1]][[1]]) #will print the last simulation!
 
-summary_results_sim(results$output_sim[[1]])
+summary_results_sim(results[[1]])
 
-psa_ipd <- bind_rows(map(results$output_sim[[1]], "merged_df")) 
+psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
 psa_ipd[1:10,] %>%
   kable() %>%
@@ -235,7 +235,7 @@ We now use the data output to plot the histograms/densities of the simulation.
 
 ```{r post-processing_plots1, fig.width=10, fig.height=8}
 
-data_plot <- results$output_sim[[1]][[1]]$merged_df %>%
+data_plot <- results[[1]][[1]]$merged_df %>%
   filter(evtname != "sick") %>%
   group_by(arm,evtname,simulation) %>%
   mutate(median = median(evttime)) %>%
@@ -348,7 +348,7 @@ results <- run_sim(
 We briefly check below that indeed the engine has been changing the corresponding parameter value.
 ```{r dsa_check}
 
-data_sensitivity <- bind_rows(map_depth(results$output_sim,2, "merged_df"))
+data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
 data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
@@ -388,7 +388,7 @@ results <- run_sim_parallel(
 We briefly check below that indeed the engine has been changing the corresponding parameter value.
 ```{r dsa_check_psa}
 
-data_sensitivity <- bind_rows(map_depth(results$output_sim,2, "merged_df"))
+data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
 data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)

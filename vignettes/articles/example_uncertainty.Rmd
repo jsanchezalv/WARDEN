@@ -393,12 +393,12 @@ for (sample_size in sample_sizes) {
   )) 
 
   #We're extracting the overall ICER/ICUR and also costs/qalys/lys for the "noint" intervention
-  loop_df <- rbind(extract_psa_result(results$output_sim[[1]],"total_costs","noint"),
-                   extract_psa_result(results$output_sim[[1]],"total_lys","noint"),
-                   extract_psa_result(results$output_sim[[1]],"total_qalys","noint"),
-                   extract_psa_result(results$output_sim[[1]],"total_costs","int"),
-                   extract_psa_result(results$output_sim[[1]],"total_lys","int"),
-                   extract_psa_result(results$output_sim[[1]],"total_qalys","int"))
+  loop_df <- rbind(extract_psa_result(results[[1]],"total_costs","noint"),
+                   extract_psa_result(results[[1]],"total_lys","noint"),
+                   extract_psa_result(results[[1]],"total_qalys","noint"),
+                   extract_psa_result(results[[1]],"total_costs","int"),
+                   extract_psa_result(results[[1]],"total_lys","int"),
+                   extract_psa_result(results[[1]],"total_qalys","int"))
   
     loop_df <- rbind(loop_df, loop_df %>%
                      spread(arm,value) %>%
@@ -488,12 +488,12 @@ for (sample_size in sample_sizes) {
   ))
 
   #We're extracting the overall ICER/ICUR and also costs/qalys/lys for the "noint" intervention
-  loop_psa_df <- rbind(extract_psa_result(results$output_sim[[1]],"total_costs","noint"),
-                   extract_psa_result(results$output_sim[[1]],"total_lys","noint"),
-                   extract_psa_result(results$output_sim[[1]],"total_qalys","noint"),
-                   extract_psa_result(results$output_sim[[1]],"total_costs","int"),
-                   extract_psa_result(results$output_sim[[1]],"total_lys","int"),
-                   extract_psa_result(results$output_sim[[1]],"total_qalys","int"))
+  loop_psa_df <- rbind(extract_psa_result(results[[1]],"total_costs","noint"),
+                   extract_psa_result(results[[1]],"total_lys","noint"),
+                   extract_psa_result(results[[1]],"total_qalys","noint"),
+                   extract_psa_result(results[[1]],"total_costs","int"),
+                   extract_psa_result(results[[1]],"total_lys","int"),
+                   extract_psa_result(results[[1]],"total_qalys","int"))
   
     loop_psa_df <- rbind(loop_psa_df, loop_psa_df %>%
                      spread(arm,value) %>%
@@ -571,13 +571,9 @@ ggplot(ceac_out,aes(x=wtp,y=prob_best,group=comparator,col=comparator)) +
   theme(plot.title = element_text(hjust = 0.5))
 
 
-ceaf <- ceac_out %>%
-  group_by(wtp) %>%
-  mutate(max_prob=prob_best==max(prob_best)) %>%
-  filter(max_prob==TRUE)
 
-ggplot(ceaf,aes(x=wtp,y=prob_best,group=comparator,col=comparator)) +
-  geom_line()+
+ggplot(ceac_out,aes(x=wtp,y=prob_best,group=comparator,col=comparator)) +
+  geom_step()+
   xlab("Willingness to Pay") +
   ylab("Probability of being cost-effective")+
   theme_bw() +

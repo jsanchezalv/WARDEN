@@ -312,6 +312,14 @@ interval_out <- function(output_sim, element, arm,round_digit=2) {
 #' @return List with the outputs formatted 
 #'
 #' @import data.table
+#' 
+#' @details
+#' It computes the discounted and undiscounted lys/costs/qalys. 
+#' It also computes the mean aggregate outcomes per arm for the simulation for numeric values of length 1, discarding NAs and Inf. 
+#' Extra data defined by user of length >1 (e.g., matrix) will not be displayed as part of the final IPD data.table and 
+#' will instead be reported in the `extradata_raw` list.
+#' Extra data defined by user of length==1 will be integrated in the final IPD data.table. 
+#' 
 #'
 #' @examples
 #' compute_outputs(patdata=patdata,input_list=input_list)
@@ -331,20 +339,32 @@ compute_outputs <- function(patdata,input_list) {
   list_patdata <- NULL
   
   #Split the data as to be exported as a data.table, and the extra data the user described
-  data_export_aslist <- names(input_list$input_out[!names(input_list$input_out) %in% input_list$categories_for_export])
+  data_export_aslist <- input_list$input_out[!input_list$input_out %in% input_list$categories_for_export]
   
   for (arm_i in arm_list) {
     list_evts <- unlist(map(map(patdata,arm_i),"evtlist"), recursive = FALSE)
     list_patdata <- c(list_patdata,list_evts)
   }  
-  
+
   #We exclude the extra data the user described that has a length > 1 (e.g., a matrix) from the data.table
   #as there could be matrices or other objects not suitable for data.table
-  items_length_greater_than_one <- unlist(lapply(list_patdata,function(x) lapply(x[data_export_aslist], function(y) length(y)>1)),recursive = FALSE)
-  items_length_greater_than_one <- items_length_greater_than_one[items_length_greater_than_one==TRUE]
-  data_export_aslist <- unique(names(items_length_greater_than_one))
   
-  list_evts <- lapply(list_patdata,function(x) x[!names(x) %in% data_export_aslist])
+  items_length_greater_than_one <- unlist(list_patdata,recursive=FALSE)
+  items_length_greater_than_one <- items_length_greater_than_one[names(items_length_greater_than_one) %in% data_export_aslist]
+  
+  items_length_one_numeric <- unlist(lapply(items_length_greater_than_one, function(x) length(x)==1 & is.numeric(x)))
+  items_length_one_numeric <- items_length_one_numeric[items_length_one_numeric==TRUE]
+  
+  items_length_greater_than_one <- unlist(lapply(items_length_greater_than_one, function(x) length(x)>1))
+  items_length_greater_than_one <- items_length_greater_than_one[items_length_greater_than_one==TRUE]
+  
+  data_export_aslist <- unique(names(items_length_greater_than_one))
+  data_export_tobesummarized <- unique(names(items_length_one_numeric))
+  
+  if (length(data_export_aslist)>0) {
+    list_evts <- lapply(list_patdata,function(x) x[!names(x) %in% data_export_aslist])
+  }
+  
   patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata)))
   
   #Extract only extra data that the user wants to export
@@ -506,13 +526,19 @@ compute_outputs <- function(patdata,input_list) {
   vector_total_outputs_search <- c("lys","qalys","costs","lys_undisc","qalys_undisc","costs_undisc")
   
   #Add to final outputs the total outcomes as well as the cost/utility categories totals
-  vector_other_outputs <- input_list$categories_for_export
+  vector_other_outputs <- c(input_list$categories_for_export)
   for (arm_i in arm_list) {
     for (output_i in 1:length(vector_total_outputs)) {
-      final_output[[paste0(vector_total_outputs[output_i],arm_i)]] <- patdata_dt[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]))),by=.(pat_id)][,mean(out)]
+      final_output[[paste0(vector_total_outputs[output_i],arm_i)]] <- patdata_dt[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
     }
-    for (output_i in 1:length(vector_other_outputs)) {
-      final_output[[paste0(vector_other_outputs[output_i],"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=sum(get(vector_other_outputs[output_i]))),by=.(pat_id)][,mean(out)]
+    for (output_i in vector_other_outputs) {
+      final_output[[paste0(output_i,"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=sum(get(output_i),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+    }
+    
+      for (output_i in data_export_tobesummarized) {
+        #mean of outcomes defined by user after removing Inf values and NAs
+        final_output[[paste0(output_i,"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=mean(get(output_i)*is.finite(get(output_i)),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+      
     }
   }
   

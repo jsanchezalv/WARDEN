@@ -31,7 +31,9 @@
 #' `run_sim_parallel` only runs multiple-core at the simulation level.
 #' `run_sim` uses only-single core.
 #' `run_sim` can be more efficient if using only one simulation (e.g., deterministic),
-#'  while `run_sim_parallel` will be more efficient if the number of simulations is >1 (e.g., PSA). 
+#'  while `run_sim_parallel` will be more efficient if the number of simulations is >1 (e.g., PSA).
+#'  A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
+#'  c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists") 
 #'
 #' @examples
 #' \dontrun{
@@ -236,7 +238,7 @@ run_sim <- function(arm_list=c("int","noint"),
   # Export results ----------------------------------------------------------
 
 
-  results <- list(output_sim=output_sim)
+  results <- output_sim
 
   return(results)
 
