@@ -34,6 +34,8 @@
 #' `run_sim` allows to run single-core.
 #' `run_sim_parallel` allows to use multiple-core at the simulation level,
 #' making it more efficient for a large number of simulations relative to `run_sim` (e.g., for  PSA).
+#' A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
+#' c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists") 
 #' 
 #' @examples
 #' \dontrun{
@@ -84,7 +86,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
 
 # Set-up basics -----------------------------------------------------------
 
-  registerDoParallel(ncores)
+  cl <- parallel::makeCluster(ncores)
+  registerDoParallel(cl)
   
   arm_list <- arm_list #this is done as otherwise there are problems passing arguments from function to function
   
@@ -231,8 +234,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
         final_output$merged_df$sensitivity <- sens
       }
   
-      # output_sim[[sens]][[simulation]] <- final_output
-  
       return(list(final_output))
       
       print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
@@ -243,12 +244,13 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   }
   print(paste0("Total time to run: ",  round(proc.time()[3]- start_time_simulations[3] , 2), "s"))
   rm(list=ls(name=foreach:::.foreachGlobals), pos=foreach:::.foreachGlobals) 
+  parallel::stopCluster(cl)
   
 
   # Export results ----------------------------------------------------------
 
 
-  results <- list(output_sim=output_sim)
+  results <- output_sim
 
   return(results)
 

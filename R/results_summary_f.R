@@ -10,10 +10,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' summary_results_det(results$output_sim[[1]][[1]],arm="int")
+#' summary_results_det(results[[1]][[1]],arm="int")
 #' }
 
-summary_results_det <- function(out = results$output_sim[[1]][[1]], arm=NULL){
+summary_results_det <- function(out = results[[1]][[1]], arm=NULL){
   arm <- ifelse(is.null(arm),out$arm_list[1],arm)
 
   other_arm_list <- out$arm_list[out$arm_list!=arm] #For any other treatment that is not the reference one, add the reference arm costs/lys/qalys
@@ -112,10 +112,10 @@ data <- data.frame()
 #'
 #' @examples
 #' \dontrun{
-#' summary_results_sim(results$output_sim[[1]], arm="int")
+#' summary_results_sim(results[[1]], arm="int")
 #' }
 
-summary_results_sim <- function(out = results$output_sim[[1]], arm=NULL){
+summary_results_sim <- function(out = results[[1]], arm=NULL){
 
   arm <- ifelse(is.null(arm),out[[1]]$arm_list[1],arm)
 
@@ -219,7 +219,7 @@ summary_results_sim <- function(out = results$output_sim[[1]], arm=NULL){
 #'
 #' @examples
 #' \dontrun{
-#' extract_psa_result(results$output_sim[[1]],"costs","int")
+#' extract_psa_result(results[[1]],"costs","int")
 #' }
 
 extract_psa_result <- function(x, element,arm) {
@@ -253,13 +253,13 @@ extract_psa_result <- function(x, element,arm) {
 ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 
   if (is.null(interventions)) {
-    interventions <- results$output_sim[[sensitivity_used]][[1]]$arm_list
+    interventions <- results[[sensitivity_used]][[1]]$arm_list
   }
 
   nmb <- data.frame()
   for (comparator in interventions) {
 
-     nmb_i <- t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results$output_sim[[sensitivity_used]],"total_costs",comparator)$value)))
+     nmb_i <- t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results[[sensitivity_used]],"total_costs",comparator)$value)))
 
      if (nrow(nmb_i)>1) {
        nmb_i <- t(nmb_i)
@@ -310,14 +310,14 @@ ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 evpi_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 
   if (is.null(interventions)) {
-    interventions <- results$output_sim[[sensitivity_used]][[1]]$arm_list
+    interventions <- results[[sensitivity_used]][[1]]$arm_list
   }
 
 
   nmb <- data.frame()
   for (comparator in interventions) {
 
-    nmb_i <- t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results$output_sim[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results$output_sim[[sensitivity_used]],"total_costs",comparator)$value)))
+    nmb_i <- t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results[[sensitivity_used]],"total_costs",comparator)$value)))
 
     if (nrow(nmb_i)>1) {
       nmb_i <- t(nmb_i)

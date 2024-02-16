@@ -235,11 +235,11 @@ Once the model has been run, we can use the results and summarize them using the
 
 ```{r post-processing_summary}
 
-summary_results_det(results$output_sim[[1]][[1]]) #will print the last simulation!
+summary_results_det(results[[1]][[1]]) #will print the last simulation!
 
-psa_ipd_simple <- bind_rows(map(results$output_sim[[1]], "merged_df")) %>% select(-trace) %>% distinct() 
+psa_ipd_simple <- bind_rows(map(results[[1]], "merged_df")) %>% select(-trace) %>% distinct() 
 
-psa_ipd <- bind_rows(map(results$output_sim[[1]], "merged_df")) 
+psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
 trace_t <- psa_ipd %>% mutate(state = rep(seq(1:4),62)) %>% select(arm,trace,state,evttime) 
 
@@ -258,10 +258,10 @@ life_years %>%
   kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-results$output_sim[[1]][[1]][["total_lys_int"]] <- life_years$ly_final[life_years$arm=="int"]
-results$output_sim[[1]][[1]][["total_lys_noint"]] <- life_years$ly_final[life_years$arm=="noint"]
+results[[1]][[1]][["total_lys_int"]] <- life_years$ly_final[life_years$arm=="int"]
+results[[1]][[1]][["total_lys_noint"]] <- life_years$ly_final[life_years$arm=="noint"]
 
-summary_results_det(results$output_sim[[1]][[1]]) #will print the last simulation!
+summary_results_det(results[[1]][[1]]) #will print the last simulation!
 
 ```
 
