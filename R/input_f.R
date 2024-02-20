@@ -98,15 +98,15 @@ pick_val_v <- function(base,
   output <- list()
     #if the parameter is out of the dsa/scenario specific iteration, or not in DSA/scenario, use PSA/normal. 
   for (it in 1:length(indicator)) {
-    output[it] <-  if (indicator[it]==0 | sens_ind==F ) { 
-                    if (psa_ind==T) {
-                      psa[it]
-                    } else {
-                      base[it]
-                    }
-                  } else { #If active, use DSA if DSA and scenario if scenario
-                    sens[it]
-                  } 
+    output[[it]] <-  if (indicator[it]==0 | sens_ind==F ) { 
+      if (psa_ind==T) {
+        psa[[it]]
+        } else {
+          base[[it]]
+          }
+      } else {#If active, use DSA if DSA and scenario if scenario
+        sens[[it]]
+      } 
   }
   
   if (!is.null(names_out)) {
@@ -263,6 +263,7 @@ add_util <- function(.data=NULL,util,evt,arm,category="default",cycle_l=NULL,cyc
   }
   return(data_list)
 }
+
 
 
 # Add item/parameter to list --------------------------------------------------------
