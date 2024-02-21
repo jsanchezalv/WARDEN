@@ -296,7 +296,7 @@ rownames(df_par) <- df_par$parameter_name
 
 sensitivity_inputs <-add_item(
             pos_indicator = sens - n_sensitivity*floor((sens-1)/n_sensitivity), # which position to use to put the value 1 in indicator
-            indicators = append(rep(0, length(df_par))[-pos_indicator],1,pos_indicator-1), #vector of indicators, value 0 everywhere except at sens, where it takes value 1
+            indicators = append(rep(0, nrow(df_par))[-pos_indicator],1,pos_indicator-1), #vector of indicators, value 0 everywhere except at sens, where it takes value 1
                               )
 
 common_all_inputs <-add_item(
