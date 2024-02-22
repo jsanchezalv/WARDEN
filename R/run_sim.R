@@ -137,7 +137,7 @@ run_sim <- function(arm_list=c("int","noint"),
     }
     
     
-    input_list <- list(drc = drc,
+    input_list_sens <- list(drc = drc,
                        drq = drq,
                        psa_bool = psa_bool,
                        init_event_list = init_event_list,
@@ -181,7 +181,7 @@ run_sim <- function(arm_list=c("int","noint"),
         if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
           warning("Item ", names(list.sensitivity_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
         }
-        input_list <- c(input_list,list.sensitivity_inputs)
+        input_list_sens <- c(input_list_sens,list.sensitivity_inputs)
       }
     }
 
@@ -191,9 +191,8 @@ run_sim <- function(arm_list=c("int","noint"),
     for (simulation in 1:n_sim) {
   
       print(paste0("Simulation number: ",simulation))
-      input_list <- c(input_list,
-                      simulation = simulation)
-  
+      input_list <- c(input_list_sens,list(simulation=simulation))
+      
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
         for (inp in 1:length(common_all_inputs)) {
