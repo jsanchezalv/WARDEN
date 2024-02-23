@@ -142,7 +142,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     }
     
     
-    input_list <- list(drc = drc,
+    input_list_sens <- list(drc = drc,
                        drq = drq,
                        psa_bool = psa_bool,
                        init_event_list = init_event_list,
@@ -182,11 +182,11 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     if(!is.null(sensitivity_inputs)){
       for (inp in 1:length(sensitivity_inputs)) {
         set.seed(sens)
-        list.sensitivity_inputs <- lapply(sensitivity_inputs[inp],function(x) eval(x, input_list))
+        list.sensitivity_inputs <- lapply(sensitivity_inputs[inp],function(x) eval(x, input_list_sens))
         if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
           warning("Item ", names(list.sensitivity_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
         }
-        input_list <- c(input_list,list.sensitivity_inputs)
+        input_list_sens <- c(input_list_sens,list.sensitivity_inputs)
       }
     }
 
@@ -196,11 +196,11 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     # Outer loop, repeat for each patient
     output_sim[[sens]] <- foreach(simulation = 1:n_sim,
                          .packages = (.packages()),
-                         .export = unique(c("input_list",ls(.GlobalEnv),ls(parent.env(environment())),ls(environment()))),
+                         .export = unique(c("input_list_sens",ls(.GlobalEnv),ls(parent.env(environment())),ls(environment()))),
                          .combine = 'c') %dopar% {
 
       print(paste0("Simulation number: ",simulation))
-      input_list <- c(input_list,
+      input_list <- c(input_list_sens,
                       simulation = simulation)
   
       # Draw Common parameters  -------------------------------
