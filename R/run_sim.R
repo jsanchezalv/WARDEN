@@ -125,6 +125,7 @@ run_sim <- function(arm_list=c("int","noint"),
   #Need to figure out how to distinguish DSA (as many sensitivities as parameters) and Scenarios (as many sensivities as scenarios)
   for (sens in 1:length_sensitivities) {
     print(paste0("Sensitivity number: ",sens))
+    
     start_time <-  proc.time()
 
     output_sim[[sens]] <- list() #initialize sensitivity lists
