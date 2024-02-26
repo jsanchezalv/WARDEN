@@ -95,6 +95,10 @@ pick_val_v <- function(base,
 ){
 
 
+  if ((any(!indicator %in% c(0,1))) | (!psa_ind %in% c(0,1)) | (!sens_ind %in% c(0,1)) ) {
+    stop("Indicator, psa_ind or sens_ind are not FALSE/TRUE (or 0/1)")
+  }
+  
   output <- list()
     #if the parameter is out of the dsa/scenario specific iteration, or not in DSA/scenario, use PSA/normal. 
   for (it in 1:length(indicator)) {
@@ -142,6 +146,9 @@ pick_val <- function(base,
                      indicator =0
                      ){
   
+  if ((!indicator %in% c(0,1)) | (!psa_ind %in% c(0,1)) | (!sens_ind %in% c(0,1)) ) {
+    stop("Indicator, psa_ind or sens_ind are not FALSE/TRUE (or 0/1)")
+  }
   
   #if the parameter is out of the dsa/scenario specific iteration, or not in DSA/scenario, use PSA/normal. 
   output <-   if (indicator==0 | sens_ind==F ) { 
@@ -559,7 +566,7 @@ disc_ongoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
   Instantdr <- log(1+lcldr)
   
   # calculate additional qalys
-  if (lclprvtime==lclcurtime | is.null(lclval)) {
+  if (is.null(lclval)) {
     add <- 0
   } else if(lcldr==0) {
     add <- lclval*(lclcurtime - lclprvtime)
@@ -582,7 +589,7 @@ disc_ongoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
 #' @return Double based on continuous time discounting
 #'
 #' @examples \dontrun{
-#' disc_ongoing_V(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
+#' disc_ongoing_v(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
 #' }
 #'
 #' @export
@@ -672,7 +679,7 @@ disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval
   
   addcycle <- 0
   
-  if (is.null(lclval)) {
+  if (is.null(lclval) ) {
     addcycle <- 0
   } else{
     
@@ -692,12 +699,15 @@ disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval
         #If the cost starts at the selected starttime or at time 0, then include that time, otherwise exclude it
         if (lclprvtime==0) {
           cycle.time <- c(0,cycle.time.total[cycle.time.total >= lclprvtime])  #times at which the cycles take place during this event, put this condition to count also time 0
-          n_cycles <- length(cycle.time)
+          n_cycles <- length(unique(cycle.time))
           s <- (1+lcldr)^cyclelength_i -1
-          addcycle <- sum(addcycle,lclval_i * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1) )
-          
+          if (lcldr==0) {
+            addcycle <- sum(addcycle, lclval_i * n_cycles)
+          } else{
+            addcycle <- sum(addcycle,lclval_i * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1) )
+          }
         } else{
-          if (starttime_i ==lclprvtime) {
+          if (starttime_i ==lclprvtime & lclprvtime==0) {
             cycle.time <- cycle.time.total[cycle.time.total >= lclprvtime]  #times at which the cycles take place during this event, put this condition to count also time of the previous event
           } else{
             cycle.time <- cycle.time.total[cycle.time.total > lclprvtime]  #times at which the cycles take place during this event
@@ -705,7 +715,12 @@ disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval
           n_cycles_remaining <- length(cycle.time)
           d <- lclprvtime/cyclelength_i
           s <- (1+lcldr)^cyclelength_i -1
-          addcycle <- sum(addcycle, lclval_i * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d)) )
+          if (lcldr==0) {
+            addcycle <- sum(addcycle, lclval_i * n_cycles_remaining)
+          } else{
+            addcycle <- sum(addcycle, lclval_i * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d)) )
+          }
+          
         }
         
         #If starting from 0, can be changed substituting interest rate such that s = (1+r)^cyclelength - 1, and using the formula that lclvalq * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1)
@@ -747,31 +762,40 @@ disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclv
     lclval_i <- lclval[i]
     starttime_i <- starttime[i]
     cyclelength_i <- cyclelength[i]
+    lclcurtime_i <- lclcurtime[i]
+    lclprvtime_i <- lclprvtime[i]
     
     
     if (lclval_i==0 ) {} else{
       
-      cycle.time.total <- if(starttime_i>= lclcurtime){0}else{seq(from=starttime_i, to = lclcurtime , by= cyclelength_i)} #all cycles that happened until current time of event
+      cycle.time.total <- if(starttime_i>= lclcurtime_i){0}else{seq(from=starttime_i, to = lclcurtime_i , by= cyclelength_i)} #all cycles that happened until current time of event
       
-      # cycle.time.total <- seq(from=starttime, to = lclcurtime , by= cyclelength) #all cycles that happened until current time of event
+      # cycle.time.total <- seq(from=starttime, to = lclcurtime_i , by= cyclelength) #all cycles that happened until current time of event
       
       #If the cost starts at the selected starttime or at time 0, then include that time, otherwise exclude it
-      if (lclprvtime==0) {
-        cycle.time <- c(0,cycle.time.total[cycle.time.total >= lclprvtime])  #times at which the cycles take place during this event, put this condition to count also time 0
-        n_cycles <- length(cycle.time)
+      if (lclprvtime_i==0) {
+        cycle.time <- c(0,cycle.time.total[cycle.time.total >= lclprvtime_i])  #times at which the cycles take place during this event, put this condition to count also time 0
+        n_cycles <- length(unique(cycle.time))
         s <- (1+lcldr)^cyclelength_i -1
-        addcycle[i] <- sum(addcycle[i],lclval_i * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1) )
-        
-      } else{
-        if (starttime_i ==lclprvtime) {
-          cycle.time <- cycle.time.total[cycle.time.total >= lclprvtime]  #times at which the cycles take place during this event, put this condition to count also time of the previous event
+        if (lcldr==0) {
+          addcycle[i] <- sum(addcycle[i],lclval_i * n_cycles )
         } else{
-          cycle.time <- cycle.time.total[cycle.time.total > lclprvtime]  #times at which the cycles take place during this event
+          addcycle[i] <- sum(addcycle[i],lclval_i * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1) )
+        }
+      } else{
+        if (starttime_i ==lclprvtime_i & lclprvtime_i==0) {
+          cycle.time <- cycle.time.total[cycle.time.total >= lclprvtime_i]  #times at which the cycles take place during this event, put this condition to count also time of the previous event
+        } else{
+          cycle.time <- cycle.time.total[cycle.time.total > lclprvtime_i]  #times at which the cycles take place during this event
         }
         n_cycles_remaining <- length(cycle.time)
-        d <- lclprvtime/cyclelength_i
+        d <- lclprvtime_i/cyclelength_i
         s <- (1+lcldr)^cyclelength_i -1
-        addcycle[i] <- sum(addcycle[i], lclval_i * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d)) )
+        if (lcldr==0) {
+          addcycle[i] <- sum(addcycle[i], lclval_i * n_cycles_remaining )
+        } else{
+          addcycle[i] <- sum(addcycle[i], lclval_i * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d)) )
+        }
       }
       
       #If starting from 0, can be changed substituting interest rate such that s = (1+r)^cyclelength - 1, and using the formula that lclvalq * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1)
