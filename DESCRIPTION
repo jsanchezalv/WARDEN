@@ -28,7 +28,8 @@ Suggests:
     rmarkdown,
     kableExtra,
     DiagrammeR,
-    MASS
+    MASS,
+    testthat (>= 3.0.0)
 Imports: 
     purrr,
     tidyr,
@@ -38,3 +39,4 @@ Imports:
     stats,
     utils
 VignetteBuilder: knitr
+Config/testthat/edition: 3
