@@ -336,6 +336,9 @@ add_item <- function(.data=NULL,...){
 new_event <- function(evt, env_ch = NULL){
   new_evt_name <- names(evt)
   new_evt <- setNames(unlist(evt),new_evt_name)
+  if (!is.numeric(new_evt)) {
+    stop("New event times are not all numeric, please review")
+  }
   
   input_list_arm <- parent.frame()$input_list_arm
   
@@ -374,6 +377,10 @@ new_event <- function(evt, env_ch = NULL){
 modify_event <- function(evt, env_ch = NULL){
   input_list_arm <- parent.frame()$input_list_arm
   
+  evt_unlist <- unlist(evt)
+  if(!is.numeric(evt_unlist)){
+      stop("Modify event times are not all numeric, please review")
+  }
   names_obj_temp <- names(input_list_arm$cur_evtlist)
   names_evt <- names(evt)
   names_found <- names_evt[names_evt %in% names_obj_temp]
@@ -382,7 +389,7 @@ modify_event <- function(evt, env_ch = NULL){
   }
   matched <- which(names_obj_temp %in% names_found)
   
-  input_list_arm[["cur_evtlist"]][matched] <- unlist(evt[names_obj_temp[names_obj_temp %in% names_found]])
+  input_list_arm[["cur_evtlist"]][matched] <- evt_unlist[names_obj_temp[names_obj_temp %in% names_found]]
   
   list2env(input_list_arm["cur_evtlist"],envir = parent.frame())
   assign("input_list_arm",input_list_arm, envir = parent.frame())
@@ -689,12 +696,9 @@ disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval
       starttime_i <- starttime[i]
       cyclelength_i <- cyclelength[i]
       
-      
       if (lclval_i==0 ) {} else{
         
         cycle.time.total <- if(starttime_i>= lclcurtime){0}else{seq(from=starttime_i, to = lclcurtime , by= cyclelength_i)} #all cycles that happened until current time of event
-        
-        # cycle.time.total <- seq(from=starttime, to = lclcurtime , by= cyclelength) #all cycles that happened until current time of event
         
         #If the cost starts at the selected starttime or at time 0, then include that time, otherwise exclude it
         if (lclprvtime==0) {
@@ -726,8 +730,6 @@ disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval
         #If starting from 0, can be changed substituting interest rate such that s = (1+r)^cyclelength - 1, and using the formula that lclvalq * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1)
         #If starting from time t, then compute transformed time as d = t/cyclelength and use lclvalq * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d-1)), where
         #n_cycles_remaining is the n_cycles - d (so the remaining cycles to be considered), e.g. if 13 cycles (From t=0), and delay 6 periods, then n_cycles_remaining = 7 and d=6
-        
-        # combine additional costs and additional quantity in a list
         
       }
       
@@ -770,8 +772,6 @@ disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclv
       
       cycle.time.total <- if(starttime_i>= lclcurtime_i){0}else{seq(from=starttime_i, to = lclcurtime_i , by= cyclelength_i)} #all cycles that happened until current time of event
       
-      # cycle.time.total <- seq(from=starttime, to = lclcurtime_i , by= cyclelength) #all cycles that happened until current time of event
-      
       #If the cost starts at the selected starttime or at time 0, then include that time, otherwise exclude it
       if (lclprvtime_i==0) {
         cycle.time <- c(0,cycle.time.total[cycle.time.total >= lclprvtime_i])  #times at which the cycles take place during this event, put this condition to count also time 0
@@ -801,9 +801,6 @@ disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclv
       #If starting from 0, can be changed substituting interest rate such that s = (1+r)^cyclelength - 1, and using the formula that lclvalq * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1)
       #If starting from time t, then compute transformed time as d = t/cyclelength and use lclvalq * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d-1)), where
       #n_cycles_remaining is the n_cycles - d (so the remaining cycles to be considered), e.g. if 13 cycles (From t=0), and delay 6 periods, then n_cycles_remaining = 7 and d=6
-      
-      # combine additional costs and additional quantity in a list
-      
     }
     
     
@@ -824,6 +821,8 @@ disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclv
 #'
 #' @export
 revert_list <- function(ls) {
+  if(!is.list(ls)){stop("Object passed is not a list")}
+  
   x <- lapply(ls,`[`, names(ls[[1]]))
   apply(do.call(rbind, x), 2, as.list)
 }
