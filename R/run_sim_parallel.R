@@ -23,11 +23,12 @@
 #' @param drc The discount rate for costs
 #' @param drq The discount rate for LYs/QALYs
 #' @param input_out A vector of variables to be returned in the output data frame
-#' @param ipd A boolean to determine if individual patient data should be returned. If set to false, only the main aggregated outputs will be returned (slightly speeds up code)
+#' @param ipd Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events
 #'
 #' @return A list of lists with the analysis results
 #' @importFrom doFuture `%dofuture%`
 #' @importFrom future plan
+#' @importFrom future multisession
 #' @importFrom foreach foreach
 #'
 #' @export
@@ -54,10 +55,10 @@
 #' npats = 500,
 #' n_sim = 1,
 #' psa_bool = FALSE,
-#' ncores = 3,
+#' ncores = future::availableCores(),
 #' drc = 0.035,
 #' drq = 0.035,
-#' ipd = TRUE)
+#' ipd = 1)
 #' }
 
 run_sim_parallel <- function(arm_list=c("int","noint"),
@@ -83,7 +84,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                    drc=0.035,
                    drq=0.035,
                    input_out = NULL,
-                   ipd = TRUE){
+                   ipd = 1){
 
 
 # Set-up basics -----------------------------------------------------------
@@ -241,7 +242,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                                         input_list = input_list)                    # run simulation
       
   
-      if (input_list$ipd==TRUE) {
+      if (input_list$ipd>0) {
   
         final_output$merged_df$simulation <- simulation
         final_output$merged_df$sensitivity <- sens

@@ -543,10 +543,20 @@ compute_outputs <- function(patdata,input_list) {
   }
   
   final_output$arm_list <- arm_list
-  
-  #Exports IPD values
-  if (input_list$ipd==TRUE) {
+
+  #Exports IPD values either fully IPD or aggregated for events
+  if (input_list$ipd==1) {
     final_output$merged_df <- patdata_dt
+    if(length(data_export_aslist)>0){
+      final_output$extradata_raw <- export_list_ipd
+    }
+  } else if (input_list$ipd==2) {
+    other_cols <- c("pat_id", "arm")
+    cols_to_rm <- colnames(patdata_dt)[grepl("total_",colnames(patdata_dt)) | colnames(patdata_dt) %in% c("evtname", "evttime", "prevtime")]
+    cols_to_sum <- colnames(patdata_dt)[!colnames(patdata_dt) %in% c(other_cols,cols_to_rm)]
+    
+    final_output$merged_df <- patdata_dt[, lapply(.SD, sum, na.rm=TRUE), by=other_cols, .SDcols=cols_to_sum]
+    
     if(length(data_export_aslist)>0){
       final_output$extradata_raw <- export_list_ipd
     }
