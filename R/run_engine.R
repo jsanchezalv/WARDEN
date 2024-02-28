@@ -8,8 +8,6 @@
 #' input_out,ipd,arm_list,simulation,npats,n_sim
 #'
 #' @return A data frame with the simulation results
-#' @importFrom foreach %dopar%
-#' @importFrom foreach foreach
 #' @importFrom purrr map
 #' @importFrom purrr map_dbl
 #' @importFrom data.table rbindlist

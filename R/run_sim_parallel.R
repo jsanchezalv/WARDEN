@@ -26,7 +26,9 @@
 #' @param ipd A boolean to determine if individual patient data should be returned. If set to false, only the main aggregated outputs will be returned (slightly speeds up code)
 #'
 #' @return A list of lists with the analysis results
-#' @importFrom doParallel registerDoParallel
+#' @importFrom doFuture `%dofuture%`
+#' @importFrom future plan
+#' @importFrom foreach foreach
 #'
 #' @export
 #' 
@@ -86,9 +88,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
 
 # Set-up basics -----------------------------------------------------------
 
-  cl <- parallel::makeCluster(ncores)
-  registerDoParallel(cl)
-  
+  plan(multisession, workers = ncores)
+
   arm_list <- arm_list #this is done as otherwise there are problems passing arguments from function to function
   
   #get cost/utility categories
@@ -172,6 +173,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        arm_list = arm_list,
                        npats = npats,
                        n_sim = n_sim,
+                       sensitivity_bool = sensitivity_bool,
                        n_sensitivity = n_sensitivity,
                        sens = sens,
                        sensitivity_names = sensitivity_names,
@@ -196,13 +198,15 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     input_list_sens <- input_list_sens[!duplic]
     
 # Simulation loop ---------------------------------------------------------
-
     output_sim[[sens]] <- vector("list", length=n_sim) # empty list with n_sim elements
     # Outer loop, repeat for each patient
+    exported_items <- unique(c("input_list_sens",ls(.GlobalEnv),ls(parent.env(environment())),ls(environment())))
+    options(future.rng.onMisuse = "ignore")
     output_sim[[sens]] <- foreach(simulation = 1:n_sim,
-                         .packages = (.packages()),
-                         .export = unique(c("input_list_sens",ls(.GlobalEnv),ls(parent.env(environment())),ls(environment()))),
-                         .combine = 'c') %dopar% {
+                         # .options.future = list(seed = TRUE),
+                         .options.future = list(packages = .packages()),
+                         .options.future = list(globals=structure(TRUE,add = exported_items)),
+                         .combine = 'c') %dofuture% {
 
       print(paste0("Simulation number: ",simulation))
                            
@@ -231,7 +235,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   
       # Run engine ----------------------------------------------------------
   
-        final_output <- run_engine(arm_list=arm_list,
+        final_output <- RDICE:::run_engine(arm_list=arm_list,
                                         common_pt_inputs=common_pt_inputs,
                                         unique_pt_inputs=unique_pt_inputs,
                                         input_list = input_list)                    # run simulation
@@ -252,8 +256,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     
   }
   print(paste0("Total time to run: ",  round(proc.time()[3]- start_time[3] , 2), "s"))
-  rm(list=ls(name=foreach:::.foreachGlobals), pos=foreach:::.foreachGlobals) 
-  parallel::stopCluster(cl)
   
 
   # Export results ----------------------------------------------------------
