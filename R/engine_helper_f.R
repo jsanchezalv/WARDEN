@@ -551,11 +551,28 @@ compute_outputs <- function(patdata,input_list) {
       final_output$extradata_raw <- export_list_ipd
     }
   } else if (input_list$ipd==2) {
-    other_cols <- c("pat_id", "arm")
-    cols_to_rm <- colnames(patdata_dt)[grepl("total_",colnames(patdata_dt)) | colnames(patdata_dt) %in% c("evtname", "evttime", "prevtime")]
-    cols_to_sum <- colnames(patdata_dt)[!colnames(patdata_dt) %in% c(other_cols,cols_to_rm)]
     
-    final_output$merged_df <- patdata_dt[, lapply(.SD, sum, na.rm=TRUE), by=other_cols, .SDcols=cols_to_sum]
+    #Get names of columns that will be used, 
+    other_cols <- c("pat_id", "arm")
+    #Columns that will not be summarized (event related columns, time and total_)
+    cols_to_rm <- colnames(patdata_dt)[grepl("total_",colnames(patdata_dt)) | colnames(patdata_dt) %in% c("evtname", "evttime", "prevtime")]
+    patdata_dt[,number_events:=1]
+    #Numeric columns only
+    numeric_c <- sapply(patdata_dt,is.numeric)
+    #Columns to sum must be in the right list and also be numeric
+    cols_to_sum <- colnames(patdata_dt)[!colnames(patdata_dt) %in% c(other_cols,cols_to_rm) & numeric_c]
+    #Other columns are left as is (takes last value of those)
+    cols_to_leave_as_is <- colnames(patdata_dt)[!colnames(patdata_dt) %in% c(other_cols,cols_to_rm) & !numeric_c]
+    
+    #Summarize the data as relevant
+    patdata_temp <- patdata_dt[, lapply(.SD, sum, na.rm=TRUE), by=other_cols, .SDcols=cols_to_sum] #sum other variables
+    patdata_temp2 <- patdata_dt[, tail(.SD, 1, na.rm=TRUE), by=other_cols, .SDcols=cols_to_leave_as_is] #get last observation if not numeric
+    
+    final_output$merged_df <- merge(patdata_temp,patdata_temp2)
+
+    if (sens==1 & simulation==1) {
+      warning("Patient-arm data aggregated across events by summing numeric variables. Some data may need readjusting by dividing over number_events.")
+      }
     
     if(length(data_export_aslist)>0){
       final_output$extradata_raw <- export_list_ipd
