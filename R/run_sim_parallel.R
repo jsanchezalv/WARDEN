@@ -118,9 +118,9 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                             )
   output_sim <- list()
 
-  start_time_simulations <-  proc.time()
+  start_time <-  proc.time()
   
-# Sensitivity loop ---------------------------------------------------------
+# Analysis loop ---------------------------------------------------------
   
   if (is.null(sensitivity_names)) {
     length_sensitivities <- n_sensitivity
@@ -129,10 +129,10 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   }
   
   for (sens in 1:length_sensitivities) {
-    print(paste0("Sensitivity number: ",sens))
-    start_time <-  proc.time()
+    print(paste0("Analysis number: ",sens))
+    start_time_analysis <-  proc.time()
 
-    output_sim[[sens]] <- list() #initialize sensitivity lists
+    output_sim[[sens]] <- list() #initialize analysis lists
     
     #e.g., if length_sensitivities is 50 (25 param x 2 DSAs) then take at each iteration the divisor to see which name should be applied
     if (!is.null(sensitivity_names)) {
@@ -189,7 +189,12 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
         input_list_sens <- c(input_list_sens,list.sensitivity_inputs)
       }
     }
-
+    
+    #Make sure there are no duplicated inputs in the model, if so, take the last one
+    duplic <- duplicated(names(input_list_sens),fromLast = T)
+    if (sum(duplic)>0) { warning("Duplicated items detected in the Simulation, using the last one added")  }
+    input_list_sens <- input_list_sens[!duplic]
+    
 # Simulation loop ---------------------------------------------------------
 
     output_sim[[sens]] <- vector("list", length=n_sim) # empty list with n_sim elements
@@ -200,6 +205,10 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                          .combine = 'c') %dopar% {
 
       print(paste0("Simulation number: ",simulation))
+                           
+      start_time_sim <-  proc.time()
+                           
+                           
       input_list <- c(input_list_sens,
                       simulation = simulation)
   
@@ -217,7 +226,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   
       #Make sure there are no duplicated inputs in the model, if so, take the last one
       duplic <- duplicated(names(input_list),fromLast = T)
-      if (sum(duplic)>0 & simulation==1 & sens==1) { warning("Duplicated items detected, using the last one added")  }
+      if (sum(duplic)>0 & simulation==1 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added")  }
       input_list <- input_list[!duplic]
   
       # Run engine ----------------------------------------------------------
@@ -236,13 +245,13 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   
       return(list(final_output))
       
-      print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
+      print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
     }
     
-    print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
+    print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
   }
-  print(paste0("Total time to run: ",  round(proc.time()[3]- start_time_simulations[3] , 2), "s"))
+  print(paste0("Total time to run: ",  round(proc.time()[3]- start_time[3] , 2), "s"))
   rm(list=ls(name=foreach:::.foreachGlobals), pos=foreach:::.foreachGlobals) 
   parallel::stopCluster(cl)
   

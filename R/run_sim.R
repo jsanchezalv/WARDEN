@@ -112,9 +112,9 @@ run_sim <- function(arm_list=c("int","noint"),
                             )
   output_sim <- list()
 
-  start_time_simulations <-  proc.time()
+  start_time <-  proc.time()
   
-# Sensitivity loop ---------------------------------------------------------
+# Analysis loop ---------------------------------------------------------
   
   if (is.null(sensitivity_names)) {
     length_sensitivities <- n_sensitivity
@@ -124,9 +124,9 @@ run_sim <- function(arm_list=c("int","noint"),
   
   #Need to figure out how to distinguish DSA (as many sensitivities as parameters) and Scenarios (as many sensivities as scenarios)
   for (sens in 1:length_sensitivities) {
-    print(paste0("Sensitivity number: ",sens))
+    print(paste0("Analysis number: ",sens))
     
-    start_time <-  proc.time()
+    start_time_analysis <-  proc.time()
 
     output_sim[[sens]] <- list() #initialize sensitivity lists
     
@@ -178,20 +178,27 @@ run_sim <- function(arm_list=c("int","noint"),
     if(!is.null(sensitivity_inputs)){
       for (inp in 1:length(sensitivity_inputs)) {
         set.seed(sens)
-        list.sensitivity_inputs <- lapply(sensitivity_inputs[inp],function(x) eval(x, input_list))
+        list.sensitivity_inputs <- lapply(sensitivity_inputs[inp],function(x) eval(x, input_list_sens))
         if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
           warning("Item ", names(list.sensitivity_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
         }
         input_list_sens <- c(input_list_sens,list.sensitivity_inputs)
       }
     }
+    
+    #Make sure there are no duplicated inputs in the model, if so, take the last one
+    duplic <- duplicated(names(input_list_sens),fromLast = T)
+    if (sum(duplic)>0) { warning("Duplicated items detected in the Analysis, using the last one added")  }
+    input_list_sens <- input_list_sens[!duplic]
 
 # Simulation loop ---------------------------------------------------------
 
 
     for (simulation in 1:n_sim) {
-  
       print(paste0("Simulation number: ",simulation))
+      
+      start_time_sim <-  proc.time()
+      
       input_list <- c(input_list_sens,list(simulation=simulation))
       
       # Draw Common parameters  -------------------------------
@@ -208,7 +215,7 @@ run_sim <- function(arm_list=c("int","noint"),
   
       #Make sure there are no duplicated inputs in the model, if so, take the last one
       duplic <- duplicated(names(input_list),fromLast = T)
-      if (sum(duplic)>0) { warning("Duplicated items detected, using the last one added")  }
+      if (sum(duplic)>0) { warning("Duplicated items detected in the Simulation, using the last one added")  }
       input_list <- input_list[!duplic]
   
       # Run engine ----------------------------------------------------------
@@ -226,13 +233,13 @@ run_sim <- function(arm_list=c("int","noint"),
       output_sim[[sens]][[simulation]] <- final_output
   
   
-      print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
+      print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
     }
     
-    print(paste0("Time to run sensitivity ", sens,": ",  round(proc.time()[3]- start_time[3] , 2 ), "s"))
+    print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
   }
-  print(paste0("Total time to run: ",  round(proc.time()[3]- start_time_simulations[3] , 2), "s"))
+  print(paste0("Total time to run: ",  round(proc.time()[3]- start_time[3] , 2), "s"))
 
 
   # Export results ----------------------------------------------------------
