@@ -20,7 +20,7 @@
 #'
 #' @examples
 #' draw_tte(n_chosen=1,dist='exp',coef1=1,hr=1)
-#' draw_tte(n_chosen=10,"rpoisgamma",coef1=1,coef2=1,obs_time=1,return_gamma_par=FALSE)
+#' draw_tte(n_chosen=10,"rpoisgamma",coef1=1,coef2=1,obs_time=1,return_rate_par=FALSE)
 
 draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,...,hr=1,seed=NULL) {
 
@@ -209,7 +209,7 @@ draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf
   #' @examples
   #' rpoisgamma(1,rate=1,obs_time=1,theta=1)
 
-rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_gamma_par=FALSE){
+rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_rate_par=FALSE){
   # Create data with sampled event times for n observations and t_reps replications                      
   # Approach is different for Poisson and PG to optimize run time
   # If t_reps not provided, derive based on 99.9th quantile of Poisson or negative binomial distribution
@@ -235,11 +235,11 @@ rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_gamm
     # Based on 99.99th quantile of NB  distribution 
     
     # For Poisson-Gamma, individual rates are first sampled from a Gamma distribution
-      gamma_pars <- rgamma(n = n, shape = theta, scale = rate/theta)
+      rate_par <- rgamma(n = n, shape = theta, scale = rate/theta)
       ds <- lapply(1:n, function(x) 
         cumsum(
             rexp(t_reps,
-               rate=gamma_pars[x]
+               rate=rate_par[x]
           )
         )
       )
@@ -254,8 +254,8 @@ rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_gamm
   ds <- lapply(ds, function(x) x[x<=obs_time])
 
   #If the gamma parameters have to be returned, modify the return structure to accommodate them
-  if(return_gamma_par==TRUE){
-    return(list(tte=ds,gamma_pars=gamma_pars))
+  if(return_rate_par==TRUE){
+    return(list(tte=ds,rate_par=rate_par))
   }  else{
     return(ds)
   }
