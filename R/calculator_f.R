@@ -4,10 +4,10 @@
 #'
 #' @param n_chosen The number of observations to be drawn
 #' @param dist The distribution; takes values 'lnorm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp'
-#' @param coef1 First coefficient of the distribution, defined as in the coef() output on a flexsurvreg object
-#' @param coef2 Second coefficient of the distribution, defined as in the coef() output on a flexsurvreg object
-#' @param coef3 Third coefficient of the distribution, defined as in the coef() output on a flexsurvreg object
-#' @param hr A hazard ratio
+#' @param coef1 First coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (rate in "rpoisgamma")
+#' @param coef2 Second coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (theta in "rpoisgamma")
+#' @param coef3 Third coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (not used in "rpoisgamma")
+#' @param hr A hazard ratio (not used in "rpoisgamma")
 #' @param seed An integer which will be used to set the seed for this draw.
 #'
 #' @return A vector of time to event estimates from the given parameters
@@ -15,11 +15,14 @@
 #' @importFrom stats rlnorm rweibull rgamma rexp
 #'
 #' @export
+#' 
+#' @details Other arguments relevant to each function can be called directly
 #'
 #' @examples
 #' draw_tte(n_chosen=1,dist='exp',coef1=1,hr=1)
+#' draw_tte(n_chosen=10,"rpoisgamma",coef1=1,coef2=1,obs_time=1,return_gamma_par=FALSE)
 
-draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,hr=1,seed=NULL) {
+draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,...,hr=1,seed=NULL) {
 
   if(!is.null(seed)){
     set.seed(seed)
@@ -34,7 +37,7 @@ draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,hr=1,se
   # }
   #
   if (dist=="lnorm") {
-    draw.out <- rlnorm(n_chosen,meanlog=coef1 - log(hr), sdlog=exp(coef2)) #AFT
+    draw.out <- rlnorm(n_chosen,meanlog=coef1 - log(hr), sdlog=exp(coef2),...) #AFT
 
   } else if (dist=="weibullPH") {
     draw.out <- flexsurv::rweibullPH(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(hr) )) #PH
@@ -56,7 +59,9 @@ draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,hr=1,se
 
   } else if (dist=="exp") {
     draw.out <- rexp(n_chosen, rate = exp(coef1 + log(hr))) #PH
-
+  
+  } else if (dist=="rpoisgamma") {
+    draw.out <- rpoisgamma(n_chosen, rate = coef1, theta=coef2,...) 
   } else {
     stop("Invalid distribution")
   }
@@ -166,3 +171,93 @@ draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf
   uniform_random_numbers <- stats::runif(n, quantiles[1], quantiles[2])
   flexsurv::qgompertz(uniform_random_numbers, shape, rate ) - lower_bound
 }
+
+
+
+  #' Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process
+  #'
+  #' @param n The number of observations to be drawn
+  #' @param rate rate of the event (in terms of events per observation-time)
+  #' @param obs_time period over which events are observable
+  #' @param theta Optional.  When omitted, the function simulates times for a Poisson process.
+  #'               Represents the shape of the gamma mixture distribution. 
+  #'               Estimated and reported as theta in negative binomial regression analyses in r. 
+  #' @param t_reps Optional. Number of TBEs to be generated to capture events within the observation window.  
+  #'               When omitted, the function sets t_reps to the 99.99th quantile of the Poisson (if no theta is provided)
+  #'               or negative binomial (if theta is provided). Thus, the risk of missing possible events in the observation window
+  #'               is 0.01%.
+  #' @param seed An integer which will be used to set the seed for this draw.
+  #' @param return_gamma_par A boolean that indicates whether an additional vector with the gamma parameters used per n is used.
+  #'          It will alter the structure of the results to two lists, one storing tte with name tte, and the other with name gamma_pars
+  #'
+  #' @return Estimate(s) from the time to event based on poisson/Poisson-Gamma (PG) Mixture/Negative Binomial (NB) distribution based on given parameters
+  #'
+  #' @importFrom stats qpois
+  #' @importFrom stats rexp
+  #' @importFrom stats rgamma
+  #' @importFrom stats qnbinom
+  #'
+  #' @export
+  #' 
+  #' @details
+    #' Function to simulate event times from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process
+    #' Event times are determined by sampling times between events (TBEs) from an exponential distribution, and cumulating 
+    #' these to derive the event times. Events occurring within the set observation time window are retained and returned.
+    #' For times for a Poisson process, the provided rate is assumed constant.
+    #' For a PG or NB, the individual rates are sampled from a Gamma distribution with shape = theta and scale = rate/theta.
+  #'
+  #' @examples
+  #' rpoisgamma(1,rate=1,obs_time=1,theta=1)
+
+rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_gamma_par=FALSE){
+  # Create data with sampled event times for n observations and t_reps replications                      
+  # Approach is different for Poisson and PG to optimize run time
+  # If t_reps not provided, derive based on 99.9th quantile of Poisson or negative binomial distribution
+  
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
+  
+  if(missing(theta)){
+    # Missing theta produces event time draws for a Poisson process
+    if (missing(t_reps)) t_reps <- qpois(0.9999, lambda=rate*obs_time)
+    # Determine the number of time replications needed                       
+    # Based on 99.99th quantile of Poisson  distribution 
+    
+    #Draw the relevant tte that we will after filter for those which actually occured
+    ds <- lapply(1:n, function(x) cumsum(rexp(n*t_reps, rate=rate))) 
+    
+  } else{
+    # Theta specified; produce event times for Poisson-gamma/NB
+    
+    if (missing(t_reps)) t_reps <- qnbinom(0.9999, size=theta, mu=rate*obs_time)
+    # Determine the number of time replications needed                       
+    # Based on 99.99th quantile of NB  distribution 
+    
+    # For Poisson-Gamma, individual rates are first sampled from a Gamma distribution
+      gamma_pars <- rgamma(n = n, shape = theta, scale = rate/theta)
+      ds <- lapply(1:n, function(x) 
+        cumsum(
+            rexp(t_reps,
+               rate=gamma_pars[x]
+          )
+        )
+      )
+  }
+
+  # Process sampled times between events to derive actual event times (as cumulative of time between events)
+  # Determine which are observable - i.e., within the obs_time set in argument
+  # Flag observable events and derive count of observable events per individual
+  # Retain only observable events 
+  
+  #Get which observations occur within time period and remove unobserved events
+  ds <- lapply(ds, function(x) x[x<=obs_time])
+
+  #If the gamma parameters have to be returned, modify the return structure to accommodate them
+  if(return_gamma_par==TRUE){
+    return(list(tte=ds,gamma_pars=gamma_pars))
+  }  else{
+    return(ds)
+  }
+}
+
