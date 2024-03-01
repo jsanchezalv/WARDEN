@@ -20,7 +20,7 @@
 #'
 #' @examples
 #' draw_tte(n_chosen=1,dist='exp',coef1=1,hr=1)
-#' draw_tte(n_chosen=10,"rpoisgamma",coef1=1,coef2=1,obs_time=1,return_rate_par=FALSE)
+#' draw_tte(n_chosen=10,"rpoisgamma",coef1=1,coef2=1,obs_time=1,return_ind_rate=FALSE)
 
 draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,...,hr=1,seed=NULL) {
 
@@ -187,8 +187,8 @@ draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf
   #'               or negative binomial (if theta is provided). Thus, the risk of missing possible events in the observation window
   #'               is 0.01%.
   #' @param seed An integer which will be used to set the seed for this draw.
-  #' @param return_gamma_par A boolean that indicates whether an additional vector with the gamma parameters used per n is used.
-  #'          It will alter the structure of the results to two lists, one storing tte with name tte, and the other with name gamma_pars
+  #' @param return_ind_rate A boolean that indicates whether an additional vector with the rate parameters used per observation is used.
+  #'          It will alter the structure of the results to two lists, one storing tte with name tte, and the other with name ind_rate
   #'
   #' @return Estimate(s) from the time to event based on poisson/Poisson-Gamma (PG) Mixture/Negative Binomial (NB) distribution based on given parameters
   #'
@@ -209,7 +209,7 @@ draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf
   #' @examples
   #' rpoisgamma(1,rate=1,obs_time=1,theta=1)
 
-rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_rate_par=FALSE){
+rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_ind_rate=FALSE){
   # Create data with sampled event times for n observations and t_reps replications                      
   # Approach is different for Poisson and PG to optimize run time
   # If t_reps not provided, derive based on 99.9th quantile of Poisson or negative binomial distribution
@@ -254,8 +254,8 @@ rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_rate
   ds <- lapply(ds, function(x) x[x<=obs_time])
 
   #If the gamma parameters have to be returned, modify the return structure to accommodate them
-  if(return_rate_par==TRUE){
-    return(list(tte=ds,rate_par=rate_par))
+  if(return_ind_rate==TRUE){
+    return(list(tte=ds,ind_rate=rate_par))
   }  else{
     return(ds)
   }
