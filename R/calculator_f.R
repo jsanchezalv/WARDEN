@@ -3,16 +3,16 @@
 #' Draw a time to event from a list of parametric survival functions
 #'
 #' @param n_chosen The number of observations to be drawn
-#' @param dist The distribution; takes values 'lnorm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp'
+#' @param dist The distribution; takes values 'lnorm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp','beta','poisgamma'
 #' @param coef1 First coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (rate in "rpoisgamma")
 #' @param coef2 Second coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (theta in "rpoisgamma")
 #' @param coef3 Third coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (not used in "rpoisgamma")
-#' @param hr A hazard ratio or parameter applied in addition to the scale/rate coefficient (not used in "rpoisgamma")
+#' @param hr A hazard ratio or parameter applied in addition to the scale/rate coefficient (not used in "rpoisgamma" nor "beta")
 #' @param seed An integer which will be used to set the seed for this draw.
 #'
 #' @return A vector of time to event estimates from the given parameters
 #'
-#' @importFrom stats rlnorm rweibull rgamma rexp
+#' @importFrom stats rlnorm rweibull rgamma rexp rbeta
 #'
 #' @export
 #' 
@@ -20,7 +20,7 @@
 #'
 #' @examples
 #' draw_tte(n_chosen=1,dist='exp',coef1=1,hr=1)
-#' draw_tte(n_chosen=10,"rpoisgamma",coef1=1,coef2=1,obs_time=1,return_ind_rate=FALSE)
+#' draw_tte(n_chosen=10,"poisgamma",coef1=1,coef2=1,obs_time=1,return_ind_rate=FALSE)
 
 draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,...,hr=1,seed=NULL) {
 
@@ -59,9 +59,13 @@ draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,...,hr=
 
   } else if (dist=="exp") {
     draw.out <- rexp(n_chosen, rate = exp(coef1 + log(hr))) #PH
-  
-  } else if (dist=="rpoisgamma") {
+    
+  } else if (dist=="beta") {
+    draw.out <- rbeta(n_chosen, shape1 = coef1, shape2 = coef2) 
+    
+  } else if (dist=="poisgamma") {
     draw.out <- rpoisgamma(n_chosen, rate = coef1, theta=coef2,...) 
+    
   } else {
     stop("Invalid distribution")
   }
