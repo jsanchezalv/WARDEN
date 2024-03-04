@@ -7,7 +7,7 @@
 #' @param coef1 First coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (rate in "rpoisgamma")
 #' @param coef2 Second coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (theta in "rpoisgamma")
 #' @param coef3 Third coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (not used in "rpoisgamma")
-#' @param hr A hazard ratio (not used in "rpoisgamma")
+#' @param hr A hazard ratio or parameter applied in addition to the scale/rate coefficient (not used in "rpoisgamma")
 #' @param seed An integer which will be used to set the seed for this draw.
 #'
 #' @return A vector of time to event estimates from the given parameters
@@ -32,10 +32,10 @@ draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,...,hr=
     warning("Provided a coefficient parameter that is a vector")
   }
 
-  # if (dist %in% c('lnorm','llogis','gamma','gengamma','weibull') & hr!=1) {
-  #   warning("Distribution selected is not PH, interpretation is an AFT.")
-  # }
-  #
+  if (dist %in% c('lnorm','llogis','gamma','gengamma','weibull') & hr!=1) {
+    warning("Distribution selected is not PH, interpretation is an AFT.")
+  }
+
   if (dist=="lnorm") {
     draw.out <- rlnorm(n_chosen,meanlog=coef1 - log(hr), sdlog=exp(coef2),...) #AFT
 
@@ -189,6 +189,7 @@ draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf
   #' @param seed An integer which will be used to set the seed for this draw.
   #' @param return_ind_rate A boolean that indicates whether an additional vector with the rate parameters used per observation is used.
   #'          It will alter the structure of the results to two lists, one storing tte with name tte, and the other with name ind_rate
+  #' @param return_df A boolean that indicates whether a data.table object should be returned
   #'
   #' @return Estimate(s) from the time to event based on poisson/Poisson-Gamma (PG) Mixture/Negative Binomial (NB) distribution based on given parameters
   #'
@@ -209,7 +210,7 @@ draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf
   #' @examples
   #' rpoisgamma(1,rate=1,obs_time=1,theta=1)
 
-rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_ind_rate=FALSE){
+rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_ind_rate=FALSE, return_df=FALSE){
   # Create data with sampled event times for n observations and t_reps replications                      
   # Approach is different for Poisson and PG to optimize run time
   # If t_reps not provided, derive based on 99.9th quantile of Poisson or negative binomial distribution
@@ -253,11 +254,31 @@ rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_ind_
   #Get which observations occur within time period and remove unobserved events
   ds <- lapply(ds, function(x) x[x<=obs_time])
 
-  #If the gamma parameters have to be returned, modify the return structure to accommodate them
-  if(return_ind_rate==TRUE){
-    return(list(tte=ds,ind_rate=rate_par))
-  }  else{
-    return(ds)
+  
+  #If return as data frame is activated
+  if (return_df==TRUE) {
+    ds_df <- lapply(ds, function(x) data.frame(tte=x))
+    ds_df <- rbindlist(ds_df,idcol=TRUE)
+    ds_df[,t_btw_evt:= tte-shift(tte,fill = 0),by=.id]
+    ds_df[,evt_num:= 1:.N,by=.id]
+    ds_df[,evt_count:= .N,by=.id]
+    
+    if(return_ind_rate==TRUE){
+    rate_par_df <- data.table(.id=1:length(rate_par),
+                              ind_rate = rate_par)
+    
+    ds_df <- merge(ds_df,rate_par_df)
+    }
+    
+    return(ds_df)
+    
+    #If the rate parameters have to be returned, modify the return structure to accommodate them
+  } else{
+    if(return_ind_rate==TRUE){
+      return(list(tte=ds,ind_rate=rate_par))
+    }  else{
+      return(ds)
+    }
   }
 }
 
