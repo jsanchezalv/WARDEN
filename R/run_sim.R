@@ -22,7 +22,7 @@
 #' @param drc The discount rate for costs
 #' @param drq The discount rate for LYs/QALYs
 #' @param input_out A vector of variables to be returned in the output data frame
-#' @param ipd Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events
+#' @param ipd Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events (summing for numeric variables, returning last value for character/factor variables). For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear.
 #'
 #' @return A list of data frames with the simulation results
 #'
@@ -34,6 +34,7 @@
 #'  while `run_sim_parallel` will be more efficient if the number of simulations is >1 (e.g., PSA).
 #'  A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
 #'  c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists") 
+#'  
 #'
 #' @examples
 #' \dontrun{

@@ -535,10 +535,9 @@ compute_outputs <- function(patdata,input_list) {
       final_output[[paste0(output_i,"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=sum(get(output_i),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
     }
     
-      for (output_i in data_export_tobesummarized) {
+    for (output_i in data_export_tobesummarized) {
         #mean of outcomes defined by user after removing Inf values and NAs
-        final_output[[paste0(output_i,"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=mean(get(output_i)*is.finite(get(output_i)),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
-      
+      final_output[[paste0(output_i,"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=mean(get(output_i)*is.finite(get(output_i)),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
     }
   }
   

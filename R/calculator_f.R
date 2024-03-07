@@ -7,7 +7,7 @@
 #' @param coef1 First coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (rate in "rpoisgamma")
 #' @param coef2 Second coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (theta in "rpoisgamma")
 #' @param coef3 Third coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (not used in "rpoisgamma")
-#' @param hr A hazard ratio or parameter applied in addition to the scale/rate coefficient (not used in "rpoisgamma" nor "beta")
+#' @param beta_tx Parameter in natural scale applied in addition to the scale/rate coefficient -e.g., a HR if used in an exponential- (not used in "rpoisgamma" nor "beta")
 #' @param seed An integer which will be used to set the seed for this draw.
 #'
 #' @return A vector of time to event estimates from the given parameters
@@ -19,10 +19,10 @@
 #' @details Other arguments relevant to each function can be called directly
 #'
 #' @examples
-#' draw_tte(n_chosen=1,dist='exp',coef1=1,hr=1)
+#' draw_tte(n_chosen=1,dist='exp',coef1=1,beta_tx=1)
 #' draw_tte(n_chosen=10,"poisgamma",coef1=1,coef2=1,obs_time=1,return_ind_rate=FALSE)
 
-draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,...,hr=1,seed=NULL) {
+draw_tte <- function(n_chosen,dist,coef1=NULL,coef2=NULL,coef3=NULL,...,beta_tx=1,seed=NULL) {
 
   if(!is.null(seed)){
     set.seed(seed)
@@ -32,33 +32,33 @@ draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,...,hr=
     warning("Provided a coefficient parameter that is a vector")
   }
 
-  if (dist %in% c('lnorm','llogis','gamma','gengamma','weibull') & hr!=1) {
+  if (dist %in% c('lnorm','llogis','gamma','gengamma','weibull') & beta_tx!=1) {
     warning("Distribution selected is not PH, interpretation is an AFT.")
   }
 
   if (dist=="lnorm") {
-    draw.out <- rlnorm(n_chosen,meanlog=coef1 - log(hr), sdlog=exp(coef2),...) #AFT
+    draw.out <- rlnorm(n_chosen,meanlog=coef1 - log(beta_tx), sdlog=exp(coef2),...) #AFT
 
   } else if (dist=="weibullPH") {
-    draw.out <- flexsurv::rweibullPH(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(hr) )) #PH
+    draw.out <- flexsurv::rweibullPH(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx) )) #PH
 
   } else if (dist=="weibull") {
-    draw.out <- rweibull(n_chosen, shape = exp(coef1), scale = exp(coef2 - log(hr))) #AFT Weibull
+    draw.out <- rweibull(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))) #AFT Weibull
 
   } else if (dist=="llogis") {
-    draw.out <- flexsurv::rllogis(n_chosen, shape = exp(coef1), scale = exp(coef2 - log(hr))) # AFT
+    draw.out <- flexsurv::rllogis(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))) # AFT
 
   } else if (dist=="gompertz") {
-    draw.out <- flexsurv::rgompertz(n_chosen, shape = coef1, rate = exp(coef2+ log(hr))) #PH
+    draw.out <- flexsurv::rgompertz(n_chosen, shape = coef1, rate = exp(coef2 + log(beta_tx))) #PH
 
   } else if (dist=="gengamma") {
-    draw.out <- flexsurv::rgengamma(n_chosen, mu = coef1 - log(hr), sigma = exp(coef2), Q = coef3) #AFT
+    draw.out <- flexsurv::rgengamma(n_chosen, mu = coef1 + log(beta_tx), sigma = exp(coef2), Q = coef3) #AFT
 
   } else if (dist=="gamma") {
-    draw.out <- rgamma(n_chosen, shape = exp(coef1), rate = exp(coef2 + log(hr)))  #AFT
+    draw.out <- rgamma(n_chosen, shape = exp(coef1), rate = exp(coef2 + log(beta_tx)))  #AFT
 
   } else if (dist=="exp") {
-    draw.out <- rexp(n_chosen, rate = exp(coef1 + log(hr))) #PH
+    draw.out <- rexp(n_chosen, rate = exp(coef1 + log(beta_tx))) #PH
     
   } else if (dist=="beta") {
     draw.out <- rbeta(n_chosen, shape1 = coef1, shape2 = coef2) 
@@ -77,7 +77,7 @@ draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,...,hr=
 
 #' Draw from a beta distribution based on mean and se
 #'
-#' @param value A vector of the mean values
+#' @param mean_v A vector of the mean values
 #' @param se A vector of the standard errors of the means
 #' @param seed An integer which will be used to set the seed for this draw.
 #'
@@ -88,23 +88,18 @@ draw_tte <- function(n_chosen=1,dist='exp',coef1=1,coef2=NULL,coef3=NULL,...,hr=
 #' @export
 #'
 #' @examples
-#' draw_beta(value=0.8,se=0.2)
+#' draw_beta(mean_v=0.8,se=0.2)
 
-draw_beta <- function(value,se,seed=NULL) {
+draw_beta <- function(mean_v,se,seed=NULL) {
   out <- NULL
 
   if(!is.null(seed)){
     set.seed(seed)
   }
 
-  for (i in 1:length(value)) {
-    value_ch <- value[i]
-    se_ch <-  se[i]
-    alpha <- ((1 - value_ch) / (se_ch^2) - (1 / value_ch)) * value_ch ^ 2
-    beta <- alpha * ((1 / value_ch) - 1)
-    temp <- rbeta(1,alpha,beta)
-    out <- c(out,temp)
-  }
+  alpha <- ((1 - mean_v) / (se^2) - (1 / mean_v)) * mean_v ^ 2
+  beta <- alpha * ((1 / mean_v) - 1)
+  out <- rbeta(length(mean_v),alpha,beta)
 
   return(out)
 }
@@ -113,7 +108,7 @@ draw_beta <- function(value,se,seed=NULL) {
 
 #' Draw from a gamma distribution based on mean and se
 #'
-#' @param value A vector of the mean values
+#' @param mean_v A vector of the mean values
 #' @param se A vector of the standard errors of the means
 #' @param seed An integer which will be used to set the seed for this draw.
 #'
@@ -124,24 +119,19 @@ draw_beta <- function(value,se,seed=NULL) {
 #' @export
 #'
 #' @examples
-#' draw_gamma(value=0.8,se=0.2)
+#' draw_gamma(mean_v=0.8,se=0.2)
 #'
 
-draw_gamma <- function(value,se,seed=NULL) {
+draw_gamma <- function(mean_v,se,seed=NULL) {
   out <- NULL
 
   if(!is.null(seed)){
     set.seed(seed)
   }
 
-  for (i in 1:length(value)) {
-    value_ch <- value[i]
-    se_ch <-  se[i]
-    scale <- se_ch^2 / value_ch
-    shape <- value_ch / scale
-    temp <- ifelse(se_ch==0,value_ch,rgamma(1,shape,scale=scale))
-    out <- c(out,temp)
-  }
+  scale <- se^2 / mean_v
+  shape <- mean_v / scale
+  out <- ifelse(se==0,mean_v,rgamma(length(mean_v),shape,scale=scale))
 
   return(out)
 }
@@ -171,8 +161,8 @@ draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf
     set.seed(seed)
   }
 
-  quantiles <- flexsurv::pgompertz(c(lower_bound, upper_bound),shape, rate)
-  uniform_random_numbers <- stats::runif(n, quantiles[1], quantiles[2])
+  surv_prob <- flexsurv::pgompertz(c(lower_bound, upper_bound),shape, rate)
+  uniform_random_numbers <- stats::runif(n, surv_prob[1], surv_prob[2])
   flexsurv::qgompertz(uniform_random_numbers, shape, rate ) - lower_bound
 }
 
@@ -201,6 +191,7 @@ draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf
   #' @importFrom stats rexp
   #' @importFrom stats rgamma
   #' @importFrom stats qnbinom
+  #' @importFrom data.table rbindlist
   #'
   #' @export
   #' 
@@ -214,22 +205,22 @@ draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf
   #' @examples
   #' rpoisgamma(1,rate=1,obs_time=1,theta=1)
 
-rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_ind_rate=FALSE, return_df=FALSE){
+rpoisgamma <- function(n, rate, theta=NULL, obs_time=1, t_reps, seed=NULL,return_ind_rate=FALSE, return_df=FALSE){
   # Create data with sampled event times for n observations and t_reps replications                      
   # Approach is different for Poisson and PG to optimize run time
   # If t_reps not provided, derive based on 99.9th quantile of Poisson or negative binomial distribution
   
-  if(!is.null(seed)){
-    set.seed(seed)
-  }
-  
-  if(missing(theta)){
+  if(is.null(theta)){
     # Missing theta produces event time draws for a Poisson process
     if (missing(t_reps)) t_reps <- qpois(0.9999, lambda=rate*obs_time)
     # Determine the number of time replications needed                       
     # Based on 99.99th quantile of Poisson  distribution 
     
     #Draw the relevant tte that we will after filter for those which actually occured
+    
+    if(!is.null(seed)){
+      set.seed(seed)
+    }
     ds <- lapply(1:n, function(x) cumsum(rexp(n*t_reps, rate=rate))) 
     
   } else{
@@ -241,9 +232,13 @@ rpoisgamma <- function(n, rate, theta, obs_time=1, t_reps, seed=NULL,return_ind_
     
     # For Poisson-Gamma, individual rates are first sampled from a Gamma distribution
       rate_par <- rgamma(n = n, shape = theta, scale = rate/theta)
+      
+      if(!is.null(seed)){
+        set.seed(seed)
+      }
       ds <- lapply(1:n, function(x) 
         cumsum(
-            rexp(t_reps,
+            rexp(n*t_reps,
                rate=rate_par[x]
           )
         )
