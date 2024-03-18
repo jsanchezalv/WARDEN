@@ -42,7 +42,7 @@ run_engine <- function(arm_list,
       for (inp in 1:length(common_pt_inputs)) {
         list.common_pt_inputs <- lapply(common_pt_inputs[inp],function(x) eval(x, input_list_pt))
         if (!is.null(names(list.common_pt_inputs[[1]]))) {
-          warning("Item ", names(list.common_pt_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model")
+          warning("Item ", names(list.common_pt_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
         }
         input_list_pt <- c(input_list_pt,list.common_pt_inputs)
       }
@@ -50,7 +50,7 @@ run_engine <- function(arm_list,
 
     #Make sure there are no duplicated inputs in the model, if so, take the last one
     duplic <- duplicated(names(input_list_pt),fromLast = T)
-    if (sum(duplic)>0 & i==1 & simulation==1 & sens==1) { warning("Duplicated items detected in the Patient, using the last one added")  }
+    if (sum(duplic)>0 & i==1 & simulation==1 & sens==1) { warning("Duplicated items detected in the Patient, using the last one added.\n")  }
     input_list_pt <- input_list_pt[!duplic]
 
     #2 Loop per treatment ------------------------------------------------------
@@ -66,7 +66,7 @@ run_engine <- function(arm_list,
         for (inp in 1:length(unique_pt_inputs)) {
           list.unique_pt_inputs <- lapply(unique_pt_inputs[inp],function(x) eval(x, input_list_arm))
           if ((!is.null(names(list.unique_pt_inputs[[1]]))) & i==1 & simulation==1 & sens==1) {
-            warning("Item ", names(list.unique_pt_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model")
+            warning("Item ", names(list.unique_pt_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
           }
           input_list_arm <- c(input_list_arm,list.unique_pt_inputs)
 
@@ -75,7 +75,7 @@ run_engine <- function(arm_list,
 
       #Make sure there are no duplicated inputs in the model, if so, take the last one
       duplic <- duplicated(names(input_list_arm),fromLast = T)
-      if (sum(duplic)>0 & i==1 & simulation==1 & sens==1) { warning("Duplicated items detected in the Arm, using the last one added")  }
+      if (sum(duplic)>0 & i==1 & simulation==1 & sens==1) { warning("Duplicated items detected in the Arm, using the last one added.\n")  }
       input_list_arm <- input_list_arm[!duplic]
 
       # Generate event list

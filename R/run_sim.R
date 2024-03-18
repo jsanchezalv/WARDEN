@@ -33,7 +33,7 @@
 #' `run_sim` can be more efficient if using only one simulation (e.g., deterministic),
 #'  while `run_sim_parallel` will be more efficient if the number of simulations is >1 (e.g., PSA).
 #'  A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
-#'  c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists") 
+#'  c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd") 
 #'  
 #'
 #' @examples
@@ -82,7 +82,24 @@ run_sim <- function(arm_list=c("int","noint"),
 
 
 # Set-up basics -----------------------------------------------------------
-
+  
+  #Stop simulation if forbidden objects are used.
+  list_forbidden_names <-  c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd") 
+  matched_list_forbidden <- which(list_forbidden_names %in% c(
+    ls(parent.frame()),
+    names(common_all_inputs),
+    names(sensitivity_inputs),
+    names(common_pt_inputs),
+    names(unique_pt_inputs),
+    names(arm_list),
+    names(evt_react_list)
+  )
+  )
+  
+  if(  length(matched_list_forbidden)>0){
+    stop(paste0("Name(s) or object ", list_forbidden_names[matched_list_forbidden]," defined belong to the list of forbidden names, which can cause issues in the model.
+         Please remove or rename those names. See run_sim or run_sim_parallel for a full list of these names.\n"))
+  }
   
   arm_list <- arm_list #this is done as otherwise there are problems passing arguments from function to function
   
@@ -182,7 +199,7 @@ run_sim <- function(arm_list=c("int","noint"),
         set.seed(sens)
         list.sensitivity_inputs <- lapply(sensitivity_inputs[inp],function(x) eval(x, input_list_sens))
         if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
-          warning("Item ", names(list.sensitivity_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
+          warning("Item ", names(list.sensitivity_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
         }
         input_list_sens <- c(input_list_sens,list.sensitivity_inputs)
       }
@@ -190,7 +207,7 @@ run_sim <- function(arm_list=c("int","noint"),
     
     #Make sure there are no duplicated inputs in the model, if so, take the last one
     duplic <- duplicated(names(input_list_sens),fromLast = T)
-    if (sum(duplic)>0 & sens==1) { warning("Duplicated items detected in the Analysis, using the last one added")  }
+    if (sum(duplic)>0 & sens==1) { warning("Duplicated items detected in the Analysis, using the last one added.\n")  }
     input_list_sens <- input_list_sens[!duplic]
 
 # Simulation loop ---------------------------------------------------------
@@ -209,7 +226,7 @@ run_sim <- function(arm_list=c("int","noint"),
           set.seed(simulation)
           list.common_all_inputs <- lapply(common_all_inputs[inp],function(x) eval(x, input_list))
           if ((!is.null(names(list.common_all_inputs[[1]]))) & simulation==1 & sens==1) {
-            warning("Item ", names(list.common_all_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.")
+            warning("Item ", names(list.common_all_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
           }
           input_list <- c(input_list,list.common_all_inputs)
         }
@@ -217,7 +234,7 @@ run_sim <- function(arm_list=c("int","noint"),
   
       #Make sure there are no duplicated inputs in the model, if so, take the last one
       duplic <- duplicated(names(input_list),fromLast = T)
-      if (sum(duplic)>0 & simulation==1 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added")  }
+      if (sum(duplic)>0 & simulation==1 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added.\n")  }
       input_list <- input_list[!duplic]
   
       # Run engine ----------------------------------------------------------
