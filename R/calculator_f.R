@@ -32,41 +32,25 @@ draw_tte <- function(n_chosen,dist,coef1=NULL,coef2=NULL,coef3=NULL,...,beta_tx=
   if (any(length(coef1)>1,length(coef2)>1,length(coef3)>1)) {
     warning("Provided a coefficient parameter that is a vector")
   }
-
-  if (dist=="lnorm") {
-    draw.out <- rlnorm(n_chosen,meanlog=coef1 - log(beta_tx), sdlog=exp(coef2),...) #AFT
-
-  } else if (dist=="weibullPH") {
-    draw.out <- flexsurv::rweibullPH(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx) )) #PH
-
-  } else if (dist=="weibull") {
-    draw.out <- rweibull(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))) #AFT Weibull
-
-  } else if (dist=="llogis") {
-    draw.out <- flexsurv::rllogis(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))) # AFT
-
-  } else if (dist=="gompertz") {
-    draw.out <- flexsurv::rgompertz(n_chosen, shape = coef1, rate = exp(coef2 + log(beta_tx))) #PH
-
-  } else if (dist=="gengamma") {
-    draw.out <- flexsurv::rgengamma(n_chosen, mu = coef1 + log(beta_tx), sigma = exp(coef2), Q = coef3) #AFT
-
-  } else if (dist=="gamma") {
-    draw.out <- rgamma(n_chosen, shape = exp(coef1), rate = exp(coef2 + log(beta_tx)))  #AFT
-
-  } else if (dist=="exp") {
-    draw.out <- rexp(n_chosen, rate = exp(coef1 + log(beta_tx))) #PH
-    
-  } else if (dist=="beta") {
-    draw.out <- rbeta(n_chosen, shape1 = coef1, shape2 = coef2) 
-    
-  } else if (dist=="poisgamma") {
-    draw.out <- rpoisgamma(n_chosen, rate = coef1, theta=coef2,...) 
-    
-  } else {
-    stop("Invalid distribution")
+  
+  if (!(dist %in% c("lnorm", "weibullPH", "weibull", "llogis", "gompertz", "gengamma", "gamma", "exp", "beta", "poisgamma"))) {
+    stop("Invalid distribution. Distribution must be one of: 'lnorm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp','beta','poisgamma'")
   }
 
+  draw.out <- switch(dist, 
+                     "lnorm" = rlnorm(n_chosen, meanlog=coef1 - log(beta_tx), sdlog=exp(coef2),...), 
+                     "weibullPH" = flexsurv::rweibullPH(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),
+                     "weibull" = rweibull(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),
+                     "llogis" = flexsurv::rllogis(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),
+                     "gompertz" = flexsurv::rgompertz(n_chosen, shape = coef1, rate = exp(coef2 + log(beta_tx))),
+                     "gengamma" = flexsurv::rgengamma(n_chosen, mu = coef1 + log(beta_tx), sigma = exp(coef2), Q = coef3),
+                     "gamma" = rgamma(n_chosen, shape = exp(coef1), rate = exp(coef2 + log(beta_tx))),
+                     "exp" = rexp(n_chosen, rate = exp(coef1 + log(beta_tx))),
+                     "beta" = rbeta(n_chosen, shape1 = coef1, shape2 = coef2),
+                     "poisgamma" = rpoisgamma(n_chosen, rate = coef1, theta=coef2,...),
+                     stop("Invalid distribution. Distribution must be one of: 'lnorm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp','beta','poisgamma'")
+  )
+  
   return(draw.out)
 }
 
