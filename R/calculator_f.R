@@ -14,6 +14,7 @@
 #' @return A vector of time to event estimates from the given parameters
 #'
 #' @importFrom stats rlnorm rweibull rgamma rexp rbeta
+#' @importFrom flexsurv rweibullPH rllogis rgompertz rgengamma
 #'
 #' @export
 #' 
@@ -39,11 +40,11 @@ draw_tte <- function(n_chosen,dist,coef1=NULL,coef2=NULL,coef3=NULL,...,beta_tx=
 
   draw.out <- switch(dist, 
                      "lnorm" = rlnorm(n_chosen, meanlog=coef1 - log(beta_tx), sdlog=exp(coef2),...), 
-                     "weibullPH" = flexsurv::rweibullPH(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),
+                     "weibullPH" = rweibullPH(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),
                      "weibull" = rweibull(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),
-                     "llogis" = flexsurv::rllogis(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),
-                     "gompertz" = flexsurv::rgompertz(n_chosen, shape = coef1, rate = exp(coef2 + log(beta_tx))),
-                     "gengamma" = flexsurv::rgengamma(n_chosen, mu = coef1 + log(beta_tx), sigma = exp(coef2), Q = coef3),
+                     "llogis" = rllogis(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),
+                     "gompertz" = rgompertz(n_chosen, shape = coef1, rate = exp(coef2 + log(beta_tx))),
+                     "gengamma" = rgengamma(n_chosen, mu = coef1 + log(beta_tx), sigma = exp(coef2), Q = coef3),
                      "gamma" = rgamma(n_chosen, shape = exp(coef1), rate = exp(coef2 + log(beta_tx))),
                      "exp" = rexp(n_chosen, rate = exp(coef1 + log(beta_tx))),
                      "beta" = rbeta(n_chosen, shape1 = coef1, shape2 = coef2),
