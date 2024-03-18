@@ -517,14 +517,14 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
   data_list <- .data
 
-  for (arm in arm) {
+  for (arm_i in arm) {
 
     if (!is.character(other_inp) & !is.null(other_inp)) {
       stop("other_inp argument is required to be a character vector or be set to NULL")
     }
 
     if (!is.character(evts) | length(evts)<2) {
-      stop("evts argument in add_tte for the intervention ", arm, " is required to be a character vector with length >1")
+      stop("evts argument in add_tte for the intervention ", arm_i, " is required to be a character vector with length >1")
     }
 
 
@@ -532,7 +532,7 @@ add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
                        evts = evts,
                        other_inp = other_inp
     ))
-    names(evt_l) <- paste(arm)
+    names(evt_l) <- paste(arm_i)
 
     if (is.null(data_list)) {
       data_list <- evt_l
@@ -816,10 +816,11 @@ disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclv
 #' @return Reverted list
 #'
 #' @examples \dontrun{
-#' revert_list(ls=list(a=list(ab=1,ac=2),b=list(ab=2,ac=3))
+#' revert_list(ls=list(a=list(ab=1,ac=2),b=list(ab=2,ac=3)))
 #' }
 #'
 #' @export
+
 revert_list <- function(ls) {
   if(!is.list(ls)){stop("Object passed is not a list")}
   

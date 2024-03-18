@@ -198,10 +198,10 @@ init_event_list <-
 
     #Early
     
-    idfs <- draw_tte(1,'lnorm',coef1=2, coef2=log(0.2),hr=1.2) 
-    ttot.early <- min(draw_tte(1,'lnorm',coef1=2, coef2=log(0.2),hr=1.2),idfs)
+    idfs <- draw_tte(1,'lnorm',coef1=2, coef2=log(0.2),beta_tx = 1.2) 
+    ttot.early <- min(draw_tte(1,'lnorm',coef1=2, coef2=log(0.2),beta_tx = 1.2),idfs)
     
-    os.early <- draw_tte(1,'lnorm',coef1=3, coef2=log(0.2),hr=1.2) 
+    os.early <- draw_tte(1,'lnorm',coef1=3, coef2=log(0.2),beta_tx = 1.2) 
     
     #if patient has remission, check when will recurrence happen
     if (fl.remission) { 

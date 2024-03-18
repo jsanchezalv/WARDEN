@@ -312,6 +312,7 @@ interval_out <- function(output_sim, element, arm,round_digit=2) {
 #' @return List with the outputs formatted 
 #'
 #' @import data.table
+#' @importFrom utils tail
 #' 
 #' @details
 #' It computes the discounted and undiscounted lys/costs/qalys. 

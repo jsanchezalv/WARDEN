@@ -62,42 +62,42 @@
 #' }
 
 run_sim_parallel <- function(arm_list=c("int","noint"),
-                   sensitivity_inputs=NULL,
-                   common_all_inputs=NULL,
-                   common_pt_inputs=NULL,
-                   unique_pt_inputs=NULL,
-                   init_event_list = NULL,
-                   evt_react_list = evt_react_list,
-                   util_ongoing_list = NULL,
-                   util_instant_list = NULL,
-                   util_cycle_list = NULL,
-                   cost_ongoing_list = NULL,
-                   cost_instant_list = NULL,
-                   cost_cycle_list = NULL,
-                   npats=500,
-                   n_sim=1,
-                   psa_bool = NULL,
-                   sensitivity_bool = FALSE,
-                   sensitivity_names = NULL,
-                   n_sensitivity = 1,
-                   ncores=1,
-                   drc=0.035,
-                   drq=0.035,
-                   input_out = NULL,
-                   ipd = 1){
-
-
-# Set-up basics -----------------------------------------------------------
-
+                             sensitivity_inputs=NULL,
+                             common_all_inputs=NULL,
+                             common_pt_inputs=NULL,
+                             unique_pt_inputs=NULL,
+                             init_event_list = NULL,
+                             evt_react_list = evt_react_list,
+                             util_ongoing_list = NULL,
+                             util_instant_list = NULL,
+                             util_cycle_list = NULL,
+                             cost_ongoing_list = NULL,
+                             cost_instant_list = NULL,
+                             cost_cycle_list = NULL,
+                             npats=500,
+                             n_sim=1,
+                             psa_bool = NULL,
+                             sensitivity_bool = FALSE,
+                             sensitivity_names = NULL,
+                             n_sensitivity = 1,
+                             ncores=1,
+                             drc=0.035,
+                             drq=0.035,
+                             input_out = NULL,
+                             ipd = 1){
+  
+  
+  # Set-up basics -----------------------------------------------------------
+  
   plan(multisession, workers = ncores)
-
+  
   arm_list <- arm_list #this is done as otherwise there are problems passing arguments from function to function
   
   #get cost/utility categories
   categories_costs_ongoing <- unlist(unique(lapply(names(cost_ongoing_list), function(n) cost_ongoing_list[[n]][["category"]])))
   categories_costs_instant <- unlist(unique(lapply(names(cost_instant_list), function(n) cost_instant_list[[n]][["category"]])))
   categories_costs_cycle   <- unlist(unique(lapply(names(cost_cycle_list), function(n) cost_cycle_list[[n]][["category"]])))
-
+  
   categories_utilities_ongoing <- unlist(unique(lapply(names(util_ongoing_list), function(n) util_ongoing_list[[n]][["category"]])))
   categories_utilities_instant <- unlist(unique(lapply(names(util_instant_list), function(n) util_instant_list[[n]][["category"]])))
   categories_utilities_cycle   <- unlist(unique(lapply(names(util_cycle_list), function(n) util_cycle_list[[n]][["category"]])))
@@ -108,21 +108,21 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                             "categories_utilities_ongoing",
                             "categories_utilities_instant",
                             "categories_utilities_cycle"
-                            )
+  )
   
   #Remove NULL values
-  categories_for_export <- c(if(!is.null(categories_costs_ongoing)){paste(categories_costs_ongoing,c("ongoing","ongoing_undisc"),sep="_")},
-                             if(!is.null(categories_costs_instant)){paste(categories_costs_instant,c("instant","instant_undisc"),sep="_")},
-                             if(!is.null(categories_costs_cycle)){paste(categories_costs_cycle,c("cycle","cycle_undisc"),sep="_")},
-                             if(!is.null(categories_utilities_ongoing)){paste(categories_utilities_ongoing,c("ongoing","ongoing_undisc"),sep="_")},
-                             if(!is.null(categories_utilities_instant)){paste(categories_utilities_instant,c("instant","instant_undisc"),sep="_")},
-                             if(!is.null(categories_utilities_cycle)){paste(categories_utilities_cycle,c("cycle","cycle_undisc"),sep="_")}
-                            )
+  categories_for_export <- c(if(!is.null(categories_costs_ongoing)){unlist(lapply(categories_costs_ongoing,function(x){paste(x,c("ongoing","ongoing_undisc"),sep="_")}))},
+                             if(!is.null(categories_costs_instant)){unlist(lapply(categories_costs_instant,function(x){paste(x,c("instant","instant_undisc"),sep="_")}))},
+                             if(!is.null(categories_costs_cycle)){unlist(lapply(categories_costs_cycle,function(x){paste(x,c("cycle","cycle_undisc"),sep="_")}))},
+                             if(!is.null(categories_utilities_ongoing)){unlist(lapply(categories_utilities_ongoing,function(x){paste(x,c("ongoing","ongoing_undisc"),sep="_")}))},
+                             if(!is.null(categories_utilities_instant)){unlist(lapply(categories_utilities_instant,function(x){paste(x,c("instant","instant_undisc"),sep="_")}))},
+                             if(!is.null(categories_utilities_cycle)){unlist(lapply(categories_utilities_cycle,function(x){paste(x,c("cycle","cycle_undisc"),sep="_")}))}
+  )
   output_sim <- list()
-
+  
   start_time <-  proc.time()
   
-# Analysis loop ---------------------------------------------------------
+  # Analysis loop ---------------------------------------------------------
   
   if (is.null(sensitivity_names)) {
     length_sensitivities <- n_sensitivity
@@ -133,7 +133,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   for (sens in 1:length_sensitivities) {
     print(paste0("Analysis number: ",sens))
     start_time_analysis <-  proc.time()
-
+    
     output_sim[[sens]] <- list() #initialize analysis lists
     
     #e.g., if length_sensitivities is 50 (25 param x 2 DSAs) then take at each iteration the divisor to see which name should be applied
@@ -195,7 +195,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     
     #Make sure there are no duplicated inputs in the model, if so, take the last one
     duplic <- duplicated(names(input_list_sens),fromLast = T)
-    if (sum(duplic)>0) { warning("Duplicated items detected in the Simulation, using the last one added")  }
+    if (sum(duplic)>0 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added")  }
     input_list_sens <- input_list_sens[!duplic]
     
 # Simulation loop ---------------------------------------------------------

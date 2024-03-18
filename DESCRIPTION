@@ -1,19 +1,12 @@
 Package: RDICE
 Title: Discrete Event Simulation for Cost-Effectiveness Modelling
-Version: 0.3
+Version: 0.4
 Authors@R: 
-    c(person(given = "Valerie",
-           family = "Aponte Ribero",
-           role = c("aut", "cre"),
-           email = "valerie.aponte_ribero@roche.com",
-           comment = ""),
-           person(given = "Javier",
+    person(given = "Javier",
            family = "Sanchez Alvarez",
-           role = c("aut"),
-           email = "javier.sanchez_alvarez@roche.com ",
-           comment = ""),
-           person("Evidera", role = c("cph"))
-           )
+           role = c("aut", "cre"),
+           email = "javier.sanchezalvarez@evidera.com",
+           comment = "")
 Description: A package designed to perform discrete event simulation for cost-effectiveness modelling.
 License: Apache License (>= 2)
 Encoding: UTF-8
@@ -32,10 +25,10 @@ Suggests:
     testthat (>= 3.0.0)
 Imports: 
     purrr,
-    tidyr,
-    doParallel,
     data.table,
     foreach,
+    future,
+    doFuture,
     stats,
     utils
 VignetteBuilder: knitr

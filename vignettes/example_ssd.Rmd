@@ -88,7 +88,7 @@ init_event_list <-
     
   }) %>%  add_tte(arm="int", evts = c("sick","sicker","death") ,input={  
     sick <- 0
-    sicker <- draw_tte(1,dist="exp", coef1=coef_noint, hr = HR_int)
+    sicker <- draw_tte(1,dist="exp", coef1=coef_noint, beta_tx = HR_int)
 
   })
 

@@ -9,6 +9,7 @@
 #' @param coef3 Third coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (not used in "rpoisgamma")
 #' @param beta_tx Parameter in natural scale applied in addition to the scale/rate coefficient -e.g., a HR if used in an exponential- (not used in "rpoisgamma" nor "beta")
 #' @param seed An integer which will be used to set the seed for this draw.
+#' @param ... Additional arguments to be used by the specific distribution (e.g., return_ind_rate if dist = "poisgamma")
 #'
 #' @return A vector of time to event estimates from the given parameters
 #'
@@ -30,10 +31,6 @@ draw_tte <- function(n_chosen,dist,coef1=NULL,coef2=NULL,coef3=NULL,...,beta_tx=
 
   if (any(length(coef1)>1,length(coef2)>1,length(coef3)>1)) {
     warning("Provided a coefficient parameter that is a vector")
-  }
-
-  if (dist %in% c('lnorm','llogis','gamma','gengamma','weibull') & beta_tx!=1) {
-    warning("Distribution selected is not PH, interpretation is an AFT.")
   }
 
   if (dist=="lnorm") {

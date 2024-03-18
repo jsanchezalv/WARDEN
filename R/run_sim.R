@@ -104,12 +104,12 @@ run_sim <- function(arm_list=c("int","noint"),
                             )
   
   #Remove NULL values
-  categories_for_export <- c(if(!is.null(categories_costs_ongoing)){paste(categories_costs_ongoing,c("ongoing","ongoing_undisc"),sep="_")},
-                             if(!is.null(categories_costs_instant)){paste(categories_costs_instant,c("instant","instant_undisc"),sep="_")},
-                             if(!is.null(categories_costs_cycle)){paste(categories_costs_cycle,c("cycle","cycle_undisc"),sep="_")},
-                             if(!is.null(categories_utilities_ongoing)){paste(categories_utilities_ongoing,c("ongoing","ongoing_undisc"),sep="_")},
-                             if(!is.null(categories_utilities_instant)){paste(categories_utilities_instant,c("instant","instant_undisc"),sep="_")},
-                             if(!is.null(categories_utilities_cycle)){paste(categories_utilities_cycle,c("cycle","cycle_undisc"),sep="_")}
+  categories_for_export <- c(if(!is.null(categories_costs_ongoing)){unlist(lapply(categories_costs_ongoing,function(x){paste(x,c("ongoing","ongoing_undisc"),sep="_")}))},
+                             if(!is.null(categories_costs_instant)){unlist(lapply(categories_costs_instant,function(x){paste(x,c("instant","instant_undisc"),sep="_")}))},
+                             if(!is.null(categories_costs_cycle)){unlist(lapply(categories_costs_cycle,function(x){paste(x,c("cycle","cycle_undisc"),sep="_")}))},
+                             if(!is.null(categories_utilities_ongoing)){unlist(lapply(categories_utilities_ongoing,function(x){paste(x,c("ongoing","ongoing_undisc"),sep="_")}))},
+                             if(!is.null(categories_utilities_instant)){unlist(lapply(categories_utilities_instant,function(x){paste(x,c("instant","instant_undisc"),sep="_")}))},
+                             if(!is.null(categories_utilities_cycle)){unlist(lapply(categories_utilities_cycle,function(x){paste(x,c("cycle","cycle_undisc"),sep="_")}))}
                             )
   output_sim <- list()
 
@@ -190,7 +190,7 @@ run_sim <- function(arm_list=c("int","noint"),
     
     #Make sure there are no duplicated inputs in the model, if so, take the last one
     duplic <- duplicated(names(input_list_sens),fromLast = T)
-    if (sum(duplic)>0) { warning("Duplicated items detected in the Analysis, using the last one added")  }
+    if (sum(duplic)>0 & sens==1) { warning("Duplicated items detected in the Analysis, using the last one added")  }
     input_list_sens <- input_list_sens[!duplic]
 
 # Simulation loop ---------------------------------------------------------
@@ -217,7 +217,7 @@ run_sim <- function(arm_list=c("int","noint"),
   
       #Make sure there are no duplicated inputs in the model, if so, take the last one
       duplic <- duplicated(names(input_list),fromLast = T)
-      if (sum(duplic)>0) { warning("Duplicated items detected in the Simulation, using the last one added")  }
+      if (sum(duplic)>0 & simulation==1 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added")  }
       input_list <- input_list[!duplic]
   
       # Run engine ----------------------------------------------------------

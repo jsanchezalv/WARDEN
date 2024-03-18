@@ -50,7 +50,7 @@ run_engine <- function(arm_list,
 
     #Make sure there are no duplicated inputs in the model, if so, take the last one
     duplic <- duplicated(names(input_list_pt),fromLast = T)
-    if (sum(duplic)>0) { warning("Duplicated items detected in the Patient, using the last one added")  }
+    if (sum(duplic)>0 & i==1 & simulation==1 & sens==1) { warning("Duplicated items detected in the Patient, using the last one added")  }
     input_list_pt <- input_list_pt[!duplic]
 
     #2 Loop per treatment ------------------------------------------------------

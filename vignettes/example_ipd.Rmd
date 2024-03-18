@@ -252,7 +252,7 @@ evt_react_list <-
                  
                  if(fl.prog == 0){ #Event only accelerates progression if progression has not occurred yet
                  modify_event(list(
-                   "Progression"=max(draw_tte(1,'weibull',coef1=TTP.shape, coef2= TTP.scale + TTP.coef.int*fl.int, hr = 1.2, seed = as.numeric(paste0(1,i,simulation))),curtime))) #Occurrence of event accelerates progression by a factor of 1.2
+                   "Progression"=max(draw_tte(1,'weibull',coef1=TTP.shape, coef2= TTP.scale + TTP.coef.int*fl.int, beta_tx = 1.2, seed = as.numeric(paste0(1,i,simulation))),curtime))) #Occurrence of event accelerates progression by a factor of 1.2
                  }
                })
 
