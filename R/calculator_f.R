@@ -55,6 +55,104 @@ draw_tte <- function(n_chosen,dist,coef1=NULL,coef2=NULL,coef3=NULL,...,beta_tx=
   return(draw.out)
 }
 
+# Draws dirichlet distribution --------
+
+#' Draw from a dirichlet distribution based on number of counts in transition. Adapted from brms::rdirichlet
+#'
+#' @param n Number of draws (must be >= 1). If n>1, it will return a list of matrices.
+#' @param alpha A matrix of alphas (transition counts)
+#' @param seed An integer which will be used to set the seed for this draw.
+#'
+#' @return A transition matrix. If n>1, it will return a list of matrices.
+#'
+#' @importFrom stats rgamma
+#'
+#' @export
+#'
+#' @examples
+#' draw_dirichlet(n=1,alpha= matrix(c(1251, 0, 350, 731),2,2))
+#' draw_dirichlet(n=2,alpha= matrix(c(1251, 0, 350, 731),2,2))
+
+draw_dirichlet <- function(n=1,alpha,seed=NULL) {
+  out <- NULL
+  
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
+  
+    if (!is.matrix(alpha)) {
+      alpha <- matrix(alpha, nrow = 1)
+    }
+    if (prod(dim(alpha)) == 0) {
+      stop2("alpha should be non-empty.")
+    }
+    if (isTRUE(any(alpha < 0))) {
+      stop2("alpha must be positive.")
+    }
+    if (n == 1) {
+      out <- matrix(rgamma(ncol(alpha) * nrow(alpha), alpha), ncol = ncol(alpha))
+      out <- out/rowSums(out)
+      
+    } else{
+     out <-  lapply(1:n,function(x) {
+      out <- matrix(rgamma(ncol(alpha) * nrow(alpha), alpha), ncol = ncol(alpha)) 
+      out/rowSums(out)} 
+      )
+    }
+  
+  return(out)
+}
+
+# Draws dirichlet distribution --------
+
+#' Draw from a dirichlet distribution based on mean transition probabilities and standard errors
+#'
+#' @param n Number of draws (must be >= 1). If n>1, it will return a list of matrices.
+#' @param alpha A matrix of transition probabilities
+#' @param se A matrix of standard errors 
+#' @param seed An integer which will be used to set the seed for this draw.
+#'
+#' @return A transition matrix. If n>1, it will return a list of matrices.
+#'
+#' @importFrom stats rgamma
+#'
+#' @export
+#'
+#' @examples
+#' draw_dirichlet_prob(n=1,alpha= matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7),3,3),se=matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7)/10,3,3))
+#' draw_dirichlet_prob(n=2,alpha= matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7),3,3),se=matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7)/10,3,3))
+
+draw_dirichlet_prob <- function(n=1,alpha,se,seed=NULL) {
+  out <- NULL
+  
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
+  
+  if (!is.matrix(alpha)) {
+    alpha <- matrix(alpha, nrow = 1)
+  }
+  if (prod(dim(alpha)) == 0) {
+    stop2("alpha should be non-empty.")
+  }
+  if (isTRUE(any(alpha < 0))) {
+    stop2("alpha must be positive.")
+  }
+  if (n == 1) {
+    out <- matrix(suppressWarnings(draw_gamma(1, c(alpha),c(se))), ncol = ncol(alpha))
+    out <- out/rowSums(out)
+    
+  } else{
+    out <-  lapply(1:n,function(x) {
+      out <- matrix(suppressWarnings(draw_gamma(1, c(alpha),c(se))), ncol = ncol(alpha)) 
+      out/rowSums(out)} 
+    )
+  }
+  
+  return(out)
+}
+
+
 # Draws beta distribution - accepts vectors--------
 
 #' Draw from a beta distribution based on mean and se
@@ -70,18 +168,18 @@ draw_tte <- function(n_chosen,dist,coef1=NULL,coef2=NULL,coef3=NULL,...,beta_tx=
 #' @export
 #'
 #' @examples
-#' draw_beta(mean_v=0.8,se=0.2)
+#' draw_beta(n=1,mean_v=0.8,se=0.2)
 
-draw_beta <- function(mean_v,se,seed=NULL) {
+draw_beta <- function(n=1,mean_v,se,seed=NULL) {
   out <- NULL
 
   if(!is.null(seed)){
     set.seed(seed)
   }
 
-  alpha <- ((1 - mean_v) / (se^2) - (1 / mean_v)) * mean_v ^ 2
-  beta <- alpha * ((1 / mean_v) - 1)
-  out <- rbeta(length(mean_v),alpha,beta)
+    alpha <- ((1 - mean_v) / (se^2) - (1 / mean_v)) * mean_v ^ 2
+    beta <- alpha * ((1 / mean_v) - 1)
+    out <- rbeta(length(mean_v)*n,alpha,beta)
 
   return(out)
 }
@@ -101,19 +199,21 @@ draw_beta <- function(mean_v,se,seed=NULL) {
 #' @export
 #'
 #' @examples
-#' draw_gamma(mean_v=0.8,se=0.2)
+#' draw_gamma(n=1,mean_v=0.8,se=0.2)
 #'
 
-draw_gamma <- function(mean_v,se,seed=NULL) {
+draw_gamma <- function(n=1,mean_v,se,seed=NULL) {
   out <- NULL
 
   if(!is.null(seed)){
     set.seed(seed)
   }
-
-  scale <- se^2 / mean_v
-  shape <- mean_v / scale
-  out <- ifelse(se==0,mean_v,rgamma(length(mean_v),shape,scale=scale))
+  
+    bool_se <- se==0 | mean_v==0
+    scale <- se^2 / mean_v
+    shape <- mean_v / scale
+    out <- rgamma(length(mean_v)*n,shape,scale=scale)
+    out[bool_se] <- mean_v[bool_se]
 
   return(out)
 }
