@@ -291,7 +291,7 @@ rpoisgamma <- function(n, rate, theta=NULL, obs_time=1, t_reps, seed=NULL,return
   # Create data with sampled event times for n observations and t_reps replications                      
   # Approach is different for Poisson and PG to optimize run time
   # If t_reps not provided, derive based on 99.9th quantile of Poisson or negative binomial distribution
-  
+
   if(is.null(theta)){
     # Missing theta produces event time draws for a Poisson process
     if (missing(t_reps)) t_reps <- qpois(0.9999, lambda=rate*obs_time)
@@ -303,7 +303,8 @@ rpoisgamma <- function(n, rate, theta=NULL, obs_time=1, t_reps, seed=NULL,return
     if(!is.null(seed)){
       set.seed(seed)
     }
-    ds <- lapply(1:n, function(x) cumsum(rexp(n*t_reps, rate=rate))) 
+    
+    ds <- lapply(1:n, function(x) cumsum(rexp(t_reps, rate=rate))) 
     
   } else{
     # Theta specified; produce event times for Poisson-gamma/NB
@@ -318,9 +319,10 @@ rpoisgamma <- function(n, rate, theta=NULL, obs_time=1, t_reps, seed=NULL,return
       if(!is.null(seed)){
         set.seed(seed)
       }
+      
       ds <- lapply(1:n, function(x) 
         cumsum(
-            rexp(n*t_reps,
+            rexp(t_reps,
                rate=rate_par[x]
           )
         )
@@ -340,6 +342,9 @@ rpoisgamma <- function(n, rate, theta=NULL, obs_time=1, t_reps, seed=NULL,return
   if (return_df==TRUE) {
     ds_df <- lapply(ds, function(x) data.frame(tte=x))
     ds_df <- rbindlist(ds_df,idcol=TRUE)
+    if(nrow(ds_df)==0){
+      return(NULL)
+    }
     ds_df[,t_btw_evt:= tte-shift(tte,fill = 0),by=.id]
     ds_df[,evt_num:= 1:.N,by=.id]
     ds_df[,evt_count:= .N,by=.id]
