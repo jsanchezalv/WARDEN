@@ -1,4 +1,4 @@
-# script to update the documentation and vignettes hosted at https://roche.github.io/
+# script to update the documentation and vignettes hosted at https://https://github.com/javiersanchezalvarezevidera/RDICE/
 # for each package once a change is made update the following files then run the appropriate section of code
 # this will pre-compile all the vignettes and documentation to the website
 
@@ -9,7 +9,6 @@
 
 # 1) make any updates to the package 
 # 2) update documentation using devtools
-devtools::document()
 devtools::document()
 
 # 3) reinstall the updated package 

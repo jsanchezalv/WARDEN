@@ -9,3 +9,5 @@
 ^other docs$
 ^Rprof.out$
 ^update_github_sites.R$
+^doc$
+^Meta$

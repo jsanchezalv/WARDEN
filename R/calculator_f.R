@@ -157,6 +157,7 @@ draw_dirichlet_prob <- function(n=1,alpha,se,seed=NULL) {
 
 #' Draw from a beta distribution based on mean and se
 #'
+#' @param n Number of draws (must be >= 1)
 #' @param mean_v A vector of the mean values
 #' @param se A vector of the standard errors of the means
 #' @param seed An integer which will be used to set the seed for this draw.
@@ -188,6 +189,7 @@ draw_beta <- function(n=1,mean_v,se,seed=NULL) {
 
 #' Draw from a gamma distribution based on mean and se
 #'
+#' @param n Number of draws (must be >= 1)
 #' @param mean_v A vector of the mean values
 #' @param se A vector of the standard errors of the means
 #' @param seed An integer which will be used to set the seed for this draw.

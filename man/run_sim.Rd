@@ -27,7 +27,7 @@ run_sim(
   drc = 0.035,
   drq = 0.035,
   input_out = NULL,
-  ipd = TRUE
+  ipd = 1
 )
 }
 \arguments{
@@ -75,7 +75,7 @@ run_sim(
 
 \item{input_out}{A vector of variables to be returned in the output data frame}
 
-\item{ipd}{A boolean to determine if individual patient data should be returned. If set to false, only the main aggregated outputs will be returned (slightly speeds up code)}
+\item{ipd}{Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events (summing for numeric variables, returning last value for character/factor variables). For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear.}
 }
 \value{
 A list of data frames with the simulation results
@@ -90,7 +90,7 @@ This function is slightly different from \code{run_sim_parallel}.
 \code{run_sim} can be more efficient if using only one simulation (e.g., deterministic),
 while \code{run_sim_parallel} will be more efficient if the number of simulations is >1 (e.g., PSA).
 A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
-c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists")
+c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd")
 }
 \examples{
 \dontrun{
@@ -109,6 +109,6 @@ n_sim = 1,
 psa_bool = FALSE,
 drc = 0.035,
 drq = 0.035,
-ipd = TRUE)
+ipd = 1)
 }
 }

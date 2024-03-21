@@ -271,6 +271,7 @@ ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = arm)) +
   theme(axis.text.x = element_text(angle = 90, vjust = .5))
 
 ```
+
 # Sensitivity Analysis
 ## Inputs
 In this case, inputs must be created first to change across sensitivity analysis. To do so, the item list `sensitivity_inputs` can be used. In this case, we also use `pick_val_v` which allows the model to automatically pick the relevant value (no PSA, PSA or sensitivity) based on the corresponding boolean flags of psa_bool and sensitivity_bool. In this case we also use the `sens` iterator for each sensitivity analysis and the `n_sensitivity` which is an argument in `run_sim`. 

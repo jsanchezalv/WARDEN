@@ -28,7 +28,7 @@ run_sim_parallel(
   drc = 0.035,
   drq = 0.035,
   input_out = NULL,
-  ipd = TRUE
+  ipd = 1
 )
 }
 \arguments{
@@ -78,7 +78,7 @@ run_sim_parallel(
 
 \item{input_out}{A vector of variables to be returned in the output data frame}
 
-\item{ipd}{A boolean to determine if individual patient data should be returned. If set to false, only the main aggregated outputs will be returned (slightly speeds up code)}
+\item{ipd}{Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events}
 }
 \value{
 A list of lists with the analysis results
@@ -92,7 +92,7 @@ This function is slightly different from \code{run_sim}.
 \code{run_sim_parallel} allows to use multiple-core at the simulation level,
 making it more efficient for a large number of simulations relative to \code{run_sim} (e.g., for  PSA).
 A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
-c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists")
+c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd")
 }
 \examples{
 \dontrun{
@@ -109,9 +109,9 @@ cost_instant_list = cost_instant_list,
 npats = 500,
 n_sim = 1,
 psa_bool = FALSE,
-ncores = 3,
+ncores = future::availableCores(),
 drc = 0.035,
 drq = 0.035,
-ipd = TRUE)
+ipd = 1)
 }
 }

@@ -4,10 +4,12 @@
 \alias{draw_gamma}
 \title{Draw from a gamma distribution based on mean and se}
 \usage{
-draw_gamma(value, se, seed = NULL)
+draw_gamma(n = 1, mean_v, se, seed = NULL)
 }
 \arguments{
-\item{value}{A vector of the mean values}
+\item{n}{Number of draws (must be >= 1)}
+
+\item{mean_v}{A vector of the mean values}
 
 \item{se}{A vector of the standard errors of the means}
 
@@ -20,6 +22,6 @@ A single estimate from the gamma distribution based on given parameters
 Draw from a gamma distribution based on mean and se
 }
 \examples{
-draw_gamma(value=0.8,se=0.2)
+draw_gamma(n=1,mean_v=0.8,se=0.2)
 
 }

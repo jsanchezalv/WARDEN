@@ -5,27 +5,30 @@
 \title{Draw a time to event from a list of parametric survival functions}
 \usage{
 draw_tte(
-  n_chosen = 1,
-  dist = "exp",
-  coef1 = 1,
+  n_chosen,
+  dist,
+  coef1 = NULL,
   coef2 = NULL,
   coef3 = NULL,
-  hr = 1,
+  ...,
+  beta_tx = 1,
   seed = NULL
 )
 }
 \arguments{
 \item{n_chosen}{The number of observations to be drawn}
 
-\item{dist}{The distribution; takes values 'lnorm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp'}
+\item{dist}{The distribution; takes values 'lnorm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp','beta','poisgamma'}
 
-\item{coef1}{First coefficient of the distribution, defined as in the coef() output on a flexsurvreg object}
+\item{coef1}{First coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (rate in "rpoisgamma")}
 
-\item{coef2}{Second coefficient of the distribution, defined as in the coef() output on a flexsurvreg object}
+\item{coef2}{Second coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (theta in "rpoisgamma")}
 
-\item{coef3}{Third coefficient of the distribution, defined as in the coef() output on a flexsurvreg object}
+\item{coef3}{Third coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (not used in "rpoisgamma")}
 
-\item{hr}{A hazard ratio}
+\item{...}{Additional arguments to be used by the specific distribution (e.g., return_ind_rate if dist = "poisgamma")}
+
+\item{beta_tx}{Parameter in natural scale applied in addition to the scale/rate coefficient -e.g., a HR if used in an exponential- (not used in "rpoisgamma" nor "beta")}
 
 \item{seed}{An integer which will be used to set the seed for this draw.}
 }
@@ -35,6 +38,10 @@ A vector of time to event estimates from the given parameters
 \description{
 Draw a time to event from a list of parametric survival functions
 }
+\details{
+Other arguments relevant to each function can be called directly
+}
 \examples{
-draw_tte(n_chosen=1,dist='exp',coef1=1,hr=1)
+draw_tte(n_chosen=1,dist='exp',coef1=1,beta_tx=1)
+draw_tte(n_chosen=10,"poisgamma",coef1=1,coef2=1,obs_time=1,return_ind_rate=FALSE)
 }

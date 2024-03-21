@@ -4,10 +4,12 @@
 \alias{draw_beta}
 \title{Draw from a beta distribution based on mean and se}
 \usage{
-draw_beta(value, se, seed = NULL)
+draw_beta(n = 1, mean_v, se, seed = NULL)
 }
 \arguments{
-\item{value}{A vector of the mean values}
+\item{n}{Number of draws (must be >= 1)}
+
+\item{mean_v}{A vector of the mean values}
 
 \item{se}{A vector of the standard errors of the means}
 
@@ -20,5 +22,5 @@ A single estimate from the beta distribution based on given parameters
 Draw from a beta distribution based on mean and se
 }
 \examples{
-draw_beta(value=0.8,se=0.2)
+draw_beta(n=1,mean_v=0.8,se=0.2)
 }

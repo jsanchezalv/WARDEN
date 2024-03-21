@@ -4,9 +4,6 @@
     <loc>/404.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
     <loc>/articles/example_eBC.html</loc>
   </url>
   <url>
@@ -31,13 +28,7 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/RunEngine.html</loc>
-  </url>
-  <url>
-    <loc>/reference/RunEngine_debug.html</loc>
-  </url>
-  <url>
-    <loc>/reference/RunSim.html</loc>
+    <loc>/LICENSE-text.html</loc>
   </url>
   <url>
     <loc>/reference/add_cost.html</loc>
@@ -58,7 +49,31 @@
     <loc>/reference/ceac_des.html</loc>
   </url>
   <url>
+    <loc>/reference/disc_cycle.html</loc>
+  </url>
+  <url>
+    <loc>/reference/disc_cycle_v.html</loc>
+  </url>
+  <url>
+    <loc>/reference/disc_instant.html</loc>
+  </url>
+  <url>
+    <loc>/reference/disc_instant_v.html</loc>
+  </url>
+  <url>
+    <loc>/reference/disc_ongoing.html</loc>
+  </url>
+  <url>
+    <loc>/reference/disc_ongoing_v.html</loc>
+  </url>
+  <url>
     <loc>/reference/draw_beta.html</loc>
+  </url>
+  <url>
+    <loc>/reference/draw_dirichlet.html</loc>
+  </url>
+  <url>
+    <loc>/reference/draw_dirichlet_prob.html</loc>
   </url>
   <url>
     <loc>/reference/draw_gamma.html</loc>
@@ -88,9 +103,48 @@
     <loc>/reference/new_event.html</loc>
   </url>
   <url>
+    <loc>/reference/pick_val.html</loc>
+  </url>
+  <url>
+    <loc>/reference/pick_val_v.html</loc>
+  </url>
+  <url>
+    <loc>/reference/replicate_profiles.html</loc>
+  </url>
+  <url>
+    <loc>/reference/revert_list.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rpoisgamma.html</loc>
+  </url>
+  <url>
+    <loc>/reference/RunEngine.html</loc>
+  </url>
+  <url>
+    <loc>/reference/RunEngine_debug.html</loc>
+  </url>
+  <url>
+    <loc>/reference/RunSim.html</loc>
+  </url>
+  <url>
+    <loc>/reference/run_engine.html</loc>
+  </url>
+  <url>
+    <loc>/reference/run_engine_debug.html</loc>
+  </url>
+  <url>
+    <loc>/reference/run_sim.html</loc>
+  </url>
+  <url>
+    <loc>/reference/run_sim_parallel.html</loc>
+  </url>
+  <url>
     <loc>/reference/summary_results_det.html</loc>
   </url>
   <url>
     <loc>/reference/summary_results_psa.html</loc>
+  </url>
+  <url>
+    <loc>/reference/summary_results_sim.html</loc>
   </url>
 </urlset>

@@ -17,7 +17,7 @@ Reverts list
 }
 \examples{
 \dontrun{
-revert_list(ls=list(a=list(ab=1,ac=2),b=list(ab=2,ac=3))
+revert_list(ls=list(a=list(ab=1,ac=2),b=list(ab=2,ac=3)))
 }
 
 }
