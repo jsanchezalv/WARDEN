@@ -8,7 +8,8 @@ Authors@R:
            email = "javier.sanchezalvarez@evidera.com",
            comment = ""),
       person(given = "Gabriel", family = "Lemyre", "Developer", role = "ctb",
-                     email = "gabriel.lemyre@evidera.com"))     
+                     email = "gabriel.lemyre@evidera.com"),                     ,
+      person(given = "Valerie", family = "Aponte Ribero", "Developer", role = "ctb"))     
 Description: A package designed to perform discrete event simulation for cost-effectiveness modelling.
 License: Apache License (>= 2)
 Encoding: UTF-8
