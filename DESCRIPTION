@@ -2,11 +2,13 @@ Package: RDICE
 Title: Discrete Event Simulation for Cost-Effectiveness Modelling
 Version: 0.4
 Authors@R: 
-    person(given = "Javier",
+    c(person(given = "Javier",
            family = "Sanchez Alvarez",
            role = c("aut", "cre"),
            email = "javier.sanchezalvarez@evidera.com",
-           comment = "")
+           comment = ""),
+      person(given = "Gabriel", family = "Lemyre", "Developer", role = "ctb",
+                     email = "gabriel.lemyre@evidera.com"))     
 Description: A package designed to perform discrete event simulation for cost-effectiveness modelling.
 License: Apache License (>= 2)
 Encoding: UTF-8
@@ -14,6 +16,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Suggests: 
+    tidyr,
     dplyr,
     ggplot2,
     knitr,
@@ -21,7 +24,9 @@ Suggests:
     kableExtra,
     DiagrammeR,
     MASS,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    survminer,
+    flexsurvPlus
 Imports: 
     purrr,
     data.table,
