@@ -221,7 +221,7 @@ draw_gamma <- function(n=1,mean_v,se,seed=NULL) {
 }
 
 
-#' Draw from a restricted Gompertz distribution
+#' Draw from a restricted Gompertz distribution (lower and upper bound)
 #'
 #' @param n The number of observations to be drawn
 #' @param shape The shape parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
@@ -237,9 +237,9 @@ draw_gamma <- function(n=1,mean_v,se,seed=NULL) {
 #' @export
 #'
 #' @examples
-#' draw_resgompertz(1,shape=0.05,rate=0.01,lower_bound = 50)
+#' draw_resgompertz_lu(1,shape=0.05,rate=0.01,lower_bound = 50)
 
-draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf, seed=NULL){
+draw_resgompertz_lu <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf, seed=NULL){
 
   if(!is.null(seed)){
     set.seed(seed)
@@ -250,7 +250,31 @@ draw_resgompertz <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf
   flexsurv::qgompertz(uniform_random_numbers, shape, rate ) - lower_bound
 }
 
+#' Draw from a restricted Gompertz distribution (lower bound only)
+#'
+#' @param n The number of observations to be drawn
+#' @param shape The shape parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
+#' @param rate The rate parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
+#' @param lower_bound The lower bound of the restricted distribution
+#' @param seed An integer which will be used to set the seed for this draw.
+#'
+#' @return Estimate(s) from the restricted Gompertz distribution based on given parameters
+#'
+#' @importFrom stats runif
+#'
+#' @export
+#'
+#' @examples
+#' draw_resgompertz(1,shape=0.05,rate=0.01,lower_bound = 50)
 
+draw_resgompertz <- function(n=1,shape,rate,lower_bound,seed=NULL){
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
+  out <- (1/shape)*log(1- ((shape/rate)*log(runif(n))/exp(shape*lower_bound)))
+  
+  return(out)
+}
 
   #' Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process
   #'

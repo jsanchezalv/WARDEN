@@ -38,7 +38,8 @@
 #' `run_sim_parallel` allows to use multiple-core at the simulation level,
 #' making it more efficient for a large number of simulations relative to `run_sim` (e.g., for  PSA).
 #' A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
-#' c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd") 
+#' c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").
+#' The engine uses the L'Ecuyer-CMRG for the random number generator
 #' 
 #' @examples
 #' \dontrun{
@@ -88,6 +89,10 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   
   
   # Set-up basics -----------------------------------------------------------
+  
+  #Store original rng kind and use L'Ecuyer-CMRG 
+  rng_kind_store <- RNGkind()[1]
+  RNGkind("L'Ecuyer-CMRG")
   
   #Stop simulation if forbidden objects are used.
   list_forbidden_names <-  c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd") 
@@ -281,7 +286,9 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
 
 
   results <- output_sim
-
+  
+  RNGkind(rng_kind_store)
+  
   return(results)
 
 }
