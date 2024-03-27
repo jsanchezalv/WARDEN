@@ -149,6 +149,18 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = FALSE,
       sens_ind = TRUE,
+      indicator=c(0,1)
+    ),
+    list(0,3)
+  )
+  
+  expect_equal(
+    pick_val_v(
+      base = c(0,0),
+      psa =c(rnorm(1,0,0.1),rnorm(1,0,0.1)),
+      sens = c(2,3),
+      psa_ind = FALSE,
+      sens_ind = TRUE,
       indicator=c(1,1)
     ),
     list(2,3)
@@ -211,6 +223,18 @@ test_that("Pick values vectorized work correctly",{
     {set.seed(1);list(rnorm(1,0,0.1),rnorm(1,0,0.1))}
   )
   
+  expect_equal(
+    pick_val_v(
+      base = c(0,0),
+      psa ={set.seed(1);c(rnorm(1,0,0.1),rnorm(1,0,0.1))},
+      sens = c(2,3),
+      psa_ind = TRUE,
+      sens_ind = FALSE,
+      indicator=c(0,1)
+    ),
+    {set.seed(1);list(0,rnorm(1,0,0.1))}
+  )
+  
   expect_equal(pick_val(base = 0, psa ={set.seed(1); rnorm(1,0,0.1)}, sens = 5,psa_ind = TRUE, sens_ind = FALSE, indicator=1),
                {set.seed(1); rnorm(1,0,0.1)})
   
@@ -227,3 +251,4 @@ test_that("Pick values vectorized work correctly",{
   expect_error(pick_val(base = 0, psa =rnorm(1,0,0.1), sens = 5,psa_ind = FALSE, sens_ind = 6, indicator=1))
   
 })
+
