@@ -320,7 +320,8 @@ interval_out <- function(output_sim, element, arm,round_digit=2) {
 #' Extra data defined by user of length >1 (e.g., matrix) will not be displayed as part of the final IPD data.table and 
 #' will instead be reported in the `extradata_raw` list.
 #' Extra data defined by user of length==1 will be integrated in the final IPD data.table. 
-#' 
+#' For `input_out` items that are of length ==1, using ipd = 2 in `run_sim` will take the last observation per patient.
+#' If using ipd = 3, it will return the average across patients of the last observation per patient (if numeric. If not numeric, it will be discarded).
 #'
 #' @examples
 #' compute_outputs(patdata=patdata,input_list=input_list)
@@ -341,7 +342,8 @@ compute_outputs <- function(patdata,input_list) {
   
   #Split the data as to be exported as a data.table, and the extra data the user described
   data_export_aslist <- input_list$input_out[!input_list$input_out %in% input_list$categories_for_export]
-  
+  data_export_summarized_nonumeric <- data_export_aslist
+    
   for (arm_i in arm_list) {
     list_evts <- unlist(map(map(patdata,arm_i),"evtlist"), recursive = FALSE)
     list_patdata <- c(list_patdata,list_evts)
@@ -361,6 +363,7 @@ compute_outputs <- function(patdata,input_list) {
   
   data_export_aslist <- unique(names(items_length_greater_than_one))
   data_export_tobesummarized <- unique(names(items_length_one_numeric))
+  data_export_summarized_nonumeric <- data_export_summarized_nonumeric[!data_export_summarized_nonumeric %in% c(data_export_aslist,data_export_tobesummarized)]
   
   if (length(data_export_aslist)>0) {
     list_evts <- lapply(list_patdata,function(x) x[!names(x) %in% data_export_aslist])
@@ -537,8 +540,8 @@ compute_outputs <- function(patdata,input_list) {
     }
     
     for (output_i in data_export_tobesummarized) {
-        #mean of outcomes defined by user after removing Inf values and NAs
-      final_output[[paste0(output_i,"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=mean(get(output_i)*is.finite(get(output_i)),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+        #Gets last value from patient, then average for numeric
+      final_output[[paste0(output_i,"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
     }
   }
   
@@ -550,6 +553,7 @@ compute_outputs <- function(patdata,input_list) {
     if(length(data_export_aslist)>0){
       final_output$extradata_raw <- export_list_ipd
     }
+    
   } else if (input_list$ipd==2) {
     
     #Get names of columns that will be used, 
@@ -560,22 +564,31 @@ compute_outputs <- function(patdata,input_list) {
     #Numeric columns only
     numeric_c <- sapply(patdata_dt,is.numeric)
     #Columns to sum must be in the right list and also be numeric
-    cols_to_sum <- colnames(patdata_dt)[!colnames(patdata_dt) %in% c(other_cols,cols_to_rm) & numeric_c]
+    cols_to_sum <- colnames(patdata_dt)[!colnames(patdata_dt) %in% c(other_cols,cols_to_rm,data_export_tobesummarized) & numeric_c]
     #Other columns are left as is (takes last value of those)
-    cols_to_leave_as_is <- colnames(patdata_dt)[!colnames(patdata_dt) %in% c(other_cols,cols_to_rm) & !numeric_c]
+    cols_to_leave_as_is <- colnames(patdata_dt)[!colnames(patdata_dt) %in% c(other_cols,cols_to_rm) & !colnames(patdata_dt) %in% c(cols_to_sum)]
     
     #Summarize the data as relevant
-    patdata_temp <- patdata_dt[, lapply(.SD, sum, na.rm=TRUE), by=other_cols, .SDcols=cols_to_sum] #sum other variables
-    patdata_temp2 <- patdata_dt[, tail(.SD, 1, na.rm=TRUE), by=other_cols, .SDcols=cols_to_leave_as_is] #get last observation if not numeric
+    patdata_temp <- patdata_dt[, lapply(.SD, sum, na.rm=TRUE), by=other_cols, .SDcols=cols_to_sum] #sum numeric variables in list
     
-    final_output$merged_df <- merge(patdata_temp,patdata_temp2)
+    if (length(cols_to_leave_as_is!=0)) {
+      patdata_temp2 <- patdata_dt[, tail(.SD, 1, na.rm=TRUE), by=other_cols, .SDcols=cols_to_leave_as_is] #get last observation if other
+      final_output$merged_df <- merge(patdata_temp,patdata_temp2)
+    } else{
+      final_output$merged_df <- patdata_temp
+    }
+    
 
     if (sens==1 & simulation==1) {
-      warning("Patient-arm data aggregated across events by summing numeric variables. Some data may need readjusting by dividing over number_events.")
+      message("Patient-arm data aggregated across events by selecting the last value for input_out items.")
       }
     
     if(length(data_export_aslist)>0){
       final_output$extradata_raw <- export_list_ipd
+    }
+  } else{
+    if (sens==1 & simulation==1) {
+      message("Data aggregated across events and patients by selecting the last value for input_out numeric items and then averaging across patients. Non numeric items or items with length > 1 have been discarded.")
     }
   }
   

@@ -22,7 +22,7 @@
 #' @param drc The discount rate for costs
 #' @param drq The discount rate for LYs/QALYs
 #' @param input_out A vector of variables to be returned in the output data frame
-#' @param ipd Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events (summing for numeric variables, returning last value for character/factor variables). For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear.
+#' @param ipd Integer taking value 1 for full IPD data returned, and 2 IPD data but aggregating events (returning last value for numeric/character/factor variables. For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear). Other values mean no IPD data returned (removes non-numerical or length>1 items)
 #'
 #' @return A list of data frames with the simulation results
 #'
