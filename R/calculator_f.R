@@ -3,7 +3,7 @@
 #' Draw a time to event from a list of parametric survival functions
 #'
 #' @param n_chosen The number of observations to be drawn
-#' @param dist The distribution; takes values 'lnorm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp','beta','poisgamma'
+#' @param dist The distribution; takes values 'lnorm','norm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp','beta','poisgamma'
 #' @param coef1 First coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (rate in "rpoisgamma")
 #' @param coef2 Second coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (theta in "rpoisgamma")
 #' @param coef3 Third coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (not used in "rpoisgamma")
@@ -13,7 +13,7 @@
 #'
 #' @return A vector of time to event estimates from the given parameters
 #'
-#' @importFrom stats rlnorm rweibull rgamma rexp rbeta
+#' @importFrom stats rlnorm rnorm rweibull rgamma rexp rbeta
 #' @importFrom flexsurv rweibullPH rllogis rgompertz rgengamma
 #'
 #' @export
@@ -34,12 +34,13 @@ draw_tte <- function(n_chosen,dist,coef1=NULL,coef2=NULL,coef3=NULL,...,beta_tx=
     warning("Provided a coefficient parameter that is a vector")
   }
   
-  if (!(dist %in% c("lnorm", "weibullPH", "weibull", "llogis", "gompertz", "gengamma", "gamma", "exp", "beta", "poisgamma"))) {
+  if (!(dist %in% c("lnorm", "norm", "weibullPH", "weibull", "llogis", "gompertz", "gengamma", "gamma", "exp", "beta", "poisgamma"))) {
     stop("Invalid distribution. Distribution must be one of: 'lnorm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp','beta','poisgamma'")
   }
 
   draw.out <- switch(dist, 
                      "lnorm" = rlnorm(n_chosen, meanlog=coef1 - log(beta_tx), sdlog=exp(coef2),...), 
+                     "norm" = rnorm(n_chosen, mean=coef1 - log(beta_tx), sd=exp(coef2),...), 
                      "weibullPH" = rweibullPH(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),
                      "weibull" = rweibull(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),
                      "llogis" = rllogis(n_chosen, shape = exp(coef1), scale = exp(coef2 + log(beta_tx))),

@@ -214,25 +214,25 @@ test_that("Pick values vectorized work correctly",{
   expect_equal(
     pick_val_v(
       base = c(0,0),
-      psa ={set.seed(1);c(rnorm(1,0,0.1),rnorm(1,0,0.1))},
+      psa ={c(draw_tte(1,'norm',0,0.1,seed=1),draw_tte(1,'norm',0,0.1,seed=2))},
       sens = c(2,3),
       psa_ind = TRUE,
-      sens_ind = FALSE,
-      indicator=c(1,1)
+      sens_ind = TRUE,
+      indicator=c(0,0)
     ),
-    {set.seed(1);list(rnorm(1,0,0.1),rnorm(1,0,0.1))}
+    {list(draw_tte(1,'norm',0,0.1,seed=1),draw_tte(1,'norm',0,0.1,seed=2))}
   )
   
   expect_equal(
     pick_val_v(
       base = c(0,0),
-      psa ={set.seed(1);c(rnorm(1,0,0.1),rnorm(1,0,0.1))},
+      psa ={c(draw_tte(1,'norm',0,0.1,seed=1),draw_tte(1,'norm',0,0.1,seed=2))},
       sens = c(2,3),
       psa_ind = TRUE,
-      sens_ind = FALSE,
-      indicator=c(0,1)
+      sens_ind = TRUE,
+      indicator=c(1,0)
     ),
-    {set.seed(1);list(0,rnorm(1,0,0.1))}
+    {list(2,draw_tte(1,'norm',0,0.1,seed=2))}
   )
   
   expect_equal(pick_val(base = 0, psa ={set.seed(1); rnorm(1,0,0.1)}, sens = 5,psa_ind = TRUE, sens_ind = FALSE, indicator=1),
