@@ -18,7 +18,7 @@ draw_tte(
 \arguments{
 \item{n_chosen}{The number of observations to be drawn}
 
-\item{dist}{The distribution; takes values 'lnorm','norm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp','beta','poisgamma'}
+\item{dist}{The distribution; takes values 'lnorm','norm','mvnorm','weibullPH','weibull','llogis','gompertz','gengamma','gamma','exp','beta','poisgamma'}
 
 \item{coef1}{First coefficient of the distribution, defined as in the coef() output on a flexsurvreg object (rate in "rpoisgamma")}
 

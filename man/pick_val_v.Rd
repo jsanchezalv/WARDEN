@@ -71,5 +71,15 @@ pick_val_v(base        = df_par[,"base_value"],
            indicator   = indicators,
            names_out   = df_par[,"parameter_name"]
            )
+           
+ pick_val_v(
+  base = c(0,0),
+  psa =c(rnorm(1,0,0.1),rnorm(1,0,0.1)),
+  sens = c(2,3),
+  psa_ind = TRUE,
+  sens_ind = TRUE,
+  indicator=create_indicators(sens=1,n_sensitivity=2,n_elem = 2)
+ )
+ 
 }
 }

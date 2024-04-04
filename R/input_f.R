@@ -34,6 +34,53 @@ replicate_profiles <- function(profiles,
   return(output)
 }
 
+# Create indicators for sensitivity/DSA analysis --------------------------------------------------------
+#' Creates a vector of indicators (0 and 1) for sensitivity/DSA analysis
+#'
+#' @param sens current analysis iterator
+#' @param n_sensitivity total number of analyses to be run
+#' @param n_elem number of elements to iterate through
+#' @param n_elem_before number of elements that go before the current n_elem to iterate through
+#'
+#' @return Numeric vector composed of 0 and 1, where value 1 will be used by `pick_val_v` to pick the corresponding index in its `sens` argument
+#' @export
+#' 
+#' @details
+#' n_elem_before is to be used when several indicators want to be used (e.g., for patient level and common level inputs) while facilitating readibility of the code
+#'
+#' @examples
+#' \dontrun{
+#'create_indicators(10,20,4)
+#'create_indicators(11,20,10,2)
+#' }
+create_indicators <- function(sens,n_sensitivity,n_elem,n_elem_before=0){
+  
+  if (n_sensitivity<sens) {
+    stop("n_sensitivity is smaller than the iterator sens")
+  }
+  
+  if (n_elem_before + n_elem >n_sensitivity) {
+    stop("n_sensitivity is smaller than n_elem_before + n_elem")
+  }
+  
+  # which position to use to put the value 1 in indicator
+  pos_indicator <-  sens - n_sensitivity*floor((sens-1)/n_sensitivity) 
+  
+  if (n_elem + n_elem_before <sens) {
+    out <- rep(0, n_elem)
+  } else{
+    if(n_elem_before == 0) { #if elements before is 0, then we don't need to remove elements
+      out <- append(rep(0, n_elem + n_elem_before)[-pos_indicator],1,pos_indicator-1)
+    } else {
+      out <- append(rep(0, n_elem + n_elem_before)[-pos_indicator],1,pos_indicator-1)
+      out <- out[-c(1:n_elem_before)] #remove elements before
+    }
+  }
+  return(out)
+}
+
+
+
 # Select which values to apply --------------------------------------------------------
 #' Select which values should be applied in the corresponding loop for several values (vector or list).
 #'
@@ -84,6 +131,16 @@ replicate_profiles <- function(profiles,
 #'            indicator   = indicators,
 #'            names_out   = df_par[,"parameter_name"]
 #'            )
+#'            
+#'  pick_val_v(
+#'   base = c(0,0),
+#'   psa =c(rnorm(1,0,0.1),rnorm(1,0,0.1)),
+#'   sens = c(2,3),
+#'   psa_ind = TRUE,
+#'   sens_ind = TRUE,
+#'   indicator=create_indicators(sens=1,n_sensitivity=2,n_elem = 2)
+#'  )
+#'  
 #' }
 pick_val_v <- function(base,
                        psa,
