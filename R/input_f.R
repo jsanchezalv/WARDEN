@@ -80,6 +80,97 @@ create_indicators <- function(sens,n_sensitivity,n_elem,n_elem_before=0){
 }
 
 
+# Helper to draw PSA values --------------------------------------------------------
+#' Helper function to create a list with random draws or whenever a series of functions needs to be called. Can be implemented within `pick_val_v`.
+#'
+#' @param f A string or vector of strings with the function to be called, e.g., "rnorm"
+#' @param ... parameters to be passed to the function (e.g., if "rnorm", arguments `n`, `mean`, `sd`)
+#'
+#' @return List with length equal to `f` of parameters called
+#' @export
+#' 
+#' @details
+#' This function can be used to pick values for the PSA within `pick_val_v.` 
+#' 
+#' The function will ignore NULL items within the respective parameter (see example below).
+#' This feature is convenient when mixing distributions with different number of arguments, e.g., `rnorm` and `rgengamma`.
+#' 
+#' While it's slightly lower than individually calling each function, it makes the code easier to read and more transparent
+#'
+#' @examples
+#' \dontrun{
+#' params <- list(
+#' param=list("a","b"),
+#' dist=list("rlnorm","rnorm"),
+#' n=list(4,1),
+#' a=list(c(1,2,3,4),1),
+#' b=list(c(0.5,0.5,0.5,0.5),0.5),
+#' dsa_min=list(c(1,2,3,4),2),
+#' dsa_max=list(c(1,2,3,4),3)
+#' )
+#'pick_psa(params[["dist"]],params[["n"]],params[["a"]],params[["b"]])
+#'
+#'#It works with functions that require different number of parameters
+#'params <- list(
+#'  param=list("a","b","c"),
+#'  dist=list("rlnorm","rnorm","rgengamma"),
+#'  n=list(4,1,1),
+#'  a=list(c(1,2,3,4),1,0),
+#'  b=list(c(0.5,0.5,0.5,0.5),0.5,1),
+#'  c=list(NULL,NULL,0.2),
+#'  dsa_min=list(c(1,2,3,4),2,1),
+#'  dsa_max=list(c(1,2,3,4),3,3)
+#')
+#'
+#'pick_psa(params[["dist"]],params[["n"]],params[["a"]],params[["b"]],params[["c"]])
+#'
+#' #Can be combined with multiple type of functions and distributions if the parameters are well located
+# params <- list(
+# param=list("a","b","c","d"),
+# dist=list("rlnorm","rnorm","rgengamma","draw_tte"),
+# n=list(4,1,1,1),
+# a=list(c(1,2,3,4),1,0,"norm"),
+# b=list(c(0.5,0.5,0.5,0.5),0.5,1,1),
+# c=list(NULL,NULL,0.2,0.5), #NULL arguments will be ignored
+# c=list(NULL,NULL,NULL,NULL), #NULL arguments will be ignored
+# dsa_min=list(c(1,2,3,4),2,1,0),
+# dsa_max=list(c(1,2,3,4),3,3,2)
+# )
+#'
+#'#'params <- list(
+#' param=list("a","b","c","d"),
+#' dist=list("rlnorm","rnorm","rgengamma","draw_tte"),
+#' n=list(4,1,1,1),
+#' a=list(c(1,2,3,4),1,0,"norm"),
+#' b=list(c(0.5,0.5,0.5,0.5),0.5,1,1),
+#' c=list(NULL,NULL,0.2,0.5),
+#' c=list(NULL,NULL,NULL,NULL), #NULL arguments will be ignored
+#' dsa_min=list(c(1,2,3,4),2,1,0),
+#' dsa_max=list(c(1,2,3,4),3,3,2)
+#' )
+#'
+#'
+#'
+#' }
+#' 
+pick_psa <- function(f,...){
+  args_called <- list(...)
+  sapply(1:length(f), function(x) {
+    args <- lapply(args_called, `[[`, x)
+    args <- args[!sapply(args, is.null)]
+    do.call(f[[x]], args)
+  })
+}
+
+
+microbenchmark::microbenchmark(
+  pick_psa(params[["dist"]],params[["n"]],params[["a"]],params[["b"]],params[["c"]],params[["d"]]),
+  {
+    rnorm(4,c(1,2,3,4), c(0.5,0.5,0.5,0.5))
+    rnorm(1,1,0.5)
+    rgengamma(1,0,1,0.5)
+    draw_tte(1,"norm",1,0.5)
+  })
 
 # Select which values to apply --------------------------------------------------------
 #' Select which values should be applied in the corresponding loop for several values (vector or list).
@@ -177,7 +268,7 @@ pick_val_v <- function(base,
   return(output)
 }
 
-# Select which value to apply --------------------------------------------------------
+# Select which value to apply for a single value --------------------------------------------------------
 #' Select which value should be applied in the corresponding loop
 #'
 #' @param base Value if no PSA/DSA/Scenario

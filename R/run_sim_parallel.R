@@ -37,8 +37,10 @@
 #' `run_sim` allows to run single-core.
 #' `run_sim_parallel` allows to use multiple-core at the simulation level,
 #' making it more efficient for a large number of simulations relative to `run_sim` (e.g., for  PSA).
+#' 
 #' A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
 #' c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").
+#' 
 #' The engine uses the L'Ecuyer-CMRG for the random number generator
 #' 
 #' @examples

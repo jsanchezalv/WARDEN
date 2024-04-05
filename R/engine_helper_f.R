@@ -316,10 +316,13 @@ interval_out <- function(output_sim, element, arm,round_digit=2) {
 #' 
 #' @details
 #' It computes the discounted and undiscounted lys/costs/qalys. 
+#' 
 #' It also computes the mean aggregate outcomes per arm for the simulation for numeric values of length 1, discarding NAs and Inf. 
 #' Extra data defined by user of length >1 (e.g., matrix) will not be displayed as part of the final IPD data.table and 
 #' will instead be reported in the `extradata_raw` list.
+#' 
 #' Extra data defined by user of length==1 will be integrated in the final IPD data.table. 
+#' 
 #' For `input_out` items that are of length ==1, using ipd = 2 in `run_sim` will take the last observation per patient.
 #' If using ipd = 3, it will return the average across patients of the last observation per patient (if numeric. If not numeric, it will be discarded).
 #'
