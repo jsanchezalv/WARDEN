@@ -465,7 +465,6 @@ add_item <- function(.data=NULL,...){
 #' Generate new events to be added to existing vector of events
 #'
 #' @param evt Event name and event time
-#' @param env_ch Environment in which to save list (should not be defined by user)
 #'
 #' @importFrom stats setNames
 #'
@@ -481,7 +480,7 @@ add_item <- function(.data=NULL,...){
 #' new_event(list("ae"=5,"nat.death" = 100))
 #' }
 
-new_event <- function(evt, env_ch = NULL){
+new_event <- function(evt){
   new_evt_name <- names(evt)
   new_evt <- setNames(unlist(evt),new_evt_name)
   if (!is.numeric(new_evt)) {
@@ -505,7 +504,6 @@ new_event <- function(evt, env_ch = NULL){
 #' Modify the time of existing events
 #'
 #' @param evt A list of events and their times
-#' @param env_ch Environment in which to save list (should not be defined by user)
 #'
 #' @importFrom utils modifyList
 #' @importFrom stats setNames
@@ -522,7 +520,7 @@ new_event <- function(evt, env_ch = NULL){
 #' modify_event(list("os"=40, "ttot"=curtime+0.0001))
 #' }
 
-modify_event <- function(evt, env_ch = NULL){
+modify_event <- function(evt){
   input_list_arm <- parent.frame()$input_list_arm
   
   evt_unlist <- unlist(evt)
@@ -554,7 +552,6 @@ modify_event <- function(evt, env_ch = NULL){
 #' Modify the value of existing items
 #'
 #' @param list_item A list of items and their values or expressions
-#' @param env_ch Environment in which to save list (should not be defined by user)
 #'
 #' @export
 #'
@@ -567,7 +564,7 @@ modify_event <- function(evt, env_ch = NULL){
 #' modify_item(list(cost.idfs = 500, cost.tx = cost.tx + 4000))
 #' }
 
-modify_item <- function(list_item, env_ch = NULL){
+modify_item <- function(list_item){
   input_list_arm <- parent.frame()$input_list_arm
   
   input_list_arm[names(list_item)] <- lapply(list_item, unname)

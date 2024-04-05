@@ -4,12 +4,10 @@
 \alias{new_event}
 \title{Generate new events to be added to existing vector of events}
 \usage{
-new_event(evt, env_ch = NULL)
+new_event(evt)
 }
 \arguments{
 \item{evt}{Event name and event time}
-
-\item{env_ch}{Environment in which to save list (should not be defined by user)}
 }
 \description{
 Generate new events to be added to existing vector of events

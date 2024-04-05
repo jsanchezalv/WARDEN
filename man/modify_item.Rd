@@ -4,12 +4,10 @@
 \alias{modify_item}
 \title{Modify the value of existing items}
 \usage{
-modify_item(list_item, env_ch = NULL)
+modify_item(list_item)
 }
 \arguments{
 \item{list_item}{A list of items and their values or expressions}
-
-\item{env_ch}{Environment in which to save list (should not be defined by user)}
 }
 \description{
 Modify the value of existing items

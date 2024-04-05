@@ -4,12 +4,10 @@
 \alias{modify_event}
 \title{Modify the time of existing events}
 \usage{
-modify_event(evt, env_ch = NULL)
+modify_event(evt)
 }
 \arguments{
 \item{evt}{A list of events and their times}
-
-\item{env_ch}{Environment in which to save list (should not be defined by user)}
 }
 \description{
 Modify the time of existing events
