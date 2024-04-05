@@ -162,16 +162,6 @@ pick_psa <- function(f,...){
   })
 }
 
-
-microbenchmark::microbenchmark(
-  pick_psa(params[["dist"]],params[["n"]],params[["a"]],params[["b"]],params[["c"]],params[["d"]]),
-  {
-    rnorm(4,c(1,2,3,4), c(0.5,0.5,0.5,0.5))
-    rnorm(1,1,0.5)
-    rgengamma(1,0,1,0.5)
-    draw_tte(1,"norm",1,0.5)
-  })
-
 # Select which values to apply --------------------------------------------------------
 #' Select which values should be applied in the corresponding loop for several values (vector or list).
 #'
