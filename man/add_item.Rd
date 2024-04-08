@@ -20,11 +20,30 @@ Defining parameters that may be used in model calculations
 \details{
 The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two \code{add_item} with a list of one element, it's better to group them into a single \code{add_item} with a list of two elements.
+
+Whenever a function is directly implemented which must be evaluated later and that has no object name attached (e.g., \code{pick_val_v}),
+it should be implemented after a first \code{add_item()} (empty or with content) to avoid confusing the \code{.data} argument, or wrapping the function within \code{substitute()}
 }
 \examples{
 \dontrun{
 add_item(fl.idfs = 0)
 add_item(util_idfs = if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}, util.mbc = 0.6, cost_idfs = 2500)
+common_inputs <- add_item() \%>\%
+add_item(pick_val_v(
+  base      = l_statics[["base"]],
+  psa       = pick_psa(
+    l_statics[["function"]],
+    l_statics[["n"]],
+    l_statics[["a"]],
+    l_statics[["b"]]
+  ),
+  sens      = l_statics[[sens_name_used]],
+  psa_ind   = psa_bool,
+  sens_ind  = sensitivity_bool,
+  indicator = indicators_statics,
+  names_out = l_statics[["parameter_name"]]
+)
+)
 }
 
 }
