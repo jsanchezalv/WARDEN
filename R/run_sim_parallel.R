@@ -165,7 +165,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     if (!is.null(sensitivity_names)) {
     sens_name_used <- sensitivity_names[ceiling(sens/n_sensitivity)] 
     } else{
-    sens_name_used <- NULL
+    sens_name_used <- ""
     }
     
     
