@@ -21,6 +21,7 @@ Helper function to create a list with random draws or whenever a series of funct
 This function can be used to pick values for the PSA within \code{pick_val_v.}
 
 The function will ignore NULL items within the respective parameter (see example below).
+If an element in f is null (e.g., a non PSA input) then it will return NA as its value
 This feature is convenient when mixing distributions with different number of arguments, e.g., \code{rnorm} and \code{rgengamma}.
 
 While it's slightly lower than individually calling each function, it makes the code easier to read and more transparent

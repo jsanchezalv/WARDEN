@@ -96,6 +96,7 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 #' This function can be used to pick values for the PSA within `pick_val_v.` 
 #' 
 #' The function will ignore NULL items within the respective parameter (see example below).
+#' If an element in f is null (e.g., a non PSA input) then it will return NA as its value
 #' This feature is convenient when mixing distributions with different number of arguments, e.g., `rnorm` and `rgengamma`.
 #' 
 #' While it's slightly lower than individually calling each function, it makes the code easier to read and more transparent
@@ -159,9 +160,13 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 pick_psa <- function(f,...){
   args_called <- list(...)
   sapply(1:length(f), function(x) {
+    if(!is.null(f[[x]])){
     args <- lapply(args_called, `[[`, x)
     args <- args[!sapply(args, is.null)]
     do.call(f[[x]], args)
+    } else{
+      NA
+    }
   })
 }
 
