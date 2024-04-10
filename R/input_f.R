@@ -95,8 +95,8 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 #' @details
 #' This function can be used to pick values for the PSA within `pick_val_v.` 
 #' 
-#' The function will ignore NULL items within the respective parameter (see example below).
-#' If an element in f is null (e.g., a non PSA input) then it will return NA as its value
+#' The function will ignore NA items within the respective parameter (see example below).
+#' If an element in f is NA (e.g., a non PSA input) then it will return NA as its value
 #' This feature is convenient when mixing distributions with different number of arguments, e.g., `rnorm` and `rgengamma`.
 #' 
 #' While it's slightly lower than individually calling each function, it makes the code easier to read and more transparent
@@ -121,7 +121,7 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 #'  n=list(4,1,1),
 #'  a=list(c(1,2,3,4),1,0),
 #'  b=list(c(0.5,0.5,0.5,0.5),0.5,1),
-#'  c=list(NULL,NULL,0.2),
+#'  c=list(NA,NA,0.2),
 #'  dsa_min=list(c(1,2,3,4),2,1),
 #'  dsa_max=list(c(1,2,3,4),3,3)
 #')
@@ -135,8 +135,8 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 # n=list(4,1,1,1),
 # a=list(c(1,2,3,4),1,0,"norm"),
 # b=list(c(0.5,0.5,0.5,0.5),0.5,1,1),
-# c=list(NULL,NULL,0.2,0.5), #NULL arguments will be ignored
-# c=list(NULL,NULL,NULL,NULL), #NULL arguments will be ignored
+# c=list(NA,NA,0.2,0.5), #NA arguments will be ignored
+# c=list(NA,NA,NA,NA), #NA arguments will be ignored
 # dsa_min=list(c(1,2,3,4),2,1,0),
 # dsa_max=list(c(1,2,3,4),3,3,2)
 # )
@@ -147,8 +147,8 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 #' n=list(4,1,1,1),
 #' a=list(c(1,2,3,4),1,0,"norm"),
 #' b=list(c(0.5,0.5,0.5,0.5),0.5,1,1),
-#' c=list(NULL,NULL,0.2,0.5),
-#' c=list(NULL,NULL,NULL,NULL), #NULL arguments will be ignored
+#' c=list(NA,NA,0.2,0.5),
+#' c=list(NA,NA,NA,NA), #NA arguments will be ignored
 #' dsa_min=list(c(1,2,3,4),2,1,0),
 #' dsa_max=list(c(1,2,3,4),3,3,2)
 #' )
@@ -160,9 +160,9 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 pick_psa <- function(f,...){
   args_called <- list(...)
   sapply(1:length(f), function(x) {
-    if(!is.null(f[[x]])){
+    if(!is.na(f[[x]])){
     args <- lapply(args_called, `[[`, x)
-    args <- args[!sapply(args, is.null)]
+    args <- args[!sapply(args, function(x) any(is.na(x)))]
     do.call(f[[x]], args)
     } else{
       NA

@@ -20,8 +20,8 @@ Helper function to create a list with random draws or whenever a series of funct
 \details{
 This function can be used to pick values for the PSA within \code{pick_val_v.}
 
-The function will ignore NULL items within the respective parameter (see example below).
-If an element in f is null (e.g., a non PSA input) then it will return NA as its value
+The function will ignore NA items within the respective parameter (see example below).
+If an element in f is NA (e.g., a non PSA input) then it will return NA as its value
 This feature is convenient when mixing distributions with different number of arguments, e.g., \code{rnorm} and \code{rgengamma}.
 
 While it's slightly lower than individually calling each function, it makes the code easier to read and more transparent
@@ -46,7 +46,7 @@ params <- list(
  n=list(4,1,1),
  a=list(c(1,2,3,4),1,0),
  b=list(c(0.5,0.5,0.5,0.5),0.5,1),
- c=list(NULL,NULL,0.2),
+ c=list(NA,NA,0.2),
  dsa_min=list(c(1,2,3,4),2,1),
  dsa_max=list(c(1,2,3,4),3,3)
 )
@@ -61,8 +61,8 @@ dist=list("rlnorm","rnorm","rgengamma","draw_tte"),
 n=list(4,1,1,1),
 a=list(c(1,2,3,4),1,0,"norm"),
 b=list(c(0.5,0.5,0.5,0.5),0.5,1,1),
-c=list(NULL,NULL,0.2,0.5),
-c=list(NULL,NULL,NULL,NULL), #NULL arguments will be ignored
+c=list(NA,NA,0.2,0.5),
+c=list(NA,NA,NA,NA), #NA arguments will be ignored
 dsa_min=list(c(1,2,3,4),2,1,0),
 dsa_max=list(c(1,2,3,4),3,3,2)
 )
