@@ -11,6 +11,7 @@ pick_val_v(
   psa_ind = psa_bool,
   sens_ind = sens_bool,
   indicator,
+  indicator_psa = NULL,
   names_out = NULL
 )
 }
@@ -26,6 +27,9 @@ pick_val_v(
 \item{sens_ind}{Boolean whether Scenario/DSA is active}
 
 \item{indicator}{Indicator which checks whether the specific parameter/parameters is/are active in the DSA or Scenario loop}
+
+\item{indicator_psa}{Indicator which checks whether the specific parameter/parameters is/are active in the PSA loop.
+If NULL, it's assumed to be a vector of 1s of length equal to length(indicator)}
 
 \item{names_out}{Names to give the output list}
 }
@@ -48,7 +52,15 @@ pick_val_v(base = c(0,0),
            sens_ind = FALSE,
            indicator=c(1,0)
            )
-
+           
+pick_val_v(base = c(0,0),
+psa =c(rnorm(1,0,0.1),rnorm(1,0,0.1)),
+sens = c(2,3),
+psa_ind = TRUE,
+sens_ind = TRUE,
+indicator=c(1,0),
+indicator_psa=c(0,1)
+)
 pick_val_v(base = c(c(2,3),list(c(1,2))),
             psa =sapply(1:3,
                         function(x) eval(call(

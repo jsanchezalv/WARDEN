@@ -39,8 +39,8 @@ replicate_profiles <- function(profiles,
 #'
 #' @param sens current analysis iterator
 #' @param n_sensitivity total number of analyses to be run
-#' @param n_elem number of elements to iterate through
-#' @param n_elem_before number of elements that go before the current n_elem to iterate through
+#' @param elem vector of 0s and 1s of elements to iterate through (1 = parameter is to be included in scenario/DSA)
+#' @param n_elem_before Sum of 1s (# of parameters to be included in scenario/DSA) that go before elem
 #'
 #' @return Numeric vector composed of 0 and 1, where value 1 will be used by `pick_val_v` to pick the corresponding index in its `sens` argument
 #' @export
@@ -50,31 +50,34 @@ replicate_profiles <- function(profiles,
 #'
 #' @examples
 #' \dontrun{
-#'create_indicators(10,20,4)
-#'create_indicators(11,20,10,2)
+#'create_indicators(10,20,c(1,1,1,1))
+#'create_indicators(7,20,c(1,0,0,1,1,1,0,0,1,1),2)
 #' }
-create_indicators <- function(sens,n_sensitivity,n_elem,n_elem_before=0){
+create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
   
   if (n_sensitivity<sens) {
     stop("n_sensitivity is smaller than the iterator sens")
   }
   
-  if (n_elem_before + n_elem >n_sensitivity) {
-    stop("n_sensitivity is smaller than n_elem_before + n_elem")
+  if (any(elem>1| elem<0)) {
+    stop("One or more elements of elem is >1 or <0. It should be a vector of 0s and 1s.")
   }
+  n_elem <- sum(elem)
+
+    if (n_elem_before + n_elem >n_sensitivity) {
+    stop("n_sensitivity is smaller than n_elem_before + sum(elem)")
+  }
+
+  n_elem_total <- length(elem)
   
-  # which position to use to put the value 1 in indicator
-  pos_indicator <-  sens - n_sensitivity*floor((sens-1)/n_sensitivity) 
-  
-  if (n_elem + n_elem_before <sens) {
-    out <- rep(0, n_elem)
+  if ((n_elem + n_elem_before <sens) | (n_elem_before >=sens)) { #here fix
+    out <- rep(0, n_elem_total)
   } else{
-    if(n_elem_before == 0) { #if elements before is 0, then we don't need to remove elements
-      out <- append(rep(0, n_elem + n_elem_before)[-pos_indicator],1,pos_indicator-1)
-    } else {
-      out <- append(rep(0, n_elem + n_elem_before)[-pos_indicator],1,pos_indicator-1)
-      out <- out[-c(1:n_elem_before)] #remove elements before
-    }
+    # which position to use to put the value 1 in indicator
+    pos_indicator <-  sens - n_sensitivity*floor((sens-1)/n_sensitivity)  - n_elem_before
+    pos_indicator <- which(elem==1)[pos_indicator]
+    
+    out <- append(rep(0, n_elem_total)[-pos_indicator],1,pos_indicator-1) 
   }
   return(out)
 }
@@ -171,6 +174,8 @@ pick_psa <- function(f,...){
 #' @param psa_ind Boolean whether PSA is active
 #' @param sens_ind Boolean whether Scenario/DSA is active
 #' @param indicator Indicator which checks whether the specific parameter/parameters is/are active in the DSA or Scenario loop 
+#' @param indicator_psa Indicator which checks whether the specific parameter/parameters is/are active in the PSA loop.
+#'  If NULL, it's assumed to be a vector of 1s of length equal to length(indicator)
 #' @param names_out Names to give the output list
 #'
 #' @return List of used for the inputs
@@ -189,7 +194,15 @@ pick_psa <- function(f,...){
 #'            sens_ind = FALSE,
 #'            indicator=c(1,0)
 #'            )
-#' 
+#'            
+#' pick_val_v(base = c(0,0),
+#' psa =c(rnorm(1,0,0.1),rnorm(1,0,0.1)),
+#' sens = c(2,3),
+#' psa_ind = TRUE,
+#' sens_ind = TRUE,
+#' indicator=c(1,0),
+#' indicator_psa=c(0,1)
+#' )
 #' pick_val_v(base = c(c(2,3),list(c(1,2))),
 #'             psa =sapply(1:3,
 #'                         function(x) eval(call(
@@ -230,6 +243,7 @@ pick_val_v <- function(base,
                        psa_ind = psa_bool,
                        sens_ind = sens_bool,
                        indicator,
+                       indicator_psa = NULL,
                        names_out=NULL
 ){
 
@@ -238,11 +252,21 @@ pick_val_v <- function(base,
     stop("Indicator, psa_ind or sens_ind are not FALSE/TRUE (or 0/1)")
   }
   
+  len_ind <- length(indicator)
+  
+  if (is.null(indicator_psa)) {
+    indicator_psa <- rep(1,len_ind)
+  }else{
+    if(len_ind != length(indicator_psa)){
+      stop("Length of indicator vector is different than length of indicator_psa")
+    }
+  }
+  
   output <- list()
     #if the parameter is out of the dsa/scenario specific iteration, or not in DSA/scenario, use PSA/normal. 
-  for (it in 1:length(indicator)) {
+  for (it in 1:len_ind) {
     output[[it]] <-  if (indicator[it]==0 | sens_ind==F ) { 
-      if (psa_ind==T) {
+      if (psa_ind==T & indicator_psa[it]==1) {
         psa[[it]]
         } else {
           base[[it]]
@@ -258,52 +282,6 @@ pick_val_v <- function(base,
     
   return(output)
 }
-
-# Select which value to apply for a single value --------------------------------------------------------
-#' Select which value should be applied in the corresponding loop
-#'
-#' @param base Value if no PSA/DSA/Scenario
-#' @param psa Value if PSA
-#' @param sens Value if sensitivity (DSA/Scenario)
-#' @param psa_ind Boolean whether PSA is active
-#' @param sens_ind Boolean whether Scenario/DSA is active
-#' @param indicator Indicator which checks whether the specific parameter is active in the DSA or Scenario loop 
-#'
-#' @return Value used for the inputs
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' pick_val(base = 0, psa =rnorm(1,0,0.1), sens = 5,psa_ind = TRUE, sens_ind = FALSE, indicator=1)
-#'}
-#'
-pick_val <- function(base,
-                     psa,
-                     sens,
-                     psa_ind = psa_bool,
-                     sens_ind = sens_bool,
-                     indicator =0
-                     ){
-  
-  if ((!indicator %in% c(0,1)) | (!psa_ind %in% c(0,1)) | (!sens_ind %in% c(0,1)) ) {
-    stop("Indicator, psa_ind or sens_ind are not FALSE/TRUE (or 0/1)")
-  }
-  
-  #if the parameter is out of the dsa/scenario specific iteration, or not in DSA/scenario, use PSA/normal. 
-  output <-   if (indicator==0 | sens_ind==F ) { 
-                if (psa_ind==T) {
-                  psa
-                } else {
-                  base
-                }
-              } else { #If active, use DSA if DSA and scenario if scenario
-                sens
-              }
-   
-  
-  return(output)
-}
-
 
 
 # Add cost to list --------------------------------------------------------

@@ -4,16 +4,16 @@
 \alias{create_indicators}
 \title{Creates a vector of indicators (0 and 1) for sensitivity/DSA analysis}
 \usage{
-create_indicators(sens, n_sensitivity, n_elem, n_elem_before = 0)
+create_indicators(sens, n_sensitivity, elem, n_elem_before = 0)
 }
 \arguments{
 \item{sens}{current analysis iterator}
 
 \item{n_sensitivity}{total number of analyses to be run}
 
-\item{n_elem}{number of elements to iterate through}
+\item{elem}{vector of 0s and 1s of elements to iterate through (1 = parameter is to be included in scenario/DSA)}
 
-\item{n_elem_before}{number of elements that go before the current n_elem to iterate through}
+\item{n_elem_before}{Sum of 1s (# of parameters to be included in scenario/DSA) that go before elem}
 }
 \value{
 Numeric vector composed of 0 and 1, where value 1 will be used by \code{pick_val_v} to pick the corresponding index in its \code{sens} argument
@@ -26,7 +26,7 @@ n_elem_before is to be used when several indicators want to be used (e.g., for p
 }
 \examples{
 \dontrun{
-create_indicators(10,20,4)
-create_indicators(11,20,10,2)
+create_indicators(10,20,c(1,1,1,1))
+create_indicators(7,20,c(1,0,0,1,1,1,0,0,1,1),2)
 }
 }
