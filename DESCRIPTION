@@ -28,7 +28,6 @@ Suggests:
     rmarkdown,
     kableExtra,
     DiagrammeR,
-    MASS,
     testthat (>= 3.0.0),
     survminer,
     flexsurvPlus
@@ -40,6 +39,7 @@ Imports:
     doFuture,
     stats,
     utils,
-    flexsurv
+    flexsurv,
+    MASS
 VignetteBuilder: knitr
 Config/testthat/edition: 3

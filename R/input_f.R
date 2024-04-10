@@ -124,7 +124,7 @@ create_indicators <- function(sens,n_sensitivity,n_elem,n_elem_before=0){
 #'
 #'pick_psa(params[["dist"]],params[["n"]],params[["a"]],params[["b"]],params[["c"]])
 #'
-#' #Can be combined with multiple type of functions and distributions if the parameters are well located
+#' #Can be combined with multiple type of functions and distributions if parameters are well located
 # params <- list(
 # param=list("a","b","c","d"),
 # dist=list("rlnorm","rnorm","rgengamma","draw_tte"),
@@ -177,7 +177,8 @@ pick_psa <- function(f,...){
 #' @export
 #' 
 #' @details
-#' This function can be used with vectors or lists, but will always return a list. Lists should be used when correlated variables are introduced to make sure the selector knows how to choose among those
+#' This function can be used with vectors or lists, but will always return a list.
+#' Lists should be used when correlated variables are introduced to make sure the selector knows how to choose among those
 #'
 #' @examples
 #' \dontrun{

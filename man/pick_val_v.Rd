@@ -36,7 +36,8 @@ List of used for the inputs
 Select which values should be applied in the corresponding loop for several values (vector or list).
 }
 \details{
-This function can be used with vectors or lists, but will always return a list. Lists should be used when correlated variables are introduced to make sure the selector knows how to choose among those
+This function can be used with vectors or lists, but will always return a list.
+Lists should be used when correlated variables are introduced to make sure the selector knows how to choose among those
 }
 \examples{
 \dontrun{

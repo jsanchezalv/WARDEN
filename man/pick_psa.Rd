@@ -52,7 +52,7 @@ params <- list(
 
 pick_psa(params[["dist"]],params[["n"]],params[["a"]],params[["b"]],params[["c"]])
 
-#Can be combined with multiple type of functions and distributions if the parameters are well located
+#Can be combined with multiple type of functions and distributions if parameters are well located
 
 #'params <- list(
 param=list("a","b","c","d"),

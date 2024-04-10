@@ -73,10 +73,10 @@ draw_tte <- function(n_chosen,dist,coef1=NULL,coef2=NULL,coef3=NULL,...,beta_tx=
 #' @export
 #'
 #' @examples
-#' draw_dirichlet(n=1,alpha= matrix(c(1251, 0, 350, 731),2,2))
-#' draw_dirichlet(n=2,alpha= matrix(c(1251, 0, 350, 731),2,2))
+#' rdirichlet(n=1,alpha= matrix(c(1251, 0, 350, 731),2,2))
+#' rdirichlet(n=2,alpha= matrix(c(1251, 0, 350, 731),2,2))
 
-draw_dirichlet <- function(n=1,alpha,seed=NULL) {
+rdirichlet <- function(n=1,alpha,seed=NULL) {
   out <- NULL
   
   if(!is.null(seed)){
@@ -122,10 +122,13 @@ draw_dirichlet <- function(n=1,alpha,seed=NULL) {
 #' @export
 #'
 #' @examples
-#' draw_dirichlet_prob(n=1,alpha= matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7),3,3),se=matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7)/10,3,3))
-#' draw_dirichlet_prob(n=2,alpha= matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7),3,3),se=matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7)/10,3,3))
+#' rdirichlet_prob(n=1,alpha= matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7),3,3),
+#' se=matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7)/10,3,3))
+#' 
+#' rdirichlet_prob(n=2,alpha= matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7),3,3),
+#' se=matrix(c(0.7,0.3,0,0.1,0.7,0.2,0.1,0.2,0.7)/10,3,3))
 
-draw_dirichlet_prob <- function(n=1,alpha,se,seed=NULL) {
+rdirichlet_prob <- function(n=1,alpha,se,seed=NULL) {
   out <- NULL
   
   if(!is.null(seed)){
@@ -142,12 +145,12 @@ draw_dirichlet_prob <- function(n=1,alpha,se,seed=NULL) {
     stop2("alpha must be positive.")
   }
   if (n == 1) {
-    out <- matrix(suppressWarnings(draw_gamma(1, c(alpha),c(se))), ncol = ncol(alpha))
+    out <- matrix(suppressWarnings(rgamma_mse(1, c(alpha),c(se))), ncol = ncol(alpha))
     out <- out/rowSums(out)
     
   } else{
     out <-  lapply(1:n,function(x) {
-      out <- matrix(suppressWarnings(draw_gamma(1, c(alpha),c(se))), ncol = ncol(alpha)) 
+      out <- matrix(suppressWarnings(rgamma_mse(1, c(alpha),c(se))), ncol = ncol(alpha)) 
       out/rowSums(out)} 
     )
   }
@@ -172,9 +175,9 @@ draw_dirichlet_prob <- function(n=1,alpha,se,seed=NULL) {
 #' @export
 #'
 #' @examples
-#' draw_beta(n=1,mean_v=0.8,se=0.2)
+#' rbeta_mse(n=1,mean_v=0.8,se=0.2)
 
-draw_beta <- function(n=1,mean_v,se,seed=NULL) {
+rbeta_mse <- function(n=1,mean_v,se,seed=NULL) {
   out <- NULL
 
   if(!is.null(seed)){
@@ -204,10 +207,10 @@ draw_beta <- function(n=1,mean_v,se,seed=NULL) {
 #' @export
 #'
 #' @examples
-#' draw_gamma(n=1,mean_v=0.8,se=0.2)
+#' rgamma_mse(n=1,mean_v=0.8,se=0.2)
 #'
 
-draw_gamma <- function(n=1,mean_v,se,seed=NULL) {
+rgamma_mse <- function(n=1,mean_v,se,seed=NULL) {
   out <- NULL
 
   if(!is.null(seed)){
@@ -240,9 +243,9 @@ draw_gamma <- function(n=1,mean_v,se,seed=NULL) {
 #' @export
 #'
 #' @examples
-#' draw_resgompertz_lu(1,shape=0.05,rate=0.01,lower_bound = 50)
+#' rresgompertz_lu(1,shape=0.05,rate=0.01,lower_bound = 50)
 
-draw_resgompertz_lu <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf, seed=NULL){
+rresgompertz_lu <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf, seed=NULL){
 
   if(!is.null(seed)){
     set.seed(seed)
@@ -268,9 +271,9 @@ draw_resgompertz_lu <- function(n, shape, rate , lower_bound = 0, upper_bound = 
 #' @export
 #'
 #' @examples
-#' draw_resgompertz(1,shape=0.05,rate=0.01,lower_bound = 50)
+#' rresgompertz(1,shape=0.05,rate=0.01,lower_bound = 50)
 
-draw_resgompertz <- function(n=1,shape,rate,lower_bound,seed=NULL){
+rresgompertz <- function(n=1,shape,rate,lower_bound,seed=NULL){
   if(!is.null(seed)){
     set.seed(seed)
   }
