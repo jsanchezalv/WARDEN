@@ -116,6 +116,77 @@ test_that("Vectorial discounting working as expected with vectors", {
                c(0,28215.4394,Inf))  
 })
 
+test_that("Create indicators works correctly",{
+  expect_equal(
+    create_indicators(
+      2,
+      10,
+      c(1,1)
+    ),
+    c(0,1)
+  )
+  
+  expect_equal(
+    create_indicators(
+      2,
+      10,
+      c(1,1),
+      5
+    ),
+    c(0,0)
+  )
+  
+  expect_equal(
+    create_indicators(
+      6,
+      10,
+      c(1,1),
+      5
+    ),
+    c(1,0)
+  )
+  
+  
+  expect_equal(
+    create_indicators(
+      9,
+      10,
+      c(1,1),
+      5
+    ),
+    c(0,0)
+  )
+  
+  expect_error(
+    create_indicators(
+      12,
+      10,
+      c(1,1),
+      5
+    )
+  )
+  
+  expect_error(
+    create_indicators(
+      9,
+      10,
+      rep(2,20),
+      5
+    )
+  )
+  
+  expect_error(
+    create_indicators(
+      9,
+      10,
+      rep(2,3),
+      20
+    )
+  )
+})
+  
+
+
 
 test_that("Pick values vectorized work correctly",{
   expect_equal(
