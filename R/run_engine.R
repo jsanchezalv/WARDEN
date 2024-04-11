@@ -41,10 +41,15 @@ run_engine <- function(arm_list,
     if(!is.null(common_pt_inputs)){
       for (inp in 1:length(common_pt_inputs)) {
         list.common_pt_inputs <- lapply(common_pt_inputs[inp],function(x) eval(x, input_list_pt))
+        #If using pick_eval_v or other expressions, the lists are not deployed, so this is necessary to do so
+        if(any(is.null(names(list.common_pt_inputs)), names(list.common_pt_inputs)=="") & length(list.common_pt_inputs)==1) {
+          input_list_pt <- c(input_list_pt, list.common_pt_inputs[[1]])
+        } else{
         if (!is.null(names(list.common_pt_inputs[[1]]))) {
           warning("Item ", names(list.common_pt_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
         }
         input_list_pt <- c(input_list_pt,list.common_pt_inputs)
+        }
       }
     }
 
@@ -65,10 +70,15 @@ run_engine <- function(arm_list,
       if(!is.null(unique_pt_inputs)){
         for (inp in 1:length(unique_pt_inputs)) {
           list.unique_pt_inputs <- lapply(unique_pt_inputs[inp],function(x) eval(x, input_list_arm))
+          #If using pick_eval_v or other expressions, the lists are not deployed, so this is necessary to do so
+          if(any(is.null(names(list.unique_pt_inputs)), names(list.unique_pt_inputs)=="") & length(list.unique_pt_inputs)==1) {
+            input_list_arm <- c(input_list_arm, list.unique_pt_inputs[[1]])
+          } else{
           if ((!is.null(names(list.unique_pt_inputs[[1]]))) & i==1 & simulation==1 & sens==1) {
             warning("Item ", names(list.unique_pt_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
           }
           input_list_arm <- c(input_list_arm,list.unique_pt_inputs)
+          }
 
         }
       }
