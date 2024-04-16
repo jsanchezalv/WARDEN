@@ -92,6 +92,10 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
   prevtime <- input_list_arm$curtime                 # Identify time of previous event
   curtime <- thisevt$evttime         # Identify time of next event
   
+  if (curtime<prevtime) {
+    stop("Time of event '", evt,"': ", round(curtime,4), " is smaller than the time of previous event '", if(!is.list(input_list_arm$evt)){input_list_arm$evt}else{NA}, "': ", round(prevtime,4), ". Arm: ", arm, ", id: ", input_list_arm$i)
+  }
+  
   input_list_arm[["curtime"]] <- curtime
   input_list_arm[["evt"]] <- evt
   input_list_arm[["prevtime"]] <- prevtime
