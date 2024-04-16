@@ -467,7 +467,7 @@ compute_outputs <- function(patdata,input_list) {
                                                                         lclcurtime=evttime,
                                                                         lclval=get(paste0(util_cat,"_","instant")))]
     
-    patdata_dt[,paste0(util_cat,"_","instant") := isc_instant_v(lcldr=input_list$drc,
+    patdata_dt[,paste0(util_cat,"_","instant") := disc_instant_v(lcldr=input_list$drc,
                                                                 lclcurtime=evttime,
                                                                 lclval=get(paste0(util_cat,"_","instant")))]
     
