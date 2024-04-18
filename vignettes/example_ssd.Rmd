@@ -206,9 +206,11 @@ Once the model has been run, we can use the results and summarize them using the
 ```{r post-processing_summary}
 
 
-summary_results_det(results[[1]][[1]]) #will print the last simulation!
+summary_results_det(results[[1]][[1]]) #print first simulation
 
 summary_results_sim(results[[1]])
+
+summary_results_sens(results)
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 

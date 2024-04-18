@@ -4,12 +4,14 @@
 \alias{summary_results_det}
 \title{Deterministic results for a specific treatment}
 \usage{
-summary_results_det(out = results[[1]][[1]], arm = NULL)
+summary_results_det(out = results[[1]][[1]], arm = NULL, wtp = 50000)
 }
 \arguments{
 \item{out}{The final_output data frame from the list object returned by \code{run_sim()}}
 
 \item{arm}{The reference treatment for calculation of incremental outcomes}
+
+\item{wtp}{Willingness to pay to have INMB}
 }
 \value{
 A dataframe with absolute costs, LYs, QALYs, and ICER and ICUR for each intervention

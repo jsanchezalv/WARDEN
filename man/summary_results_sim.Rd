@@ -4,12 +4,14 @@
 \alias{summary_results_sim}
 \title{Summary of PSA outputs for a treatment}
 \usage{
-summary_results_sim(out = results[[1]], arm = NULL)
+summary_results_sim(out = results[[1]], arm = NULL, wtp = 50000)
 }
 \arguments{
 \item{out}{The output_sim data frame from the list object returned by \code{run_sim()}}
 
 \item{arm}{The reference treatment for calculation of incremental outcomes}
+
+\item{wtp}{Willingness to pay to have INMB}
 }
 \value{
 A data frame with mean and 95\% CI of absolute costs, LYs, QALYs, ICER and ICUR for each intervention from the PSA samples

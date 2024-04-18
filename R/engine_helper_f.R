@@ -281,7 +281,6 @@ get_input <-  function(x,ifnull=0,type,evt_arm_i =evt_arm, input_list_arm_i=inpu
 #'
 #' @param output_sim The output_psa data frame from the list object returned by `run_sim()`
 #' @param element Variable for which mean and 95% CIs are computed (single string)
-#' @param arm Treatment for which mean and 95% CIs are computed (single string)
 #' @param round_digit Number of digits to round outputs
 #'
 #' @return Mean and 95% CI from the PSA samples
@@ -289,17 +288,17 @@ get_input <-  function(x,ifnull=0,type,evt_arm_i =evt_arm, input_list_arm_i=inpu
 #' @importFrom stats quantile
 #'
 #' @examples
-#' interval_out(output_sim=results$output_sim[[1]],element="costs.",arm="int",round_digit=3)
+#' interval_out(output_sim=results$output_sim[[1]],element="costs.",round_digit=3)
 #'
 #' @keywords internal
 #' @noRd
 
-interval_out <- function(output_sim, element, arm,round_digit=2) {
-  out <- paste0(round(mean(map_dbl(output_sim,paste0(element,arm)),na.rm=TRUE),round_digit),
-                "(",
-                round(quantile(map_dbl(output_sim,paste0(element,arm)),0.025,na.rm=TRUE),round_digit) ,
-                ", ",
-                round(quantile(map_dbl(output_sim,paste0(element,arm)),0.975,na.rm=TRUE),round_digit),
+interval_out <- function(output_sim, element,round_digit=2) {
+  out <- paste0(apply(do.call(rbind, map(output_sim,element)),2,function(x) format(round(mean(x,na.rm=TRUE),round_digit), big.mark=",", scientific=FALSE)),
+                " (",
+                apply(do.call(rbind, map(output_sim,element)),2,function(x) format(round(quantile(x,0.025,na.rm=TRUE),round_digit), big.mark=",", scientific=FALSE)) ,
+                "; ",
+                apply(do.call(rbind, map(output_sim,element)),2,function(x) format(round(quantile(x,0.975,na.rm=TRUE),round_digit), big.mark=",", scientific=FALSE)) ,
                 ")"
   )
   return(out)
@@ -533,22 +532,22 @@ compute_outputs <- function(patdata,input_list) {
   final_output <- list()
   
   #Create total outputs and user-defined costs/utilities from IPD
-  vector_total_outputs <- c("total_lys_","total_qalys_","total_costs_","total_lys_undisc_","total_qalys_undisc_","total_costs_undisc_")
+  vector_total_outputs <- c("total_lys","total_qalys","total_costs","total_lys_undisc","total_qalys_undisc","total_costs_undisc")
   vector_total_outputs_search <- c("lys","qalys","costs","lys_undisc","qalys_undisc","costs_undisc")
   
   #Add to final outputs the total outcomes as well as the cost/utility categories totals
   vector_other_outputs <- c(input_list$categories_for_export)
   for (arm_i in arm_list) {
     for (output_i in 1:length(vector_total_outputs)) {
-      final_output[[paste0(vector_total_outputs[output_i],arm_i)]] <- patdata_dt[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+      final_output[[vector_total_outputs[output_i]]][arm_i] <- patdata_dt[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
     }
     for (output_i in vector_other_outputs) {
-      final_output[[paste0(output_i,"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=sum(get(output_i),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+      final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=sum(get(output_i),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
     }
     
     for (output_i in data_export_tobesummarized) {
         #Gets last value from patient, then average for numeric
-      final_output[[paste0(output_i,"_",arm_i)]] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+      final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
     }
   }
   

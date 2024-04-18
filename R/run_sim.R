@@ -265,7 +265,8 @@ run_sim <- function(arm_list=c("int","noint"),
         final_output$merged_df$simulation <- simulation
         final_output$merged_df$sensitivity <- sens
       }
-  
+      final_output[["sensitivity_name"]] <- sens_name_used
+      
       output_sim[[sens]][[simulation]] <- final_output
   
   

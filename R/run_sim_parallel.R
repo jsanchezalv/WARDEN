@@ -282,12 +282,15 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
         final_output$merged_df$simulation <- simulation
         final_output$merged_df$sensitivity <- sens
       }
-  
+      
+      final_output[["sensitivity_name"]] <- sens_name_used
+      
       return(list(final_output))
       
       print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
     }
     
+
     print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
   }

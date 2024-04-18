@@ -4,6 +4,7 @@
 #'
 #' @param out The final_output data frame from the list object returned by `run_sim()`
 #' @param arm The reference treatment for calculation of incremental outcomes
+#' @param wtp Willingness to pay to have INMB
 #'
 #' @return A dataframe with absolute costs, LYs, QALYs, and ICER and ICUR for each intervention
 #' @export
@@ -13,78 +14,70 @@
 #' summary_results_det(results[[1]][[1]],arm="int")
 #' }
 
-summary_results_det <- function(out = results[[1]][[1]], arm=NULL){
-  arm <- ifelse(is.null(arm),out$arm_list[1],arm)
+summary_results_det <- function(out = results[[1]][[1]], arm = NULL, wtp = 50000){
+  arm_ref <- ifelse(is.null(arm),1,match(arm,out$arm_list))
 
-  other_arm_list <- out$arm_list[out$arm_list!=arm] #For any other treatment that is not the reference one, add the reference arm costs/lys/qalys
-
-  remove_outputs_list <- c("total_lys_int", "total_qalys_int", "total_costs_int", "total_lys_undisc_int", 
-                             "total_qalys_undisc_int", "total_costs_undisc_int", "total_lys_noint", "total_qalys_noint", 
-                             "total_costs_noint", "total_lys_undisc_noint", "total_qalys_undisc_noint", 
-                             "total_costs_undisc_noint", 
-                             "arm_list", "merged_df")
+  remove_outputs_list <- c("total_lys", "total_qalys", "total_costs", "total_lys_undisc", 
+                             "total_qalys_undisc", "total_costs_undisc",
+                             "arm_list", "merged_df","sensitivity_name")
+  
+  outputs_names <- c("dlys","dqalys","dcosts","dlys_undisc","dqalys_undisc","dcosts_undisc")
 
   other_outputs <- names(out)[!names(out)%in% remove_outputs_list]
-  other_outputs <- unique(sub("_[^_]+$", "", other_outputs)) #remove treatment indicator
-  
-  for (other_arm in other_arm_list) { #add reference arm costs/lys/qalys to compare with the other arms
-    out[[paste0("dlys_",other_arm)]] <-  out[[paste0("total_lys_",arm)]] - out[[paste0("total_lys_",other_arm)]]
-    out[[paste0("dqalys_",other_arm)]] <-   out[[paste0("total_qalys_",arm)]] - out[[paste0("total_qalys_",other_arm)]]
-    out[[paste0("dcosts_",other_arm)]] <-   out[[paste0("total_costs_",arm)]] - out[[paste0("total_costs_",other_arm)]]
-    out[[paste0("dlys_undisc_",other_arm)]] <-  out[[paste0("total_lys_undisc_",arm)]] - out[[paste0("total_lys_undisc_",other_arm)]]
-    out[[paste0("dqalys_undisc_",other_arm)]] <-   out[[paste0("total_qalys_undisc_",arm)]] - out[[paste0("total_qalys_undisc_",other_arm)]]
-    out[[paste0("dcosts_undisc_",other_arm)]] <-   out[[paste0("total_costs_undisc_",arm)]] - out[[paste0("total_costs_undisc_",other_arm)]]
-
-    out[[paste0("ICER_",other_arm)]] <-   out[[paste0("dcosts_",other_arm)]] / out[[paste0("dlys_",other_arm)]]
-    out[[paste0("ICUR_",other_arm)]] <-   out[[paste0("dcosts_",other_arm)]] / out[[paste0("dqalys_",other_arm)]]
-    out[[paste0("ICER_undisc_",other_arm)]] <-   out[[paste0("dcosts_undisc_",other_arm)]] / out[[paste0("dlys_undisc_",other_arm)]]
-    out[[paste0("ICUR_undisc_",other_arm)]] <-   out[[paste0("dcosts_undisc_",other_arm)]] / out[[paste0("dqalys_undisc_",other_arm)]]
+  other_outputs <- other_outputs[!other_outputs=="extradata_raw"]
     
-    for (output_i in other_outputs) {
-      out[[paste0("d",output_i,other_arm)]] <-  out[[paste0(output_i,"_",arm)]] - out[[paste0(output_i,"_",other_arm)]]
-      
+  for (arm_i in 1:length(out$arm_list)) { #add reference arm costs/lys/qalys to compare with the other arms
+    
+    for (output in 1:length(outputs_names)) { #standard outputs
+      out[[outputs_names[output]]][arm_i] <- out[[remove_outputs_list[output]]][arm_ref] - out[[remove_outputs_list[output]]][arm_i]
     }
     
-
+    for (output_i in other_outputs) { #other outputs
+      out[[paste0("d",output_i)]][arm_i] <-  out[[output_i]][arm_ref] - out[[output_i]][arm_i]
+    }
+    
+    if (arm_i!=arm_ref) {
+      out[["ICER"]][arm_i]         <-   out[["dcosts"]][arm_i]  / out[["dlys"]][arm_i] 
+      out[["ICUR"]][arm_i]         <-   out[["dcosts"]][arm_i]  / out[["dqalys"]][arm_i] 
+      out[["ICER_undisc"]][arm_i]  <-   out[["dcosts_undisc"]][arm_i]  / out[["dlys_undisc"]][arm_i] 
+      out[["ICUR_undisc"]][arm_i]  <-   out[["dcosts_undisc"]][arm_i]  / out[["dqalys_undisc"]][arm_i] 
+      out[["INMB"]][arm_i]         <-   wtp *  out[["dqalys"]][arm_i] - out[["dcosts"]][arm_i] 
+      out[["INMB_undisc"]][arm_i]  <-  wtp *  out[["dqalys_undisc"]][arm_i] - out[["dcosts_undisc"]][arm_i] 
+    } else{
+      out[["ICER"]][arm_i]         <- NA
+      out[["ICUR"]][arm_i]         <- NA
+      out[["ICER_undisc"]][arm_i]  <- NA
+      out[["ICUR_undisc"]][arm_i]  <- NA
+      out[["INMB"]][arm_i]         <- NA
+      out[["INMB_undisc"]][arm_i]  <- NA
+    }
   }
 
-  out[[paste0("dlys_",arm)]] <-   0
-  out[[paste0("dqalys_",arm)]] <-   0
-  out[[paste0("dcosts_",arm)]] <-   0
-  out[[paste0("dlys_undisc_",arm)]] <-   0
-  out[[paste0("dqalys_undisc_",arm)]] <-   0
-  out[[paste0("dcosts_undisc_",arm)]] <-   0  
-  for (output_i in other_outputs) {
-    out[[paste0("d",output_i,arm)]] <-  0
-  }
-
-  out[[paste0("ICER_",arm)]] <-   NA
-  out[[paste0("ICUR_",arm)]] <-   NA
-  out[[paste0("ICER_undisc_",arm)]] <-   NA
-  out[[paste0("ICUR_undisc_",arm)]] <-   NA
-
-
-data <- data.frame()
-  for (arm in out$arm_list) {
-    temp <- data.frame(
-      arm = arm,
-      costs = out[[paste0("total_costs_",arm)]],
-      lys = out[[paste0("total_lys_",arm)]],
-      qalys = out[[paste0("total_qalys_",arm)]],
-      ICER = out[[paste0("ICER_",arm)]],
-      ICUR = out[[paste0("ICUR_",arm)]],
-      costs_undisc = out[[paste0("total_costs_undisc_",arm)]],
-      lys_undisc = out[[paste0("total_lys_undisc_",arm)]],
-      qalys_undisc = out[[paste0("total_qalys_undisc_",arm)]],
-      ICER_undisc = out[[paste0("ICER_undisc_",arm)]],
-      ICUR_undisc = out[[paste0("ICUR_undisc_",arm)]]
+  data <- data.frame(
+      arm = out$arm_list,
+      costs = out[["total_costs"]],
+      dcosts = out[["dcosts"]],
+      lys = out[["total_lys"]],
+      dlys = out[["dlys"]],
+      qalys = out[["total_qalys"]],
+      dqalys = out[["dqalys"]],
+      ICER = out[["ICER"]],
+      ICUR = out[["ICUR"]],
+      INMB = out[["INMB"]],
+      costs_undisc = out[["total_costs_undisc"]],
+      dcosts_undisc = out[["dcosts_undisc"]],
+      lys_undisc = out[["total_lys_undisc"]],
+      dlys_undisc = out[["dlys_undisc"]],
+      qalys_undisc = out[["total_qalys_undisc"]],
+      dqalys_undisc = out[["dqalys_undisc"]],
+      ICER_undisc = out[["ICER_undisc"]],
+      ICUR_undisc = out[["ICUR_undisc"]],
+      INMB_undisc = out[["INMB_undisc"]]
     )
     for (output_i in other_outputs) {
-      temp[[output_i]] <-  out[[paste0(output_i,"_",arm)]]
+      data[[output_i]] <-  out[[output_i]]
+      data[[paste0("d",output_i)]] <-  out[[paste0("d",output_i)]]
     }
-    
-    data <- rbind(data,temp)
-  }
 
   names <-  data[,1]
 
@@ -106,6 +99,7 @@ data <- data.frame()
 #'
 #' @param out The output_sim data frame from the list object returned by `run_sim()`
 #' @param arm The reference treatment for calculation of incremental outcomes
+#' @param wtp Willingness to pay to have INMB
 #'
 #' @return A data frame with mean and 95% CI of absolute costs, LYs, QALYs, ICER and ICUR for each intervention from the PSA samples
 #' @export
@@ -115,82 +109,74 @@ data <- data.frame()
 #' summary_results_sim(results[[1]], arm="int")
 #' }
 
-summary_results_sim <- function(out = results[[1]], arm=NULL){
+summary_results_sim <- function(out = results[[1]], arm=NULL, wtp = 50000){
 
-  arm <- ifelse(is.null(arm),out[[1]]$arm_list[1],arm)
+  arm_ref <- ifelse(is.null(arm),1,match(arm,out[[1]]$arm_list))
 
-  other_arm_list <- out[[1]]$arm_list[out[[1]]$arm_list!=arm] #For any other treatment that is not the reference one, add the reference arm costs/lys/qalys
+  remove_outputs_list <- c("total_lys", "total_qalys", "total_costs", "total_lys_undisc", 
+                           "total_qalys_undisc", "total_costs_undisc",
+                           "arm_list", "merged_df","sensitivity_name")
   
-  remove_outputs_list <- c("total_lys_int", "total_qalys_int", "total_costs_int", "total_lys_undisc_int", 
-                           "total_qalys_undisc_int", "total_costs_undisc_int", "total_lys_noint", "total_qalys_noint", 
-                           "total_costs_noint", "total_lys_undisc_noint", "total_qalys_undisc_noint", 
-                           "total_costs_undisc_noint", 
-                           "arm_list", "merged_df")
+  outputs_names <- c("dlys","dqalys","dcosts","dlys_undisc","dqalys_undisc","dcosts_undisc")
   
   other_outputs <- names(out[[1]])[!names(out[[1]])%in% remove_outputs_list]
-  other_outputs <- unique(sub("_[^_]+$", "", other_outputs)) #remove treatment indicator
-  other_outputs <- other_outputs[!other_outputs=="extradata"]
+  other_outputs <- other_outputs[!other_outputs=="extradata_raw"]
   
   for (sim in 1:length(out)) {
 
-    for (other_arm in other_arm_list) { #add reference arm costs/lys/qalys to compare with the other arms
-      out[[sim]][[paste0("dlys_",other_arm)]] <-  out[[sim]][[paste0("total_lys_",arm)]] - out[[sim]][[paste0("total_lys_",other_arm)]]
-      out[[sim]][[paste0("dqalys_",other_arm)]] <-   out[[sim]][[paste0("total_qalys_",arm)]] - out[[sim]][[paste0("total_qalys_",other_arm)]]
-      out[[sim]][[paste0("dcosts_",other_arm)]] <-   out[[sim]][[paste0("total_costs_",arm)]] - out[[sim]][[paste0("total_costs_",other_arm)]]
-      out[[sim]][[paste0("dlys_undisc_",other_arm)]] <-  out[[sim]][[paste0("total_lys_undisc_",arm)]] - out[[sim]][[paste0("total_lys_undisc_",other_arm)]]
-      out[[sim]][[paste0("dqalys_undisc_",other_arm)]] <-   out[[sim]][[paste0("total_qalys_undisc_",arm)]] - out[[sim]][[paste0("total_qalys_undisc_",other_arm)]]
-      out[[sim]][[paste0("dcosts_undisc_",other_arm)]] <-   out[[sim]][[paste0("total_costs_undisc_",arm)]] - out[[sim]][[paste0("total_costs_undisc_",other_arm)]]
+    for (arm_i in 1:length(out[[1]]$arm_list)) { #add reference arm costs/lys/qalys to compare with the other arms
       
-      out[[sim]][[paste0("ICER_",other_arm)]] <-   out[[sim]][[paste0("dcosts_",other_arm)]] / out[[sim]][[paste0("dlys_",other_arm)]]
-      out[[sim]][[paste0("ICUR_",other_arm)]] <-   out[[sim]][[paste0("dcosts_",other_arm)]] / out[[sim]][[paste0("dqalys_",other_arm)]]
-      out[[sim]][[paste0("ICER_undisc_",other_arm)]] <-   out[[sim]][[paste0("dcosts_undisc_",other_arm)]] / out[[sim]][[paste0("dlys_undisc_",other_arm)]]
-      out[[sim]][[paste0("ICUR_undisc_",other_arm)]] <-   out[[sim]][[paste0("dcosts_undisc_",other_arm)]] / out[[sim]][[paste0("dqalys_undisc_",other_arm)]]
-      
-      for (output_i in other_outputs) {
-        out[[sim]][[paste0("d",output_i,other_arm)]] <-  out[[sim]][[paste0(output_i,"_",arm)]] - out[[sim]][[paste0(output_i,"_",other_arm)]]
-        
+      for (output in 1:length(outputs_names)) { #standard outputs
+        out[[sim]][[outputs_names[output]]][arm_i] <- out[[sim]][[remove_outputs_list[output]]][arm_ref] - out[[sim]][[remove_outputs_list[output]]][arm_i]
       }
       
+      for (output_i in other_outputs) { #other outputs
+        out[[sim]][[paste0("d",output_i)]][arm_i] <-  out[[sim]][[output_i]][arm_ref] - out[[sim]][[output_i]][arm_i]
+      }
+      
+      if (arm_i!=arm_ref) {
+        out[[sim]][["ICER"]][arm_i]         <-   out[[sim]][["dcosts"]][arm_i]  / out[[sim]][["dlys"]][arm_i] 
+        out[[sim]][["ICUR"]][arm_i]         <-   out[[sim]][["dcosts"]][arm_i]  / out[[sim]][["dqalys"]][arm_i] 
+        out[[sim]][["ICER_undisc"]][arm_i]  <-   out[[sim]][["dcosts_undisc"]][arm_i]  / out[[sim]][["dlys_undisc"]][arm_i] 
+        out[[sim]][["ICUR_undisc"]][arm_i]  <-   out[[sim]][["dcosts_undisc"]][arm_i]  / out[[sim]][["dqalys_undisc"]][arm_i] 
+        out[[sim]][["INMB"]][arm_i]         <-   wtp * out[[sim]][["dqalys"]][arm_i] - out[[sim]][["dcosts"]][arm_i] 
+        out[[sim]][["INMB_undisc"]][arm_i]  <-   wtp * out[[sim]][["dqalys_undisc"]][arm_i] - out[[sim]][["dcosts_undisc"]][arm_i] 
+      } else{
+        out[[sim]][["ICER"]][arm_i]         <- NA
+        out[[sim]][["ICUR"]][arm_i]         <- NA
+        out[[sim]][["ICER_undisc"]][arm_i]  <- NA
+        out[[sim]][["ICUR_undisc"]][arm_i]  <- NA
+        out[[sim]][["INMB"]][arm_i]         <- NA
+        out[[sim]][["INMB_undisc"]][arm_i]  <- NA
+      }
     }
-
-    out[[sim]][[paste0("dlys_",arm)]] <-   0
-    out[[sim]][[paste0("dqalys_",arm)]] <-   0
-    out[[sim]][[paste0("dcosts_",arm)]] <-   0
-    out[[sim]][[paste0("dlys_undisc_",arm)]] <-   0
-    out[[sim]][[paste0("dqalys_undisc_",arm)]] <-   0
-    out[[sim]][[paste0("dcosts_undisc_",arm)]] <-   0  
-    for (output_i in other_outputs) {
-      out[[sim]][[paste0("d",output_i,arm)]] <-  0
-    }
-    
-    out[[sim]][[paste0("ICER_",arm)]] <-   NA
-    out[[sim]][[paste0("ICUR_",arm)]] <-   NA
-    out[[sim]][[paste0("ICER_undisc_",arm)]] <-   NA
-    out[[sim]][[paste0("ICUR_undisc_",arm)]] <-   NA
 
   }
 
-  data <- data.frame()
-  for (arm in out[[1]]$arm_list) {
-    temp <- data.frame(
-      arm = arm,
-      costs = interval_out(out,"total_costs_",arm,0),
-      lys = interval_out(out,"total_lys_",arm,2),
-      qalys =  interval_out(out,"total_qalys_",arm,2),
-      ICER =  interval_out(out,"ICER_",arm,0),
-      ICUR =  interval_out(out,"ICUR_",arm,0),
-      costs_undisc = interval_out(out,"total_costs_undisc_",arm,0),
-      lys_undisc = interval_out(out,"total_lys_undisc_",arm,2),
-      qalys_undisc =  interval_out(out,"total_qalys_undisc_",arm,2),
-      ICER_undisc =  interval_out(out,"ICER_undisc_",arm,0),
-      ICUR_undisc =  interval_out(out,"ICUR_undisc_",arm,0)
-    )
-    
-    for (output_i in other_outputs) {
-      temp[[output_i]] <-  interval_out(out,paste0(output_i,"_"),arm,2) 
-    }
-
-    data <- rbind(data,temp)
+  data <- data.frame(
+    arm           = out[[1]]$arm_list,
+    costs         = interval_out(out,"total_costs",0),
+    dcosts        = interval_out(out,"dcosts",0),
+    lys           = interval_out(out,"total_lys",2),
+    dlys          = interval_out(out,"dlys",3),
+    qalys         = interval_out(out,"total_qalys",2),
+    dqalys        = interval_out(out,"dqalys",3),
+    ICER          = interval_out(out,"ICER",0),
+    ICUR          = interval_out(out,"ICUR",0),
+    INMB          = interval_out(out,"INMB",0),
+    costs_undisc  = interval_out(out,"total_costs_undisc",0),
+    dcosts_undisc = interval_out(out,"dcosts_undisc",0),
+    lys_undisc    = interval_out(out,"total_lys_undisc",2),
+    dlys_undisc   = interval_out(out,"dlys_undisc",3),
+    qalys_undisc  = interval_out(out,"total_qalys_undisc",2),
+    dqalys_undisc = interval_out(out,"dqalys_undisc",3),
+    ICER_undisc   = interval_out(out,"ICER_undisc",0),
+    ICUR_undisc   = interval_out(out,"ICUR_undisc",0),
+    INMB_undisc   = interval_out(out,"INMB_undisc",0)
+  )
+  for (output_i in other_outputs) {
+    data[[output_i]] <- interval_out(out,output_i,2)
+    data[[paste0("d",output_i)]] <-  interval_out(out,paste0("d",output_i),3)
   }
 
   names <-  data[,1]
@@ -206,26 +192,137 @@ summary_results_sim <- function(out = results[[1]], arm=NULL){
 }
 
 
+# Summary for sensitivity output for specific treatment --------------------------------------------------
+
+#' Summary of sensitivity outputs for a treatment
+#'
+#' @param out The list object returned by `run_sim()`
+#' @param arm The reference treatment for calculation of incremental outcomes
+#' @param wtp Willingness to pay to have INMB
+#'
+#' @return A data frame with each sensitivity output per arm
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' summary_results_sens(results, arm="int")
+#' }
+
+summary_results_sens <- function(out = results, arm=NULL, wtp = 50000){
+  
+  arm_ref <- ifelse(is.null(arm),1,match(arm,out[[1]][[1]]$arm_list))
+  
+  remove_outputs_list <- c("total_lys", "total_qalys", "total_costs", "total_lys_undisc", 
+                           "total_qalys_undisc", "total_costs_undisc",
+                           "arm_list", "merged_df","sensitivity_name")
+  
+  outputs_names <- c("dlys","dqalys","dcosts","dlys_undisc","dqalys_undisc","dcosts_undisc")
+  
+  other_outputs <- names(out[[1]][[1]])[!names(out[[1]][[1]])%in% remove_outputs_list]
+  other_outputs <- other_outputs[!other_outputs=="extradata_raw"]
+  
+  data_final <- data.frame()
+  
+  for (sens in 1:length(out)) {
+    data <- data.frame()
+    for (sim in 1:length(out[[1]])) {
+      
+      for (arm_i in 1:length(out[[1]][[1]]$arm_list)) { #add reference arm costs/lys/qalys to compare with the other arms
+        
+        for (output in 1:length(outputs_names)) { #standard outputs
+          out[[sens]][[sim]][[outputs_names[output]]][arm_i] <- out[[sens]][[sim]][[remove_outputs_list[output]]][arm_ref] - out[[sens]][[sim]][[remove_outputs_list[output]]][arm_i]
+        }
+        
+        for (output_i in other_outputs) { #other outputs
+          out[[sens]][[sim]][[paste0("d",output_i)]][arm_i] <-  out[[sens]][[sim]][[output_i]][arm_ref] - out[[sens]][[sim]][[output_i]][arm_i]
+        }
+        
+        if (arm_i!=arm_ref) {
+          out[[sens]][[sim]][["ICER"]][arm_i]         <-   out[[sens]][[sim]][["dcosts"]][arm_i]             / out[[sens]][[sim]][["dlys"]][arm_i] 
+          out[[sens]][[sim]][["ICUR"]][arm_i]         <-   out[[sens]][[sim]][["dcosts"]][arm_i]             / out[[sens]][[sim]][["dqalys"]][arm_i] 
+          out[[sens]][[sim]][["ICER_undisc"]][arm_i]  <-   out[[sens]][[sim]][["dcosts_undisc"]][arm_i]      / out[[sens]][[sim]][["dlys_undisc"]][arm_i] 
+          out[[sens]][[sim]][["ICUR_undisc"]][arm_i]  <-   out[[sens]][[sim]][["dcosts_undisc"]][arm_i]      / out[[sens]][[sim]][["dqalys_undisc"]][arm_i] 
+          out[[sens]][[sim]][["INMB"]][arm_i]         <-  out[[sens]][[sim]][["dqalys"]][arm_i] * wtp        - out[[sens]][[sim]][["dcosts"]][arm_i]  
+          out[[sens]][[sim]][["INMB_undisc"]][arm_i]  <-  out[[sens]][[sim]][["dqalys_undisc"]][arm_i] * wtp - out[[sens]][[sim]][["dcosts_undisc"]][arm_i]  
+          
+        } else{
+          out[[sens]][[sim]][["ICER"]][arm_i] <- NA
+          out[[sens]][[sim]][["ICUR"]][arm_i] <- NA
+          out[[sens]][[sim]][["ICER_undisc"]][arm_i]  <- NA
+          out[[sens]][[sim]][["ICUR_undisc"]][arm_i]  <- NA
+          out[[sens]][[sim]][["INMB"]][arm_i]  <- NA
+          out[[sens]][[sim]][["INMB_undisc"]][arm_i]  <- NA
+        }
+      }
+    }
+ 
+  
+    data <- data.frame(
+      arm           = out[[1]][[1]]$arm_list,
+      analysis      = sens,
+      analysis_name = out[[sens]][[1]][["sensitivity_name"]],
+      costs         = interval_out(out[[sens]],"total_costs",0),
+      dcosts        = interval_out(out[[sens]],"dcosts",0),
+      lys           = interval_out(out[[sens]],"total_lys",2),
+      dlys          = interval_out(out[[sens]],"dlys",3),
+      qalys         = interval_out(out[[sens]],"total_qalys",2),
+      dqalys        = interval_out(out[[sens]],"dqalys",3),
+      ICER          = interval_out(out[[sens]],"ICER",0),
+      ICUR          = interval_out(out[[sens]],"ICUR",0),
+      INMB          = interval_out(out[[sens]],"INMB",0),
+      costs_undisc  = interval_out(out[[sens]],"total_costs_undisc",0),
+      dcosts_undisc = interval_out(out[[sens]],"dcosts_undisc",0),
+      lys_undisc    = interval_out(out[[sens]],"total_lys_undisc",2),
+      dlys_undisc   = interval_out(out[[sens]],"dlys_undisc",3),
+      qalys_undisc  = interval_out(out[[sens]],"total_qalys_undisc",2),
+      dqalys_undisc = interval_out(out[[sens]],"dqalys_undisc",3),
+      ICER_undisc   = interval_out(out[[sens]],"ICER_undisc",0),
+      ICUR_undisc   = interval_out(out[[sens]],"ICUR_undisc",0),
+      INMB_undisc   = interval_out(out[[sens]],"INMB_undisc",0)
+    )
+    for (output_i in other_outputs) {
+      data[[output_i]] <- interval_out(out[[sens]],output_i,2)
+      data[[paste0("d",output_i)]] <-  interval_out(out[[sens]],paste0("d",output_i),3)
+    }
+    
+    names <-  data[,1]
+    
+    # # Transpose everything other than the first column
+    # data <- as.data.frame(as.matrix(t(data[,-1])))
+    # 
+    # # Assign first column as the column names of the transposed dataframe
+    # colnames(data) <- names
+    
+    data_final <- rbind(data_final,data)
+  
+  }
+  
+  data_final <- melt(as.data.table(data_final), id.vars = c("arm", "analysis","analysis_name"))
+  
+  return(data_final)
+  
+}
+
+
 # Extract all specific PSA result -------------------------------------------------------------------------------------------------------------------------
 
 #' Extract PSA results from a treatment
 #'
 #' @param x The output_sim data frame from the list object returned by `run_sim()`
 #' @param element Variable for which PSA results are being extracted (single string)
-#' @param arm Intervention for which PSA results are being extracted (single string)
 #'
 #' @return A dataframe with PSA results from the specified intervention
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' extract_psa_result(results[[1]],"costs","int")
+#' extract_psa_result(results[[1]],"total_costs")
 #' }
 
-extract_psa_result <- function(x, element,arm) {
-  out <- purrr::map_dbl(x,paste0(paste0(element,"_"),arm))
-
-  out <- data.frame(element = element, arm = arm , simulation = 1:length(out),value=out)
+extract_psa_result <- function(x, element) {
+  out <- as.data.frame(do.call(rbind, map(x,element)))
+  out$simulation <- 1:nrow(out)
+  out$element <- element
   return(out)
 }
 
@@ -259,7 +356,7 @@ ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
   nmb <- data.frame()
   for (comparator in interventions) {
 
-     nmb_i <- t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results[[sensitivity_used]],"total_costs",comparator)$value)))
+     nmb_i <- t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results[[sensitivity_used]],"total_qalys")[,comparator] - extract_psa_result(results[[sensitivity_used]],"total_costs")[,comparator])))
 
      if (nrow(nmb_i)>1) {
        nmb_i <- t(nmb_i)
@@ -317,7 +414,7 @@ evpi_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
   nmb <- data.frame()
   for (comparator in interventions) {
 
-    nmb_i <- t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results[[sensitivity_used]],"total_qalys",comparator)$value - extract_psa_result(results[[sensitivity_used]],"total_costs",comparator)$value)))
+    nmb_i <- t(as.matrix(sapply(wtp, function(wtp_i) wtp_i * extract_psa_result(results[[sensitivity_used]],"total_qalys")[,comparator] - extract_psa_result(results[[sensitivity_used]],"total_costs")[,comparator])))
 
     if (nrow(nmb_i)>1) {
       nmb_i <- t(nmb_i)
