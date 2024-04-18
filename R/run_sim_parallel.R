@@ -41,7 +41,9 @@
 #' A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
 #' c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").
 #' 
-#' The engine uses the L'Ecuyer-CMRG for the random number generator
+#' The engine uses the L'Ecuyer-CMRG for the random number generator.
+#' Note that if ncores > 1, then results per simulation will only be exactly replicable if using run_sim_parallel 
+#' (as seeds are automatically transformed to be seven integer seeds -i.e, L'Ecuyer-CMRG seeds-)
 #' 
 #' @examples
 #' \dontrun{
@@ -234,7 +236,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     exported_items <- unique(c("input_list_sens",ls(.GlobalEnv),ls(parent.env(environment())),ls(environment())))
     options(future.rng.onMisuse = "ignore")
     output_sim[[sens]] <- foreach(simulation = 1:n_sim,
-                         # .options.future = list(seed = TRUE),
+                         .options.future = list(seed = TRUE),
                          .options.future = list(packages = .packages()),
                          .options.future = list(globals=structure(TRUE,add = exported_items)),
                          .combine = 'c') %dofuture% {

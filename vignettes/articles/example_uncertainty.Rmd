@@ -368,7 +368,7 @@ To do this test, we set `psa_bool = FALSE` and (optional) we set `ipd = FALSE`. 
 
 ```{r struct_uncertainty, message=FALSE, results="hide"}
 
-sample_sizes <- c(10,100,500)
+sample_sizes <- c(50,100,500,1000)
 
 sim_size_df <- NULL
 for (sample_size in sample_sizes) {
@@ -393,15 +393,13 @@ for (sample_size in sample_sizes) {
   )) 
 
   #We're extracting the overall ICER/ICUR and also costs/qalys/lys for the "noint" intervention
-  loop_df <- rbind(extract_psa_result(results[[1]],"total_costs","noint"),
-                   extract_psa_result(results[[1]],"total_lys","noint"),
-                   extract_psa_result(results[[1]],"total_qalys","noint"),
-                   extract_psa_result(results[[1]],"total_costs","int"),
-                   extract_psa_result(results[[1]],"total_lys","int"),
-                   extract_psa_result(results[[1]],"total_qalys","int"))
+  loop_df <- rbind(extract_psa_result(results[[1]],"total_costs"),
+                   extract_psa_result(results[[1]],"total_lys"),
+                   extract_psa_result(results[[1]],"total_qalys"))
   
-    loop_df <- rbind(loop_df, loop_df %>%
-                     spread(arm,value) %>%
+  loop_df <- rbind(loop_df %>%
+                     pivot_longer(cols=c("int","noint"),names_to="arm"),
+                   loop_df %>%
                      mutate(dif = int - noint) %>%
                      group_by(simulation) %>%
                      transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", arm="noint") %>%
@@ -410,7 +408,7 @@ for (sample_size in sample_sizes) {
                      distinct())
     
 
-  loop_df$sample_size = sample_size
+  loop_df$sample_size <- sample_size
   sim_size_df <- rbind(sim_size_df,loop_df)
   
 }
@@ -432,13 +430,13 @@ ggplot(sim_size_df%>% filter(arm=="noint") ,aes(x=sample_size,y=value)) +
 
 ```
 
-We can also try to understand what is the relative size of the uncertainty provided by the sampling. We compute the coefficient of variation for the outcomes exported (costs, qalys, lys, ICER and ICUR). The first thing to be noticed is that the ICER and ICUR CV is much higher than for costs/lys/qalys. This is because of the incremental nature of ICER/ICUR, which means it's more sensitive to small variations of these outputs. So while the costs/qalys/lys are quite precise with a reduced number of simulations (~1,000), in order to have a precise ICER/ICUR we need to go higher (~5,000/10,000). However, one can see that the mean is quite stable at ~5,000 patients.
+We can also try to understand what is the relative size of the uncertainty provided by the sampling. We compute the coefficient of variation for the outcomes exported (costs, qalys, lys, ICER and ICUR). The first thing to be noticed is that the ICER and ICUR CV is much higher than for costs/lys/qalys. This is because of the incremental nature of ICER/ICUR, which means it's more sensitive to small variations of these outputs. So while the costs/qalys/lys are quite precise with a reduced number of simulations (~1,000), in order to have a precise ICER/ICUR we would need to go higher (~5,000/10,000). However, one could see that the mean would be quite stable at ~5,000 patients.
 
 ```{r struct_uncertainty3, echo = FALSE, message=FALSE}
 
 sim_size_df %>% filter(arm=="noint")  %>%
   group_by(element,sample_size) %>%
-  summarise(mean=mean(value),sd=sd(value), `CV (%)` = 100*sd(value)/mean(value)) %>%
+  summarise(mean=mean(value),sd=sd(value), `CV (%)` = 100*sd(value)/abs(mean(value))) %>%
   kable(digits =2) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
@@ -450,7 +448,7 @@ We can plot the CV to see this more clearly:
 ggplot(
     sim_size_df%>% filter(arm=="noint")  %>%
         group_by(element,sample_size) %>%
-        summarise(mean=mean(value),sd=sd(value), `CV (%)` = 100*sd(value)/mean(value))) +
+        summarise(mean=mean(value),sd=sd(value), `CV (%)` = 100*sd(value)/abs(mean(value)))) +
     geom_point(aes(x=sample_size,y=`CV (%)`,fill= element),shape=21,size = 2, alpha=0.7) +
     geom_line(aes(x=sample_size,y=`CV (%)`,col= element, group=element)) +
     ggforce::facet_zoom(ylim = c(0, 10)) +
@@ -468,9 +466,10 @@ sample_sizes <- 1000
 
 sim_size_psa_df <- NULL
 for (sample_size in sample_sizes) {
-  results <- suppressWarnings(run_sim_parallel(  
+  results <- suppressWarnings( #run without warnings
+      run_sim_parallel(  
     npats=sample_size,                        # number of patients to be simulated
-    n_sim=5,                                # number of simulations to run
+    n_sim=6,                                # number of simulations to run
     psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
     arm_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
@@ -481,21 +480,20 @@ for (sample_size in sample_sizes) {
     util_ongoing_list = util_ongoing,
     cost_ongoing_list = cost_ongoing,
     cost_instant_list = cost_instant,
+    ncores = 6, # number of cores to use, recommended not to use all
     drc = 0.035,                              # discount rate for costs
     drq = 0.035,                              # discount rate for qalys
     ipd=FALSE                                 # Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower
-  ))
+  )) 
 
   #We're extracting the overall ICER/ICUR and also costs/qalys/lys for the "noint" intervention
-  loop_psa_df <- rbind(extract_psa_result(results[[1]],"total_costs","noint"),
-                   extract_psa_result(results[[1]],"total_lys","noint"),
-                   extract_psa_result(results[[1]],"total_qalys","noint"),
-                   extract_psa_result(results[[1]],"total_costs","int"),
-                   extract_psa_result(results[[1]],"total_lys","int"),
-                   extract_psa_result(results[[1]],"total_qalys","int"))
+  loop_psa_df <- rbind(extract_psa_result(results[[1]],"total_costs"),
+                   extract_psa_result(results[[1]],"total_lys"),
+                   extract_psa_result(results[[1]],"total_qalys"))
   
-    loop_psa_df <- rbind(loop_psa_df, loop_psa_df %>%
-                     spread(arm,value) %>%
+  loop_psa_df <- rbind(loop_psa_df %>%
+                     pivot_longer(cols=c("int","noint"),names_to="arm"),
+                   loop_psa_df %>%
                      mutate(dif = int - noint) %>%
                      group_by(simulation) %>%
                      transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", arm="noint") %>%
@@ -503,7 +501,7 @@ for (sample_size in sample_sizes) {
                      ungroup() %>%
                      distinct())
   
-  loop_psa_df$sample_size = sample_size
+  loop_psa_df$sample_size  <-  sample_size
   sim_size_psa_df <- rbind(sim_size_psa_df,loop_psa_df)
   
 }
@@ -519,7 +517,7 @@ sim_size_psa_df%>% filter(arm=="noint")  %>%
   mutate(uncertainty = "structural + parameter")%>%
   bind_rows(sim_size_df %>% filter(sample_size==1000 & arm=="noint") %>% mutate(uncertainty = "structural"))%>%
   group_by(element,sample_size,uncertainty) %>%
-  summarise(mean=mean(value),sd=sd(value), `CV (%)` = 100*sd(value)/mean(value)) %>%
+  summarise(mean=mean(value),sd=sd(value), `CV (%)` = 100*sd(value)/abs(mean(value))) %>%
   kable(digits =2) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
@@ -527,29 +525,8 @@ sim_size_psa_df%>% filter(arm=="noint")  %>%
 
 # CEAC/CEAF and EVPI
 
-When a PSA is run, additional analyses can be performed to understand the importance and behavior of uncertainty. Let's run our model for 1,000 patients in 4 simulations.
+When a PSA is run, additional analyses can be performed to understand the importance and behavior of uncertainty. 
 
-```{r psa_unc5 , message=FALSE, results="hide"}
-
-  results <- suppressWarnings(run_sim(  
-    npats=1000,                        # number of patients to be simulated
-    n_sim=4,                                # number of simulations to run
-    psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
-    arm_list = c("int", "noint"),             # intervention list
-    common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
-    common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
-    unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
-    init_event_list = init_event_list,        # initial event list
-    evt_react_list = evt_react_list,          # reaction of events
-    util_ongoing_list = util_ongoing,
-    cost_ongoing_list = cost_ongoing,
-    cost_instant_list = cost_instant,
-    drc = 0.035,                              # discount rate for costs
-    drq = 0.035,                              # discount rate for qalys
-    ipd=FALSE                                 # Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower
-  ))
-
-```
 ## CEAC/CEAF
 
 We can now use the `ceac_des` function with a vector of willingness to pay and the results of our PSA to generate the CEAC and CEAF plots.
