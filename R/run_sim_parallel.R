@@ -13,6 +13,8 @@
 #' @param cost_ongoing_list A list of costs that are accrued at an ongoing basis
 #' @param cost_instant_list A list of costs that are accrued instantaneously at an event
 #' @param cost_cycle_list A list of costs that are accrued in cycles
+#' @param other_ongoing_list A list of other data that are accrued at an ongoing basis (discounted using drq)
+#' @param other_instant_list A list of other data that are accrued instantaneously at an event (discounted using drq)
 #' @param npats The number of patients to be simulated (it will simulate npats * length(arm_list))
 #' @param n_sim The number of simulations to run per sensitivity
 #' @param psa_bool A boolean to determine if PSA should be conducted. If n_sim > 1 and psa_bool = FALSE, the differences between simulations will be due to sampling
@@ -79,6 +81,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                              cost_ongoing_list = NULL,
                              cost_instant_list = NULL,
                              cost_cycle_list = NULL,
+                             other_ongoing_list = NULL,
+                             other_instant_list = NULL,
                              npats=500,
                              n_sim=1,
                              psa_bool = NULL,
@@ -129,12 +133,17 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   categories_utilities_instant <- unlist(unique(lapply(names(util_instant_list), function(n) util_instant_list[[n]][["category"]])))
   categories_utilities_cycle   <- unlist(unique(lapply(names(util_cycle_list), function(n) util_cycle_list[[n]][["category"]])))
   
+  categories_other_ongoing <- unlist(unique(lapply(names(other_ongoing_list), function(n) other_ongoing_list[[n]][["category"]])))
+  categories_other_instant <- unlist(unique(lapply(names(other_instant_list), function(n) other_instant_list[[n]][["category"]])))
+  
   categories_for_export <-c("categories_costs_ongoing",
                             "categories_costs_instant",
                             "categories_costs_cycle",
                             "categories_utilities_ongoing",
                             "categories_utilities_instant",
-                            "categories_utilities_cycle"
+                            "categories_utilities_cycle",
+                            "categories_other_ongoing",
+                            "categories_other_instant"
   )
   
   #Remove NULL values
@@ -143,8 +152,11 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                              if(!is.null(categories_costs_cycle)){unlist(lapply(categories_costs_cycle,function(x){paste(x,c("cycle","cycle_undisc"),sep="_")}))},
                              if(!is.null(categories_utilities_ongoing)){unlist(lapply(categories_utilities_ongoing,function(x){paste(x,c("ongoing","ongoing_undisc"),sep="_")}))},
                              if(!is.null(categories_utilities_instant)){unlist(lapply(categories_utilities_instant,function(x){paste(x,c("instant","instant_undisc"),sep="_")}))},
-                             if(!is.null(categories_utilities_cycle)){unlist(lapply(categories_utilities_cycle,function(x){paste(x,c("cycle","cycle_undisc"),sep="_")}))}
+                             if(!is.null(categories_utilities_cycle)){unlist(lapply(categories_utilities_cycle,function(x){paste(x,c("cycle","cycle_undisc"),sep="_")}))},
+                             if(!is.null(categories_other_ongoing)){unlist(lapply(categories_other_ongoing,function(x){paste(x,c("ongoing","ongoing_undisc"),sep="_")}))},
+                             if(!is.null(categories_other_instant)){unlist(lapply(categories_other_instant,function(x){paste(x,c("instant","instant_undisc"),sep="_")}))}
   )
+  
   output_sim <- list()
   
   start_time <-  proc.time()
@@ -193,7 +205,11 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                                        util_categories_instant = categories_utilities_instant,
                                        l_util_categories_instant = length(categories_utilities_instant),
                                        util_categories_cycle = categories_utilities_cycle,
-                                       l_util_categories_cycle = length(categories_utilities_cycle)
+                                       l_util_categories_cycle = length(categories_utilities_cycle),
+                                       other_categories_ongoing = categories_other_ongoing,
+                                       l_other_categories_ongoing = length(categories_other_ongoing),
+                                       other_categories_instant = categories_other_instant,
+                                       l_other_categories_instant = length(categories_other_instant)
                        ),
                        input_out = unique(c(input_out,categories_for_export)),
                        categories_for_export = categories_for_export,

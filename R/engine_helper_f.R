@@ -167,6 +167,23 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
                                                                         evt_arm_i=paste(evt_arm,util_cat,sep="_"),
                                                                         input_list_arm_i=input_list_arm)
   }
+  
+
+  # Other -------------------------------------------------------------------
+  for (other_cat in input_list_arm$uc_lists$other_categories_ongoing) {
+    input_list_arm[paste0(other_cat,"_","ongoing")] <- get_input(input_list_arm$uc_lists$other_ongoing_list,
+                                                                ifnull=0,
+                                                                type="other",
+                                                                evt_arm_i=paste(evt_arm,other_cat,sep="_"),
+                                                                input_list_arm_i=input_list_arm)
+  }
+  for (other_cat in input_list_arm$uc_lists$other_categories_instant) {
+    input_list_arm[paste0(other_cat,"_","instant")] <- get_input(input_list_arm$uc_lists$other_instant_list,
+                                                                ifnull=0,
+                                                                type="other",
+                                                                evt_arm_i=paste(evt_arm,other_cat,sep="_"),
+                                                                input_list_arm_i=input_list_arm)
+  }
 
   #Evaluate the reaction to the event
   input_list_arm <- eval_reactevt(input_list_arm$evt_react_list, evt,input_list_arm)
@@ -497,6 +514,34 @@ compute_outputs <- function(patdata,input_list) {
     patdata_dt[,"qalys" := qalys + get(paste0(util_cat,"_","cycle"))]
     
     patdata_dt[,"qalys_undisc" := qalys_undisc + get(paste0(util_cat,"_","cycle_undisc"))]
+    
+  }
+  
+  
+  #Discount and undiscount other data
+
+  for (other_cat in input_list$uc_lists$other_categories_ongoing) {
+    patdata_dt[,paste0(other_cat,"_","ongoing_undisc") := disc_ongoing_v(lcldr=0,
+                                                                        lclprvtime=prevtime,
+                                                                        lclcurtime=evttime,
+                                                                        lclval=get(paste0(other_cat,"_","ongoing")))]
+    
+    patdata_dt[,paste0(other_cat,"_","ongoing") := disc_ongoing_v(lcldr=input_list$drq,
+                                                                 lclprvtime=prevtime,
+                                                                 lclcurtime=evttime,
+                                                                 lclval=get(paste0(other_cat,"_","ongoing")))]
+    
+    
+  }
+  
+  for (other_cat in input_list$uc_lists$other_categories_instant) {
+    patdata_dt[,paste0(other_cat,"_","instant_undisc") := disc_instant_v(lcldr=0,
+                                                                        lclcurtime=evttime,
+                                                                        lclval=get(paste0(other_cat,"_","instant")))]
+    
+    patdata_dt[,paste0(other_cat,"_","instant") := disc_instant_v(lcldr=input_list$drq,
+                                                                 lclcurtime=evttime,
+                                                                 lclval=get(paste0(other_cat,"_","instant")))]
     
   }
   

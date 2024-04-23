@@ -355,7 +355,7 @@ add_cost <- function(.data=NULL,cost,evt,arm,category="default",cycle_l=NULL,cyc
 #' @export
 #'
 #' @details
-#' Utilities can be defined by writing expressions and objects in the cost argument whose execution will be delayed until the model runs.
+#' Utilities can be defined by writing expressions and objects in the util argument whose execution will be delayed until the model runs.
 #'
 #' This function accepts the use of pipes (%>%) to define multiple utilities.
 #'
@@ -393,7 +393,56 @@ add_util <- function(.data=NULL,util,evt,arm,category="default",cycle_l=NULL,cyc
   return(data_list)
 }
 
+# Add other to list --------------------------------------------------------
 
+#' Defining other data for events and interventions (only ongoing and instantaneous)
+#'
+#' @param .data Existing other data
+#' @param other Value or expression to calculate other estimates
+#' @param evt Events for which this other data is applicable
+#' @param arm Interventions for which this other data is applicable
+#' @param category Name of the other data category. If not defined, will be set as default.
+#'
+#' @return A list of other data
+#' @export
+#'
+#' @details
+#' Other data can be defined by writing expressions and objects in the value argument whose execution will be delayed until the model runs.
+#'
+#' This function accepts the use of pipes (%>%) to define multiple other data.
+#'
+#' @examples
+#' \dontrun{
+#' add_other(evt = c("start","idfs","ttot"),
+#' arm = c("int", "noint"),
+#' value = 1,
+#' category = "other_discounted_output"
+#' }
+
+add_other <- function(.data=NULL,other,evt,arm,category="default"){
+  
+  if (category=="default") {
+    warning("No other category name assigned, used 'default'")
+  }
+  category <- paste0("other_",category)
+  data_list <- .data
+  for (arm_item in arm) {
+    
+    for (event_item in evt) {
+      
+      other_item <- list(list(other=substitute(other),
+                             category = category))
+      names(other_item) <- paste(event_item,arm_item,category,sep="_")
+      
+      if (is.null(data_list)) {
+        data_list <- other_item
+      } else{
+        data_list <- append(data_list,other_item)
+      }
+    }
+  }
+  return(data_list)
+}
 
 # Add item/parameter to list --------------------------------------------------------
 
@@ -551,6 +600,10 @@ modify_event <- function(evt){
 #' @details
 #' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 #' So rather than use two `modify_item` with a list of one element, it's better to group them into a single `modify_item` with a list of two elements.
+#'
+#' Costs and utilities can be modified by using the construction `type_name_category`, where type is either "qaly" or "cost",
+#'  name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
+#'  This will overwrite the value defined in the corresponding cost/utility section.
 #'
 #' @examples
 #' \dontrun{

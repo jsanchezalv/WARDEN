@@ -112,7 +112,7 @@ The functions to add/modify events and inputs use lists. Whenever several inputs
 
 `new_event`allows to generate events and add them to the vector of events. It accepts more than one event. 
 `modify_event` allows to modify events (e.g. delay death). When adding an event, the name of the events and the time of the events must be defined. When using `modify_event`, one must indicate which events are affected and what are the new times of the events. If the event specified does not exist or has already occurred, it will be ignored. Note that one could potentially omit part of the modeling set in `init_event_list` and actually define new events dynamically through the reactions (we do that below for the `"ae"` event). However, this can have an impact in computation time, so if possible it's always better to use `init_event_list`.
-`modify_item` allows to modify and add items. Elements defined within this function are not evaluated sequentially (i.e. defining `modify_item(list(fl.new = 1, var1 = fl.new * 5)))` will give an error if `fl.new` was not defined outside this function).
+`modify_item` allows to modify and add items. Elements defined within this function are not evaluated sequentially (i.e. defining `modify_item(list(fl.new = 1, var1 = fl.new * 5)))` will give an error if `fl.new` was not defined outside this function). Note that one can modify costs/utilities by using the construction `type_name_category`, where type is either "qaly" or "cost", name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
 
 The list of relevant functions to be used within `add_reactevt` are:
 

@@ -36,7 +36,7 @@ A list of utilities
 Defining utilities for events and interventions
 }
 \details{
-Utilities can be defined by writing expressions and objects in the cost argument whose execution will be delayed until the model runs.
+Utilities can be defined by writing expressions and objects in the util argument whose execution will be delayed until the model runs.
 
 This function accepts the use of pipes (\%>\%) to define multiple utilities.
 }

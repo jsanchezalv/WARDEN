@@ -18,6 +18,8 @@ run_sim(
   cost_ongoing_list = NULL,
   cost_instant_list = NULL,
   cost_cycle_list = NULL,
+  other_ongoing_list = NULL,
+  other_instant_list = NULL,
   npats = 500,
   n_sim = 1,
   psa_bool = NULL,
@@ -56,6 +58,10 @@ run_sim(
 \item{cost_instant_list}{A list of costs that are accrued instantaneously at an event}
 
 \item{cost_cycle_list}{A list of costs that are accrued in cycles}
+
+\item{other_ongoing_list}{A list of other data that are accrued at an ongoing basis (discounted using drq)}
+
+\item{other_instant_list}{A list of other data that are accrued instantaneously at an event (discounted using drq)}
 
 \item{npats}{The number of patients to be simulated (it will simulate npats * length(arm_list))}
 
@@ -107,6 +113,7 @@ util_ongoing_list = util_ongoing_list,
 util_instant_list = util_instant_list,
 cost_ongoing_list = cost_ongoing_list,
 cost_instant_list = cost_instant_list,
+other_ongoing_list = other_ongoing_list,
 npats = 500,
 n_sim = 1,
 psa_bool = FALSE,

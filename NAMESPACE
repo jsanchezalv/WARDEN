@@ -2,6 +2,7 @@
 
 export(add_cost)
 export(add_item)
+export(add_other)
 export(add_reactevt)
 export(add_tte)
 export(add_util)
