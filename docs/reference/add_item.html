@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,6 +87,8 @@
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two <code>add_item</code> with a list of one element, it's better to group them into a single <code>add_item</code> with a list of two elements.</p>
+<p>Whenever a function is directly implemented which must be evaluated later and that has no object name attached (e.g., <code>pick_val_v</code>),
+it should be implemented after a first <code>add_item()</code> (empty or with content) to avoid confusing the <code>.data</code> argument, or wrapping the function within <code><a href="https://rdrr.io/r/base/substitute.html" class="external-link">substitute()</a></code></p>
     </div>
 
     <div class="section level2">
@@ -94,6 +96,22 @@ So rather than use two <code>add_item</code> with a list of one element, it's be
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu">add_item</span><span class="op">(</span>fl.idfs <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">add_item</span><span class="op">(</span>util_idfs <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">psa_bool</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.8</span>,<span class="fl">0.2</span><span class="op">)</span><span class="op">}</span> <span class="kw">else</span><span class="op">{</span><span class="fl">0.8</span><span class="op">}</span>, util.mbc <span class="op">=</span> <span class="fl">0.6</span>, cost_idfs <span class="op">=</span> <span class="fl">2500</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">common_inputs</span> <span class="op">&lt;-</span> <span class="fu">add_item</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span></span>
+<span class="r-in"><span><span class="fu">add_item</span><span class="op">(</span><span class="fu"><a href="pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  base      <span class="op">=</span> <span class="va">l_statics</span><span class="op">[[</span><span class="st">"base"</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  psa       <span class="op">=</span> <span class="fu"><a href="pick_psa.html">pick_psa</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">l_statics</span><span class="op">[[</span><span class="st">"function"</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>    <span class="va">l_statics</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>    <span class="va">l_statics</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>    <span class="va">l_statics</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  sens      <span class="op">=</span> <span class="va">l_statics</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  psa_ind   <span class="op">=</span> <span class="va">psa_bool</span>,</span></span>
+<span class="r-in"><span>  sens_ind  <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span></span>
+<span class="r-in"><span>  indicator <span class="op">=</span> <span class="va">indicators_statics</span>,</span></span>
+<span class="r-in"><span>  names_out <span class="op">=</span> <span class="va">l_statics</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

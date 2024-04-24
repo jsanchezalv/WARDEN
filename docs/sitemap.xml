@@ -31,10 +31,16 @@
     <loc>/LICENSE-text.html</loc>
   </url>
   <url>
+    <loc>/news/index.html</loc>
+  </url>
+  <url>
     <loc>/reference/add_cost.html</loc>
   </url>
   <url>
     <loc>/reference/add_item.html</loc>
+  </url>
+  <url>
+    <loc>/reference/add_other.html</loc>
   </url>
   <url>
     <loc>/reference/add_reactevt.html</loc>
@@ -47,6 +53,9 @@
   </url>
   <url>
     <loc>/reference/ceac_des.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_indicators.html</loc>
   </url>
   <url>
     <loc>/reference/disc_cycle.html</loc>
@@ -103,10 +112,22 @@
     <loc>/reference/new_event.html</loc>
   </url>
   <url>
+    <loc>/reference/pick_psa.html</loc>
+  </url>
+  <url>
     <loc>/reference/pick_val.html</loc>
   </url>
   <url>
     <loc>/reference/pick_val_v.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rbeta_mse.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rdirichlet.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rdirichlet_prob.html</loc>
   </url>
   <url>
     <loc>/reference/replicate_profiles.html</loc>
@@ -115,7 +136,16 @@
     <loc>/reference/revert_list.html</loc>
   </url>
   <url>
+    <loc>/reference/rgamma_mse.html</loc>
+  </url>
+  <url>
     <loc>/reference/rpoisgamma.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rresgompertz.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rresgompertz_lu.html</loc>
   </url>
   <url>
     <loc>/reference/RunEngine.html</loc>
@@ -143,6 +173,9 @@
   </url>
   <url>
     <loc>/reference/summary_results_psa.html</loc>
+  </url>
+  <url>
+    <loc>/reference/summary_results_sens.html</loc>
   </url>
   <url>
     <loc>/reference/summary_results_sim.html</loc>

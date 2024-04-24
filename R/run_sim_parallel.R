@@ -7,14 +7,14 @@
 #' @param unique_pt_inputs A list of inputs that change across each intervention
 #' @param init_event_list A list of initial events and event times. If no initial events are given, a "Start" event at time 0 is created automatically
 #' @param evt_react_list A list of event reactions
-#' @param util_ongoing_list A list of utilities that are accrued at an ongoing basis
-#' @param util_instant_list A list of utilities that are accrued instantaneously at an event
-#' @param util_cycle_list A list of utilities that are accrued in cycles
-#' @param cost_ongoing_list A list of costs that are accrued at an ongoing basis
-#' @param cost_instant_list A list of costs that are accrued instantaneously at an event
-#' @param cost_cycle_list A list of costs that are accrued in cycles
-#' @param other_ongoing_list A list of other data that are accrued at an ongoing basis (discounted using drq)
-#' @param other_instant_list A list of other data that are accrued instantaneously at an event (discounted using drq)
+#' @param util_ongoing_list A list of utilities that are accrued at an ongoing basis (discounted using parameter drq)
+#' @param util_instant_list A list of utilities that are accrued instantaneously at an event (discounted using parameter drq)
+#' @param util_cycle_list A list of utilities that are accrued in cycles (discounted using parameter drq)
+#' @param cost_ongoing_list A list of costs that are accrued at an ongoing basis (discounted using parameter drc)
+#' @param cost_instant_list A list of costs that are accrued instantaneously at an event (discounted using parameter drc)
+#' @param cost_cycle_list A list of costs that are accrued in cycles (discounted using parameter drc)
+#' @param other_ongoing_list A list of other data that are accrued at an ongoing basis (discounted using parameter drq)
+#' @param other_instant_list A list of other data that are accrued instantaneously at an event (discounted using parameter drq)
 #' @param npats The number of patients to be simulated (it will simulate npats * length(arm_list))
 #' @param n_sim The number of simulations to run per sensitivity
 #' @param psa_bool A boolean to determine if PSA should be conducted. If n_sim > 1 and psa_bool = FALSE, the differences between simulations will be due to sampling
@@ -22,8 +22,6 @@
 #' @param sensitivity_names A vector of scenario/DSA names that can be used to select the right sensitivity (e.g., c("Scenario_1", "Scenario_2")). The parameter "sens_name_used" is created from it which corresponds to the one being used for each iteration.
 #' @param n_sensitivity Number of sensitivity analysis (DSA or Scenarios) to run. It will be interacted with sensitivity_names argument if not null (n_sensitivityitivity = n_sensitivity * length(sensitivity_names)). For DSA, it should be as many parameters as there are. For scenario, it should be 1.
 #' @param ncores The number of cores to use for parallel computing
-#' @param drc The discount rate for costs
-#' @param drq The discount rate for LYs/QALYs
 #' @param input_out A vector of variables to be returned in the output data frame
 #' @param ipd Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events
 #'
@@ -47,6 +45,8 @@
 #' Note that if ncores > 1, then results per simulation will only be exactly replicable if using run_sim_parallel 
 #' (as seeds are automatically transformed to be seven integer seeds -i.e, L'Ecuyer-CMRG seeds-)
 #' 
+#' If no `drc` or `drq` parameters are passed within any of the input lists, these are assigned value 0.03.
+#' 
 #' @examples
 #' \dontrun{
 #' run_sim_parallel(arm_list=c("int","noint"),
@@ -63,8 +63,6 @@
 #' n_sim = 1,
 #' psa_bool = FALSE,
 #' ncores = future::availableCores(),
-#' drc = 0.035,
-#' drq = 0.035,
 #' ipd = 1)
 #' }
 
@@ -90,8 +88,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                              sensitivity_names = NULL,
                              n_sensitivity = 1,
                              ncores=1,
-                             drc=0.035,
-                             drq=0.035,
                              input_out = NULL,
                              ipd = 1){
   
@@ -183,8 +179,9 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     }
     
     
-    input_list_sens <- list(drc = drc,
-                       drq = drq,
+    input_list_sens <- list(
+                       drc = 0.03,
+                       drq = 0.03,
                        psa_bool = psa_bool,
                        init_event_list = init_event_list,
                        evt_react_list = evt_react_list,
@@ -234,7 +231,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
           input_list_sens <- c(input_list_sens, list.sensitivity_inputs[[1]])
         } else{
         if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
-          warning("Item ", names(list.sensitivity_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
+          warning("Item ", names(list.sensitivity_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
         }
         input_list_sens <- c(input_list_sens,list.sensitivity_inputs)
         }
@@ -275,7 +272,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
             input_list <- c(input_list, list.common_all_inputs[[1]])
           } else{
           if ((!is.null(names(list.common_all_inputs[[1]]))) & simulation==1 & sens==1) {
-            warning("Item ", names(list.common_all_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
+            warning("Item ", names(list.common_all_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
           }
           input_list <- c(input_list,list.common_all_inputs)
           }

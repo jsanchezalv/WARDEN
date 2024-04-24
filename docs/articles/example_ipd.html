@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,7 +83,7 @@
                         <h4 data-toc-skip class="author">Valerie Aponte
 Ribero and Javier Sanchez Alvarez</h4>
             
-            <h4 data-toc-skip class="date">March 21, 2024</h4>
+            <h4 data-toc-skip class="date">April 24, 2024</h4>
       
       
       <div class="d-none name"><code>example_ipd.Rmd</code></div>
@@ -111,7 +111,7 @@ generate a model when IPD from a trial is available.</p>
 <span><span class="co">#&gt; Warning: package 'survival' was built under R version 4.3.2</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rpkgs.datanovia.com/survminer/index.html" class="external-link">survminer</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: package 'survminer' was built under R version 4.3.2</span></span>
-<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.3.2</span></span>
+<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.3.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/chjackson/flexsurv-dev" class="external-link">flexsurv</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: package 'flexsurv' was built under R version 4.3.2</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">flexsurvPlus</span><span class="op">)</span></span>
@@ -130,8 +130,8 @@ progression-free state and may move to the progressed state. At any
 point in time they can die, depending on the risk of each disease stage.
 Patients may also experience a disease event which accelerates
 progression.</p>
-<div id="htmlwidget-c206706843e21844dc2d" style="width:700px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c206706843e21844dc2d">{"x":{"diagram":"\n  digraph graph1 {\n  \n  graph [layout = dot, rankdir = LR, nodesep=\"1\", fontsize = 12]\n  \n  # node definitions with substituted label text\n  \n  node [shape = oval]\n  a [label = \"Progression-free\"]\n  b [label = \"Progressed\"]\n  d [label = \"Death\"]\n  \n  node [shape = box]\n  c [label = \"Progression-accelerating event\", style = dashed]\n  \n  a -> d\n  a -> b\n  b -> d\n  c -> b [style = dashed]\n  \n  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-f1a94e83480c29159329" style="width:700px;height:300px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f1a94e83480c29159329">{"x":{"diagram":"\n  digraph graph1 {\n  \n  graph [layout = dot, rankdir = LR, nodesep=\"1\", fontsize = 12]\n  \n  # node definitions with substituted label text\n  \n  node [shape = oval]\n  a [label = \"Progression-free\"]\n  b [label = \"Progressed\"]\n  d [label = \"Death\"]\n  \n  node [shape = box]\n  c [label = \"Progression-accelerating event\", style = dashed]\n  \n  a -> d\n  a -> b\n  b -> d\n  c -> b [style = dashed]\n  \n  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
 <h2 id="generate-dummy-ipd-trial-data-and-fit-survival-models">Generate dummy IPD trial data and fit survival models<a class="anchor" aria-label="anchor" href="#generate-dummy-ipd-trial-data-and-fit-survival-models"></a>
@@ -268,7 +268,7 @@ one could use the items generated in <code>common_all_inputs</code> in
 <span>  BLAge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">IPD</span><span class="op">[</span><span class="va">i</span>,<span class="st">"AGE"</span><span class="op">]</span><span class="op">)</span>, <span class="co">#Record patient age at baseline</span></span>
 <span>  </span>
 <span>  <span class="co">#Draw time to non-disease related death from a restricted Gompertz distribution</span></span>
-<span>  nat.death <span class="op">=</span> <span class="fu"><a href="../reference/draw_resgompertz.html">draw_resgompertz</a></span><span class="op">(</span><span class="fl">1</span>,shape<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">Sex</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span><span class="op">{</span><span class="fl">0.102</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.115</span><span class="op">}</span>,</span>
+<span>  nat.death <span class="op">=</span> <span class="fu"><a href="../reference/rresgompertz.html">rresgompertz</a></span><span class="op">(</span><span class="fl">1</span>,shape<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">Sex</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span><span class="op">{</span><span class="fl">0.102</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.115</span><span class="op">}</span>,</span>
 <span>                               rate<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">Sex</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span><span class="op">{</span><span class="fl">0.000016</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.0000041</span><span class="op">}</span>,</span>
 <span>                               lower_bound <span class="op">=</span> <span class="va">BLAge</span><span class="op">)</span> <span class="co"># Baseline Age in years</span></span>
 <span>  <span class="op">)</span></span>
@@ -456,15 +456,13 @@ defined for each patient in the simulated data set.</p>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
 <span>  cost_instant_list <span class="op">=</span> <span class="va">cost_instant</span>,</span>
-<span>  drc <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for costs</span></span>
-<span>  drq <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for QALYs</span></span>
 <span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLAge"</span>,<span class="st">"Sex"</span>,<span class="st">"nat.death"</span>,<span class="st">"pfs.time"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 1.37s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 1: 1.37s"</span></span>
-<span><span class="co">#&gt; [1] "Total time to run: 1.37s"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.78s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.78s"</span></span>
+<span><span class="co">#&gt; [1] "Total time to run: 0.78s"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -480,33 +478,45 @@ simulation is recorded in the <code>psa_ipd</code> object.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#will print the last simulation!</span></span>
-<span><span class="co">#&gt;                                   int       ref</span></span>
-<span><span class="co">#&gt; costs                       136014.79 100382.81</span></span>
-<span><span class="co">#&gt; lys                              3.69      2.86</span></span>
-<span><span class="co">#&gt; qalys                            1.75      1.24</span></span>
-<span><span class="co">#&gt; ICER                               NA  42674.04</span></span>
-<span><span class="co">#&gt; ICUR                               NA  70612.24</span></span>
-<span><span class="co">#&gt; costs_undisc                142949.43 110178.98</span></span>
-<span><span class="co">#&gt; lys_undisc                       4.16      3.13</span></span>
-<span><span class="co">#&gt; qalys_undisc                     1.95      1.35</span></span>
-<span><span class="co">#&gt; ICER_undisc                        NA  31805.97</span></span>
-<span><span class="co">#&gt; ICUR_undisc                        NA  55364.57</span></span>
-<span><span class="co">#&gt; cost_default_ongoing        136014.79 100082.81</span></span>
-<span><span class="co">#&gt; cost_default_ongoing_undisc 142949.43 109878.98</span></span>
-<span><span class="co">#&gt; cost_default_instant             0.00    300.00</span></span>
-<span><span class="co">#&gt; cost_default_instant_undisc      0.00    300.00</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing             1.75      1.24</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing_undisc      1.95      1.35</span></span>
-<span><span class="co">#&gt; BLAge                           59.75     59.75</span></span>
-<span><span class="co">#&gt; Sex                              0.51      0.51</span></span>
-<span><span class="co">#&gt; nat.death                       24.28     24.28</span></span>
-<span><span class="co">#&gt; pfs.time                         1.49      0.52</span></span>
-<span><span class="co">#&gt; total_lys                        3.69      2.86</span></span>
-<span><span class="co">#&gt; total_qalys                      1.75      1.24</span></span>
-<span><span class="co">#&gt; total_costs                 136014.79 100382.81</span></span>
-<span><span class="co">#&gt; total_lys_undisc                 4.16      3.13</span></span>
-<span><span class="co">#&gt; total_qalys_undisc               1.95      1.35</span></span>
-<span><span class="co">#&gt; total_costs_undisc          142949.43 110178.98</span></span>
+<span><span class="co">#&gt;                                    int       ref</span></span>
+<span><span class="co">#&gt; costs                        141680.40  96091.69</span></span>
+<span><span class="co">#&gt; dcosts                            0.00  45588.71</span></span>
+<span><span class="co">#&gt; lys                               3.57      2.74</span></span>
+<span><span class="co">#&gt; dlys                              0.00      0.84</span></span>
+<span><span class="co">#&gt; qalys                             1.71      1.21</span></span>
+<span><span class="co">#&gt; dqalys                            0.00      0.51</span></span>
+<span><span class="co">#&gt; ICER                                NA  54509.20</span></span>
+<span><span class="co">#&gt; ICUR                                NA  89594.93</span></span>
+<span><span class="co">#&gt; INMB                                NA -20147.14</span></span>
+<span><span class="co">#&gt; costs_undisc                 148163.29 103600.47</span></span>
+<span><span class="co">#&gt; dcosts_undisc                     0.00  44562.81</span></span>
+<span><span class="co">#&gt; lys_undisc                        3.94      2.95</span></span>
+<span><span class="co">#&gt; dlys_undisc                       0.00      0.99</span></span>
+<span><span class="co">#&gt; qalys_undisc                      1.87      1.29</span></span>
+<span><span class="co">#&gt; dqalys_undisc                     0.00      0.58</span></span>
+<span><span class="co">#&gt; ICER_undisc                         NA  44902.60</span></span>
+<span><span class="co">#&gt; ICUR_undisc                         NA  76775.12</span></span>
+<span><span class="co">#&gt; INMB_undisc                         NA -15541.16</span></span>
+<span><span class="co">#&gt; cost_default_ongoing         141680.40  95791.69</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing             0.00  45888.71</span></span>
+<span><span class="co">#&gt; cost_default_ongoing_undisc  148163.29 103300.47</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing_undisc      0.00  44862.81</span></span>
+<span><span class="co">#&gt; cost_default_instant              0.00    300.00</span></span>
+<span><span class="co">#&gt; dcost_default_instant             0.00   -300.00</span></span>
+<span><span class="co">#&gt; cost_default_instant_undisc       0.00    300.00</span></span>
+<span><span class="co">#&gt; dcost_default_instant_undisc      0.00   -300.00</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing              1.71      1.21</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing             0.00      0.51</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing_undisc       1.87      1.29</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing_undisc      0.00      0.58</span></span>
+<span><span class="co">#&gt; BLAge                            59.77     59.74</span></span>
+<span><span class="co">#&gt; dBLAge                            0.00      0.02</span></span>
+<span><span class="co">#&gt; Sex                               0.51      0.51</span></span>
+<span><span class="co">#&gt; dSex                              0.00      0.01</span></span>
+<span><span class="co">#&gt; nat.death                        23.83     23.85</span></span>
+<span><span class="co">#&gt; dnat.death                        0.00     -0.02</span></span>
+<span><span class="co">#&gt; pfs.time                          1.51      0.54</span></span>
+<span><span class="co">#&gt; dpfs.time                         0.00      0.97</span></span>
 <span></span>
 <span><span class="va">psa_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span> </span>
 <span></span>
@@ -612,7 +622,7 @@ Start
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0000000
+0.000000
 </td>
 <td style="text-align:right;">
 1
@@ -621,22 +631,22 @@ Start
 int
 </td>
 <td style="text-align:right;">
-6.762667
+1.5055640
 </td>
 <td style="text-align:right;">
-2.962797
+0.9033384
 </td>
 <td style="text-align:right;">
-145925.9
+138511.88
 </td>
 <td style="text-align:right;">
-153161.3
+141688.56
 </td>
 <td style="text-align:right;">
-3.342632
+0.9240559
 </td>
 <td style="text-align:right;">
-7.697537
+1.5400931
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -663,7 +673,7 @@ int
 0
 </td>
 <td style="text-align:right;">
-15.91429
+17.640804
 </td>
 <td style="text-align:right;">
 NA
@@ -698,10 +708,10 @@ NA
 PAE
 </td>
 <td style="text-align:right;">
-0.2684478
+1.4598976
 </td>
 <td style="text-align:right;">
-0.0000000
+0.000000
 </td>
 <td style="text-align:right;">
 1
@@ -710,40 +720,40 @@ PAE
 int
 </td>
 <td style="text-align:right;">
-6.762667
+1.5055640
 </td>
 <td style="text-align:right;">
-2.962797
+0.9033384
 </td>
 <td style="text-align:right;">
-145925.9
+138511.88
 </td>
 <td style="text-align:right;">
-153161.3
+141688.56
 </td>
 <td style="text-align:right;">
-3.342632
+0.9240559
 </td>
 <td style="text-align:right;">
-7.697537
+1.5400931
 </td>
 <td style="text-align:right;">
-0.2672120
+1.4288465
 </td>
 <td style="text-align:right;">
-0.1603272
+0.8573079
 </td>
 <td style="text-align:right;">
-24583.505
+131453.878
 </td>
 <td style="text-align:right;">
-0.2684478
+1.4598976
 </td>
 <td style="text-align:right;">
-0.1610687
+0.8759386
 </td>
 <td style="text-align:right;">
-24697.194
+134310.579
 </td>
 <td style="text-align:right;">
 64.43993
@@ -752,206 +762,28 @@ int
 0
 </td>
 <td style="text-align:right;">
-15.91429
+17.640804
 </td>
 <td style="text-align:right;">
 NA
 </td>
 <td style="text-align:right;">
-24583.505
+131453.878
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.1603272
+0.8573079
 </td>
 <td style="text-align:right;">
-24697.194
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.1610687
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Progression
-</td>
-<td style="text-align:right;">
-1.3180871
-</td>
-<td style="text-align:right;">
-0.2684478
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-6.762667
-</td>
-<td style="text-align:right;">
-2.962797
-</td>
-<td style="text-align:right;">
-145925.9
-</td>
-<td style="text-align:right;">
-153161.3
-</td>
-<td style="text-align:right;">
-3.342632
-</td>
-<td style="text-align:right;">
-7.697537
-</td>
-<td style="text-align:right;">
-1.0214380
-</td>
-<td style="text-align:right;">
-0.6128628
-</td>
-<td style="text-align:right;">
-93972.292
-</td>
-<td style="text-align:right;">
-1.0496393
-</td>
-<td style="text-align:right;">
-0.6297836
-</td>
-<td style="text-align:right;">
-96566.818
-</td>
-<td style="text-align:right;">
-64.43993
+134310.579
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-15.91429
-</td>
-<td style="text-align:right;">
-1.318087
-</td>
-<td style="text-align:right;">
-93972.292
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.6128628
-</td>
-<td style="text-align:right;">
-96566.818
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.6297836
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-TxDisc
-</td>
-<td style="text-align:right;">
-1.3180871
-</td>
-<td style="text-align:right;">
-1.3180871
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-6.762667
-</td>
-<td style="text-align:right;">
-2.962797
-</td>
-<td style="text-align:right;">
-145925.9
-</td>
-<td style="text-align:right;">
-153161.3
-</td>
-<td style="text-align:right;">
-3.342632
-</td>
-<td style="text-align:right;">
-7.697537
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-64.43993
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-15.91429
-</td>
-<td style="text-align:right;">
-1.318087
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
+0.8759386
 </td>
 <td style="text-align:right;">
 1
@@ -965,10 +797,10 @@ int
 Death
 </td>
 <td style="text-align:right;">
-7.6975370
+1.5400931
 </td>
 <td style="text-align:right;">
-1.3180871
+1.459898
 </td>
 <td style="text-align:right;">
 1
@@ -977,40 +809,40 @@ Death
 int
 </td>
 <td style="text-align:right;">
-6.762667
+1.5055640
 </td>
 <td style="text-align:right;">
-2.962797
+0.9033384
 </td>
 <td style="text-align:right;">
-145925.9
+138511.88
 </td>
 <td style="text-align:right;">
-153161.3
+141688.56
 </td>
 <td style="text-align:right;">
-3.342632
+0.9240559
 </td>
 <td style="text-align:right;">
-7.697537
+1.5400931
 </td>
 <td style="text-align:right;">
-5.4740170
+0.0767175
 </td>
 <td style="text-align:right;">
-2.1896068
+0.0460305
 </td>
 <td style="text-align:right;">
-27370.085
+7058.007
 </td>
 <td style="text-align:right;">
-6.3794499
+0.0801955
 </td>
 <td style="text-align:right;">
-2.5517800
+0.0481173
 </td>
 <td style="text-align:right;">
-31897.250
+7377.985
 </td>
 <td style="text-align:right;">
 64.43993
@@ -1019,28 +851,28 @@ int
 0
 </td>
 <td style="text-align:right;">
-15.91429
+17.640804
 </td>
 <td style="text-align:right;">
-1.318087
+NA
 </td>
 <td style="text-align:right;">
-27370.085
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-2.1896068
-</td>
-<td style="text-align:right;">
-31897.250
+7058.007
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-2.5517800
+0.0460305
+</td>
+<td style="text-align:right;">
+7377.985
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0481173
 </td>
 <td style="text-align:right;">
 1
@@ -1057,7 +889,7 @@ Start
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0000000
+0.000000
 </td>
 <td style="text-align:right;">
 2
@@ -1066,22 +898,22 @@ Start
 int
 </td>
 <td style="text-align:right;">
-2.349831
+2.1750928
 </td>
 <td style="text-align:right;">
-1.323783
+1.3050557
 </td>
 <td style="text-align:right;">
-178724.0
+200108.54
 </td>
 <td style="text-align:right;">
-184993.7
+206831.08
 </td>
 <td style="text-align:right;">
-1.377212
+1.3488984
 </td>
 <td style="text-align:right;">
-2.450258
+2.2481639
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1108,7 +940,7 @@ int
 0
 </td>
 <td style="text-align:right;">
-26.65978
+21.400254
 </td>
 <td style="text-align:right;">
 NA
@@ -1143,10 +975,10 @@ NA
 PAE
 </td>
 <td style="text-align:right;">
-0.1375550
+1.3959764
 </td>
 <td style="text-align:right;">
-0.0000000
+0.000000
 </td>
 <td style="text-align:right;">
 2
@@ -1155,40 +987,40 @@ PAE
 int
 </td>
 <td style="text-align:right;">
-2.349831
+2.1750928
 </td>
 <td style="text-align:right;">
-1.323783
+1.3050557
 </td>
 <td style="text-align:right;">
-178724.0
+200108.54
 </td>
 <td style="text-align:right;">
-184993.7
+206831.08
 </td>
 <td style="text-align:right;">
-1.377212
+1.3488984
 </td>
 <td style="text-align:right;">
-2.450258
+2.2481639
 </td>
 <td style="text-align:right;">
-0.1372301
+1.3675671
 </td>
 <td style="text-align:right;">
-0.0823380
+0.8205403
 </td>
 <td style="text-align:right;">
-12625.167
+125816.172
 </td>
 <td style="text-align:right;">
-0.1375550
+1.3959764
 </td>
 <td style="text-align:right;">
-0.0825330
+0.8375858
 </td>
 <td style="text-align:right;">
-12655.062
+128429.824
 </td>
 <td style="text-align:right;">
 65.07078
@@ -1197,28 +1029,28 @@ int
 0
 </td>
 <td style="text-align:right;">
-26.65978
+21.400254
 </td>
 <td style="text-align:right;">
 NA
 </td>
 <td style="text-align:right;">
-12625.167
+125816.172
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.0823380
+0.8205403
 </td>
 <td style="text-align:right;">
-12655.062
+128429.824
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.0825330
+0.8375858
 </td>
 <td style="text-align:right;">
 1
@@ -1229,13 +1061,13 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
-Progression
+Death
 </td>
 <td style="text-align:right;">
-1.9855454
+2.2481639
 </td>
 <td style="text-align:right;">
-0.1375550
+1.395976
 </td>
 <td style="text-align:right;">
 2
@@ -1244,40 +1076,40 @@ Progression
 int
 </td>
 <td style="text-align:right;">
-2.349831
+2.1750928
 </td>
 <td style="text-align:right;">
-1.323783
+1.3050557
 </td>
 <td style="text-align:right;">
-178724.0
+200108.54
 </td>
 <td style="text-align:right;">
-184993.7
+206831.08
 </td>
 <td style="text-align:right;">
-1.377212
+1.3488984
 </td>
 <td style="text-align:right;">
-2.450258
+2.2481639
 </td>
 <td style="text-align:right;">
-1.7820214
+0.8075257
 </td>
 <td style="text-align:right;">
-1.0692128
+0.4845154
 </td>
 <td style="text-align:right;">
-163945.967
+74292.365
 </td>
 <td style="text-align:right;">
-1.8479904
+0.8521876
 </td>
 <td style="text-align:right;">
-1.1087942
+0.5113125
 </td>
 <td style="text-align:right;">
-170015.116
+78401.257
 </td>
 <td style="text-align:right;">
 65.07078
@@ -1286,28 +1118,28 @@ int
 0
 </td>
 <td style="text-align:right;">
-26.65978
+21.400254
 </td>
 <td style="text-align:right;">
-1.985545
+NA
 </td>
 <td style="text-align:right;">
-163945.967
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1.0692128
-</td>
-<td style="text-align:right;">
-170015.116
+74292.365
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-1.1087942
+0.4845154
+</td>
+<td style="text-align:right;">
+78401.257
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.5113125
 </td>
 <td style="text-align:right;">
 1
@@ -1318,37 +1150,37 @@ int
 </tr>
 <tr>
 <td style="text-align:left;">
-TxDisc
+Start
 </td>
 <td style="text-align:right;">
-1.9855454
+0.0000000
 </td>
 <td style="text-align:right;">
-1.9855454
+0.000000
 </td>
 <td style="text-align:right;">
-2
+3
 </td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-2.349831
+0.5544693
 </td>
 <td style="text-align:right;">
-1.323783
+0.3326816
 </td>
 <td style="text-align:right;">
-178724.0
+51011.17
 </td>
 <td style="text-align:right;">
-184993.7
+51433.82
 </td>
 <td style="text-align:right;">
-1.377212
+0.3354379
 </td>
 <td style="text-align:right;">
-2.450258
+0.5590632
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1369,16 +1201,16 @@ int
 0.000
 </td>
 <td style="text-align:right;">
-65.07078
+59.49900
 </td>
 <td style="text-align:right;">
-0
+1
 </td>
 <td style="text-align:right;">
-26.65978
+12.385984
 </td>
 <td style="text-align:right;">
-1.985545
+NA
 </td>
 <td style="text-align:right;">
 0.000
@@ -1410,82 +1242,260 @@ int
 Death
 </td>
 <td style="text-align:right;">
-2.4502583
+0.5590632
 </td>
 <td style="text-align:right;">
-1.9855454
+0.000000
 </td>
 <td style="text-align:right;">
-2
+3
 </td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-2.349831
+0.5544693
 </td>
 <td style="text-align:right;">
-1.323783
+0.3326816
 </td>
 <td style="text-align:right;">
-178724.0
+51011.17
 </td>
 <td style="text-align:right;">
-184993.7
+51433.82
 </td>
 <td style="text-align:right;">
-1.377212
+0.3354379
 </td>
 <td style="text-align:right;">
-2.450258
+0.5590632
 </td>
 <td style="text-align:right;">
-0.4305793
+0.5544693
 </td>
 <td style="text-align:right;">
-0.1722317
+0.3326816
 </td>
 <td style="text-align:right;">
-2152.896
+51011.172
 </td>
 <td style="text-align:right;">
-0.4647129
+0.5590632
 </td>
 <td style="text-align:right;">
-0.1858852
+0.3354379
 </td>
 <td style="text-align:right;">
-2323.565
+51433.819
 </td>
 <td style="text-align:right;">
-65.07078
+59.49900
 </td>
 <td style="text-align:right;">
-0
+1
 </td>
 <td style="text-align:right;">
-26.65978
+12.385984
 </td>
 <td style="text-align:right;">
-1.985545
+NA
 </td>
 <td style="text-align:right;">
-2152.896
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.1722317
-</td>
-<td style="text-align:right;">
-2323.565
+51011.172
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.1858852
+0.3326816
+</td>
+<td style="text-align:right;">
+51433.819
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.3354379
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Start
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+int
+</td>
+<td style="text-align:right;">
+0.9496596
+</td>
+<td style="text-align:right;">
+0.5697957
+</td>
+<td style="text-align:right;">
+87368.68
+</td>
+<td style="text-align:right;">
+88618.38
+</td>
+<td style="text-align:right;">
+0.5779459
+</td>
+<td style="text-align:right;">
+0.9632432
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+51.58496
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+7.747782
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAE
+</td>
+<td style="text-align:right;">
+0.9565434
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+int
+</td>
+<td style="text-align:right;">
+0.9496596
+</td>
+<td style="text-align:right;">
+0.5697957
+</td>
+<td style="text-align:right;">
+87368.68
+</td>
+<td style="text-align:right;">
+88618.38
+</td>
+<td style="text-align:right;">
+0.5779459
+</td>
+<td style="text-align:right;">
+0.9632432
+</td>
+<td style="text-align:right;">
+0.9431472
+</td>
+<td style="text-align:right;">
+0.5658883
+</td>
+<td style="text-align:right;">
+86769.541
+</td>
+<td style="text-align:right;">
+0.9565434
+</td>
+<td style="text-align:right;">
+0.5739261
+</td>
+<td style="text-align:right;">
+88001.995
+</td>
+<td style="text-align:right;">
+51.58496
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+7.747782
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+86769.541
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.5658883
+</td>
+<td style="text-align:right;">
+88001.995
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.5739261
 </td>
 <td style="text-align:right;">
 1
@@ -1541,7 +1551,7 @@ int
 PAE
 </td>
 <td style="text-align:right;">
-417
+411
 </td>
 </tr>
 <tr>
@@ -1552,7 +1562,7 @@ int
 Progression
 </td>
 <td style="text-align:right;">
-358
+322
 </td>
 </tr>
 <tr>
@@ -1563,7 +1573,7 @@ int
 TxDisc
 </td>
 <td style="text-align:right;">
-358
+322
 </td>
 </tr>
 <tr>
@@ -1596,7 +1606,7 @@ ref
 Progression
 </td>
 <td style="text-align:right;">
-440
+439
 </td>
 </tr>
 <tr>
@@ -1607,7 +1617,7 @@ ref
 PAE
 </td>
 <td style="text-align:right;">
-404
+395
 </td>
 </tr>
 </tbody>

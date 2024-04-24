@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">March 21, 2024</h4>
+            <h4 data-toc-skip class="date">April 24, 2024</h4>
       
       
       <div class="d-none name"><code>example_eBC.Rmd</code></div>
@@ -126,7 +126,7 @@ be simulated equal to 1.</p>
 <span><span class="co">#&gt; Loading required package: survival</span></span>
 <span><span class="co">#&gt; Warning: package 'survival' was built under R version 4.3.2</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.3.2</span></span>
+<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.3.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: package 'kableExtra' was built under R version 4.3.2</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -227,7 +227,7 @@ just <code>qaly</code>).</p>
 <span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#costs</span></span>
 <span>    cost_v <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">psa_bool</span><span class="op">)</span><span class="op">{</span></span>
-<span>                     <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="../reference/draw_gamma.html">draw_gamma</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="co">#in this case I choose a gamma distribution</span></span>
+<span>                     <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="../reference/rgamma_mse.html">rgamma_mse</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="co">#in this case I choose a gamma distribution</span></span>
 <span>             <span class="op">}</span> <span class="kw">else</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span><span class="op">}</span>,</span>
 <span>    cost.idfs.tx  <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.idfs.tx"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>    cost.recurrence  <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.recurrence"</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -242,7 +242,7 @@ just <code>qaly</code>).</p>
 <span>    <span class="op">)</span></span>
 <span><span class="co">#Put objects here that do not change as we loop through interventions for a patient</span></span>
 <span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>sex_pt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,p<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span>,<span class="st">"male"</span>,<span class="st">"female"</span><span class="op">)</span>,</span>
-<span>                             nat.os.s <span class="op">=</span> <span class="fu"><a href="../reference/draw_resgompertz.html">draw_resgompertz</a></span><span class="op">(</span><span class="fl">1</span>,</span>
+<span>                             nat.os.s <span class="op">=</span> <span class="fu"><a href="../reference/rresgompertz.html">rresgompertz</a></span><span class="op">(</span><span class="fl">1</span>,</span>
 <span>                                                     shape<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">sex_pt</span><span class="op">==</span><span class="st">"male"</span><span class="op">)</span><span class="op">{</span><span class="fl">0.102</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.115</span><span class="op">}</span>,</span>
 <span>                                                     rate<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">sex_pt</span><span class="op">==</span><span class="st">"male"</span><span class="op">)</span><span class="op">{</span><span class="fl">0.000016</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.0000041</span><span class="op">}</span>,</span>
 <span>                                                     lower_bound <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">)</span> <span class="co">#in years, for a patient who is 50yo</span></span>
@@ -702,8 +702,6 @@ time of the model.</p>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
 <span>  cost_instant_list <span class="op">=</span> <span class="va">cost_instant</span>,</span>
-<span>  drc <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for costs</span></span>
-<span>  drq <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for QALYs</span></span>
 <span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>                            <span class="co"># list of additional outputs (Flags, etc) that the user wants to export for each patient and event</span></span>
 <span>                <span class="st">"os.early"</span>,</span>
 <span>                <span class="st">"os.mbc"</span>,</span>
@@ -713,11 +711,11 @@ time of the model.</p>
 <span>          <span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; Warning in run_sim(npats = 2000, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item util_v is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
-<span><span class="co">#&gt; Warning in run_sim(npats = 2000, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item cost_v is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 6.19s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 1: 6.19s"</span></span>
-<span><span class="co">#&gt; [1] "Total time to run: 6.19s"</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning in run_sim(npats = 2000, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item util_v is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
+<span><span class="co">#&gt; Warning in run_sim(npats = 2000, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item cost_v is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 4.8s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 1: 4.8s"</span></span>
+<span><span class="co">#&gt; [1] "Total time to run: 4.8s"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -737,68 +735,119 @@ generated by the simulation, which we collect here to plot in the
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#will print the last simulation!</span></span>
-<span><span class="co">#&gt;                                   int     noint</span></span>
-<span><span class="co">#&gt; costs                       369224.97 267125.06</span></span>
-<span><span class="co">#&gt; lys                             13.07     11.84</span></span>
-<span><span class="co">#&gt; qalys                            9.89      8.93</span></span>
-<span><span class="co">#&gt; ICER                               NA  83129.83</span></span>
-<span><span class="co">#&gt; ICUR                               NA 106017.74</span></span>
-<span><span class="co">#&gt; costs_undisc                458453.63 324435.54</span></span>
-<span><span class="co">#&gt; lys_undisc                      17.73     15.43</span></span>
-<span><span class="co">#&gt; qalys_undisc                    13.32     11.57</span></span>
-<span><span class="co">#&gt; ICER_undisc                        NA  58044.25</span></span>
-<span><span class="co">#&gt; ICUR_undisc                        NA  76515.21</span></span>
-<span><span class="co">#&gt; cost_default_ongoing        368732.13 266557.51</span></span>
-<span><span class="co">#&gt; cost_default_ongoing_undisc 457835.13 323741.04</span></span>
-<span><span class="co">#&gt; cost_default_instant           492.83    567.55</span></span>
-<span><span class="co">#&gt; cost_default_instant_undisc    618.50    694.50</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing             9.89      8.93</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing_undisc     13.32     11.57</span></span>
-<span><span class="co">#&gt; os.early                        20.51     17.02</span></span>
-<span><span class="co">#&gt; os.mbc                          21.63     19.41</span></span>
-<span><span class="co">#&gt; nat.os.s                        35.06     35.06</span></span>
+<span><span class="co">#&gt;                                    int     noint</span></span>
+<span><span class="co">#&gt; costs                        379798.85 275953.25</span></span>
+<span><span class="co">#&gt; dcosts                            0.00 103845.59</span></span>
+<span><span class="co">#&gt; lys                              13.64     12.29</span></span>
+<span><span class="co">#&gt; dlys                              0.00      1.36</span></span>
+<span><span class="co">#&gt; qalys                            10.32      9.29</span></span>
+<span><span class="co">#&gt; dqalys                            0.00      1.03</span></span>
+<span><span class="co">#&gt; ICER                                NA  76564.20</span></span>
+<span><span class="co">#&gt; ICUR                                NA 100955.29</span></span>
+<span><span class="co">#&gt; INMB                                NA -52414.11</span></span>
+<span><span class="co">#&gt; costs_undisc                 459151.49 327330.98</span></span>
+<span><span class="co">#&gt; dcosts_undisc                     0.00 131820.52</span></span>
+<span><span class="co">#&gt; lys_undisc                       17.80     15.47</span></span>
+<span><span class="co">#&gt; dlys_undisc                       0.00      2.34</span></span>
+<span><span class="co">#&gt; qalys_undisc                     13.37     11.64</span></span>
+<span><span class="co">#&gt; dqalys_undisc                     0.00      1.73</span></span>
+<span><span class="co">#&gt; ICER_undisc                         NA  56438.84</span></span>
+<span><span class="co">#&gt; ICUR_undisc                         NA  76157.99</span></span>
+<span><span class="co">#&gt; INMB_undisc                         NA -45276.40</span></span>
+<span><span class="co">#&gt; cost_default_ongoing         379335.22 275343.48</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing             0.00 103991.74</span></span>
+<span><span class="co">#&gt; cost_default_ongoing_undisc  458586.99 326606.48</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing_undisc      0.00 131980.52</span></span>
+<span><span class="co">#&gt; cost_default_instant            463.63    609.78</span></span>
+<span><span class="co">#&gt; dcost_default_instant             0.00   -146.15</span></span>
+<span><span class="co">#&gt; cost_default_instant_undisc     564.50    724.50</span></span>
+<span><span class="co">#&gt; dcost_default_instant_undisc      0.00   -160.00</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing             10.32      9.29</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing             0.00      1.03</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing_undisc      13.37     11.64</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing_undisc      0.00      1.73</span></span>
+<span><span class="co">#&gt; os.early                         20.64     17.19</span></span>
+<span><span class="co">#&gt; dos.early                         0.00      3.45</span></span>
+<span><span class="co">#&gt; os.mbc                           21.78     19.61</span></span>
+<span><span class="co">#&gt; dos.mbc                           0.00      2.17</span></span>
+<span><span class="co">#&gt; nat.os.s                         34.24     34.23</span></span>
+<span><span class="co">#&gt; dnat.os.s                         0.00      0.01</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                                                         int</span></span>
-<span><span class="co">#&gt; costs                                369225(369225, 369225)</span></span>
-<span><span class="co">#&gt; lys                                     13.07(13.07, 13.07)</span></span>
-<span><span class="co">#&gt; qalys                                      9.89(9.89, 9.89)</span></span>
-<span><span class="co">#&gt; ICER                                            NaN(NA, NA)</span></span>
-<span><span class="co">#&gt; ICUR                                            NaN(NA, NA)</span></span>
-<span><span class="co">#&gt; costs_undisc                         458454(458454, 458454)</span></span>
-<span><span class="co">#&gt; lys_undisc                              17.73(17.73, 17.73)</span></span>
-<span><span class="co">#&gt; qalys_undisc                            13.32(13.32, 13.32)</span></span>
-<span><span class="co">#&gt; ICER_undisc                                     NaN(NA, NA)</span></span>
-<span><span class="co">#&gt; ICUR_undisc                                     NaN(NA, NA)</span></span>
-<span><span class="co">#&gt; cost_default_ongoing        368732.13(368732.13, 368732.13)</span></span>
-<span><span class="co">#&gt; cost_default_ongoing_undisc 457835.13(457835.13, 457835.13)</span></span>
-<span><span class="co">#&gt; cost_default_instant                 492.83(492.83, 492.83)</span></span>
-<span><span class="co">#&gt; cost_default_instant_undisc             618.5(618.5, 618.5)</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing                       9.89(9.89, 9.89)</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing_undisc             13.32(13.32, 13.32)</span></span>
-<span><span class="co">#&gt; os.early                                20.51(20.51, 20.51)</span></span>
-<span><span class="co">#&gt; os.mbc                                  21.63(21.63, 21.63)</span></span>
-<span><span class="co">#&gt; nat.os.s                                35.06(35.06, 35.06)</span></span>
-<span><span class="co">#&gt;                                                       noint</span></span>
-<span><span class="co">#&gt; costs                                267125(267125, 267125)</span></span>
-<span><span class="co">#&gt; lys                                     11.84(11.84, 11.84)</span></span>
-<span><span class="co">#&gt; qalys                                      8.93(8.93, 8.93)</span></span>
-<span><span class="co">#&gt; ICER                                    83130(83130, 83130)</span></span>
-<span><span class="co">#&gt; ICUR                                 106018(106018, 106018)</span></span>
-<span><span class="co">#&gt; costs_undisc                         324436(324436, 324436)</span></span>
-<span><span class="co">#&gt; lys_undisc                              15.43(15.43, 15.43)</span></span>
-<span><span class="co">#&gt; qalys_undisc                            11.57(11.57, 11.57)</span></span>
-<span><span class="co">#&gt; ICER_undisc                             58044(58044, 58044)</span></span>
-<span><span class="co">#&gt; ICUR_undisc                             76515(76515, 76515)</span></span>
-<span><span class="co">#&gt; cost_default_ongoing        266557.51(266557.51, 266557.51)</span></span>
-<span><span class="co">#&gt; cost_default_ongoing_undisc 323741.04(323741.04, 323741.04)</span></span>
-<span><span class="co">#&gt; cost_default_instant                 567.55(567.55, 567.55)</span></span>
-<span><span class="co">#&gt; cost_default_instant_undisc             694.5(694.5, 694.5)</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing                       8.93(8.93, 8.93)</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing_undisc             11.57(11.57, 11.57)</span></span>
-<span><span class="co">#&gt; os.early                                17.02(17.02, 17.02)</span></span>
-<span><span class="co">#&gt; os.mbc                                  19.41(19.41, 19.41)</span></span>
-<span><span class="co">#&gt; nat.os.s                                35.06(35.06, 35.06)</span></span>
+<span><span class="co">#&gt;                                                           int</span></span>
+<span><span class="co">#&gt; costs                              379,799 (379,799; 379,799)</span></span>
+<span><span class="co">#&gt; dcosts                                               0 (0; 0)</span></span>
+<span><span class="co">#&gt; lys                                      13.64 (13.64; 13.64)</span></span>
+<span><span class="co">#&gt; dlys                                                 0 (0; 0)</span></span>
+<span><span class="co">#&gt; qalys                                    10.32 (10.32; 10.32)</span></span>
+<span><span class="co">#&gt; dqalys                                               0 (0; 0)</span></span>
+<span><span class="co">#&gt; ICER                                             NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; ICUR                                             NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; INMB                                             NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; costs_undisc                       459,151 (459,151; 459,151)</span></span>
+<span><span class="co">#&gt; dcosts_undisc                                        0 (0; 0)</span></span>
+<span><span class="co">#&gt; lys_undisc                                  17.8 (17.8; 17.8)</span></span>
+<span><span class="co">#&gt; dlys_undisc                                          0 (0; 0)</span></span>
+<span><span class="co">#&gt; qalys_undisc                             13.37 (13.37; 13.37)</span></span>
+<span><span class="co">#&gt; dqalys_undisc                                        0 (0; 0)</span></span>
+<span><span class="co">#&gt; ICER_undisc                                      NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; ICUR_undisc                                      NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; INMB_undisc                                      NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; cost_default_ongoing         379,335.2 (379,335.2; 379,335.2)</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing                                0 (0; 0)</span></span>
+<span><span class="co">#&gt; cost_default_ongoing_undisc        458,587 (458,587; 458,587)</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing_undisc                         0 (0; 0)</span></span>
+<span><span class="co">#&gt; cost_default_instant                  463.63 (463.63; 463.63)</span></span>
+<span><span class="co">#&gt; dcost_default_instant                                0 (0; 0)</span></span>
+<span><span class="co">#&gt; cost_default_instant_undisc              564.5 (564.5; 564.5)</span></span>
+<span><span class="co">#&gt; dcost_default_instant_undisc                         0 (0; 0)</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing                     10.32 (10.32; 10.32)</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing                                0 (0; 0)</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing_undisc              13.37 (13.37; 13.37)</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing_undisc                         0 (0; 0)</span></span>
+<span><span class="co">#&gt; os.early                                 20.64 (20.64; 20.64)</span></span>
+<span><span class="co">#&gt; dos.early                                            0 (0; 0)</span></span>
+<span><span class="co">#&gt; os.mbc                                   21.78 (21.78; 21.78)</span></span>
+<span><span class="co">#&gt; dos.mbc                                              0 (0; 0)</span></span>
+<span><span class="co">#&gt; nat.os.s                                 34.24 (34.24; 34.24)</span></span>
+<span><span class="co">#&gt; dnat.os.s                                            0 (0; 0)</span></span>
+<span><span class="co">#&gt;                                                         noint</span></span>
+<span><span class="co">#&gt; costs                              275,953 (275,953; 275,953)</span></span>
+<span><span class="co">#&gt; dcosts                             103,846 (103,846; 103,846)</span></span>
+<span><span class="co">#&gt; lys                                      12.29 (12.29; 12.29)</span></span>
+<span><span class="co">#&gt; dlys                                     1.356 (1.356; 1.356)</span></span>
+<span><span class="co">#&gt; qalys                                       9.29 (9.29; 9.29)</span></span>
+<span><span class="co">#&gt; dqalys                                   1.029 (1.029; 1.029)</span></span>
+<span><span class="co">#&gt; ICER                                  76,564 (76,564; 76,564)</span></span>
+<span><span class="co">#&gt; ICUR                               100,955 (100,955; 100,955)</span></span>
+<span><span class="co">#&gt; INMB                               -52,414 (-52,414; -52,414)</span></span>
+<span><span class="co">#&gt; costs_undisc                       327,331 (327,331; 327,331)</span></span>
+<span><span class="co">#&gt; dcosts_undisc                      131,821 (131,821; 131,821)</span></span>
+<span><span class="co">#&gt; lys_undisc                               15.47 (15.47; 15.47)</span></span>
+<span><span class="co">#&gt; dlys_undisc                              2.336 (2.336; 2.336)</span></span>
+<span><span class="co">#&gt; qalys_undisc                             11.64 (11.64; 11.64)</span></span>
+<span><span class="co">#&gt; dqalys_undisc                            1.731 (1.731; 1.731)</span></span>
+<span><span class="co">#&gt; ICER_undisc                           56,439 (56,439; 56,439)</span></span>
+<span><span class="co">#&gt; ICUR_undisc                           76,158 (76,158; 76,158)</span></span>
+<span><span class="co">#&gt; INMB_undisc                        -45,276 (-45,276; -45,276)</span></span>
+<span><span class="co">#&gt; cost_default_ongoing         275,343.5 (275,343.5; 275,343.5)</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing        103,991.7 (103,991.7; 103,991.7)</span></span>
+<span><span class="co">#&gt; cost_default_ongoing_undisc  326,606.5 (326,606.5; 326,606.5)</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing_undisc 131,980.5 (131,980.5; 131,980.5)</span></span>
+<span><span class="co">#&gt; cost_default_instant                  609.78 (609.78; 609.78)</span></span>
+<span><span class="co">#&gt; dcost_default_instant           -146.146 (-146.146; -146.146)</span></span>
+<span><span class="co">#&gt; cost_default_instant_undisc              724.5 (724.5; 724.5)</span></span>
+<span><span class="co">#&gt; dcost_default_instant_undisc                -160 (-160; -160)</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing                        9.29 (9.29; 9.29)</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing                    1.029 (1.029; 1.029)</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing_undisc              11.64 (11.64; 11.64)</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing_undisc             1.731 (1.731; 1.731)</span></span>
+<span><span class="co">#&gt; os.early                                 17.19 (17.19; 17.19)</span></span>
+<span><span class="co">#&gt; dos.early                                3.451 (3.451; 3.451)</span></span>
+<span><span class="co">#&gt; os.mbc                                   19.61 (19.61; 19.61)</span></span>
+<span><span class="co">#&gt; dos.mbc                                  2.172 (2.172; 2.172)</span></span>
+<span><span class="co">#&gt; nat.os.s                                 34.23 (34.23; 34.23)</span></span>
+<span><span class="co">#&gt; dnat.os.s                                0.012 (0.012; 0.012)</span></span>
 <span></span>
 <span><span class="va">psa_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span> </span>
 <span></span>
@@ -913,25 +962,25 @@ start
 int
 </td>
 <td style="text-align:right;">
-11.57476
+12.64317
 </td>
 <td style="text-align:right;">
-9.206335
+8.234229
 </td>
 <td style="text-align:right;">
-295186.2
+440586.1
 </td>
 <td style="text-align:right;">
-378646.7
+508817.7
 </td>
 <td style="text-align:right;">
-11.86662
+9.968604
 </td>
 <td style="text-align:right;">
-14.76132
+15.83126
 </td>
 <td style="text-align:right;">
-0.000000
+0.0000000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -949,22 +998,22 @@ int
 0.000
 </td>
 <td style="text-align:right;">
-14.76132
+19.1188
 </td>
 <td style="text-align:right;">
-Inf
+16.08126
 </td>
 <td style="text-align:right;">
-32.61437
+37.76054
 </td>
 <td style="text-align:left;">
 female
 </td>
 <td style="text-align:right;">
-0.0000
+0.000
 </td>
 <td style="text-align:right;">
-0
+0.0000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -974,6 +1023,273 @@ female
 </td>
 <td style="text-align:right;">
 0
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ttot.early
+</td>
+<td style="text-align:right;">
+6.817560
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+int
+</td>
+<td style="text-align:right;">
+12.64317
+</td>
+<td style="text-align:right;">
+8.234229
+</td>
+<td style="text-align:right;">
+440586.1
+</td>
+<td style="text-align:right;">
+508817.7
+</td>
+<td style="text-align:right;">
+9.968604
+</td>
+<td style="text-align:right;">
+15.83126
+</td>
+<td style="text-align:right;">
+6.1745360
+</td>
+<td style="text-align:right;">
+4.6309020
+</td>
+<td style="text-align:right;">
+370472.1597
+</td>
+<td style="text-align:right;">
+6.8175604
+</td>
+<td style="text-align:right;">
+5.1131703
+</td>
+<td style="text-align:right;">
+409053.622
+</td>
+<td style="text-align:right;">
+19.1188
+</td>
+<td style="text-align:right;">
+16.08126
+</td>
+<td style="text-align:right;">
+37.76054
+</td>
+<td style="text-align:left;">
+female
+</td>
+<td style="text-align:right;">
+370472.160
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+4.6309020
+</td>
+<td style="text-align:right;">
+409053.622
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+5.1131703
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ae
+</td>
+<td style="text-align:right;">
+6.817660
+</td>
+<td style="text-align:right;">
+6.817560
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+int
+</td>
+<td style="text-align:right;">
+12.64317
+</td>
+<td style="text-align:right;">
+8.234229
+</td>
+<td style="text-align:right;">
+440586.1
+</td>
+<td style="text-align:right;">
+508817.7
+</td>
+<td style="text-align:right;">
+9.968604
+</td>
+<td style="text-align:right;">
+15.83126
+</td>
+<td style="text-align:right;">
+0.0000817
+</td>
+<td style="text-align:right;">
+0.0000817
+</td>
+<td style="text-align:right;">
+817.4857
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+1000.000
+</td>
+<td style="text-align:right;">
+19.1188
+</td>
+<td style="text-align:right;">
+16.08126
+</td>
+<td style="text-align:right;">
+37.76054
+</td>
+<td style="text-align:left;">
+female
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+817.4857
+</td>
+<td style="text-align:right;">
+0.0000817
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0.0001000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ae
+</td>
+<td style="text-align:right;">
+6.817660
+</td>
+<td style="text-align:right;">
+6.817660
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+int
+</td>
+<td style="text-align:right;">
+12.64317
+</td>
+<td style="text-align:right;">
+8.234229
+</td>
+<td style="text-align:right;">
+440586.1
+</td>
+<td style="text-align:right;">
+508817.7
+</td>
+<td style="text-align:right;">
+9.968604
+</td>
+<td style="text-align:right;">
+15.83126
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+817.4857
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1000.000
+</td>
+<td style="text-align:right;">
+19.1188
+</td>
+<td style="text-align:right;">
+16.08126
+</td>
+<td style="text-align:right;">
+37.76054
+</td>
+<td style="text-align:left;">
+female
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+817.4857
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -990,99 +1306,10 @@ female
 ttot.beva
 </td>
 <td style="text-align:right;">
-8.027943
+7.127105
 </td>
 <td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-11.57476
-</td>
-<td style="text-align:right;">
-9.206335
-</td>
-<td style="text-align:right;">
-295186.2
-</td>
-<td style="text-align:right;">
-378646.7
-</td>
-<td style="text-align:right;">
-11.86662
-</td>
-<td style="text-align:right;">
-14.76132
-</td>
-<td style="text-align:right;">
-7.014770
-</td>
-<td style="text-align:right;">
-5.2610774
-</td>
-<td style="text-align:right;">
-161339.7061
-</td>
-<td style="text-align:right;">
-8.0279426
-</td>
-<td style="text-align:right;">
-6.0209570
-</td>
-<td style="text-align:right;">
-184642.681
-</td>
-<td style="text-align:right;">
-14.76132
-</td>
-<td style="text-align:right;">
-Inf
-</td>
-<td style="text-align:right;">
-32.61437
-</td>
-<td style="text-align:left;">
-female
-</td>
-<td style="text-align:right;">
-161339.7061
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-5.2610774
-</td>
-<td style="text-align:right;">
-184642.681
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-6.0209570
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-ttot.early
-</td>
-<td style="text-align:right;">
-9.530392
-</td>
-<td style="text-align:right;">
-8.027943
+6.817660
 </td>
 <td style="text-align:right;">
 1
@@ -1091,70 +1318,70 @@ ttot.early
 int
 </td>
 <td style="text-align:right;">
-11.57476
+12.64317
 </td>
 <td style="text-align:right;">
-9.206335
+8.234229
 </td>
 <td style="text-align:right;">
-295186.2
+440586.1
 </td>
 <td style="text-align:right;">
-378646.7
+508817.7
 </td>
 <td style="text-align:right;">
-11.86662
+9.968604
 </td>
 <td style="text-align:right;">
-14.76132
+15.83126
 </td>
 <td style="text-align:right;">
-1.110924
+0.2518132
 </td>
 <td style="text-align:right;">
-0.8331931
+0.2518132
 </td>
 <td style="text-align:right;">
-55546.2051
+5791.7040
 </td>
 <td style="text-align:right;">
-1.5024495
+0.3094447
 </td>
 <td style="text-align:right;">
-1.1268371
+0.3094447
 </td>
 <td style="text-align:right;">
-75122.474
+7117.228
 </td>
 <td style="text-align:right;">
-14.76132
+19.1188
 </td>
 <td style="text-align:right;">
-Inf
+16.08126
 </td>
 <td style="text-align:right;">
-32.61437
+37.76054
 </td>
 <td style="text-align:left;">
 female
 </td>
 <td style="text-align:right;">
-55546.2051
+5791.704
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.2518132
+</td>
+<td style="text-align:right;">
+7117.228
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.8331931
-</td>
-<td style="text-align:right;">
-75122.474
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1.1268371
+0.3094447
 </td>
 <td style="text-align:right;">
 1
@@ -1168,10 +1395,10 @@ female
 idfs
 </td>
 <td style="text-align:right;">
-9.640374
+10.387739
 </td>
 <td style="text-align:right;">
-9.530392
+7.127105
 </td>
 <td style="text-align:right;">
 1
@@ -1180,70 +1407,70 @@ idfs
 int
 </td>
 <td style="text-align:right;">
-11.57476
+12.64317
 </td>
 <td style="text-align:right;">
-9.206335
+8.234229
 </td>
 <td style="text-align:right;">
-295186.2
+440586.1
 </td>
 <td style="text-align:right;">
-378646.7
+508817.7
 </td>
 <td style="text-align:right;">
-11.86662
+9.968604
 </td>
 <td style="text-align:right;">
-14.76132
+15.83126
 </td>
 <td style="text-align:right;">
-0.079088
+2.5179617
 </td>
 <td style="text-align:right;">
-0.0790880
+2.5179617
 </td>
 <td style="text-align:right;">
-790.8796
+25179.6167
 </td>
 <td style="text-align:right;">
-0.1099814
+3.2606338
 </td>
 <td style="text-align:right;">
-0.1099814
+3.2606338
 </td>
 <td style="text-align:right;">
-1099.814
+32606.338
 </td>
 <td style="text-align:right;">
-14.76132
+19.1188
 </td>
 <td style="text-align:right;">
-Inf
+16.08126
 </td>
 <td style="text-align:right;">
-32.61437
+37.76054
 </td>
 <td style="text-align:left;">
 female
 </td>
 <td style="text-align:right;">
-790.8796
+25179.617
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+2.5179617
+</td>
+<td style="text-align:right;">
+32606.338
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.0790880
-</td>
-<td style="text-align:right;">
-1099.814
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.1099814
+3.2606338
 </td>
 <td style="text-align:right;">
 1
@@ -1254,102 +1481,13 @@ female
 </tr>
 <tr>
 <td style="text-align:left;">
-remission
+start.early.mbc
 </td>
 <td style="text-align:right;">
-9.640374
+13.571525
 </td>
 <td style="text-align:right;">
-9.640374
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-11.57476
-</td>
-<td style="text-align:right;">
-9.206335
-</td>
-<td style="text-align:right;">
-295186.2
-</td>
-<td style="text-align:right;">
-378646.7
-</td>
-<td style="text-align:right;">
-11.86662
-</td>
-<td style="text-align:right;">
-14.76132
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-14.76132
-</td>
-<td style="text-align:right;">
-Inf
-</td>
-<td style="text-align:right;">
-32.61437
-</td>
-<td style="text-align:left;">
-female
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-os
-</td>
-<td style="text-align:right;">
-14.761316
-</td>
-<td style="text-align:right;">
-9.640374
+10.387739
 </td>
 <td style="text-align:right;">
 1
@@ -1358,114 +1496,25 @@ os
 int
 </td>
 <td style="text-align:right;">
-11.57476
+12.64317
 </td>
 <td style="text-align:right;">
-9.206335
+8.234229
 </td>
 <td style="text-align:right;">
-295186.2
+440586.1
 </td>
 <td style="text-align:right;">
-378646.7
+508817.7
 </td>
 <td style="text-align:right;">
-11.86662
+9.968604
 </td>
 <td style="text-align:right;">
-14.76132
+15.83126
 </td>
 <td style="text-align:right;">
-3.369973
-</td>
-<td style="text-align:right;">
-3.0329761
-</td>
-<td style="text-align:right;">
-77509.3900
-</td>
-<td style="text-align:right;">
-5.1209427
-</td>
-<td style="text-align:right;">
-4.6088485
-</td>
-<td style="text-align:right;">
-117781.683
-</td>
-<td style="text-align:right;">
-14.76132
-</td>
-<td style="text-align:right;">
-Inf
-</td>
-<td style="text-align:right;">
-32.61437
-</td>
-<td style="text-align:left;">
-female
-</td>
-<td style="text-align:right;">
-77509.3900
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-3.0329761
-</td>
-<td style="text-align:right;">
-117781.683
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-4.6088485
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-start
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-15.71826
-</td>
-<td style="text-align:right;">
-12.188626
-</td>
-<td style="text-align:right;">
-489074.6
-</td>
-<td style="text-align:right;">
-619389.8
-</td>
-<td style="text-align:right;">
-17.34002
-</td>
-<td style="text-align:right;">
-22.61877
-</td>
-<td style="text-align:right;">
-0.000000
+2.2352131
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1474,7 +1523,7 @@ int
 0.0000
 </td>
 <td style="text-align:right;">
-0.0000000
+3.1837864
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1483,22 +1532,22 @@ int
 0.000
 </td>
 <td style="text-align:right;">
-22.61877
+19.1188
 </td>
 <td style="text-align:right;">
-26.21267
+16.08126
 </td>
 <td style="text-align:right;">
-35.56463
+37.76054
 </td>
 <td style="text-align:left;">
 female
 </td>
 <td style="text-align:right;">
-0.0000
+0.000
 </td>
 <td style="text-align:right;">
-0
+0.0000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1521,85 +1570,85 @@ female
 </tr>
 <tr>
 <td style="text-align:left;">
-idfs
+progression.mbc
 </td>
 <td style="text-align:right;">
-7.365169
+15.125418
 </td>
 <td style="text-align:right;">
-0.000000
+13.571525
 </td>
 <td style="text-align:right;">
-2
+1
 </td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-15.71826
+12.64317
 </td>
 <td style="text-align:right;">
-12.188626
+8.234229
 </td>
 <td style="text-align:right;">
-489074.6
+440586.1
 </td>
 <td style="text-align:right;">
-619389.8
+508817.7
 </td>
 <td style="text-align:right;">
-17.34002
+9.968604
 </td>
 <td style="text-align:right;">
-22.61877
+15.83126
 </td>
 <td style="text-align:right;">
-6.506159
+1.0168684
 </td>
 <td style="text-align:right;">
-4.8796192
+0.6101211
 </td>
 <td style="text-align:right;">
-390369.5374
+23387.9743
 </td>
 <td style="text-align:right;">
-7.3651686
+1.5538932
 </td>
 <td style="text-align:right;">
-5.5238765
+0.9323359
 </td>
 <td style="text-align:right;">
-441910.119
+35739.543
 </td>
 <td style="text-align:right;">
-22.61877
+19.1188
 </td>
 <td style="text-align:right;">
-26.21267
+16.08126
 </td>
 <td style="text-align:right;">
-35.56463
+37.76054
 </td>
 <td style="text-align:left;">
 female
 </td>
 <td style="text-align:right;">
-390369.5374
+23387.974
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.6101211
+</td>
+<td style="text-align:right;">
+35739.543
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-4.8796192
-</td>
-<td style="text-align:right;">
-441910.119
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-5.5238765
+0.9323359
 </td>
 <td style="text-align:right;">
 1
@@ -1610,85 +1659,85 @@ female
 </tr>
 <tr>
 <td style="text-align:left;">
-ttot.early
+2ndline_mbc
 </td>
 <td style="text-align:right;">
-7.365169
+15.151359
 </td>
 <td style="text-align:right;">
-7.365169
+15.125418
 </td>
 <td style="text-align:right;">
-2
+1
 </td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-15.71826
+12.64317
 </td>
 <td style="text-align:right;">
-12.188626
+8.234229
 </td>
 <td style="text-align:right;">
-489074.6
+440586.1
 </td>
 <td style="text-align:right;">
-619389.8
+508817.7
 </td>
 <td style="text-align:right;">
-17.34002
+9.968604
 </td>
 <td style="text-align:right;">
-22.61877
+15.83126
 </td>
 <td style="text-align:right;">
-0.000000
+0.0165822
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0082911
 </td>
 <td style="text-align:right;">
-0.0000
+878.8550
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0259404
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0129702
 </td>
 <td style="text-align:right;">
-0.000
+1374.840
 </td>
 <td style="text-align:right;">
-22.61877
+19.1188
 </td>
 <td style="text-align:right;">
-26.21267
+16.08126
 </td>
 <td style="text-align:right;">
-35.56463
+37.76054
 </td>
 <td style="text-align:left;">
 female
 </td>
 <td style="text-align:right;">
+878.855
+</td>
+<td style="text-align:right;">
 0.0000
 </td>
 <td style="text-align:right;">
-0
+0.0082911
 </td>
 <td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000
+1374.840
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0129702
 </td>
 <td style="text-align:right;">
 1
@@ -1699,85 +1748,85 @@ female
 </tr>
 <tr>
 <td style="text-align:left;">
-remission
+ttot
 </td>
 <td style="text-align:right;">
-7.365169
+15.327769
 </td>
 <td style="text-align:right;">
-7.365169
+15.151359
 </td>
 <td style="text-align:right;">
-2
+1
 </td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-15.71826
+12.64317
 </td>
 <td style="text-align:right;">
-12.188626
+8.234229
 </td>
 <td style="text-align:right;">
-489074.6
+440586.1
 </td>
 <td style="text-align:right;">
-619389.8
+508817.7
 </td>
 <td style="text-align:right;">
-17.34002
+9.968604
 </td>
 <td style="text-align:right;">
-22.61877
+15.83126
 </td>
 <td style="text-align:right;">
-0.000000
+0.1124321
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0562161
 </td>
 <td style="text-align:right;">
-0.0000
+3710.2595
 </td>
 <td style="text-align:right;">
-0.0000000
+0.1764101
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0882051
 </td>
 <td style="text-align:right;">
-0.000
+5821.535
 </td>
 <td style="text-align:right;">
-22.61877
+19.1188
 </td>
 <td style="text-align:right;">
-26.21267
+16.08126
 </td>
 <td style="text-align:right;">
-35.56463
+37.76054
 </td>
 <td style="text-align:left;">
 female
 </td>
 <td style="text-align:right;">
+3710.260
+</td>
+<td style="text-align:right;">
 0.0000
 </td>
 <td style="text-align:right;">
-0
+0.0562161
 </td>
 <td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000
+5821.535
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0882051
 </td>
 <td style="text-align:right;">
 1
@@ -1833,7 +1882,7 @@ int
 ttot.early
 </td>
 <td style="text-align:right;">
-1976
+1977
 </td>
 </tr>
 <tr>
@@ -1844,7 +1893,7 @@ int
 idfs
 </td>
 <td style="text-align:right;">
-1973
+1969
 </td>
 </tr>
 <tr>
@@ -1855,7 +1904,7 @@ int
 ttot.beva
 </td>
 <td style="text-align:right;">
-1962
+1956
 </td>
 </tr>
 <tr>
@@ -1866,7 +1915,7 @@ int
 remission
 </td>
 <td style="text-align:right;">
-1563
+1594
 </td>
 </tr>
 <tr>
@@ -1877,7 +1926,7 @@ int
 recurrence
 </td>
 <td style="text-align:right;">
-1353
+1366
 </td>
 </tr>
 <tr>
@@ -1888,7 +1937,7 @@ int
 ae
 </td>
 <td style="text-align:right;">
-1237
+1129
 </td>
 </tr>
 <tr>
@@ -1899,7 +1948,7 @@ int
 progression.mbc
 </td>
 <td style="text-align:right;">
-610
+570
 </td>
 </tr>
 <tr>
@@ -1910,7 +1959,7 @@ int
 ttot
 </td>
 <td style="text-align:right;">
-590
+566
 </td>
 </tr>
 <tr>
@@ -1921,7 +1970,7 @@ int
 start.early.mbc
 </td>
 <td style="text-align:right;">
-407
+369
 </td>
 </tr>
 <tr>
@@ -1932,7 +1981,7 @@ int
 2ndline_mbc
 </td>
 <td style="text-align:right;">
-262
+247
 </td>
 </tr>
 <tr>
@@ -1965,7 +2014,7 @@ noint
 ttot.early
 </td>
 <td style="text-align:right;">
-1985
+1979
 </td>
 </tr>
 <tr>
@@ -1976,7 +2025,7 @@ noint
 idfs
 </td>
 <td style="text-align:right;">
-1981
+1976
 </td>
 </tr>
 <tr>
@@ -1987,7 +2036,7 @@ noint
 remission
 </td>
 <td style="text-align:right;">
-1579
+1609
 </td>
 </tr>
 <tr>
@@ -1998,7 +2047,7 @@ noint
 ae
 </td>
 <td style="text-align:right;">
-1389
+1449
 </td>
 </tr>
 <tr>
@@ -2009,7 +2058,7 @@ noint
 recurrence
 </td>
 <td style="text-align:right;">
-1234
+1222
 </td>
 </tr>
 <tr>
@@ -2020,7 +2069,7 @@ noint
 progression.mbc
 </td>
 <td style="text-align:right;">
-467
+450
 </td>
 </tr>
 <tr>
@@ -2031,7 +2080,7 @@ noint
 ttot
 </td>
 <td style="text-align:right;">
-459
+450
 </td>
 </tr>
 <tr>
@@ -2042,7 +2091,7 @@ noint
 start.early.mbc
 </td>
 <td style="text-align:right;">
-375
+350
 </td>
 </tr>
 <tr>
@@ -2053,7 +2102,7 @@ noint
 2ndline_mbc
 </td>
 <td style="text-align:right;">
-195
+204
 </td>
 </tr>
 </tbody>

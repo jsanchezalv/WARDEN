@@ -26,8 +26,6 @@ run_sim(
   sensitivity_bool = FALSE,
   sensitivity_names = NULL,
   n_sensitivity = 1,
-  drc = 0.035,
-  drq = 0.035,
   input_out = NULL,
   ipd = 1
 )
@@ -75,10 +73,6 @@ run_sim(
 
 \item{n_sensitivity}{Number of sensitivity analysis (DSA or Scenarios) to run. It will be interacted with sensitivity_names argument if not null (n_sensitivityitivity = n_sensitivity * length(sensitivity_names)). For DSA, it should be as many parameters as there are. For scenario, it should be 1.}
 
-\item{drc}{The discount rate for costs}
-
-\item{drq}{The discount rate for LYs/QALYs}
-
 \item{input_out}{A vector of variables to be returned in the output data frame}
 
 \item{ipd}{Integer taking value 1 for full IPD data returned, and 2 IPD data but aggregating events (returning last value for numeric/character/factor variables. For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear). Other values mean no IPD data returned (removes non-numerical or length>1 items)}
@@ -100,6 +94,8 @@ A list of protected objects that should not be used by the user as input names t
 c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").
 
 The engine uses the L'Ecuyer-CMRG for the random number generator
+
+If no \code{drc} or `drq parameters are passed within any of the input lists, these are assigned value 0.03.
 }
 \examples{
 \dontrun{
@@ -117,8 +113,6 @@ other_ongoing_list = other_ongoing_list,
 npats = 500,
 n_sim = 1,
 psa_bool = FALSE,
-drc = 0.035,
-drq = 0.035,
 ipd = 1)
 }
 }

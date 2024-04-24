@@ -220,8 +220,6 @@ results <- run_sim(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  drc = 0.035,                              # discount rate for costs
-  drq = 0.035,                              # discount rate for QALYs
   input_out = c(                            # list of additional outputs (Flags, etc) that the user wants to export for each patient and event
     "trace",
     "cycle_time"

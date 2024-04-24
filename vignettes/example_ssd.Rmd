@@ -61,7 +61,9 @@ common_all_inputs <-add_item(
                       cost.sicker = 7000,
                       cost.int = 1000,
                       coef_noint = log(0.2),
-                      HR_int = 0.8)
+                      HR_int = 0.8,
+                      drc = 0.035, #different values than what's assumed by default
+                      drq = 0.035) #different values than what's assumed by default
 
 
 #Put objects here that do not change as we loop through treatments for a patient
@@ -193,9 +195,7 @@ results <- run_sim(
   init_event_list = init_event_list,        # initial event list
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
-  cost_ongoing_list = cost_ongoing,
-  drc = 0.035,                              # discount rate for costs
-  drq = 0.035                               # discount rate for qaly/lys
+  cost_ongoing_list = cost_ongoing
 )
 ```
 # Post-processing of Model Outputs
@@ -336,8 +336,6 @@ results <- run_sim(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  drc = 0.035,                              # discount rate for costs
-  drq = 0.035,
   sensitivity_inputs = sensitivity_inputs,
   sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
@@ -374,8 +372,6 @@ results <- run_sim(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  drc = 0.035,                              # discount rate for costs
-  drq = 0.035,
   sensitivity_inputs = sensitivity_inputs,
   sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,

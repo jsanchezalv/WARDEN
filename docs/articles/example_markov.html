@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">March 21, 2024</h4>
+            <h4 data-toc-skip class="date">April 24, 2024</h4>
       
       
       <div class="d-none name"><code>example_markov.Rmd</code></div>
@@ -118,7 +118,7 @@ the cohort one.</p>
 <span><span class="co">#&gt; Loading required package: survival</span></span>
 <span><span class="co">#&gt; Warning: package 'survival' was built under R version 4.3.2</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.3.2</span></span>
+<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.3.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: package 'kableExtra' was built under R version 4.3.2</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -196,7 +196,7 @@ simulated, the transition matrices and the initial cycle time
 <span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>max_n_cycles <span class="op">=</span> <span class="fl">30</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#utilities</span></span>
 <span>    util_v <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">psa_bool</span><span class="op">)</span><span class="op">{</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="../reference/draw_gamma.html">draw_gamma</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">se</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="co">#in this case I choose a gamma distribution</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="../reference/rgamma_mse.html">rgamma_mse</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">se</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="co">#in this case I choose a gamma distribution</span></span>
 <span>    <span class="op">}</span> <span class="kw">else</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span><span class="op">}</span>,</span>
 <span>    util1 <span class="op">=</span> <span class="va">util_v</span><span class="op">[[</span><span class="st">"util1"</span><span class="op">]</span><span class="op">]</span>, </span>
 <span>    util2 <span class="op">=</span> <span class="va">util_v</span><span class="op">[[</span><span class="st">"util2"</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -204,7 +204,7 @@ simulated, the transition matrices and the initial cycle time
 <span>    util4 <span class="op">=</span> <span class="va">util_v</span><span class="op">[[</span><span class="st">"util4"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#costs</span></span>
 <span>    cost_v <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">psa_bool</span><span class="op">)</span><span class="op">{</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="../reference/draw_gamma.html">draw_gamma</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="co">#in this case I choose a gamma distribution</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="../reference/rgamma_mse.html">rgamma_mse</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="co">#in this case I choose a gamma distribution</span></span>
 <span>    <span class="op">}</span> <span class="kw">else</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span><span class="op">}</span>,</span>
 <span>    cost1    <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost1"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>    cost2    <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost2"</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -370,8 +370,6 @@ to indicate <code>npats = 1</code>.</p>
 <span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,          <span class="co"># reaction of events</span></span>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
-<span>  drc <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for costs</span></span>
-<span>  drq <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for QALYs</span></span>
 <span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>                            <span class="co"># list of additional outputs (Flags, etc) that the user wants to export for each patient and event</span></span>
 <span>    <span class="st">"trace"</span>,</span>
 <span>    <span class="st">"cycle_time"</span></span>
@@ -379,8 +377,8 @@ to indicate <code>npats = 1</code>.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; Warning in run_sim(npats = 1, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item util_v is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
-<span><span class="co">#&gt; Warning in run_sim(npats = 1, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item cost_v is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
+<span><span class="co">#&gt; Warning in run_sim(npats = 1, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item util_v is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
+<span><span class="co">#&gt; Warning in run_sim(npats = 1, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item cost_v is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.08s"</span></span>
 <span><span class="co">#&gt; [1] "Time to run analysis 1: 0.08s"</span></span>
 <span><span class="co">#&gt; [1] "Total time to run: 0.08s"</span></span></code></pre></div>
@@ -405,22 +403,35 @@ can manually adjust this to get the correct life years.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#will print the last simulation!</span></span>
-<span><span class="co">#&gt;                                  int    noint</span></span>
-<span><span class="co">#&gt; costs                       24279.14 13956.96</span></span>
-<span><span class="co">#&gt; lys                            18.71    18.71</span></span>
-<span><span class="co">#&gt; qalys                           4.94     3.53</span></span>
-<span><span class="co">#&gt; ICER                              NA      Inf</span></span>
-<span><span class="co">#&gt; ICUR                              NA  7293.44</span></span>
-<span><span class="co">#&gt; costs_undisc                30679.83 16441.70</span></span>
-<span><span class="co">#&gt; lys_undisc                     30.00    30.00</span></span>
-<span><span class="co">#&gt; qalys_undisc                    6.03     4.00</span></span>
-<span><span class="co">#&gt; ICER_undisc                       NA      Inf</span></span>
-<span><span class="co">#&gt; ICUR_undisc                       NA  7013.23</span></span>
-<span><span class="co">#&gt; cost_default_ongoing        24279.14 13956.96</span></span>
-<span><span class="co">#&gt; cost_default_ongoing_undisc 30679.83 16441.70</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing            4.94     3.53</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing_undisc     6.03     4.00</span></span>
-<span><span class="co">#&gt; cycle_time                     15.00    15.00</span></span>
+<span><span class="co">#&gt;                                   int    noint</span></span>
+<span><span class="co">#&gt; costs                        25037.88 14268.77</span></span>
+<span><span class="co">#&gt; dcosts                           0.00 10769.11</span></span>
+<span><span class="co">#&gt; lys                             19.89    19.89</span></span>
+<span><span class="co">#&gt; dlys                             0.00     0.00</span></span>
+<span><span class="co">#&gt; qalys                            5.07     3.59</span></span>
+<span><span class="co">#&gt; dqalys                           0.00     1.49</span></span>
+<span><span class="co">#&gt; ICER                               NA      Inf</span></span>
+<span><span class="co">#&gt; ICUR                               NA  7251.17</span></span>
+<span><span class="co">#&gt; INMB                               NA 63488.68</span></span>
+<span><span class="co">#&gt; costs_undisc                 30679.83 16441.70</span></span>
+<span><span class="co">#&gt; dcosts_undisc                    0.00 14238.12</span></span>
+<span><span class="co">#&gt; lys_undisc                      30.00    30.00</span></span>
+<span><span class="co">#&gt; dlys_undisc                      0.00     0.00</span></span>
+<span><span class="co">#&gt; qalys_undisc                     6.03     4.00</span></span>
+<span><span class="co">#&gt; dqalys_undisc                    0.00     2.03</span></span>
+<span><span class="co">#&gt; ICER_undisc                        NA      Inf</span></span>
+<span><span class="co">#&gt; ICUR_undisc                        NA  7013.23</span></span>
+<span><span class="co">#&gt; INMB_undisc                        NA 87270.97</span></span>
+<span><span class="co">#&gt; cost_default_ongoing         25037.88 14268.77</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing            0.00 10769.11</span></span>
+<span><span class="co">#&gt; cost_default_ongoing_undisc  30679.83 16441.70</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing_undisc     0.00 14238.12</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing             5.07     3.59</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing            0.00     1.49</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing_undisc      6.03     4.00</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing_undisc     0.00     2.03</span></span>
+<span><span class="co">#&gt; cycle_time                      29.67    29.67</span></span>
+<span><span class="co">#&gt; dcycle_time                      0.00     0.00</span></span>
 <span></span>
 <span><span class="va">psa_ipd_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">trace</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="op">)</span> </span>
 <span></span>
@@ -616,7 +627,7 @@ ly_final
 int
 </td>
 <td style="text-align:right;">
-2.889712
+2.945366
 </td>
 </tr>
 <tr>
@@ -624,7 +635,7 @@ int
 noint
 </td>
 <td style="text-align:right;">
-2.007887
+2.029567
 </td>
 </tr>
 </tbody>
@@ -635,22 +646,39 @@ noint
 <span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"total_lys_noint"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">life_years</span><span class="op">$</span><span class="va">ly_final</span><span class="op">[</span><span class="va">life_years</span><span class="op">$</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">]</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#will print the last simulation!</span></span>
-<span><span class="co">#&gt;                                  int    noint</span></span>
-<span><span class="co">#&gt; costs                       24279.14 13956.96</span></span>
-<span><span class="co">#&gt; lys                             2.89     2.01</span></span>
-<span><span class="co">#&gt; qalys                           4.94     3.53</span></span>
-<span><span class="co">#&gt; ICER                              NA 11705.47</span></span>
-<span><span class="co">#&gt; ICUR                              NA  7293.44</span></span>
-<span><span class="co">#&gt; costs_undisc                30679.83 16441.70</span></span>
-<span><span class="co">#&gt; lys_undisc                     30.00    30.00</span></span>
-<span><span class="co">#&gt; qalys_undisc                    6.03     4.00</span></span>
-<span><span class="co">#&gt; ICER_undisc                       NA      Inf</span></span>
-<span><span class="co">#&gt; ICUR_undisc                       NA  7013.23</span></span>
-<span><span class="co">#&gt; cost_default_ongoing        24279.14 13956.96</span></span>
-<span><span class="co">#&gt; cost_default_ongoing_undisc 30679.83 16441.70</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing            4.94     3.53</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing_undisc     6.03     4.00</span></span>
-<span><span class="co">#&gt; cycle_time                     15.00    15.00</span></span></code></pre></div>
+<span><span class="co">#&gt;                                   int    noint</span></span>
+<span><span class="co">#&gt; costs                        25037.88 14268.77</span></span>
+<span><span class="co">#&gt; dcosts                           0.00 10769.11</span></span>
+<span><span class="co">#&gt; lys                             19.89    19.89</span></span>
+<span><span class="co">#&gt; dlys                             0.00     0.00</span></span>
+<span><span class="co">#&gt; qalys                            5.07     3.59</span></span>
+<span><span class="co">#&gt; dqalys                           0.00     1.49</span></span>
+<span><span class="co">#&gt; ICER                               NA      Inf</span></span>
+<span><span class="co">#&gt; ICUR                               NA  7251.17</span></span>
+<span><span class="co">#&gt; INMB                               NA 63488.68</span></span>
+<span><span class="co">#&gt; costs_undisc                 30679.83 16441.70</span></span>
+<span><span class="co">#&gt; dcosts_undisc                    0.00 14238.12</span></span>
+<span><span class="co">#&gt; lys_undisc                      30.00    30.00</span></span>
+<span><span class="co">#&gt; dlys_undisc                      0.00     0.00</span></span>
+<span><span class="co">#&gt; qalys_undisc                     6.03     4.00</span></span>
+<span><span class="co">#&gt; dqalys_undisc                    0.00     2.03</span></span>
+<span><span class="co">#&gt; ICER_undisc                        NA      Inf</span></span>
+<span><span class="co">#&gt; ICUR_undisc                        NA  7013.23</span></span>
+<span><span class="co">#&gt; INMB_undisc                        NA 87270.97</span></span>
+<span><span class="co">#&gt; cost_default_ongoing         25037.88 14268.77</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing            0.00 10769.11</span></span>
+<span><span class="co">#&gt; cost_default_ongoing_undisc  30679.83 16441.70</span></span>
+<span><span class="co">#&gt; dcost_default_ongoing_undisc     0.00 14238.12</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing             5.07     3.59</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing            0.00     1.49</span></span>
+<span><span class="co">#&gt; qaly_default_ongoing_undisc      6.03     4.00</span></span>
+<span><span class="co">#&gt; dqaly_default_ongoing_undisc     0.00     2.03</span></span>
+<span><span class="co">#&gt; cycle_time                      29.67    29.67</span></span>
+<span><span class="co">#&gt; dcycle_time                      0.00     0.00</span></span>
+<span><span class="co">#&gt; total_lys_int                    2.95     2.95</span></span>
+<span><span class="co">#&gt; dtotal_lys_int                   0.00       NA</span></span>
+<span><span class="co">#&gt; total_lys_noint                  2.03     2.03</span></span>
+<span><span class="co">#&gt; dtotal_lys_noint                 0.00       NA</span></span></code></pre></div>
 <p>We can also check each of the cycles</p>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -745,13 +773,13 @@ start
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -819,13 +847,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -837,13 +865,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.9829948
+0.9853651
 </td>
 <td style="text-align:right;">
-0.8846954
+0.8868286
 </td>
 <td style="text-align:right;">
-1965.989690
+1970.730299
 </td>
 <td style="text-align:right;">
 1
@@ -858,10 +886,10 @@ int
 1
 </td>
 <td style="text-align:right;">
-1965.989690
+1970.730299
 </td>
 <td style="text-align:right;">
-0.8846954
+0.8868286
 </td>
 <td style="text-align:right;">
 2000.000000
@@ -893,13 +921,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -967,13 +995,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -985,13 +1013,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.9497535
+0.9566652
 </td>
 <td style="text-align:right;">
-0.6980688
+0.7031489
 </td>
 <td style="text-align:right;">
-2754.285073
+2774.329062
 </td>
 <td style="text-align:right;">
 1
@@ -1006,10 +1034,10 @@ int
 2
 </td>
 <td style="text-align:right;">
-2754.285073
+2774.329062
 </td>
 <td style="text-align:right;">
-0.6980688
+0.7031489
 </td>
 <td style="text-align:right;">
 2900.000000
@@ -1041,13 +1069,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1115,13 +1143,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1133,13 +1161,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.9176362
+0.9288012
 </td>
 <td style="text-align:right;">
-0.5684756
+0.5753923
 </td>
 <td style="text-align:right;">
-2872.201325
+2907.147628
 </td>
 <td style="text-align:right;">
 1
@@ -1154,10 +1182,10 @@ int
 3
 </td>
 <td style="text-align:right;">
-2872.201325
+2907.147628
 </td>
 <td style="text-align:right;">
-0.5684756
+0.5753923
 </td>
 <td style="text-align:right;">
 3130.000000
@@ -1189,13 +1217,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1263,13 +1291,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1281,13 +1309,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.8866050
+0.9017487
 </td>
 <td style="text-align:right;">
-0.4691914
+0.4772054
 </td>
 <td style="text-align:right;">
-2634.990149
+2679.997131
 </td>
 <td style="text-align:right;">
 1
@@ -1302,10 +1330,10 @@ int
 4
 </td>
 <td style="text-align:right;">
-2634.990149
+2679.997131
 </td>
 <td style="text-align:right;">
-0.4691914
+0.4772054
 </td>
 <td style="text-align:right;">
 2972.000000
@@ -1337,13 +1365,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1411,13 +1439,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1429,13 +1457,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.8566232
+0.8754842
 </td>
 <td style="text-align:right;">
-0.3895537
+0.3981308
 </td>
 <td style="text-align:right;">
-2291.724094
+2342.182808
 </td>
 <td style="text-align:right;">
 1
@@ -1450,10 +1478,10 @@ int
 5
 </td>
 <td style="text-align:right;">
-2291.724094
+2342.182808
 </td>
 <td style="text-align:right;">
-0.3895537
+0.3981308
 </td>
 <td style="text-align:right;">
 2675.300000
@@ -1485,13 +1513,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1559,13 +1587,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1577,13 +1605,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.8276553
+0.8499846
 </td>
 <td style="text-align:right;">
-0.3242989
+0.3330482
 </td>
 <td style="text-align:right;">
-1947.762559
+2000.311338
 </td>
 <td style="text-align:right;">
 1
@@ -1598,10 +1626,10 @@ int
 6
 </td>
 <td style="text-align:right;">
-1947.762559
+2000.311338
 </td>
 <td style="text-align:right;">
-0.3242989
+0.3330482
 </td>
 <td style="text-align:right;">
 2353.350000
@@ -1633,13 +1661,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1707,13 +1735,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1725,13 +1753,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.7996669
+0.8252278
 </td>
 <td style="text-align:right;">
-0.2703019
+0.2789419
 </td>
 <td style="text-align:right;">
-1638.647105
+1691.025449
 </td>
 <td style="text-align:right;">
 1
@@ -1746,10 +1774,10 @@ int
 7
 </td>
 <td style="text-align:right;">
-1638.647105
+1691.025449
 </td>
 <td style="text-align:right;">
-0.2703019
+0.2789419
 </td>
 <td style="text-align:right;">
 2049.162000
@@ -1781,13 +1809,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1855,13 +1883,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -1873,13 +1901,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.7726251
+0.8011920
 </td>
 <td style="text-align:right;">
-0.2254192
+0.2337538
 </td>
 <td style="text-align:right;">
-1372.316934
+1423.056869
 </td>
 <td style="text-align:right;">
 1
@@ -1894,10 +1922,10 @@ int
 8
 </td>
 <td style="text-align:right;">
-1372.316934
+1423.056869
 </td>
 <td style="text-align:right;">
-0.2254192
+0.2337538
 </td>
 <td style="text-align:right;">
 1776.174500
@@ -1929,13 +1957,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2003,13 +2031,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2021,13 +2049,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.7464976
+0.7778563
 </td>
 <td style="text-align:right;">
-0.1880358
+0.1959348
 </td>
 <td style="text-align:right;">
-1146.914659
+1195.093990
 </td>
 <td style="text-align:right;">
 1
@@ -2042,10 +2070,10 @@ int
 9
 </td>
 <td style="text-align:right;">
-1146.914659
+1195.093990
 </td>
 <td style="text-align:right;">
-0.1880358
+0.1959348
 </td>
 <td style="text-align:right;">
 1536.394210
@@ -2077,13 +2105,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2151,13 +2179,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2169,13 +2197,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.7212538
+0.7552003
 </td>
 <td style="text-align:right;">
-0.1568698
+0.1642530
 </td>
 <td style="text-align:right;">
-957.644750
+1002.717318
 </td>
 <td style="text-align:right;">
 1
@@ -2190,10 +2218,10 @@ int
 10
 </td>
 <td style="text-align:right;">
-957.644750
+1002.717318
 </td>
 <td style="text-align:right;">
-0.1568698
+0.1642530
 </td>
 <td style="text-align:right;">
 1327.750092
@@ -2225,13 +2253,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2299,13 +2327,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2317,13 +2345,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.6968635
+0.7332042
 </td>
 <td style="text-align:right;">
-0.1308761
+0.1377011
 </td>
 <td style="text-align:right;">
-799.272995
+840.954209
 </td>
 <td style="text-align:right;">
 1
@@ -2338,10 +2366,10 @@ int
 11
 </td>
 <td style="text-align:right;">
-799.272995
+840.954209
 </td>
 <td style="text-align:right;">
-0.1308761
+0.1377011
 </td>
 <td style="text-align:right;">
 1146.957690
@@ -2373,13 +2401,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2447,13 +2475,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2465,13 +2493,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.6732981
+0.7118487
 </td>
 <td style="text-align:right;">
-0.1091921
+0.1154440
 </td>
 <td style="text-align:right;">
-666.965087
+705.153125
 </td>
 <td style="text-align:right;">
 1
@@ -2486,10 +2514,10 @@ int
 12
 </td>
 <td style="text-align:right;">
-666.965087
+705.153125
 </td>
 <td style="text-align:right;">
-0.1091921
+0.1154440
 </td>
 <td style="text-align:right;">
 990.594035
@@ -2521,13 +2549,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2595,13 +2623,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2613,13 +2641,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.6505296
+0.6911153
 </td>
 <td style="text-align:right;">
-0.0911018
+0.0967855
 </td>
 <td style="text-align:right;">
-556.510746
+591.230750
 </td>
 <td style="text-align:right;">
 1
@@ -2634,10 +2662,10 @@ int
 13
 </td>
 <td style="text-align:right;">
-556.510746
+591.230750
 </td>
 <td style="text-align:right;">
-0.0911018
+0.0967855
 </td>
 <td style="text-align:right;">
 855.473404
@@ -2669,13 +2697,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2743,13 +2771,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2761,13 +2789,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.6285310
+0.6709857
 </td>
 <td style="text-align:right;">
-0.0760089
+0.0811430
 </td>
 <td style="text-align:right;">
-464.330280
+495.693917
 </td>
 <td style="text-align:right;">
 1
@@ -2782,10 +2810,10 @@ int
 14
 </td>
 <td style="text-align:right;">
-464.330280
+495.693917
 </td>
 <td style="text-align:right;">
-0.0760089
+0.0811430
 </td>
 <td style="text-align:right;">
 738.754795
@@ -2817,13 +2845,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2891,13 +2919,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -2909,13 +2937,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.6072763
+0.6514424
 </td>
 <td style="text-align:right;">
-0.0634166
+0.0680288
 </td>
 <td style="text-align:right;">
-387.411713
+415.587480
 </td>
 <td style="text-align:right;">
 1
@@ -2930,10 +2958,10 @@ int
 15
 </td>
 <td style="text-align:right;">
-387.411713
+415.587480
 </td>
 <td style="text-align:right;">
-0.0634166
+0.0680288
 </td>
 <td style="text-align:right;">
 637.949650
@@ -2965,13 +2993,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3039,13 +3067,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3057,13 +3085,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.5867404
+0.6324684
 </td>
 <td style="text-align:right;">
-0.0529105
+0.0570341
 </td>
 <td style="text-align:right;">
-323.232479
+348.423811
 </td>
 <td style="text-align:right;">
 1
@@ -3078,10 +3106,10 @@ int
 16
 </td>
 <td style="text-align:right;">
-323.232479
+348.423811
 </td>
 <td style="text-align:right;">
-0.0529105
+0.0570341
 </td>
 <td style="text-align:right;">
 550.895213
@@ -3113,13 +3141,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3187,13 +3215,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3205,13 +3233,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.5668989
+0.6140470
 </td>
 <td style="text-align:right;">
-0.0441450
+0.0478164
 </td>
 <td style="text-align:right;">
-269.684293
+292.113489
 </td>
 <td style="text-align:right;">
 1
@@ -3226,10 +3254,10 @@ int
 17
 </td>
 <td style="text-align:right;">
-269.684293
+292.113489
 </td>
 <td style="text-align:right;">
-0.0441450
+0.0478164
 </td>
 <td style="text-align:right;">
 475.718466
@@ -3261,13 +3289,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3335,13 +3363,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3353,13 +3381,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.5477284
+0.5961621
 </td>
 <td style="text-align:right;">
-0.0368316
+0.0400885
 </td>
 <td style="text-align:right;">
-225.006775
+244.903324
 </td>
 <td style="text-align:right;">
 1
@@ -3374,10 +3402,10 @@ int
 18
 </td>
 <td style="text-align:right;">
-225.006775
+244.903324
 </td>
 <td style="text-align:right;">
-0.0368316
+0.0400885
 </td>
 <td style="text-align:right;">
 410.799874
@@ -3409,13 +3437,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3483,13 +3511,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3501,13 +3529,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.5292062
+0.5787982
 </td>
 <td style="text-align:right;">
-0.0307298
+0.0336095
 </td>
 <td style="text-align:right;">
-187.730662
+205.322915
 </td>
 <td style="text-align:right;">
 1
@@ -3522,10 +3550,10 @@ int
 19
 </td>
 <td style="text-align:right;">
-187.730662
+205.322915
 </td>
 <td style="text-align:right;">
-0.0307298
+0.0336095
 </td>
 <td style="text-align:right;">
 354.740087
@@ -3557,13 +3585,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3631,13 +3659,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3649,13 +3677,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.5113104
+0.5619400
 </td>
 <td style="text-align:right;">
-0.0256389
+0.0281776
 </td>
 <td style="text-align:right;">
-156.629904
+172.139293
 </td>
 <td style="text-align:right;">
 1
@@ -3670,10 +3698,10 @@ int
 20
 </td>
 <td style="text-align:right;">
-156.629904
+172.139293
 </td>
 <td style="text-align:right;">
-0.0256389
+0.0281776
 </td>
 <td style="text-align:right;">
 306.330392
@@ -3705,13 +3733,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3779,13 +3807,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3797,13 +3825,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.4940197
+0.5455728
 </td>
 <td style="text-align:right;">
-0.0213914
+0.0236236
 </td>
 <td style="text-align:right;">
-130.681491
+144.318678
 </td>
 <td style="text-align:right;">
 1
@@ -3818,10 +3846,10 @@ int
 21
 </td>
 <td style="text-align:right;">
-130.681491
+144.318678
 </td>
 <td style="text-align:right;">
-0.0213914
+0.0236236
 </td>
 <td style="text-align:right;">
 264.526897
@@ -3853,13 +3881,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3927,13 +3955,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -3945,13 +3973,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.4773137
+0.5296823
 </td>
 <td style="text-align:right;">
-0.0178475
+0.0198057
 </td>
 <td style="text-align:right;">
-109.031868
+120.994336
 </td>
 <td style="text-align:right;">
 1
@@ -3966,10 +3994,10 @@ int
 22
 </td>
 <td style="text-align:right;">
-109.031868
+120.994336
 </td>
 <td style="text-align:right;">
-0.0178475
+0.0198057
 </td>
 <td style="text-align:right;">
 228.428117
@@ -4001,13 +4029,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4075,13 +4103,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4093,13 +4121,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.4611727
+0.5142547
 </td>
 <td style="text-align:right;">
-0.0148908
+0.0166047
 </td>
 <td style="text-align:right;">
-90.968872
+101.439598
 </td>
 <td style="text-align:right;">
 1
@@ -4114,10 +4142,10 @@ int
 23
 </td>
 <td style="text-align:right;">
-90.968872
+101.439598
 </td>
 <td style="text-align:right;">
-0.0148908
+0.0166047
 </td>
 <td style="text-align:right;">
 197.255566
@@ -4149,13 +4177,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4223,13 +4251,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4241,13 +4269,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.4455774
+0.4992764
 </td>
 <td style="text-align:right;">
-0.0124239
+0.0139211
 </td>
 <td style="text-align:right;">
-75.898320
+85.045237
 </td>
 <td style="text-align:right;">
 1
@@ -4262,10 +4290,10 @@ int
 24
 </td>
 <td style="text-align:right;">
-75.898320
+85.045237
 </td>
 <td style="text-align:right;">
-0.0124239
+0.0139211
 </td>
 <td style="text-align:right;">
 170.336990
@@ -4297,13 +4325,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4371,13 +4399,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4389,13 +4417,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.4305096
+0.4847344
 </td>
 <td style="text-align:right;">
-0.0103656
+0.0116712
 </td>
 <td style="text-align:right;">
-63.324462
+71.300483
 </td>
 <td style="text-align:right;">
 1
@@ -4410,10 +4438,10 @@ int
 25
 </td>
 <td style="text-align:right;">
-63.324462
+71.300483
 </td>
 <td style="text-align:right;">
-0.0103656
+0.0116712
 </td>
 <td style="text-align:right;">
 147.091869
@@ -4445,13 +4473,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4519,13 +4547,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4537,13 +4565,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.4159513
+0.4706159
 </td>
 <td style="text-align:right;">
-0.0086484
+0.0097850
 </td>
 <td style="text-align:right;">
-52.833680
+59.777114
 </td>
 <td style="text-align:right;">
 1
@@ -4558,10 +4586,10 @@ int
 26
 </td>
 <td style="text-align:right;">
-52.833680
+59.777114
 </td>
 <td style="text-align:right;">
-0.0086484
+0.0097850
 </td>
 <td style="text-align:right;">
 127.018905
@@ -4593,13 +4621,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4667,13 +4695,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4685,13 +4713,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.4018853
+0.4569086
 </td>
 <td style="text-align:right;">
-0.0072156
+0.0082035
 </td>
 <td style="text-align:right;">
-44.080875
+50.116117
 </td>
 <td style="text-align:right;">
 1
@@ -4706,10 +4734,10 @@ int
 27
 </td>
 <td style="text-align:right;">
-44.080875
+50.116117
 </td>
 <td style="text-align:right;">
-0.0072156
+0.0082035
 </td>
 <td style="text-align:right;">
 109.685207
@@ -4741,13 +4769,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4815,13 +4843,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4833,13 +4861,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.3882950
+0.4436006
 </td>
 <td style="text-align:right;">
-0.0060202
+0.0068777
 </td>
 <td style="text-align:right;">
-36.778122
+42.016501
 </td>
 <td style="text-align:right;">
 1
@@ -4854,10 +4882,10 @@ int
 28
 </td>
 <td style="text-align:right;">
-36.778122
+42.016501
 </td>
 <td style="text-align:right;">
-0.0060202
+0.0068777
 </td>
 <td style="text-align:right;">
 94.716961
@@ -4889,13 +4917,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4963,13 +4991,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -4981,13 +5009,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.3751642
+0.4306802
 </td>
 <td style="text-align:right;">
-0.0050229
+0.0057662
 </td>
 <td style="text-align:right;">
-30.685196
+35.225921
 </td>
 <td style="text-align:right;">
 1
@@ -5002,10 +5030,10 @@ int
 29
 </td>
 <td style="text-align:right;">
-30.685196
+35.225921
 </td>
 <td style="text-align:right;">
-0.0050229
+0.0057662
 </td>
 <td style="text-align:right;">
 81.791364
@@ -5037,13 +5065,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -5111,13 +5139,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -5129,13 +5157,13 @@ int
 30
 </td>
 <td style="text-align:right;">
-0.3624775
+0.4181361
 </td>
 <td style="text-align:right;">
-0.0041908
+0.0048342
 </td>
 <td style="text-align:right;">
-25.601667
+29.532814
 </td>
 <td style="text-align:right;">
 1
@@ -5150,10 +5178,10 @@ int
 30
 </td>
 <td style="text-align:right;">
-25.601667
+29.532814
 </td>
 <td style="text-align:right;">
-0.0041908
+0.0048342
 </td>
 <td style="text-align:right;">
 70.629665
@@ -5185,13 +5213,13 @@ cycle
 int
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-4.943779
+5.073559
 </td>
 <td style="text-align:right;">
-24279.14
+25037.88
 </td>
 <td style="text-align:right;">
 30679.83
@@ -5259,13 +5287,13 @@ start
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -5333,13 +5361,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -5351,13 +5379,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.9829948
+0.9853651
 </td>
 <td style="text-align:right;">
-0.8846954
+0.8868286
 </td>
 <td style="text-align:right;">
-982.994845
+985.365150
 </td>
 <td style="text-align:right;">
 1
@@ -5372,10 +5400,10 @@ noint
 1
 </td>
 <td style="text-align:right;">
-982.994845
+985.365150
 </td>
 <td style="text-align:right;">
-0.8846954
+0.8868286
 </td>
 <td style="text-align:right;">
 1000.000000
@@ -5407,13 +5435,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -5481,13 +5509,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -5499,13 +5527,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.9497535
+0.9566652
 </td>
 <td style="text-align:right;">
-0.6695762
+0.6744490
 </td>
 <td style="text-align:right;">
-2374.383683
+2391.662984
 </td>
 <td style="text-align:right;">
 1
@@ -5520,10 +5548,10 @@ noint
 2
 </td>
 <td style="text-align:right;">
-2374.383683
+2391.662984
 </td>
 <td style="text-align:right;">
-0.6695762
+0.6744490
 </td>
 <td style="text-align:right;">
 2500.000000
@@ -5555,13 +5583,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -5629,13 +5657,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -5647,13 +5675,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.9176362
+0.9288012
 </td>
 <td style="text-align:right;">
-0.5010294
+0.5071254
 </td>
 <td style="text-align:right;">
-2395.030498
+2424.171025
 </td>
 <td style="text-align:right;">
 1
@@ -5668,10 +5696,10 @@ noint
 3
 </td>
 <td style="text-align:right;">
-2395.030498
+2424.171025
 </td>
 <td style="text-align:right;">
-0.5010294
+0.5071254
 </td>
 <td style="text-align:right;">
 2610.000000
@@ -5703,13 +5731,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -5777,13 +5805,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -5795,13 +5823,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.8866050
+0.9017487
 </td>
 <td style="text-align:right;">
-0.3739700
+0.3803576
 </td>
 <td style="text-align:right;">
-1993.974713
+2028.032822
 </td>
 <td style="text-align:right;">
 1
@@ -5816,10 +5844,10 @@ noint
 4
 </td>
 <td style="text-align:right;">
-1993.974713
+2028.032822
 </td>
 <td style="text-align:right;">
-0.3739700
+0.3803576
 </td>
 <td style="text-align:right;">
 2249.000000
@@ -5851,13 +5879,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -5925,13 +5953,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -5943,13 +5971,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.8566232
+0.8754842
 </td>
 <td style="text-align:right;">
-0.2790364
+0.2851802
 </td>
 <td style="text-align:right;">
-1551.258984
+1585.414289
 </td>
 <td style="text-align:right;">
 1
@@ -5964,10 +5992,10 @@ noint
 5
 </td>
 <td style="text-align:right;">
-1551.258984
+1585.414289
 </td>
 <td style="text-align:right;">
-0.2790364
+0.2851802
 </td>
 <td style="text-align:right;">
 1810.900000
@@ -5999,13 +6027,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6073,13 +6101,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6091,13 +6119,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.8276553
+0.8499846
 </td>
 <td style="text-align:right;">
-0.2082166
+0.2138340
 </td>
 <td style="text-align:right;">
-1175.940902
+1207.666668
 </td>
 <td style="text-align:right;">
 1
@@ -6112,10 +6140,10 @@ noint
 6
 </td>
 <td style="text-align:right;">
-1175.940902
+1207.666668
 </td>
 <td style="text-align:right;">
-0.2082166
+0.2138340
 </td>
 <td style="text-align:right;">
 1420.810000
@@ -6147,13 +6175,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6221,13 +6249,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6239,13 +6267,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.7996669
+0.8252278
 </td>
 <td style="text-align:right;">
-0.1553847
+0.1603515
 </td>
 <td style="text-align:right;">
-882.644380
+910.857562
 </td>
 <td style="text-align:right;">
 1
@@ -6260,10 +6288,10 @@ noint
 7
 </td>
 <td style="text-align:right;">
-882.644380
+910.857562
 </td>
 <td style="text-align:right;">
-0.1553847
+0.1603515
 </td>
 <td style="text-align:right;">
 1103.765000
@@ -6295,13 +6323,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6369,13 +6397,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6387,13 +6415,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.7726251
+0.8011920
 </td>
 <td style="text-align:right;">
-0.1159643
+0.1202519
 </td>
 <td style="text-align:right;">
-660.066030
+684.471258
 </td>
 <td style="text-align:right;">
 1
@@ -6408,10 +6436,10 @@ noint
 8
 </td>
 <td style="text-align:right;">
-660.066030
+684.471258
 </td>
 <td style="text-align:right;">
-0.1159643
+0.1202519
 </td>
 <td style="text-align:right;">
 854.316100
@@ -6443,13 +6471,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6517,13 +6545,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6535,13 +6563,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.7464976
+0.7778563
 </td>
 <td style="text-align:right;">
-0.0865468
+0.0901824
 </td>
 <td style="text-align:right;">
-492.963971
+513.672289
 </td>
 <td style="text-align:right;">
 1
@@ -6556,10 +6584,10 @@ noint
 9
 </td>
 <td style="text-align:right;">
-492.963971
+513.672289
 </td>
 <td style="text-align:right;">
-0.0865468
+0.0901824
 </td>
 <td style="text-align:right;">
 660.369090
@@ -6591,13 +6619,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6665,13 +6693,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6683,13 +6711,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.7212538
+0.7552003
 </td>
 <td style="text-align:right;">
-0.0645925
+0.0676327
 </td>
 <td style="text-align:right;">
-367.997323
+385.317508
 </td>
 <td style="text-align:right;">
 1
@@ -6704,10 +6732,10 @@ noint
 10
 </td>
 <td style="text-align:right;">
-367.997323
+385.317508
 </td>
 <td style="text-align:right;">
-0.0645925
+0.0676327
 </td>
 <td style="text-align:right;">
 510.218929
@@ -6739,13 +6767,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6813,13 +6841,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6831,13 +6859,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.6968635
+0.7332042
 </td>
 <td style="text-align:right;">
-0.0482076
+0.0507216
 </td>
 <td style="text-align:right;">
-274.668169
+288.991814
 </td>
 <td style="text-align:right;">
 1
@@ -6852,10 +6880,10 @@ noint
 11
 </td>
 <td style="text-align:right;">
-274.668169
+288.991814
 </td>
 <td style="text-align:right;">
-0.0482076
+0.0507216
 </td>
 <td style="text-align:right;">
 394.149146
@@ -6887,13 +6915,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6961,13 +6989,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -6979,13 +7007,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.6732981
+0.7118487
 </td>
 <td style="text-align:right;">
-0.0359790
+0.0380391
 </td>
 <td style="text-align:right;">
-204.998719
+216.736214
 </td>
 <td style="text-align:right;">
 1
@@ -7000,10 +7028,10 @@ noint
 12
 </td>
 <td style="text-align:right;">
-204.998719
+216.736214
 </td>
 <td style="text-align:right;">
-0.0359790
+0.0380391
 </td>
 <td style="text-align:right;">
 304.469473
@@ -7035,13 +7063,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7109,13 +7137,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7127,13 +7155,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.6505296
+0.6911153
 </td>
 <td style="text-align:right;">
-0.0268524
+0.0285277
 </td>
 <td style="text-align:right;">
-152.998690
+162.544086
 </td>
 <td style="text-align:right;">
 1
@@ -7148,10 +7176,10 @@ noint
 13
 </td>
 <td style="text-align:right;">
-152.998690
+162.544086
 </td>
 <td style="text-align:right;">
-0.0268524
+0.0285277
 </td>
 <td style="text-align:right;">
 235.190985
@@ -7183,13 +7211,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7257,13 +7285,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7275,13 +7303,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.6285310
+0.6709857
 </td>
 <td style="text-align:right;">
-0.0200409
+0.0213946
 </td>
 <td style="text-align:right;">
-114.188546
+121.901522
 </td>
 <td style="text-align:right;">
 1
@@ -7296,10 +7324,10 @@ noint
 14
 </td>
 <td style="text-align:right;">
-114.188546
+121.901522
 </td>
 <td style="text-align:right;">
-0.0200409
+0.0213946
 </td>
 <td style="text-align:right;">
 181.675285
@@ -7331,13 +7359,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7405,13 +7433,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7423,13 +7451,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.6072763
+0.6514424
 </td>
 <td style="text-align:right;">
-0.0149573
+0.0160451
 </td>
 <td style="text-align:right;">
-85.223026
+91.421145
 </td>
 <td style="text-align:right;">
 1
@@ -7444,10 +7472,10 @@ noint
 15
 </td>
 <td style="text-align:right;">
-85.223026
+91.421145
 </td>
 <td style="text-align:right;">
-0.0149573
+0.0160451
 </td>
 <td style="text-align:right;">
 140.336489
@@ -7479,13 +7507,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7553,13 +7581,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7571,13 +7599,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.5867404
+0.6324684
 </td>
 <td style="text-align:right;">
-0.0111631
+0.0120332
 </td>
 <td style="text-align:right;">
-63.605003
+68.562100
 </td>
 <td style="text-align:right;">
 1
@@ -7592,10 +7620,10 @@ noint
 16
 </td>
 <td style="text-align:right;">
-63.605003
+68.562100
 </td>
 <td style="text-align:right;">
-0.0111631
+0.0120332
 </td>
 <td style="text-align:right;">
 108.403994
@@ -7627,13 +7655,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7701,13 +7729,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7719,13 +7747,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.5668989
+0.6140470
 </td>
 <td style="text-align:right;">
-0.0083315
+0.0090244
 </td>
 <td style="text-align:right;">
-47.470696
+51.418755
 </td>
 <td style="text-align:right;">
 1
@@ -7740,10 +7768,10 @@ noint
 17
 </td>
 <td style="text-align:right;">
-47.470696
+51.418755
 </td>
 <td style="text-align:right;">
-0.0083315
+0.0090244
 </td>
 <td style="text-align:right;">
 83.737493
@@ -7775,13 +7803,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7849,13 +7877,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7867,13 +7895,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.5477284
+0.5961621
 </td>
 <td style="text-align:right;">
-0.0062181
+0.0067679
 </td>
 <td style="text-align:right;">
-35.429084
+38.561952
 </td>
 <td style="text-align:right;">
 1
@@ -7888,10 +7916,10 @@ noint
 18
 </td>
 <td style="text-align:right;">
-35.429084
+38.561952
 </td>
 <td style="text-align:right;">
-0.0062181
+0.0067679
 </td>
 <td style="text-align:right;">
 64.683667
@@ -7923,13 +7951,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -7997,13 +8025,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8015,13 +8043,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.5292062
+0.5787982
 </td>
 <td style="text-align:right;">
-0.0046408
+0.0050757
 </td>
 <td style="text-align:right;">
-26.441998
+28.919879
 </td>
 <td style="text-align:right;">
 1
@@ -8036,10 +8064,10 @@ noint
 19
 </td>
 <td style="text-align:right;">
-26.441998
+28.919879
 </td>
 <td style="text-align:right;">
-0.0046408
+0.0050757
 </td>
 <td style="text-align:right;">
 49.965395
@@ -8071,13 +8099,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8145,13 +8173,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8163,13 +8191,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.5113104
+0.5619400
 </td>
 <td style="text-align:right;">
-0.0034636
+0.0038065
 </td>
 <td style="text-align:right;">
-19.734613
+21.688721
 </td>
 <td style="text-align:right;">
 1
@@ -8184,10 +8212,10 @@ noint
 20
 </td>
 <td style="text-align:right;">
-19.734613
+21.688721
 </td>
 <td style="text-align:right;">
-0.0034636
+0.0038065
 </td>
 <td style="text-align:right;">
 38.596152
@@ -8219,13 +8247,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8293,13 +8321,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8311,13 +8339,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.4940197
+0.5455728
 </td>
 <td style="text-align:right;">
-0.0025850
+0.0028547
 </td>
 <td style="text-align:right;">
-14.728650
+16.265649
 </td>
 <td style="text-align:right;">
 1
@@ -8332,10 +8360,10 @@ noint
 21
 </td>
 <td style="text-align:right;">
-14.728650
+16.265649
 </td>
 <td style="text-align:right;">
-0.0025850
+0.0028547
 </td>
 <td style="text-align:right;">
 29.813894
@@ -8367,13 +8395,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8441,13 +8469,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8459,13 +8487,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.4773137
+0.5296823
 </td>
 <td style="text-align:right;">
-0.0019293
+0.0021409
 </td>
 <td style="text-align:right;">
-10.992521
+12.198569
 </td>
 <td style="text-align:right;">
 1
@@ -8480,10 +8508,10 @@ noint
 22
 </td>
 <td style="text-align:right;">
-10.992521
+12.198569
 </td>
 <td style="text-align:right;">
-0.0019293
+0.0021409
 </td>
 <td style="text-align:right;">
 23.029971
@@ -8515,13 +8543,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8589,13 +8617,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8607,13 +8635,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.4611727
+0.5142547
 </td>
 <td style="text-align:right;">
-0.0014399
+0.0016056
 </td>
 <td style="text-align:right;">
-8.204113
+9.148425
 </td>
 <td style="text-align:right;">
 1
@@ -8628,10 +8656,10 @@ noint
 23
 </td>
 <td style="text-align:right;">
-8.204113
+9.148425
 </td>
 <td style="text-align:right;">
-0.0014399
+0.0016056
 </td>
 <td style="text-align:right;">
 17.789678
@@ -8663,13 +8691,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8737,13 +8765,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8755,13 +8783,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.4455774
+0.4992764
 </td>
 <td style="text-align:right;">
-0.0010746
+0.0012041
 </td>
 <td style="text-align:right;">
-6.123024
+6.860943
 </td>
 <td style="text-align:right;">
 1
@@ -8776,10 +8804,10 @@ noint
 24
 </td>
 <td style="text-align:right;">
-6.123024
+6.860943
 </td>
 <td style="text-align:right;">
-0.0010746
+0.0012041
 </td>
 <td style="text-align:right;">
 13.741773
@@ -8811,13 +8839,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8885,13 +8913,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -8903,13 +8931,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.4305096
+0.4847344
 </td>
 <td style="text-align:right;">
-0.0008020
+0.0009031
 </td>
 <td style="text-align:right;">
-4.569833
+5.145425
 </td>
 <td style="text-align:right;">
 1
@@ -8924,10 +8952,10 @@ noint
 25
 </td>
 <td style="text-align:right;">
-4.569833
+5.145425
 </td>
 <td style="text-align:right;">
-0.0008020
+0.0009031
 </td>
 <td style="text-align:right;">
 10.614938
@@ -8959,13 +8987,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -9033,13 +9061,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -9051,13 +9079,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.4159513
+0.4706159
 </td>
 <td style="text-align:right;">
-0.0005986
+0.0006773
 </td>
 <td style="text-align:right;">
-3.410630
+3.858858
 </td>
 <td style="text-align:right;">
 1
@@ -9072,10 +9100,10 @@ noint
 26
 </td>
 <td style="text-align:right;">
-3.410630
+3.858858
 </td>
 <td style="text-align:right;">
-0.0005986
+0.0006773
 </td>
 <td style="text-align:right;">
 8.199590
@@ -9107,13 +9135,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -9181,13 +9209,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -9199,13 +9227,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.4018853
+0.4569086
 </td>
 <td style="text-align:right;">
-0.0004467
+0.0005079
 </td>
 <td style="text-align:right;">
-2.545476
+2.893985
 </td>
 <td style="text-align:right;">
 1
@@ -9220,10 +9248,10 @@ noint
 27
 </td>
 <td style="text-align:right;">
-2.545476
+2.893985
 </td>
 <td style="text-align:right;">
-0.0004467
+0.0005079
 </td>
 <td style="text-align:right;">
 6.333837
@@ -9255,13 +9283,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -9329,13 +9357,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -9347,13 +9375,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.3882950
+0.4436006
 </td>
 <td style="text-align:right;">
-0.0003334
+0.0003809
 </td>
 <td style="text-align:right;">
-1.899780
+2.170370
 </td>
 <td style="text-align:right;">
 1
@@ -9368,10 +9396,10 @@ noint
 28
 </td>
 <td style="text-align:right;">
-1.899780
+2.170370
 </td>
 <td style="text-align:right;">
-0.0003334
+0.0003809
 </td>
 <td style="text-align:right;">
 4.892621
@@ -9403,13 +9431,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -9477,13 +9505,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -9495,13 +9523,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.3751642
+0.4306802
 </td>
 <td style="text-align:right;">
-0.0002488
+0.0002857
 </td>
 <td style="text-align:right;">
-1.417874
+1.627688
 </td>
 <td style="text-align:right;">
 1
@@ -9516,10 +9544,10 @@ noint
 29
 </td>
 <td style="text-align:right;">
-1.417874
+1.627688
 </td>
 <td style="text-align:right;">
-0.0002488
+0.0002857
 </td>
 <td style="text-align:right;">
 3.779342
@@ -9551,13 +9579,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -9625,13 +9653,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70
@@ -9643,13 +9671,13 @@ noint
 30
 </td>
 <td style="text-align:right;">
-0.3624775
+0.4181361
 </td>
 <td style="text-align:right;">
-0.0001857
+0.0002142
 </td>
 <td style="text-align:right;">
-1.058210
+1.220699
 </td>
 <td style="text-align:right;">
 1
@@ -9664,10 +9692,10 @@ noint
 30
 </td>
 <td style="text-align:right;">
-1.058210
+1.220699
 </td>
 <td style="text-align:right;">
-0.0001857
+0.0002142
 </td>
 <td style="text-align:right;">
 2.919382
@@ -9699,13 +9727,13 @@ cycle
 noint
 </td>
 <td style="text-align:right;">
-18.71206
+19.893
 </td>
 <td style="text-align:right;">
-3.528511
+3.588404
 </td>
 <td style="text-align:right;">
-13956.96
+14268.77
 </td>
 <td style="text-align:right;">
 16441.70

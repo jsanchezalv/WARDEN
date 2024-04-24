@@ -21,8 +21,6 @@
 #' @param sensitivity_bool A boolean to determine if Scenarios/DSA should be conducted. 
 #' @param sensitivity_names A vector of scenario/DSA names that can be used to select the right sensitivity (e.g., c("Scenario_1", "Scenario_2")). The parameter "sens_name_used" is created from it which corresponds to the one being used for each iteration.
 #' @param n_sensitivity Number of sensitivity analysis (DSA or Scenarios) to run. It will be interacted with sensitivity_names argument if not null (n_sensitivityitivity = n_sensitivity * length(sensitivity_names)). For DSA, it should be as many parameters as there are. For scenario, it should be 1.
-#' @param drc The discount rate for costs
-#' @param drq The discount rate for LYs/QALYs
 #' @param input_out A vector of variables to be returned in the output data frame
 #' @param ipd Integer taking value 1 for full IPD data returned, and 2 IPD data but aggregating events (returning last value for numeric/character/factor variables. For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear). Other values mean no IPD data returned (removes non-numerical or length>1 items)
 #'
@@ -39,6 +37,8 @@
 #'  c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").
 #'  
 #'  The engine uses the L'Ecuyer-CMRG for the random number generator
+#'  
+#'  If no `drc` or `drq parameters are passed within any of the input lists, these are assigned value 0.03.
 #'
 #' @examples
 #' \dontrun{
@@ -56,8 +56,6 @@
 #' npats = 500,
 #' n_sim = 1,
 #' psa_bool = FALSE,
-#' drc = 0.035,
-#' drq = 0.035,
 #' ipd = 1)
 #' }
 
@@ -82,8 +80,6 @@ run_sim <- function(arm_list=c("int","noint"),
                    sensitivity_bool = FALSE,
                    sensitivity_names = NULL,
                    n_sensitivity = 1,
-                   drc=0.035,
-                   drq=0.035,
                    input_out = NULL,
                    ipd = 1){
 
@@ -175,8 +171,9 @@ run_sim <- function(arm_list=c("int","noint"),
     }
     
     
-    input_list_sens <- list(drc = drc,
-                       drq = drq,
+    input_list_sens <- list(
+                       drc = 0.03,
+                       drq = 0.03,
                        psa_bool = psa_bool,
                        init_event_list = init_event_list,
                        evt_react_list = evt_react_list,
@@ -229,7 +226,7 @@ run_sim <- function(arm_list=c("int","noint"),
           input_list_sens <- c(input_list_sens, list.sensitivity_inputs[[1]])
         } else{
         if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
-          warning("Item ", names(list.sensitivity_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
+          warning("Item ", names(list.sensitivity_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
         }
         input_list_sens <- c(input_list_sens,list.sensitivity_inputs)
         }
@@ -261,7 +258,7 @@ run_sim <- function(arm_list=c("int","noint"),
             input_list <- c(input_list, list.common_all_inputs[[1]])
           } else{
           if ((!is.null(names(list.common_all_inputs[[1]]))) & simulation==1 & sens==1) {
-            warning("Item ", names(list.common_all_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
+            warning("Item ", names(list.common_all_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
           }
           input_list <- c(input_list,list.common_all_inputs)
           }

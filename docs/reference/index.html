@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,6 +79,11 @@
         <dd>Defining parameters that may be used in model calculations</dd>
       </dl><dl><dt>
           
+          <code><a href="add_other.html">add_other()</a></code> 
+        </dt>
+        <dd>Defining other data for events and interventions (only ongoing and instantaneous)</dd>
+      </dl><dl><dt>
+          
           <code><a href="add_reactevt.html">add_reactevt()</a></code> 
         </dt>
         <dd>Define the modifications to other events, costs, utilities, or other items affected by the occurrence of the event</dd>
@@ -97,6 +102,11 @@
           <code><a href="ceac_des.html">ceac_des()</a></code> 
         </dt>
         <dd>Calculate the cost-effectiveness acceptability curve (CEAC) for a DES model with a PSA result</dd>
+      </dl><dl><dt>
+          
+          <code><a href="create_indicators.html">create_indicators()</a></code> 
+        </dt>
+        <dd>Creates a vector of indicators (0 and 1) for sensitivity/DSA analysis</dd>
       </dl><dl><dt>
           
           <code><a href="disc_cycle.html">disc_cycle()</a></code> 
@@ -129,31 +139,6 @@
         <dd>Calculate discounted costs and qalys between events for vectors</dd>
       </dl><dl><dt>
           
-          <code><a href="draw_beta.html">draw_beta()</a></code> 
-        </dt>
-        <dd>Draw from a beta distribution based on mean and se</dd>
-      </dl><dl><dt>
-          
-          <code><a href="draw_dirichlet.html">draw_dirichlet()</a></code> 
-        </dt>
-        <dd>Draw from a dirichlet distribution based on number of counts in transition. Adapted from brms::rdirichlet</dd>
-      </dl><dl><dt>
-          
-          <code><a href="draw_dirichlet_prob.html">draw_dirichlet_prob()</a></code> 
-        </dt>
-        <dd>Draw from a dirichlet distribution based on mean transition probabilities and standard errors</dd>
-      </dl><dl><dt>
-          
-          <code><a href="draw_gamma.html">draw_gamma()</a></code> 
-        </dt>
-        <dd>Draw from a gamma distribution based on mean and se</dd>
-      </dl><dl><dt>
-          
-          <code><a href="draw_resgompertz.html">draw_resgompertz()</a></code> 
-        </dt>
-        <dd>Draw from a restricted Gompertz distribution</dd>
-      </dl><dl><dt>
-          
           <code><a href="draw_tte.html">draw_tte()</a></code> 
         </dt>
         <dd>Draw a time to event from a list of parametric survival functions</dd>
@@ -184,14 +169,29 @@
         <dd>Generate new events to be added to existing vector of events</dd>
       </dl><dl><dt>
           
-          <code><a href="pick_val.html">pick_val()</a></code> 
+          <code><a href="pick_psa.html">pick_psa()</a></code> 
         </dt>
-        <dd>Select which value should be applied in the corresponding loop</dd>
+        <dd>Helper function to create a list with random draws or whenever a series of functions needs to be called. Can be implemented within <code>pick_val_v</code>.</dd>
       </dl><dl><dt>
           
           <code><a href="pick_val_v.html">pick_val_v()</a></code> 
         </dt>
         <dd>Select which values should be applied in the corresponding loop for several values (vector or list).</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rbeta_mse.html">rbeta_mse()</a></code> 
+        </dt>
+        <dd>Draw from a beta distribution based on mean and se</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rdirichlet.html">rdirichlet()</a></code> 
+        </dt>
+        <dd>Draw from a dirichlet distribution based on number of counts in transition. Adapted from brms::rdirichlet</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rdirichlet_prob.html">rdirichlet_prob()</a></code> 
+        </dt>
+        <dd>Draw from a dirichlet distribution based on mean transition probabilities and standard errors</dd>
       </dl><dl><dt>
           
           <code><a href="replicate_profiles.html">replicate_profiles()</a></code> 
@@ -204,9 +204,24 @@
         <dd>Reverts list</dd>
       </dl><dl><dt>
           
+          <code><a href="rgamma_mse.html">rgamma_mse()</a></code> 
+        </dt>
+        <dd>Draw from a gamma distribution based on mean and se</dd>
+      </dl><dl><dt>
+          
           <code><a href="rpoisgamma.html">rpoisgamma()</a></code> 
         </dt>
         <dd>Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rresgompertz.html">rresgompertz()</a></code> 
+        </dt>
+        <dd>Draw from a restricted Gompertz distribution (lower bound only)</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rresgompertz_lu.html">rresgompertz_lu()</a></code> 
+        </dt>
+        <dd>Draw from a restricted Gompertz distribution (lower and upper bound)</dd>
       </dl><dl><dt>
           
           <code><a href="run_sim.html">run_sim()</a></code> 
@@ -222,6 +237,11 @@
           <code><a href="summary_results_det.html">summary_results_det()</a></code> 
         </dt>
         <dd>Deterministic results for a specific treatment</dd>
+      </dl><dl><dt>
+          
+          <code><a href="summary_results_sens.html">summary_results_sens()</a></code> 
+        </dt>
+        <dd>Summary of sensitivity outputs for a treatment</dd>
       </dl><dl><dt>
           
           <code><a href="summary_results_sim.html">summary_results_sim()</a></code> 

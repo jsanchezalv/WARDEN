@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">March 21, 2024</h4>
+            <h4 data-toc-skip class="date">April 24, 2024</h4>
       
       
       <div class="d-none name"><code>example_uncertainty.Rmd</code></div>
@@ -122,7 +122,7 @@ check the original model for details on functions, parameters etc.</p>
 <span><span class="co">#&gt; Loading required package: survival</span></span>
 <span><span class="co">#&gt; Warning: package 'survival' was built under R version 4.3.2</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.3.2</span></span>
+<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.3.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: package 'kableExtra' was built under R version 4.3.2</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -164,7 +164,7 @@ utilities and costs also have a distribution.</p>
 <span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#costs</span></span>
 <span>    cost_v <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">psa_bool</span><span class="op">)</span><span class="op">{</span></span>
-<span>                     <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="../reference/draw_gamma.html">draw_gamma</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="co">#in this case I choose a gamma distribution</span></span>
+<span>                     <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="../reference/rgamma_mse.html">rgamma_mse</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="co">#in this case I choose a gamma distribution</span></span>
 <span>             <span class="op">}</span> <span class="kw">else</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span><span class="op">}</span>,</span>
 <span>    cost.idfs.tx  <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.idfs.tx"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>    cost.recurrence  <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.recurrence"</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -190,7 +190,7 @@ utilities and costs also have a distribution.</p>
 <span></span>
 <span><span class="co">#Put objects here that do not change as we loop through interventions for a patient</span></span>
 <span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>sex_pt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,p<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span>,<span class="st">"male"</span>,<span class="st">"female"</span><span class="op">)</span>,</span>
-<span>                             nat.os.s <span class="op">=</span> <span class="fu"><a href="../reference/draw_resgompertz.html">draw_resgompertz</a></span><span class="op">(</span><span class="fl">1</span>,</span>
+<span>                             nat.os.s <span class="op">=</span> <span class="fu"><a href="../reference/rresgompertz.html">rresgompertz</a></span><span class="op">(</span><span class="fl">1</span>,</span>
 <span>                                                     shape<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">sex_pt</span><span class="op">==</span><span class="st">"male"</span><span class="op">)</span><span class="op">{</span><span class="fl">0.102</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.115</span><span class="op">}</span>,</span>
 <span>                                                     rate<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">sex_pt</span><span class="op">==</span><span class="st">"male"</span><span class="op">)</span><span class="op">{</span><span class="fl">0.000016</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.0000041</span><span class="op">}</span>,</span>
 <span>                                                     lower_bound <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">)</span> <span class="co">#in years, for a patient who is 50yo</span></span>
@@ -487,7 +487,7 @@ require <code>psa_bool = TRUE</code> and a high number of
 simulations.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">sample_sizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">100</span>,<span class="fl">500</span><span class="op">)</span></span>
+<span><span class="va">sample_sizes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>,<span class="fl">100</span>,<span class="fl">500</span>,<span class="fl">1000</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">sim_size_df</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">sample_size</span> <span class="kw">in</span> <span class="va">sample_sizes</span><span class="op">)</span> <span class="op">{</span></span>
@@ -506,21 +506,17 @@ simulations.</p>
 <span>    cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
 <span>    cost_instant_list <span class="op">=</span> <span class="va">cost_instant</span>,</span>
 <span>    ncores <span class="op">=</span> <span class="fl">6</span>, <span class="co"># number of cores to use, recommended not to use all</span></span>
-<span>    drc <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for costs</span></span>
-<span>    drq <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for qalys</span></span>
 <span>    ipd<span class="op">=</span><span class="cn">FALSE</span>                                 <span class="co"># Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> </span>
 <span></span>
 <span>  <span class="co">#We're extracting the overall ICER/ICUR and also costs/qalys/lys for the "noint" intervention</span></span>
-<span>  <span class="va">loop_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_costs"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span>
-<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_lys"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span>
-<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_qalys"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span>
-<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_costs"</span>,<span class="st">"int"</span><span class="op">)</span>,</span>
-<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_lys"</span>,<span class="st">"int"</span><span class="op">)</span>,</span>
-<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_qalys"</span>,<span class="st">"int"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">loop_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_costs"</span><span class="op">)</span>,</span>
+<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_lys"</span><span class="op">)</span>,</span>
+<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_qalys"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  </span>
-<span>    <span class="va">loop_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">loop_df</span>, <span class="va">loop_df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>                     <span class="fu"><a href="https://tidyr.tidyverse.org/reference/spread.html" class="external-link">spread</a></span><span class="op">(</span><span class="va">arm</span>,<span class="va">value</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="va">loop_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">loop_df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>                     <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>,<span class="st">"noint"</span><span class="op">)</span>,names_to<span class="op">=</span><span class="st">"arm"</span><span class="op">)</span>,</span>
+<span>                   <span class="va">loop_df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>dif <span class="op">=</span> <span class="va">int</span> <span class="op">-</span> <span class="va">noint</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">simulation</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>value <span class="op">=</span> <span class="va">dif</span><span class="op">[</span><span class="va">element</span><span class="op">==</span><span class="st">"total_costs"</span><span class="op">]</span><span class="op">/</span><span class="va">dif</span><span class="op">[</span><span class="va">element</span><span class="op">==</span><span class="st">"total_qalys"</span><span class="op">]</span>,element <span class="op">=</span> <span class="st">"ICUR"</span>, arm<span class="op">=</span><span class="st">"noint"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -529,7 +525,7 @@ simulations.</p>
 <span>                     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span>    </span>
 <span></span>
-<span>  <span class="va">loop_df</span><span class="op">$</span><span class="va">sample_size</span> <span class="op">=</span> <span class="va">sample_size</span></span>
+<span>  <span class="va">loop_df</span><span class="op">$</span><span class="va">sample_size</span> <span class="op">&lt;-</span> <span class="va">sample_size</span></span>
 <span>  <span class="va">sim_size_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">sim_size_df</span>,<span class="va">loop_df</span><span class="op">)</span></span>
 <span>  </span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -544,8 +540,8 @@ higher than for costs/lys/qalys. This is because of the incremental
 nature of ICER/ICUR, which means it’s more sensitive to small variations
 of these outputs. So while the costs/qalys/lys are quite precise with a
 reduced number of simulations (~1,000), in order to have a precise
-ICER/ICUR we need to go higher (~5,000/10,000). However, one can see
-that the mean is quite stable at ~5,000 patients.</p>
+ICER/ICUR we would need to go higher (~5,000/10,000). However, one could
+see that the mean would be quite stable at ~5,000 patients.</p>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
 <th style="text-align:left;">
@@ -570,16 +566,16 @@ CV (%)
 ICUR
 </td>
 <td style="text-align:left;">
-10
+50
 </td>
 <td style="text-align:right;">
-131301.87
+138192.77
 </td>
 <td style="text-align:right;">
-66303.03
+105538.76
 </td>
 <td style="text-align:right;">
-50.50
+76.37
 </td>
 </tr>
 <tr>
@@ -590,13 +586,13 @@ ICUR
 100
 </td>
 <td style="text-align:right;">
-129462.48
+121613.16
 </td>
 <td style="text-align:right;">
-80561.30
+46590.63
 </td>
 <td style="text-align:right;">
-62.23
+38.31
 </td>
 </tr>
 <tr>
@@ -607,13 +603,30 @@ ICUR
 500
 </td>
 <td style="text-align:right;">
-104743.08
+101800.13
 </td>
 <td style="text-align:right;">
-16105.71
+14095.88
 </td>
 <td style="text-align:right;">
-15.38
+13.85
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ICUR
+</td>
+<td style="text-align:left;">
+1000
+</td>
+<td style="text-align:right;">
+100263.90
+</td>
+<td style="text-align:right;">
+10974.37
+</td>
+<td style="text-align:right;">
+10.95
 </td>
 </tr>
 <tr>
@@ -621,16 +634,16 @@ ICUR
 total_costs
 </td>
 <td style="text-align:left;">
-10
+50
 </td>
 <td style="text-align:right;">
-265232.41
+272451.17
 </td>
 <td style="text-align:right;">
-16566.26
+7272.48
 </td>
 <td style="text-align:right;">
-6.25
+2.67
 </td>
 </tr>
 <tr>
@@ -641,13 +654,13 @@ total_costs
 100
 </td>
 <td style="text-align:right;">
-270611.84
+274804.71
 </td>
 <td style="text-align:right;">
-6104.83
+7662.30
 </td>
 <td style="text-align:right;">
-2.26
+2.79
 </td>
 </tr>
 <tr>
@@ -658,13 +671,30 @@ total_costs
 500
 </td>
 <td style="text-align:right;">
-268998.60
+275335.15
 </td>
 <td style="text-align:right;">
-2313.84
+2177.30
 </td>
 <td style="text-align:right;">
-0.86
+0.79
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+total_costs
+</td>
+<td style="text-align:left;">
+1000
+</td>
+<td style="text-align:right;">
+275879.11
+</td>
+<td style="text-align:right;">
+1724.14
+</td>
+<td style="text-align:right;">
+0.62
 </td>
 </tr>
 <tr>
@@ -672,67 +702,84 @@ total_costs
 total_lys
 </td>
 <td style="text-align:left;">
-10
+50
 </td>
 <td style="text-align:right;">
-11.43
-</td>
-<td style="text-align:right;">
-0.65
-</td>
-<td style="text-align:right;">
-5.65
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-total_lys
-</td>
-<td style="text-align:left;">
-100
-</td>
-<td style="text-align:right;">
-11.78
-</td>
-<td style="text-align:right;">
-0.15
-</td>
-<td style="text-align:right;">
-1.30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-total_lys
-</td>
-<td style="text-align:left;">
-500
-</td>
-<td style="text-align:right;">
-11.77
-</td>
-<td style="text-align:right;">
-0.05
+12.16
 </td>
 <td style="text-align:right;">
 0.43
 </td>
+<td style="text-align:right;">
+3.51
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+total_lys
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:right;">
+12.14
+</td>
+<td style="text-align:right;">
+0.39
+</td>
+<td style="text-align:right;">
+3.23
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+total_lys
+</td>
+<td style="text-align:left;">
+500
+</td>
+<td style="text-align:right;">
+12.23
+</td>
+<td style="text-align:right;">
+0.07
+</td>
+<td style="text-align:right;">
+0.59
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+total_lys
+</td>
+<td style="text-align:left;">
+1000
+</td>
+<td style="text-align:right;">
+12.26
+</td>
+<td style="text-align:right;">
+0.08
+</td>
+<td style="text-align:right;">
+0.62
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 total_qalys
 </td>
 <td style="text-align:left;">
-10
+50
 </td>
 <td style="text-align:right;">
-8.37
+8.98
 </td>
 <td style="text-align:right;">
-0.87
+0.47
 </td>
 <td style="text-align:right;">
-10.37
+5.26
 </td>
 </tr>
 <tr>
@@ -743,13 +790,13 @@ total_qalys
 100
 </td>
 <td style="text-align:right;">
-8.78
+9.11
 </td>
 <td style="text-align:right;">
-0.15
+0.41
 </td>
 <td style="text-align:right;">
-1.69
+4.48
 </td>
 </tr>
 <tr>
@@ -760,10 +807,27 @@ total_qalys
 500
 </td>
 <td style="text-align:right;">
-8.88
+9.25
 </td>
 <td style="text-align:right;">
-0.09
+0.10
+</td>
+<td style="text-align:right;">
+1.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+total_qalys
+</td>
+<td style="text-align:left;">
+1000
+</td>
+<td style="text-align:right;">
+9.26
+</td>
+<td style="text-align:right;">
+0.10
 </td>
 <td style="text-align:right;">
 1.04
@@ -788,9 +852,10 @@ patients.</p>
 <span></span>
 <span><span class="va">sim_size_psa_df</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">sample_size</span> <span class="kw">in</span> <span class="va">sample_sizes</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="../reference/run_sim_parallel.html">run_sim_parallel</a></span><span class="op">(</span>  </span>
+<span>  <span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span> <span class="co">#run without warnings</span></span>
+<span>      <span class="fu"><a href="../reference/run_sim_parallel.html">run_sim_parallel</a></span><span class="op">(</span>  </span>
 <span>    npats<span class="op">=</span><span class="va">sample_size</span>,                        <span class="co"># number of patients to be simulated</span></span>
-<span>    n_sim<span class="op">=</span><span class="fl">5</span>,                                <span class="co"># number of simulations to run</span></span>
+<span>    n_sim<span class="op">=</span><span class="fl">6</span>,                                <span class="co"># number of simulations to run</span></span>
 <span>    psa_bool <span class="op">=</span> <span class="cn">TRUE</span>,                         <span class="co"># use PSA or not. If n_sim &gt; 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)</span></span>
 <span>    arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,             <span class="co"># intervention list</span></span>
 <span>    common_all_inputs <span class="op">=</span> <span class="va">common_all_inputs</span>,    <span class="co"># inputs common that do not change within a simulation</span></span>
@@ -801,21 +866,18 @@ patients.</p>
 <span>    util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>    cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
 <span>    cost_instant_list <span class="op">=</span> <span class="va">cost_instant</span>,</span>
-<span>    drc <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for costs</span></span>
-<span>    drq <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for qalys</span></span>
+<span>    ncores <span class="op">=</span> <span class="fl">6</span>, <span class="co"># number of cores to use, recommended not to use all</span></span>
 <span>    ipd<span class="op">=</span><span class="cn">FALSE</span>                                 <span class="co"># Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower</span></span>
-<span>  <span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> </span>
 <span></span>
 <span>  <span class="co">#We're extracting the overall ICER/ICUR and also costs/qalys/lys for the "noint" intervention</span></span>
-<span>  <span class="va">loop_psa_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_costs"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span>
-<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_lys"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span>
-<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_qalys"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span>
-<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_costs"</span>,<span class="st">"int"</span><span class="op">)</span>,</span>
-<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_lys"</span>,<span class="st">"int"</span><span class="op">)</span>,</span>
-<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_qalys"</span>,<span class="st">"int"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">loop_psa_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_costs"</span><span class="op">)</span>,</span>
+<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_lys"</span><span class="op">)</span>,</span>
+<span>                   <span class="fu"><a href="../reference/extract_psa_result.html">extract_psa_result</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_qalys"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  </span>
-<span>    <span class="va">loop_psa_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">loop_psa_df</span>, <span class="va">loop_psa_df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>                     <span class="fu"><a href="https://tidyr.tidyverse.org/reference/spread.html" class="external-link">spread</a></span><span class="op">(</span><span class="va">arm</span>,<span class="va">value</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="va">loop_psa_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">loop_psa_df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>                     <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>,<span class="st">"noint"</span><span class="op">)</span>,names_to<span class="op">=</span><span class="st">"arm"</span><span class="op">)</span>,</span>
+<span>                   <span class="va">loop_psa_df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>dif <span class="op">=</span> <span class="va">int</span> <span class="op">-</span> <span class="va">noint</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">simulation</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>value <span class="op">=</span> <span class="va">dif</span><span class="op">[</span><span class="va">element</span><span class="op">==</span><span class="st">"total_costs"</span><span class="op">]</span><span class="op">/</span><span class="va">dif</span><span class="op">[</span><span class="va">element</span><span class="op">==</span><span class="st">"total_qalys"</span><span class="op">]</span>,element <span class="op">=</span> <span class="st">"ICUR"</span>, arm<span class="op">=</span><span class="st">"noint"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -823,7 +885,7 @@ patients.</p>
 <span>                     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span>  </span>
-<span>  <span class="va">loop_psa_df</span><span class="op">$</span><span class="va">sample_size</span> <span class="op">=</span> <span class="va">sample_size</span></span>
+<span>  <span class="va">loop_psa_df</span><span class="op">$</span><span class="va">sample_size</span>  <span class="op">&lt;-</span>  <span class="va">sample_size</span></span>
 <span>  <span class="va">sim_size_psa_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">sim_size_psa_df</span>,<span class="va">loop_psa_df</span><span class="op">)</span></span>
 <span>  </span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -859,16 +921,56 @@ ICUR
 1000
 </td>
 <td style="text-align:left;">
+structural
+</td>
+<td style="text-align:right;">
+100263.90
+</td>
+<td style="text-align:right;">
+10974.37
+</td>
+<td style="text-align:right;">
+10.95
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ICUR
+</td>
+<td style="text-align:left;">
+1000
+</td>
+<td style="text-align:left;">
 structural + parameter
 </td>
 <td style="text-align:right;">
-128216.42
+116958.76
 </td>
 <td style="text-align:right;">
-54896.58
+31500.56
 </td>
 <td style="text-align:right;">
-42.82
+26.93
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+total_costs
+</td>
+<td style="text-align:left;">
+1000
+</td>
+<td style="text-align:left;">
+structural
+</td>
+<td style="text-align:right;">
+275879.11
+</td>
+<td style="text-align:right;">
+1724.14
+</td>
+<td style="text-align:right;">
+0.62
 </td>
 </tr>
 <tr>
@@ -882,13 +984,33 @@ total_costs
 structural + parameter
 </td>
 <td style="text-align:right;">
-242287.47
+244758.28
 </td>
 <td style="text-align:right;">
-23916.51
+25087.27
 </td>
 <td style="text-align:right;">
-9.87
+10.25
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+total_lys
+</td>
+<td style="text-align:left;">
+1000
+</td>
+<td style="text-align:left;">
+structural
+</td>
+<td style="text-align:right;">
+12.26
+</td>
+<td style="text-align:right;">
+0.08
+</td>
+<td style="text-align:right;">
+0.62
 </td>
 </tr>
 <tr>
@@ -902,13 +1024,33 @@ total_lys
 structural + parameter
 </td>
 <td style="text-align:right;">
-11.52
+12.00
 </td>
 <td style="text-align:right;">
-0.27
+0.32
 </td>
 <td style="text-align:right;">
-2.33
+2.67
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+total_qalys
+</td>
+<td style="text-align:left;">
+1000
+</td>
+<td style="text-align:left;">
+structural
+</td>
+<td style="text-align:right;">
+9.26
+</td>
+<td style="text-align:right;">
+0.10
+</td>
+<td style="text-align:right;">
+1.04
 </td>
 </tr>
 <tr>
@@ -922,13 +1064,13 @@ total_qalys
 structural + parameter
 </td>
 <td style="text-align:right;">
-8.67
+9.05
 </td>
 <td style="text-align:right;">
-0.30
+0.34
 </td>
 <td style="text-align:right;">
-3.47
+3.76
 </td>
 </tr>
 </tbody>
@@ -939,34 +1081,14 @@ structural + parameter
 <h2 id="ceacceaf-and-evpi">CEAC/CEAF and EVPI<a class="anchor" aria-label="anchor" href="#ceacceaf-and-evpi"></a>
 </h2>
 <p>When a PSA is run, additional analyses can be performed to understand
-the importance and behavior of uncertainty. Let’s run our model for
-1,000 patients in 4 simulations.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span>  <span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
-<span>    npats<span class="op">=</span><span class="fl">1000</span>,                        <span class="co"># number of patients to be simulated</span></span>
-<span>    n_sim<span class="op">=</span><span class="fl">4</span>,                                <span class="co"># number of simulations to run</span></span>
-<span>    psa_bool <span class="op">=</span> <span class="cn">TRUE</span>,                         <span class="co"># use PSA or not. If n_sim &gt; 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)</span></span>
-<span>    arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,             <span class="co"># intervention list</span></span>
-<span>    common_all_inputs <span class="op">=</span> <span class="va">common_all_inputs</span>,    <span class="co"># inputs common that do not change within a simulation</span></span>
-<span>    common_pt_inputs <span class="op">=</span> <span class="va">common_pt_inputs</span>,      <span class="co"># inputs that change within a simulation but are not affected by the intervention</span></span>
-<span>    unique_pt_inputs <span class="op">=</span> <span class="va">unique_pt_inputs</span>,      <span class="co"># inputs that change within a simulation between interventions</span></span>
-<span>    init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,        <span class="co"># initial event list</span></span>
-<span>    evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,          <span class="co"># reaction of events</span></span>
-<span>    util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
-<span>    cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
-<span>    cost_instant_list <span class="op">=</span> <span class="va">cost_instant</span>,</span>
-<span>    drc <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for costs</span></span>
-<span>    drq <span class="op">=</span> <span class="fl">0.035</span>,                              <span class="co"># discount rate for qalys</span></span>
-<span>    ipd<span class="op">=</span><span class="cn">FALSE</span>                                 <span class="co"># Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower</span></span>
-<span>  <span class="op">)</span><span class="op">)</span></span></code></pre></div>
+the importance and behavior of uncertainty.</p>
 <div class="section level3">
 <h3 id="ceacceaf">CEAC/CEAF<a class="anchor" aria-label="anchor" href="#ceacceaf"></a>
 </h3>
 <p>We can now use the <code>ceac_des</code> function with a vector of
 willingness to pay and the results of our PSA to generate the CEAC and
 CEAF plots.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">wtp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from<span class="op">=</span><span class="fl">0</span>,to<span class="op">=</span><span class="fl">150000</span>,by<span class="op">=</span><span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="va">ceac_out</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/ceac_des.html">ceac_des</a></span><span class="op">(</span><span class="va">wtp</span>,<span class="va">results</span><span class="op">)</span></span>
@@ -980,7 +1102,7 @@ CEAF plots.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Cost Effectiveness Acceptability Curve (CEAC)"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_uncertainty_files/figure-html/ceac_ceaf-1.png" width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
 <span></span>
@@ -999,7 +1121,7 @@ CEAF plots.</p>
 </h3>
 <p>Similarly to <code>ceac_des</code>, the function
 <code>evpi_des</code> also allows to compute the EVPI.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">evpi_out</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/evpi_des.html">evpi_des</a></span><span class="op">(</span><span class="va">wtp</span>,<span class="va">results</span><span class="op">)</span></span>
 <span></span>

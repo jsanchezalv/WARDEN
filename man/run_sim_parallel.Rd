@@ -27,8 +27,6 @@ run_sim_parallel(
   sensitivity_names = NULL,
   n_sensitivity = 1,
   ncores = 1,
-  drc = 0.035,
-  drq = 0.035,
   input_out = NULL,
   ipd = 1
 )
@@ -48,21 +46,21 @@ run_sim_parallel(
 
 \item{evt_react_list}{A list of event reactions}
 
-\item{util_ongoing_list}{A list of utilities that are accrued at an ongoing basis}
+\item{util_ongoing_list}{A list of utilities that are accrued at an ongoing basis (discounted using parameter drq)}
 
-\item{util_instant_list}{A list of utilities that are accrued instantaneously at an event}
+\item{util_instant_list}{A list of utilities that are accrued instantaneously at an event (discounted using parameter drq)}
 
-\item{util_cycle_list}{A list of utilities that are accrued in cycles}
+\item{util_cycle_list}{A list of utilities that are accrued in cycles (discounted using parameter drq)}
 
-\item{cost_ongoing_list}{A list of costs that are accrued at an ongoing basis}
+\item{cost_ongoing_list}{A list of costs that are accrued at an ongoing basis (discounted using parameter drc)}
 
-\item{cost_instant_list}{A list of costs that are accrued instantaneously at an event}
+\item{cost_instant_list}{A list of costs that are accrued instantaneously at an event (discounted using parameter drc)}
 
-\item{cost_cycle_list}{A list of costs that are accrued in cycles}
+\item{cost_cycle_list}{A list of costs that are accrued in cycles (discounted using parameter drc)}
 
-\item{other_ongoing_list}{A list of other data that are accrued at an ongoing basis (discounted using drq)}
+\item{other_ongoing_list}{A list of other data that are accrued at an ongoing basis (discounted using parameter drq)}
 
-\item{other_instant_list}{A list of other data that are accrued instantaneously at an event (discounted using drq)}
+\item{other_instant_list}{A list of other data that are accrued instantaneously at an event (discounted using parameter drq)}
 
 \item{npats}{The number of patients to be simulated (it will simulate npats * length(arm_list))}
 
@@ -77,10 +75,6 @@ run_sim_parallel(
 \item{n_sensitivity}{Number of sensitivity analysis (DSA or Scenarios) to run. It will be interacted with sensitivity_names argument if not null (n_sensitivityitivity = n_sensitivity * length(sensitivity_names)). For DSA, it should be as many parameters as there are. For scenario, it should be 1.}
 
 \item{ncores}{The number of cores to use for parallel computing}
-
-\item{drc}{The discount rate for costs}
-
-\item{drq}{The discount rate for LYs/QALYs}
 
 \item{input_out}{A vector of variables to be returned in the output data frame}
 
@@ -104,6 +98,8 @@ c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "
 The engine uses the L'Ecuyer-CMRG for the random number generator.
 Note that if ncores > 1, then results per simulation will only be exactly replicable if using run_sim_parallel
 (as seeds are automatically transformed to be seven integer seeds -i.e, L'Ecuyer-CMRG seeds-)
+
+If no \code{drc} or \code{drq} parameters are passed within any of the input lists, these are assigned value 0.03.
 }
 \examples{
 \dontrun{
@@ -121,8 +117,6 @@ npats = 500,
 n_sim = 1,
 psa_bool = FALSE,
 ncores = future::availableCores(),
-drc = 0.035,
-drq = 0.035,
 ipd = 1)
 }
 }

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">modify_item</span><span class="op">(</span><span class="va">list_item</span>, env_ch <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">modify_item</span><span class="op">(</span><span class="va">list_item</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -72,15 +72,14 @@
     <dl><dt>list_item</dt>
 <dd><p>A list of items and their values or expressions</p></dd>
 
-
-<dt>env_ch</dt>
-<dd><p>Environment in which to save list (should not be defined by user)</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two <code>modify_item</code> with a list of one element, it's better to group them into a single <code>modify_item</code> with a list of two elements.</p>
+<p>Costs and utilities can be modified by using the construction <code>type_name_category</code>, where type is either "qaly" or "cost",
+name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass <code>cost_default_instant</code> and modify the cost.
+This will overwrite the value defined in the corresponding cost/utility section.</p>
     </div>
 
     <div class="section level2">

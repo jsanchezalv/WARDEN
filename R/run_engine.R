@@ -46,7 +46,7 @@ run_engine <- function(arm_list,
           input_list_pt <- c(input_list_pt, list.common_pt_inputs[[1]])
         } else{
         if (!is.null(names(list.common_pt_inputs[[1]]))) {
-          warning("Item ", names(list.common_pt_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
+          warning("Item ", names(list.common_pt_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
         }
         input_list_pt <- c(input_list_pt,list.common_pt_inputs)
         }
@@ -75,7 +75,7 @@ run_engine <- function(arm_list,
             input_list_arm <- c(input_list_arm, list.unique_pt_inputs[[1]])
           } else{
           if ((!is.null(names(list.unique_pt_inputs[[1]]))) & i==1 & simulation==1 & sens==1) {
-            warning("Item ", names(list.unique_pt_inputs), " is named. It is strongly advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
+            warning("Item ", names(list.unique_pt_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
           }
           input_list_arm <- c(input_list_arm,list.unique_pt_inputs)
           }

@@ -387,8 +387,6 @@ for (sample_size in sample_sizes) {
     cost_ongoing_list = cost_ongoing,
     cost_instant_list = cost_instant,
     ncores = 6, # number of cores to use, recommended not to use all
-    drc = 0.035,                              # discount rate for costs
-    drq = 0.035,                              # discount rate for qalys
     ipd=FALSE                                 # Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower
   )) 
 
@@ -481,8 +479,6 @@ for (sample_size in sample_sizes) {
     cost_ongoing_list = cost_ongoing,
     cost_instant_list = cost_instant,
     ncores = 6, # number of cores to use, recommended not to use all
-    drc = 0.035,                              # discount rate for costs
-    drq = 0.035,                              # discount rate for qalys
     ipd=FALSE                                 # Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower
   )) 
 

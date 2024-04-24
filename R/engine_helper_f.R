@@ -58,6 +58,16 @@ initiate_evt <- function(arm_name,input_list_arm){
 get_next_evt <- function(evt_list){                  # This function identifies which event is to be processed next for each patient, depending on intervention
 
   if (length(evt_list)>0) {
+    # #Alternative way, 9x slower
+    # x <- unlist(evt_list)
+    # min_x <- x[x==min(x)]
+    # priority_index <- match(names(min_x),names_order) #names order is the priority of the event names
+    # max_priority <- which.min(priority_index)
+    # min_evt <- min_x[max_priority]
+    # # Or
+    # min_x <- evt_list[min(evt_list)==evt_list]
+    # min_x[which.min(names_order[names(names_order) %in% names(min_x)])] #order is a named vector
+    
     min_evt <- which.min(unlist(evt_list)) #select the position in the vector that has the minimum time
     cur_evtlist <- list(out = list(evt = names(evt_list[min_evt]), evttime = evt_list[[min_evt]]), evt_list = evt_list[-min_evt])
   } else {

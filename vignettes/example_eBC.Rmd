@@ -420,8 +420,6 @@ results <- run_sim(
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   cost_instant_list = cost_instant,
-  drc = 0.035,                              # discount rate for costs
-  drq = 0.035,                              # discount rate for QALYs
   input_out = c(                            # list of additional outputs (Flags, etc) that the user wants to export for each patient and event
                 "os.early",
                 "os.mbc",
