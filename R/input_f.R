@@ -415,8 +415,9 @@ add_util <- function(.data=NULL,util,evt,arm,category="default",cycle_l=NULL,cyc
 #' \dontrun{
 #' add_other(evt = c("start","idfs","ttot"),
 #' arm = c("int", "noint"),
-#' value = 1,
+#' other = 1,
 #' category = "other_discounted_output"
+#' )
 #' }
 
 add_other <- function(.data=NULL,other,evt,arm,category="default"){

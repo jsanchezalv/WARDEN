@@ -32,7 +32,8 @@ This function accepts the use of pipes (\%>\%) to define multiple other data.
 \dontrun{
 add_other(evt = c("start","idfs","ttot"),
 arm = c("int", "noint"),
-value = 1,
+other = 1,
 category = "other_discounted_output"
+)
 }
 }
