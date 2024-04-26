@@ -602,7 +602,7 @@ compute_outputs <- function(patdata,input_list) {
     
     for (output_i in data_export_tobesummarized) {
         #Gets last value from patient, then average for numeric
-      final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+      final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),n=1,na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
     }
   }
   
