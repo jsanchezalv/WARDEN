@@ -4,10 +4,14 @@
 \alias{modify_event}
 \title{Modify the time of existing events}
 \usage{
-modify_event(evt)
+modify_event(evt, create_if_null = TRUE)
 }
 \arguments{
 \item{evt}{A list of events and their times}
+
+\item{create_if_null}{A boolean.
+If TRUE, it will create non-existing events with the chosen time to event.
+If FALSE, it will ignore those.}
 }
 \description{
 Modify the time of existing events

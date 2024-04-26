@@ -547,6 +547,9 @@ new_event <- function(evt){
 #' Modify the time of existing events
 #'
 #' @param evt A list of events and their times
+#' @param create_if_null A boolean.
+#'  If TRUE, it will create non-existing events with the chosen time to event.
+#'  If FALSE, it will ignore those.
 #'
 #' @importFrom utils modifyList
 #' @importFrom stats setNames
@@ -563,23 +566,29 @@ new_event <- function(evt){
 #' modify_event(list("os"=40, "ttot"=curtime+0.0001))
 #' }
 
-modify_event <- function(evt){
+modify_event <- function(evt,create_if_null=TRUE){
   input_list_arm <- parent.frame()$input_list_arm
   
   evt_unlist <- unlist(evt)
   if(!is.numeric(evt_unlist)){
       stop("Modify event times are not all numeric, please review")
   }
-  names_obj_temp <- names(input_list_arm$cur_evtlist)
   names_evt <- names(evt)
-  names_found <- names_evt[names_evt %in% names_obj_temp]
-  if (length(names_found)==0) {
-    warning("Some or all event/s in modify_evt within ", paste(names_evt,collapse=", "), " not found. Use new_evt to add new events.")
+  
+  if (create_if_null==FALSE) {
+    names_obj_temp <- names(input_list_arm$cur_evtlist)
+    names_found <- names_evt[names_evt %in% names_obj_temp]
+    if (length(names_found)==0) {
+      warning("Some or all event/s in modify_evt within ", paste(names_evt,collapse=", "), " not found. Use new_evt to add new events.")
+    }
+    matched <- which(names_obj_temp %in% names_found)
+    
+    input_list_arm[["cur_evtlist"]][matched] <- evt_unlist[names_obj_temp[names_obj_temp %in% names_found]]
+  } else{
+    input_list_arm[["cur_evtlist"]][names_evt] <- evt_unlist
   }
-  matched <- which(names_obj_temp %in% names_found)
   
-  input_list_arm[["cur_evtlist"]][matched] <- evt_unlist[names_obj_temp[names_obj_temp %in% names_found]]
-  
+   
   list2env(input_list_arm["cur_evtlist"],envir = parent.frame())
   assign("input_list_arm",input_list_arm, envir = parent.frame())
   
