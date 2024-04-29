@@ -46,21 +46,21 @@ run_sim_parallel(
 
 \item{evt_react_list}{A list of event reactions}
 
-\item{util_ongoing_list}{A list of utilities that are accrued at an ongoing basis (discounted using parameter drq)}
+\item{util_ongoing_list}{Vector of QALY named variables that are accrued at an ongoing basis (discounted using drq)}
 
-\item{util_instant_list}{A list of utilities that are accrued instantaneously at an event (discounted using parameter drq)}
+\item{util_instant_list}{Vector of QALY named variables that are accrued instantaneously at an event (discounted using drq)}
 
-\item{util_cycle_list}{A list of utilities that are accrued in cycles (discounted using parameter drq)}
+\item{util_cycle_list}{Vector of QALY named variables that are accrued in cycles (discounted using drq)}
 
-\item{cost_ongoing_list}{A list of costs that are accrued at an ongoing basis (discounted using parameter drc)}
+\item{cost_ongoing_list}{Vector of cost named variables that are accrued at an ongoing basis (discounted using drc)}
 
-\item{cost_instant_list}{A list of costs that are accrued instantaneously at an event (discounted using parameter drc)}
+\item{cost_instant_list}{Vector of cost named variables that are accrued instantaneously at an event (discounted using drc)}
 
-\item{cost_cycle_list}{A list of costs that are accrued in cycles (discounted using parameter drc)}
+\item{cost_cycle_list}{Vector of cost named variables that are accrued in cycles (discounted using drc)}
 
-\item{other_ongoing_list}{A list of other data that are accrued at an ongoing basis (discounted using parameter drq)}
+\item{other_ongoing_list}{Vector of other named variables that are accrued at an ongoing basis (discounted using drq)}
 
-\item{other_instant_list}{A list of other data that are accrued instantaneously at an event (discounted using parameter drq)}
+\item{other_instant_list}{Vector of other named variables that are accrued instantaneously at an event (discounted using drq)}
 
 \item{npats}{The number of patients to be simulated (it will simulate npats * length(arm_list))}
 
@@ -91,6 +91,10 @@ This function is slightly different from \code{run_sim}.
 \code{run_sim} allows to run single-core.
 \code{run_sim_parallel} allows to use multiple-core at the simulation level,
 making it more efficient for a large number of simulations relative to \code{run_sim} (e.g., for  PSA).
+
+Event ties are processed in the order declared within the \code{init_event_list} argument (\code{evts} argument within the first sublist of that object).
+To do so, the program automatically adds a sequence from to 0 to the (number of events - 1) times 1e-10 to add to the event times when selecting the event with minimum time.
+This time has been selected as it's relatively small yet not so small as to be ignored by which.min (see .Machine for more details)
 
 A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
 c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").

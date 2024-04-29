@@ -7,14 +7,14 @@
 #' @param unique_pt_inputs A list of inputs that change across each intervention
 #' @param init_event_list A list of initial events and event times. If no initial events are given, a "Start" event at time 0 is created automatically
 #' @param evt_react_list A list of event reactions
-#' @param util_ongoing_list A list of utilities that are accrued at an ongoing basis
-#' @param util_instant_list A list of utilities that are accrued instantaneously at an event
-#' @param util_cycle_list A list of utilities that are accrued in cycles
-#' @param cost_ongoing_list A list of costs that are accrued at an ongoing basis
-#' @param cost_instant_list A list of costs that are accrued instantaneously at an event
-#' @param cost_cycle_list A list of costs that are accrued in cycles
-#' @param other_ongoing_list A list of other data that are accrued at an ongoing basis (discounted using drq)
-#' @param other_instant_list A list of other data that are accrued instantaneously at an event (discounted using drq)
+#' @param util_ongoing_list Vector of QALY named variables that are accrued at an ongoing basis (discounted using drq)
+#' @param util_instant_list Vector of QALY named variables that are accrued instantaneously at an event (discounted using drq)
+#' @param util_cycle_list Vector of QALY named variables that are accrued in cycles (discounted using drq)
+#' @param cost_ongoing_list Vector of cost named variables that are accrued at an ongoing basis (discounted using drc)
+#' @param cost_instant_list Vector of cost named variables that are accrued instantaneously at an event (discounted using drc)
+#' @param cost_cycle_list Vector of cost named variables that are accrued in cycles (discounted using drc)
+#' @param other_ongoing_list Vector of other named variables that are accrued at an ongoing basis (discounted using drq)
+#' @param other_instant_list Vector of other named variables that are accrued instantaneously at an event (discounted using drq)
 #' @param npats The number of patients to be simulated (it will simulate npats * length(arm_list))
 #' @param n_sim The number of simulations to run per sensitivity
 #' @param psa_bool A boolean to determine if PSA should be conducted. If n_sim > 1 and psa_bool = FALSE, the differences between simulations will be due to sampling
@@ -32,6 +32,10 @@
 #' `run_sim` uses only-single core.
 #' `run_sim` can be more efficient if using only one simulation (e.g., deterministic),
 #'  while `run_sim_parallel` will be more efficient if the number of simulations is >1 (e.g., PSA).
+#'  
+#'  Event ties are processed in the order declared within the `init_event_list` argument (`evts` argument within the first sublist of that object).
+#'  To do so, the program automatically adds a sequence from to 0 to the (number of events - 1) times 1e-10 to add to the event times when selecting the event with minimum time.
+#'  This time has been selected as it's relatively small yet not so small as to be ignored by which.min (see .Machine for more details)
 #'  
 #'  A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
 #'  c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").
@@ -109,40 +113,39 @@ run_sim <- function(arm_list=c("int","noint"),
          Please remove or rename those names. See run_sim or run_sim_parallel for a full list of these names.\n"))
   }
   
+  if(length(names(evt_react_list)) != length(init_event_list[[1]][["evts"]])){
+    dif <- setdiff(names(evt_react_list),init_event_list[[1]][["evts"]])
+    stop(paste0("Number of events defined in init_event_list first sublist `evts` is not equal to the number of events defined in evt_react_list.
+         Please ensure both have equal length, ",dif," is/are missing from one of the lists."))
+  }
+  
   arm_list <- arm_list #this is done as otherwise there are problems passing arguments from function to function
   
   #get cost/utility categories
-  categories_costs_ongoing <- unlist(unique(lapply(names(cost_ongoing_list), function(n) cost_ongoing_list[[n]][["category"]])))
-  categories_costs_instant <- unlist(unique(lapply(names(cost_instant_list), function(n) cost_instant_list[[n]][["category"]])))
-  categories_costs_cycle   <- unlist(unique(lapply(names(cost_cycle_list), function(n) cost_cycle_list[[n]][["category"]])))
+  categories_costs_ongoing <- cost_ongoing_list
+  categories_costs_instant <- cost_instant_list
+  categories_costs_cycle   <- cost_cycle_list
 
-  categories_utilities_ongoing <- unlist(unique(lapply(names(util_ongoing_list), function(n) util_ongoing_list[[n]][["category"]])))
-  categories_utilities_instant <- unlist(unique(lapply(names(util_instant_list), function(n) util_instant_list[[n]][["category"]])))
-  categories_utilities_cycle   <- unlist(unique(lapply(names(util_cycle_list), function(n) util_cycle_list[[n]][["category"]])))
+  categories_utilities_ongoing <- util_ongoing_list
+  categories_utilities_instant <- util_instant_list
+  categories_utilities_cycle   <- util_cycle_list
  
-  categories_other_ongoing <- unlist(unique(lapply(names(other_ongoing_list), function(n) other_ongoing_list[[n]][["category"]])))
-  categories_other_instant <- unlist(unique(lapply(names(other_instant_list), function(n) other_instant_list[[n]][["category"]])))
+  categories_other_ongoing <- other_ongoing_list
+  categories_other_instant <- other_instant_list
   
-  categories_for_export <-c("categories_costs_ongoing",
-                            "categories_costs_instant",
-                            "categories_costs_cycle",
-                            "categories_utilities_ongoing",
-                            "categories_utilities_instant",
-                            "categories_utilities_cycle",
-                            "categories_other_ongoing",
-                            "categories_other_instant"
-                            )
   
   #Remove NULL values
-  categories_for_export <- c(if(!is.null(categories_costs_ongoing)){unlist(lapply(categories_costs_ongoing,function(x){paste(x,c("ongoing","ongoing_undisc"),sep="_")}))},
-                             if(!is.null(categories_costs_instant)){unlist(lapply(categories_costs_instant,function(x){paste(x,c("instant","instant_undisc"),sep="_")}))},
-                             if(!is.null(categories_costs_cycle)){unlist(lapply(categories_costs_cycle,function(x){paste(x,c("cycle","cycle_undisc"),sep="_")}))},
-                             if(!is.null(categories_utilities_ongoing)){unlist(lapply(categories_utilities_ongoing,function(x){paste(x,c("ongoing","ongoing_undisc"),sep="_")}))},
-                             if(!is.null(categories_utilities_instant)){unlist(lapply(categories_utilities_instant,function(x){paste(x,c("instant","instant_undisc"),sep="_")}))},
-                             if(!is.null(categories_utilities_cycle)){unlist(lapply(categories_utilities_cycle,function(x){paste(x,c("cycle","cycle_undisc"),sep="_")}))},
-                             if(!is.null(categories_other_ongoing)){unlist(lapply(categories_other_ongoing,function(x){paste(x,c("ongoing","ongoing_undisc"),sep="_")}))},
-                             if(!is.null(categories_other_instant)){unlist(lapply(categories_other_instant,function(x){paste(x,c("instant","instant_undisc"),sep="_")}))}
-                            )
+  categories_for_export <- unique(
+    c(if(!is.null(categories_costs_ongoing)){categories_costs_ongoing},
+      if(!is.null(categories_costs_instant)){categories_costs_instant},
+      if(!is.null(categories_costs_cycle)){categories_costs_cycle},
+      if(!is.null(categories_utilities_ongoing)){categories_utilities_ongoing},
+      if(!is.null(categories_utilities_instant)){categories_utilities_instant},
+      if(!is.null(categories_utilities_cycle)){categories_utilities_cycle},
+      if(!is.null(categories_other_ongoing)){categories_other_ongoing},
+      if(!is.null(categories_other_instant)){categories_other_instant}
+    ))
+  
   output_sim <- list()
 
   start_time <-  proc.time()
@@ -172,10 +175,10 @@ run_sim <- function(arm_list=c("int","noint"),
     
     
     input_list_sens <- list(
-                       drc = 0.03,
-                       drq = 0.03,
                        psa_bool = psa_bool,
                        init_event_list = init_event_list,
+                       precision_times = if(!is.null(init_event_list)){setNames((seq_along(init_event_list[[1]][["evts"]])-1)*1e-10,
+                                                                                init_event_list[[1]][["evts"]])},
                        evt_react_list = evt_react_list,
                        uc_lists = list(util_ongoing_list = util_ongoing_list,
                                        util_instant_list = util_instant_list,
@@ -185,6 +188,20 @@ run_sim <- function(arm_list=c("int","noint"),
                                        cost_cycle_list = cost_cycle_list,
                                        other_ongoing_list = other_ongoing_list,
                                        other_instant_list = other_instant_list,
+                                       ongoing_inputs = c(
+                                         if(!is.null(categories_costs_ongoing)){categories_costs_ongoing},
+                                         if(!is.null(categories_utilities_ongoing)){categories_utilities_ongoing},
+                                         if(!is.null(categories_other_ongoing)){categories_other_ongoing}
+                                       ),
+                                       instant_inputs = c(
+                                         if(!is.null(categories_costs_instant)){categories_costs_instant},
+                                         if(!is.null(categories_utilities_instant)){categories_utilities_instant},
+                                         if(!is.null(categories_other_instant)){categories_other_instant}
+                                       ),
+                                       cycle_inputs = c(
+                                         if(!is.null(categories_costs_cycle)){categories_costs_cycle},
+                                         if(!is.null(categories_utilities_cycle)){categories_utilities_cycle}
+                                       ),
                                        cost_categories_ongoing = categories_costs_ongoing,
                                        l_cost_categories_ongoing = length(categories_costs_ongoing),
                                        cost_categories_instant = categories_costs_instant,
@@ -269,7 +286,10 @@ run_sim <- function(arm_list=c("int","noint"),
       duplic <- duplicated(names(input_list),fromLast = T)
       if (sum(duplic)>0 & simulation==1 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added.\n")  }
       input_list <- input_list[!duplic]
-  
+      
+      if(is.null(input_list$drc)){input_list$drc <- 0.03}
+      if(is.null(input_list$drq)){input_list$drq <- 0.03}
+      
       # Run engine ----------------------------------------------------------
   
         final_output <- run_engine(arm_list=arm_list,

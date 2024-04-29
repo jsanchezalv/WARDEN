@@ -70,7 +70,9 @@ common_all_inputs <-add_item(
 common_pt_inputs <- add_item(death= max(0.0000001,rnorm(n=1, mean=12, sd=3))) 
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
-unique_pt_inputs <- add_item(fl.sick = 1) 
+unique_pt_inputs <- add_item(fl.sick = 1,
+                             q_default = 1,
+                             c_default = 0) 
 
 ```
 
@@ -132,11 +134,15 @@ evt_react_list <-
                input = {}) %>%
   add_reactevt(name_evt = "sicker",
                input = {
-                 modify_item(list(fl.sick = 0)) 
+                 modify_item(list(q_default = util.sick * fl.sick + util.sicker * (1-fl.sick),
+                                  c_default = cost.sick * fl.sick + cost.sicker * (1-fl.sick) + if(arm=="int"){cost.int * fl.sick }else{0},
+                                  fl.sick = 0)) 
                }) %>%
   add_reactevt(name_evt = "death",
                input = {
-                 modify_item(list(curtime = Inf)) 
+                 modify_item(list(q_default = util.sick * fl.sick + util.sicker * (1-fl.sick),
+                                  c_default = cost.sick * fl.sick + cost.sicker * (1-fl.sick) + if(arm=="int"){cost.int * fl.sick }else{0}, 
+                                  curtime = Inf)) 
                }) 
 
 ```
@@ -149,11 +155,7 @@ Utilities are defined using pipes with the `add_util` function. The first argume
 
 ```{r utilities}
 
-util_ongoing <- add_util(evt = c("sick", "sicker","death"),
-                              arm = c("int", "noint"),
-                              util = util.sick * fl.sick + util.sicker * (1-fl.sick)
-)
-
+util_ongoing <- "q_default"
 
 ```
 ## Costs
@@ -161,16 +163,7 @@ Costs are defined using pipes with the `add_cost` function, in a similar fashion
 
 ```{r costs}
 
-cost_ongoing <-
-  add_cost(
-    evt = c("sick", "sicker","death") ,
-    arm = "noint",
-    cost = cost.sick * fl.sick + cost.sicker * (1-fl.sick) ) %>%
-  add_cost(
-    evt = c("sick", "sicker","death") ,
-    arm = "int",
-    cost = cost.sick * fl.sick + cost.sicker * (1-fl.sick) + cost.int * fl.sick ) 
-
+cost_ongoing <- "c_default"
 
 ```
 

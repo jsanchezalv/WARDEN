@@ -111,7 +111,13 @@ unique_pt_inputs <- add_item(
                                                      0.1,0.2,0.5,0.2,
                                                      0,0,0,1),nrow=4,byrow=T)
                                               },
-                            cycle_time = 0
+                            cycle_time = 0,
+                            q_default =  trace %*% c(util1,util2,util3,util4),
+                            c_default = if(arm=="noint"){
+                               trace %*% c(cost1+ cost_int,cost2+ cost_int,cost3+ cost_int,cost4)
+                             } else{
+                               trace %*% c(cost1,cost2,cost3,cost4)
+                             }
 )
 
 ```
@@ -153,7 +159,18 @@ evt_react_list <-
                }) %>%
   add_reactevt(name_evt = "cycle",
                input = {
-                 modify_item(list("cycle_time" = cycle_time + 1)) #Update cycle time
+                 c_default <- if(arm=="noint"){
+                   trace %*% c(cost1+ cost_int,cost2+ cost_int,cost3+ cost_int,cost4)
+                 } else{
+                   trace %*% c(cost1,cost2,cost3,cost4)
+                 }
+                   
+                   
+                 modify_item(list(
+                   q_default = trace %*% c(util1,util2,util3,util4),
+                   c_default = c_default,
+                   "cycle_time" = cycle_time + 1
+                   )) #Update cycle time
                  
                  modify_item(list( "trace" = trace %*% transition)) #Update trace
                  
@@ -174,26 +191,15 @@ Utilities are defined using pipes with the `add_util` function. In this case cas
 ```{r utilities}
 
 
-util_ongoing <- add_util(evt = c("start","cycle"),
-                              arm = c("int", "noint"),
-                              util = trace %*% c(util1,util2,util3,util4)
-) #common utility across arms
-
+util_ongoing <- "q_default"
+  
 ```
 ### Costs
 Costs are defined using pipes with the `add_cost` function, in a similar fashion to the utilities. In this case we add the costs in a continuous fashion.
 
 ```{r costs}
 
-cost_ongoing <-
-  add_cost(
-    evt = c("start","cycle") ,
-    arm = "noint",
-    cost = trace %*% c(cost1,cost2,cost3,cost4)) %>%
-  add_cost(
-    evt = c("start","cycle") ,
-    arm = "int",
-    cost = trace %*% c(cost1+ cost_int,cost2+ cost_int,cost3+ cost_int,cost4) ) 
+cost_ongoing <- "c_default"
 
 
 ```

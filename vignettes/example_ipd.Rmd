@@ -157,7 +157,7 @@ common_all_inputs <- add_item(
   cost.dm.PFS = 3000, #Annual disease-management cost in progression-free state
   cost.dm.PPS = 5000, #Annual disease-management cost in progressed state
   cost.ae.int = 2200, #Annual adverse event costs for intervention
-  cost.ae.ref = 1400, #Annual adverse event costs for reference treatment
+  cost.ae.ref = 1400 #Annual adverse event costs for reference treatment
     )
 
 
@@ -180,7 +180,11 @@ unique_pt_inputs <- add_item(
   fl.prog = 0, #Flag to determine if patient has progressed. All patients start progression-free
   fl.ontx = 1, #Flag to determine if patient is on treatment. All patients start on treatment
   fl.PAE = 0,  #Flag to determine if progression-accelerating event occurred
-  pfs.time = NA #Recording of time at progression
+  pfs.time = NA, #Recording of time at progression
+  q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
+  q_default_inst = 0,
+  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref},
+  c_default_inst = 0
 )
 
 ```
@@ -211,6 +215,7 @@ init_event_list <-
   #Events applicable to reference treatment
   add_tte(arm="ref",
           evts = c("Start", #Events are the same except that there will be no treatment discontinuation
+                   "TxDisc",
                    "Progression",
                    "PAE",
                    "Death"),
@@ -231,24 +236,37 @@ Reactions for each individual event are defined in the following using the `add_
 evt_react_list <-
   add_reactevt(name_evt = "Start",
                input = {
-                 modify_item(list(fl.int = ifelse(arm=="int",1,0)))
+                 modify_item(list(fl.int = ifelse(arm=="int",1,0),
+                                  q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
+                                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref},
+                                  c_default_inst = cost.admin.oral
+                                  ))
                }) %>%
   add_reactevt(name_evt = "TxDisc",
                input = {
-                 modify_item(list("fl.ontx"= 0))
+                 modify_item(list(q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
+                                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref},
+                                  "fl.ontx"= 0))
                }) %>%
   add_reactevt(name_evt = "Progression",
                input = {
-                 modify_item(list("pfs.time"=curtime,"fl.prog"= 1))
+                 modify_item(list(q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
+                                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref},
+                                  "pfs.time"=curtime,"fl.prog"= 1))
                  if(arm=="int"){modify_event(list("TxDisc" = curtime))} #Trigger treatment discontinuation at progression
                }) %>%
   add_reactevt(name_evt = "Death",
                input = {
-                 modify_item(list("curtime"=Inf)) 
+                 modify_item(list(q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
+                                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref},
+                                  "curtime"=Inf)) 
                }) %>%
   add_reactevt(name_evt = "PAE",
                input = {
-                 modify_item(list("fl.PAE"= 1))
+                 modify_item(list("fl.PAE"= 1,
+                                  q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
+                                  q_default_inst = disutil.PAE,
+                                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}))
                  
                  if(fl.prog == 0){ #Event only accelerates progression if progression has not occurred yet
                  modify_event(list(
@@ -267,15 +285,10 @@ Utilities relating to progression-free and progressed states are common across a
 
 ```{r utilities}
 
-util_ongoing <- add_util(evt = c("Start","TxDisc","Progression","Death","PAE"),
-                              arm = c("int", "ref"), #common utility across arms
-                              util = ifelse(fl.prog == 0, util.PFS, util.PPS)
-)
+util_ongoing <- "q_default"
 
-util_instant <- add_util(evt = c("PAE"),
-                              arm = c("int", "ref"), #common utility across arms
-                              util = disutil.PAE
-)
+util_instant <- "q_default_inst"
+
 
 ```
 
@@ -284,29 +297,11 @@ Costs are defined specific to each arm due to differences in drug, administratio
 
 ```{r costs}
 
-cost_ongoing <-
-  #Drug costs are specific to each arm
-  add_cost(
-    evt = c("Start","TxDisc","Progression","Death","PAE"),
-    arm = "int",
-    cost = (cost.drug.int + 
-            cost.admin.SC * 12 + #Intervention is administered once a month
-            cost.ae.int) * fl.ontx +
-           ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS)
-      ) %>%
-    add_cost(
-    evt = c("Start","TxDisc","Progression","Death","PAE"),
-    arm = "ref",
-    cost = cost.drug.ref + cost.ae.ref + #No ongoing administration cost as reference treatment is oral
-      ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS)
-    )
+cost_ongoing <- "c_default"
 
-#One-off cost only applies to oral administration of reference treatment, applied at start of treatment
-cost_instant <-  add_cost(
-  evt = "Start",
-  arm = "ref",
-  cost = cost.admin.oral
-)
+cost_instant <- "c_default_inst"
+  
+
 
 ```
 
@@ -328,6 +323,7 @@ results <- run_sim(
   init_event_list = init_event_list,        
   evt_react_list = evt_react_list,          
   util_ongoing_list = util_ongoing,
+  util_instant_list = util_instant,
   cost_ongoing_list = cost_ongoing,
   cost_instant_list = cost_instant,
   input_out = c("BLAge","Sex","nat.death","pfs.time")
