@@ -83,7 +83,7 @@
                         <h4 data-toc-skip class="author">Valerie Aponte
 Ribero and Javier Sanchez Alvarez</h4>
             
-            <h4 data-toc-skip class="date">April 24, 2024</h4>
+            <h4 data-toc-skip class="date">April 29, 2024</h4>
       
       
       <div class="d-none name"><code>example_ipd.Rmd</code></div>
@@ -130,8 +130,8 @@ progression-free state and may move to the progressed state. At any
 point in time they can die, depending on the risk of each disease stage.
 Patients may also experience a disease event which accelerates
 progression.</p>
-<div id="htmlwidget-f1a94e83480c29159329" style="width:700px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-f1a94e83480c29159329">{"x":{"diagram":"\n  digraph graph1 {\n  \n  graph [layout = dot, rankdir = LR, nodesep=\"1\", fontsize = 12]\n  \n  # node definitions with substituted label text\n  \n  node [shape = oval]\n  a [label = \"Progression-free\"]\n  b [label = \"Progressed\"]\n  d [label = \"Death\"]\n  \n  node [shape = box]\n  c [label = \"Progression-accelerating event\", style = dashed]\n  \n  a -> d\n  a -> b\n  b -> d\n  c -> b [style = dashed]\n  \n  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-5396aaf9f50c506aed0e" style="width:700px;height:300px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5396aaf9f50c506aed0e">{"x":{"diagram":"\n  digraph graph1 {\n  \n  graph [layout = dot, rankdir = LR, nodesep=\"1\", fontsize = 12]\n  \n  # node definitions with substituted label text\n  \n  node [shape = oval]\n  a [label = \"Progression-free\"]\n  b [label = \"Progressed\"]\n  d [label = \"Death\"]\n  \n  node [shape = box]\n  c [label = \"Progression-accelerating event\", style = dashed]\n  \n  a -> d\n  a -> b\n  b -> d\n  c -> b [style = dashed]\n  \n  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
 <h2 id="generate-dummy-ipd-trial-data-and-fit-survival-models">Generate dummy IPD trial data and fit survival models<a class="anchor" aria-label="anchor" href="#generate-dummy-ipd-trial-data-and-fit-survival-models"></a>
@@ -257,7 +257,7 @@ one could use the items generated in <code>common_all_inputs</code> in
 <span>  cost.dm.PFS <span class="op">=</span> <span class="fl">3000</span>, <span class="co">#Annual disease-management cost in progression-free state</span></span>
 <span>  cost.dm.PPS <span class="op">=</span> <span class="fl">5000</span>, <span class="co">#Annual disease-management cost in progressed state</span></span>
 <span>  cost.ae.int <span class="op">=</span> <span class="fl">2200</span>, <span class="co">#Annual adverse event costs for intervention</span></span>
-<span>  cost.ae.ref <span class="op">=</span> <span class="fl">1400</span>, <span class="co">#Annual adverse event costs for reference treatment</span></span>
+<span>  cost.ae.ref <span class="op">=</span> <span class="fl">1400</span> <span class="co">#Annual adverse event costs for reference treatment</span></span>
 <span>    <span class="op">)</span></span>
 <span></span>
 <span></span>
@@ -280,7 +280,11 @@ one could use the items generated in <code>common_all_inputs</code> in
 <span>  fl.prog <span class="op">=</span> <span class="fl">0</span>, <span class="co">#Flag to determine if patient has progressed. All patients start progression-free</span></span>
 <span>  fl.ontx <span class="op">=</span> <span class="fl">1</span>, <span class="co">#Flag to determine if patient is on treatment. All patients start on treatment</span></span>
 <span>  fl.PAE <span class="op">=</span> <span class="fl">0</span>,  <span class="co">#Flag to determine if progression-accelerating event occurred</span></span>
-<span>  pfs.time <span class="op">=</span> <span class="cn">NA</span> <span class="co">#Recording of time at progression</span></span>
+<span>  pfs.time <span class="op">=</span> <span class="cn">NA</span>, <span class="co">#Recording of time at progression</span></span>
+<span>  q_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>, <span class="va">util.PFS</span>, <span class="va">util.PPS</span><span class="op">)</span>,</span>
+<span>  q_default_inst <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  c_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>,<span class="va">cost.dm.PFS</span>,<span class="va">cost.dm.PPS</span><span class="op">)</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="op">(</span><span class="va">cost.drug.int</span> <span class="op">+</span> <span class="va">cost.admin.SC</span> <span class="op">*</span> <span class="fl">12</span> <span class="op">+</span> <span class="va">cost.ae.int</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.ontx</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="va">cost.drug.ref</span> <span class="op">+</span> <span class="va">cost.ae.ref</span><span class="op">}</span>,</span>
+<span>  c_default_inst <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -317,6 +321,7 @@ can be replicated and updated at later time points.</p>
 <span>  <span class="co">#Events applicable to reference treatment</span></span>
 <span>  <span class="fu"><a href="../reference/add_tte.html">add_tte</a></span><span class="op">(</span>arm<span class="op">=</span><span class="st">"ref"</span>,</span>
 <span>          evts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Start"</span>, <span class="co">#Events are the same except that there will be no treatment discontinuation</span></span>
+<span>                   <span class="st">"TxDisc"</span>,</span>
 <span>                   <span class="st">"Progression"</span>,</span>
 <span>                   <span class="st">"PAE"</span>,</span>
 <span>                   <span class="st">"Death"</span><span class="op">)</span>,</span>
@@ -343,24 +348,37 @@ progression.</p>
 <span><span class="va">evt_react_list</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"Start"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fl.int <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span>,<span class="fl">1</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fl.int <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span>,<span class="fl">1</span>,<span class="fl">0</span><span class="op">)</span>,</span>
+<span>                                  q_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>, <span class="va">util.PFS</span>, <span class="va">util.PPS</span><span class="op">)</span>,</span>
+<span>                                  c_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>,<span class="va">cost.dm.PFS</span>,<span class="va">cost.dm.PPS</span><span class="op">)</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="op">(</span><span class="va">cost.drug.int</span> <span class="op">+</span> <span class="va">cost.admin.SC</span> <span class="op">*</span> <span class="fl">12</span> <span class="op">+</span> <span class="va">cost.ae.int</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.ontx</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="va">cost.drug.ref</span> <span class="op">+</span> <span class="va">cost.ae.ref</span><span class="op">}</span>,</span>
+<span>                                  c_default_inst <span class="op">=</span> <span class="va">cost.admin.oral</span></span>
+<span>                                  <span class="op">)</span><span class="op">)</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"TxDisc"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"fl.ontx"</span><span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>, <span class="va">util.PFS</span>, <span class="va">util.PPS</span><span class="op">)</span>,</span>
+<span>                                  c_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>,<span class="va">cost.dm.PFS</span>,<span class="va">cost.dm.PPS</span><span class="op">)</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="op">(</span><span class="va">cost.drug.int</span> <span class="op">+</span> <span class="va">cost.admin.SC</span> <span class="op">*</span> <span class="fl">12</span> <span class="op">+</span> <span class="va">cost.ae.int</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.ontx</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="va">cost.drug.ref</span> <span class="op">+</span> <span class="va">cost.ae.ref</span><span class="op">}</span>,</span>
+<span>                                  <span class="st">"fl.ontx"</span><span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"Progression"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"pfs.time"</span><span class="op">=</span><span class="va">curtime</span>,<span class="st">"fl.prog"</span><span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>, <span class="va">util.PFS</span>, <span class="va">util.PPS</span><span class="op">)</span>,</span>
+<span>                                  c_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>,<span class="va">cost.dm.PFS</span>,<span class="va">cost.dm.PPS</span><span class="op">)</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="op">(</span><span class="va">cost.drug.int</span> <span class="op">+</span> <span class="va">cost.admin.SC</span> <span class="op">*</span> <span class="fl">12</span> <span class="op">+</span> <span class="va">cost.ae.int</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.ontx</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="va">cost.drug.ref</span> <span class="op">+</span> <span class="va">cost.ae.ref</span><span class="op">}</span>,</span>
+<span>                                  <span class="st">"pfs.time"</span><span class="op">=</span><span class="va">curtime</span>,<span class="st">"fl.prog"</span><span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span>                 <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"TxDisc"</span> <span class="op">=</span> <span class="va">curtime</span><span class="op">)</span><span class="op">)</span><span class="op">}</span> <span class="co">#Trigger treatment discontinuation at progression</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"Death"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"curtime"</span><span class="op">=</span><span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>, <span class="va">util.PFS</span>, <span class="va">util.PPS</span><span class="op">)</span>,</span>
+<span>                                  c_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>,<span class="va">cost.dm.PFS</span>,<span class="va">cost.dm.PPS</span><span class="op">)</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="op">(</span><span class="va">cost.drug.int</span> <span class="op">+</span> <span class="va">cost.admin.SC</span> <span class="op">*</span> <span class="fl">12</span> <span class="op">+</span> <span class="va">cost.ae.int</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.ontx</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="va">cost.drug.ref</span> <span class="op">+</span> <span class="va">cost.ae.ref</span><span class="op">}</span>,</span>
+<span>                                  <span class="st">"curtime"</span><span class="op">=</span><span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> </span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"PAE"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"fl.PAE"</span><span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"fl.PAE"</span><span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                                  q_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>, <span class="va">util.PFS</span>, <span class="va">util.PPS</span><span class="op">)</span>,</span>
+<span>                                  q_default_inst <span class="op">=</span> <span class="va">disutil.PAE</span>,</span>
+<span>                                  c_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>,<span class="va">cost.dm.PFS</span>,<span class="va">cost.dm.PPS</span><span class="op">)</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="op">(</span><span class="va">cost.drug.int</span> <span class="op">+</span> <span class="va">cost.admin.SC</span> <span class="op">*</span> <span class="fl">12</span> <span class="op">+</span> <span class="va">cost.ae.int</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.ontx</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="va">cost.drug.ref</span> <span class="op">+</span> <span class="va">cost.ae.ref</span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
 <span>                 </span>
 <span>                 <span class="kw">if</span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span><span class="op">{</span> <span class="co">#Event only accelerates progression if progression has not occurred yet</span></span>
 <span>                 <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -380,19 +398,9 @@ progression.</p>
 common across arms.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">util_ongoing</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_util.html">add_util</a></span><span class="op">(</span>evt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Start"</span>,<span class="st">"TxDisc"</span>,<span class="st">"Progression"</span>,<span class="st">"Death"</span>,<span class="st">"PAE"</span><span class="op">)</span>,</span>
-<span>                              arm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"ref"</span><span class="op">)</span>, <span class="co">#common utility across arms</span></span>
-<span>                              util <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>, <span class="va">util.PFS</span>, <span class="va">util.PPS</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in add_util(evt = c("Start", "TxDisc", "Progression", "Death", "PAE"),</span></span>
-<span><span class="co">#&gt; : No utility category name assigned, used 'default'</span></span>
+<span><span class="va">util_ongoing</span> <span class="op">&lt;-</span> <span class="st">"q_default"</span></span>
 <span></span>
-<span><span class="va">util_instant</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_util.html">add_util</a></span><span class="op">(</span>evt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PAE"</span><span class="op">)</span>,</span>
-<span>                              arm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"ref"</span><span class="op">)</span>, <span class="co">#common utility across arms</span></span>
-<span>                              util <span class="op">=</span> <span class="va">disutil.PAE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in add_util(evt = c("PAE"), arm = c("int", "ref"), util = disutil.PAE):</span></span>
-<span><span class="co">#&gt; No utility category name assigned, used 'default'</span></span></code></pre></div>
+<span><span class="va">util_instant</span> <span class="op">&lt;-</span> <span class="st">"q_default_inst"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="costs">Costs<a class="anchor" aria-label="anchor" href="#costs"></a>
@@ -402,35 +410,10 @@ administration and AE costs. A one-off cost for oral administration of
 the reference arm is also applied.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">cost_ongoing</span> <span class="op">&lt;-</span></span>
-<span>  <span class="co">#Drug costs are specific to each arm</span></span>
-<span>  <span class="fu"><a href="../reference/add_cost.html">add_cost</a></span><span class="op">(</span></span>
-<span>    evt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Start"</span>,<span class="st">"TxDisc"</span>,<span class="st">"Progression"</span>,<span class="st">"Death"</span>,<span class="st">"PAE"</span><span class="op">)</span>,</span>
-<span>    arm <span class="op">=</span> <span class="st">"int"</span>,</span>
-<span>    cost <span class="op">=</span> <span class="op">(</span><span class="va">cost.drug.int</span> <span class="op">+</span> </span>
-<span>            <span class="va">cost.admin.SC</span> <span class="op">*</span> <span class="fl">12</span> <span class="op">+</span> <span class="co">#Intervention is administered once a month</span></span>
-<span>            <span class="va">cost.ae.int</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.ontx</span> <span class="op">+</span></span>
-<span>           <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>,<span class="va">cost.dm.PFS</span>,<span class="va">cost.dm.PPS</span><span class="op">)</span></span>
-<span>      <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="../reference/add_cost.html">add_cost</a></span><span class="op">(</span></span>
-<span>    evt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Start"</span>,<span class="st">"TxDisc"</span>,<span class="st">"Progression"</span>,<span class="st">"Death"</span>,<span class="st">"PAE"</span><span class="op">)</span>,</span>
-<span>    arm <span class="op">=</span> <span class="st">"ref"</span>,</span>
-<span>    cost <span class="op">=</span> <span class="va">cost.drug.ref</span> <span class="op">+</span> <span class="va">cost.ae.ref</span> <span class="op">+</span> <span class="co">#No ongoing administration cost as reference treatment is oral</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">fl.prog</span> <span class="op">==</span> <span class="fl">0</span>,<span class="va">cost.dm.PFS</span>,<span class="va">cost.dm.PPS</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in add_cost(., evt = c("Start", "TxDisc", "Progression", "Death", : No</span></span>
-<span><span class="co">#&gt; cost category name assigned, used 'default'</span></span>
-<span><span class="co">#&gt; Warning in add_cost(evt = c("Start", "TxDisc", "Progression", "Death", "PAE"),</span></span>
-<span><span class="co">#&gt; : No cost category name assigned, used 'default'</span></span>
+<span><span class="va">cost_ongoing</span> <span class="op">&lt;-</span> <span class="st">"c_default"</span></span>
 <span></span>
-<span><span class="co">#One-off cost only applies to oral administration of reference treatment, applied at start of treatment</span></span>
-<span><span class="va">cost_instant</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../reference/add_cost.html">add_cost</a></span><span class="op">(</span></span>
-<span>  evt <span class="op">=</span> <span class="st">"Start"</span>,</span>
-<span>  arm <span class="op">=</span> <span class="st">"ref"</span>,</span>
-<span>  cost <span class="op">=</span> <span class="va">cost.admin.oral</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in add_cost(evt = "Start", arm = "ref", cost = cost.admin.oral): No</span></span>
-<span><span class="co">#&gt; cost category name assigned, used 'default'</span></span></code></pre></div>
+<span><span class="va">cost_instant</span> <span class="op">&lt;-</span> <span class="st">"c_default_inst"</span></span>
+<span>  </span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -454,15 +437,16 @@ defined for each patient in the simulated data set.</p>
 <span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,        </span>
 <span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,          </span>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
+<span>  util_instant_list <span class="op">=</span> <span class="va">util_instant</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
 <span>  cost_instant_list <span class="op">=</span> <span class="va">cost_instant</span>,</span>
 <span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLAge"</span>,<span class="st">"Sex"</span>,<span class="st">"nat.death"</span>,<span class="st">"pfs.time"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.78s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.78s"</span></span>
-<span><span class="co">#&gt; [1] "Total time to run: 0.78s"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.67s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.67s"</span></span>
+<span><span class="co">#&gt; [1] "Total time to run: 0.67s"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -478,45 +462,49 @@ simulation is recorded in the <code>psa_ipd</code> object.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#will print the last simulation!</span></span>
-<span><span class="co">#&gt;                                    int       ref</span></span>
-<span><span class="co">#&gt; costs                        141680.40  96091.69</span></span>
-<span><span class="co">#&gt; dcosts                            0.00  45588.71</span></span>
-<span><span class="co">#&gt; lys                               3.57      2.74</span></span>
-<span><span class="co">#&gt; dlys                              0.00      0.84</span></span>
-<span><span class="co">#&gt; qalys                             1.71      1.21</span></span>
-<span><span class="co">#&gt; dqalys                            0.00      0.51</span></span>
-<span><span class="co">#&gt; ICER                                NA  54509.20</span></span>
-<span><span class="co">#&gt; ICUR                                NA  89594.93</span></span>
-<span><span class="co">#&gt; INMB                                NA -20147.14</span></span>
-<span><span class="co">#&gt; costs_undisc                 148163.29 103600.47</span></span>
-<span><span class="co">#&gt; dcosts_undisc                     0.00  44562.81</span></span>
-<span><span class="co">#&gt; lys_undisc                        3.94      2.95</span></span>
-<span><span class="co">#&gt; dlys_undisc                       0.00      0.99</span></span>
-<span><span class="co">#&gt; qalys_undisc                      1.87      1.29</span></span>
-<span><span class="co">#&gt; dqalys_undisc                     0.00      0.58</span></span>
-<span><span class="co">#&gt; ICER_undisc                         NA  44902.60</span></span>
-<span><span class="co">#&gt; ICUR_undisc                         NA  76775.12</span></span>
-<span><span class="co">#&gt; INMB_undisc                         NA -15541.16</span></span>
-<span><span class="co">#&gt; cost_default_ongoing         141680.40  95791.69</span></span>
-<span><span class="co">#&gt; dcost_default_ongoing             0.00  45888.71</span></span>
-<span><span class="co">#&gt; cost_default_ongoing_undisc  148163.29 103300.47</span></span>
-<span><span class="co">#&gt; dcost_default_ongoing_undisc      0.00  44862.81</span></span>
-<span><span class="co">#&gt; cost_default_instant              0.00    300.00</span></span>
-<span><span class="co">#&gt; dcost_default_instant             0.00   -300.00</span></span>
-<span><span class="co">#&gt; cost_default_instant_undisc       0.00    300.00</span></span>
-<span><span class="co">#&gt; dcost_default_instant_undisc      0.00   -300.00</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing              1.71      1.21</span></span>
-<span><span class="co">#&gt; dqaly_default_ongoing             0.00      0.51</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing_undisc       1.87      1.29</span></span>
-<span><span class="co">#&gt; dqaly_default_ongoing_undisc      0.00      0.58</span></span>
-<span><span class="co">#&gt; BLAge                            59.77     59.74</span></span>
-<span><span class="co">#&gt; dBLAge                            0.00      0.02</span></span>
-<span><span class="co">#&gt; Sex                               0.51      0.51</span></span>
-<span><span class="co">#&gt; dSex                              0.00      0.01</span></span>
-<span><span class="co">#&gt; nat.death                        23.83     23.85</span></span>
-<span><span class="co">#&gt; dnat.death                        0.00     -0.02</span></span>
-<span><span class="co">#&gt; pfs.time                          1.51      0.54</span></span>
-<span><span class="co">#&gt; dpfs.time                         0.00      0.97</span></span>
+<span><span class="co">#&gt;                              int       ref</span></span>
+<span><span class="co">#&gt; costs                  141980.40  96091.69</span></span>
+<span><span class="co">#&gt; dcosts                      0.00  45888.71</span></span>
+<span><span class="co">#&gt; lys                         3.57      2.74</span></span>
+<span><span class="co">#&gt; dlys                        0.00      0.84</span></span>
+<span><span class="co">#&gt; qalys                       1.70      1.19</span></span>
+<span><span class="co">#&gt; dqalys                      0.00      0.51</span></span>
+<span><span class="co">#&gt; ICER                          NA  54867.90</span></span>
+<span><span class="co">#&gt; ICUR                          NA  90287.99</span></span>
+<span><span class="co">#&gt; INMB                          NA -20476.30</span></span>
+<span><span class="co">#&gt; costs_undisc           148463.29 103600.47</span></span>
+<span><span class="co">#&gt; dcosts_undisc               0.00  44862.81</span></span>
+<span><span class="co">#&gt; lys_undisc                  3.94      2.95</span></span>
+<span><span class="co">#&gt; dlys_undisc                 0.00      0.99</span></span>
+<span><span class="co">#&gt; qalys_undisc                1.86      1.28</span></span>
+<span><span class="co">#&gt; dqalys_undisc               0.00      0.58</span></span>
+<span><span class="co">#&gt; ICER_undisc                   NA  45204.89</span></span>
+<span><span class="co">#&gt; ICUR_undisc                   NA  77377.30</span></span>
+<span><span class="co">#&gt; INMB_undisc                   NA -15873.16</span></span>
+<span><span class="co">#&gt; c_default              141680.40  95791.69</span></span>
+<span><span class="co">#&gt; dc_default                  0.00  45888.71</span></span>
+<span><span class="co">#&gt; c_default_inst            300.00    300.00</span></span>
+<span><span class="co">#&gt; dc_default_inst             0.00      0.00</span></span>
+<span><span class="co">#&gt; q_default                   1.71      1.21</span></span>
+<span><span class="co">#&gt; dq_default                  0.00      0.51</span></span>
+<span><span class="co">#&gt; q_default_inst             -0.02     -0.02</span></span>
+<span><span class="co">#&gt; dq_default_inst             0.00      0.00</span></span>
+<span><span class="co">#&gt; c_default_undisc       148163.29 103300.47</span></span>
+<span><span class="co">#&gt; dc_default_undisc           0.00  44862.81</span></span>
+<span><span class="co">#&gt; q_default_undisc            1.87      1.29</span></span>
+<span><span class="co">#&gt; dq_default_undisc           0.00      0.58</span></span>
+<span><span class="co">#&gt; c_default_inst_undisc     300.00    300.00</span></span>
+<span><span class="co">#&gt; dc_default_inst_undisc      0.00      0.00</span></span>
+<span><span class="co">#&gt; q_default_inst_undisc      -0.02     -0.02</span></span>
+<span><span class="co">#&gt; dq_default_inst_undisc      0.00      0.00</span></span>
+<span><span class="co">#&gt; BLAge                      59.75     59.75</span></span>
+<span><span class="co">#&gt; dBLAge                      0.00      0.00</span></span>
+<span><span class="co">#&gt; Sex                         0.51      0.51</span></span>
+<span><span class="co">#&gt; dSex                        0.00      0.00</span></span>
+<span><span class="co">#&gt; nat.death                  23.94     23.94</span></span>
+<span><span class="co">#&gt; dnat.death                  0.00      0.00</span></span>
+<span><span class="co">#&gt; pfs.time                    1.61      0.58</span></span>
+<span><span class="co">#&gt; dpfs.time                   0.00      1.03</span></span>
 <span></span>
 <span><span class="va">psa_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span> </span>
 <span></span>
@@ -589,22 +577,28 @@ nat.death
 pfs.time
 </th>
 <th style="text-align:right;">
-cost_default_ongoing
+c_default
 </th>
 <th style="text-align:right;">
-cost_default_instant
+c_default_inst
 </th>
 <th style="text-align:right;">
-qaly_default_ongoing
+q_default
 </th>
 <th style="text-align:right;">
-cost_default_ongoing_undisc
+q_default_inst
 </th>
 <th style="text-align:right;">
-cost_default_instant_undisc
+c_default_undisc
 </th>
 <th style="text-align:right;">
-qaly_default_ongoing_undisc
+q_default_undisc
+</th>
+<th style="text-align:right;">
+c_default_inst_undisc
+</th>
+<th style="text-align:right;">
+q_default_inst_undisc
 </th>
 <th style="text-align:right;">
 simulation
@@ -634,16 +628,16 @@ int
 1.5055640
 </td>
 <td style="text-align:right;">
-0.9033384
+0.8841831
 </td>
 <td style="text-align:right;">
-138511.88
+138811.88
 </td>
 <td style="text-align:right;">
-141688.56
+141988.56
 </td>
 <td style="text-align:right;">
-0.9240559
+0.9040559
 </td>
 <td style="text-align:right;">
 1.5400931
@@ -655,7 +649,7 @@ int
 0.0000000
 </td>
 <td style="text-align:right;">
-0.000
+300.000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -664,7 +658,7 @@ int
 0.0000000
 </td>
 <td style="text-align:right;">
-0.000
+300.000
 </td>
 <td style="text-align:right;">
 64.43993
@@ -682,7 +676,10 @@ NA
 0.000
 </td>
 <td style="text-align:right;">
-0
+300
+</td>
+<td style="text-align:right;">
+0.0000000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -691,10 +688,13 @@ NA
 0.000
 </td>
 <td style="text-align:right;">
-0
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0000000
+300
+</td>
+<td style="text-align:right;">
+0.00
 </td>
 <td style="text-align:right;">
 1
@@ -723,16 +723,16 @@ int
 1.5055640
 </td>
 <td style="text-align:right;">
-0.9033384
+0.8841831
 </td>
 <td style="text-align:right;">
-138511.88
+138811.88
 </td>
 <td style="text-align:right;">
-141688.56
+141988.56
 </td>
 <td style="text-align:right;">
-0.9240559
+0.9040559
 </td>
 <td style="text-align:right;">
 1.5400931
@@ -741,7 +741,7 @@ int
 1.4288465
 </td>
 <td style="text-align:right;">
-0.8573079
+0.8381526
 </td>
 <td style="text-align:right;">
 131453.878
@@ -750,7 +750,7 @@ int
 1.4598976
 </td>
 <td style="text-align:right;">
-0.8759386
+0.8559386
 </td>
 <td style="text-align:right;">
 134310.579
@@ -777,13 +777,19 @@ NA
 0.8573079
 </td>
 <td style="text-align:right;">
+-0.0191553
+</td>
+<td style="text-align:right;">
 134310.579
+</td>
+<td style="text-align:right;">
+0.8759386
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.8759386
+-0.02
 </td>
 <td style="text-align:right;">
 1
@@ -812,16 +818,16 @@ int
 1.5055640
 </td>
 <td style="text-align:right;">
-0.9033384
+0.8841831
 </td>
 <td style="text-align:right;">
-138511.88
+138811.88
 </td>
 <td style="text-align:right;">
-141688.56
+141988.56
 </td>
 <td style="text-align:right;">
-0.9240559
+0.9040559
 </td>
 <td style="text-align:right;">
 1.5400931
@@ -866,13 +872,19 @@ NA
 0.0460305
 </td>
 <td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
 7377.985
+</td>
+<td style="text-align:right;">
+0.0481173
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.0481173
+0.00
 </td>
 <td style="text-align:right;">
 1
@@ -901,16 +913,16 @@ int
 2.1750928
 </td>
 <td style="text-align:right;">
-1.3050557
+1.2858641
 </td>
 <td style="text-align:right;">
-200108.54
+200408.54
 </td>
 <td style="text-align:right;">
-206831.08
+207131.08
 </td>
 <td style="text-align:right;">
-1.3488984
+1.3288984
 </td>
 <td style="text-align:right;">
 2.2481639
@@ -922,7 +934,7 @@ int
 0.0000000
 </td>
 <td style="text-align:right;">
-0.000
+300.000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -931,7 +943,7 @@ int
 0.0000000
 </td>
 <td style="text-align:right;">
-0.000
+300.000
 </td>
 <td style="text-align:right;">
 65.07078
@@ -949,7 +961,10 @@ NA
 0.000
 </td>
 <td style="text-align:right;">
-0
+300
+</td>
+<td style="text-align:right;">
+0.0000000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -958,10 +973,13 @@ NA
 0.000
 </td>
 <td style="text-align:right;">
-0
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0000000
+300
+</td>
+<td style="text-align:right;">
+0.00
 </td>
 <td style="text-align:right;">
 1
@@ -990,16 +1008,16 @@ int
 2.1750928
 </td>
 <td style="text-align:right;">
-1.3050557
+1.2858641
 </td>
 <td style="text-align:right;">
-200108.54
+200408.54
 </td>
 <td style="text-align:right;">
-206831.08
+207131.08
 </td>
 <td style="text-align:right;">
-1.3488984
+1.3288984
 </td>
 <td style="text-align:right;">
 2.2481639
@@ -1008,7 +1026,7 @@ int
 1.3675671
 </td>
 <td style="text-align:right;">
-0.8205403
+0.8013487
 </td>
 <td style="text-align:right;">
 125816.172
@@ -1017,7 +1035,7 @@ int
 1.3959764
 </td>
 <td style="text-align:right;">
-0.8375858
+0.8175858
 </td>
 <td style="text-align:right;">
 128429.824
@@ -1044,13 +1062,19 @@ NA
 0.8205403
 </td>
 <td style="text-align:right;">
+-0.0191915
+</td>
+<td style="text-align:right;">
 128429.824
+</td>
+<td style="text-align:right;">
+0.8375858
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.8375858
+-0.02
 </td>
 <td style="text-align:right;">
 1
@@ -1079,16 +1103,16 @@ int
 2.1750928
 </td>
 <td style="text-align:right;">
-1.3050557
+1.2858641
 </td>
 <td style="text-align:right;">
-200108.54
+200408.54
 </td>
 <td style="text-align:right;">
-206831.08
+207131.08
 </td>
 <td style="text-align:right;">
-1.3488984
+1.3288984
 </td>
 <td style="text-align:right;">
 2.2481639
@@ -1133,13 +1157,19 @@ NA
 0.4845154
 </td>
 <td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
 78401.257
+</td>
+<td style="text-align:right;">
+0.5113125
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.5113125
+0.00
 </td>
 <td style="text-align:right;">
 1
@@ -1171,10 +1201,10 @@ int
 0.3326816
 </td>
 <td style="text-align:right;">
-51011.17
+51311.17
 </td>
 <td style="text-align:right;">
-51433.82
+51733.82
 </td>
 <td style="text-align:right;">
 0.3354379
@@ -1189,7 +1219,7 @@ int
 0.0000000
 </td>
 <td style="text-align:right;">
-0.000
+300.000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1198,7 +1228,7 @@ int
 0.0000000
 </td>
 <td style="text-align:right;">
-0.000
+300.000
 </td>
 <td style="text-align:right;">
 59.49900
@@ -1216,7 +1246,10 @@ NA
 0.000
 </td>
 <td style="text-align:right;">
-0
+300
+</td>
+<td style="text-align:right;">
+0.0000000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1225,10 +1258,13 @@ NA
 0.000
 </td>
 <td style="text-align:right;">
-0
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0000000
+300
+</td>
+<td style="text-align:right;">
+0.00
 </td>
 <td style="text-align:right;">
 1
@@ -1260,10 +1296,10 @@ int
 0.3326816
 </td>
 <td style="text-align:right;">
-51011.17
+51311.17
 </td>
 <td style="text-align:right;">
-51433.82
+51733.82
 </td>
 <td style="text-align:right;">
 0.3354379
@@ -1311,13 +1347,19 @@ NA
 0.3326816
 </td>
 <td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
 51433.819
+</td>
+<td style="text-align:right;">
+0.3354379
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.3354379
+0.00
 </td>
 <td style="text-align:right;">
 1
@@ -1346,16 +1388,16 @@ int
 0.9496596
 </td>
 <td style="text-align:right;">
-0.5697957
+0.5503533
 </td>
 <td style="text-align:right;">
-87368.68
+87668.68
 </td>
 <td style="text-align:right;">
-88618.38
+88918.38
 </td>
 <td style="text-align:right;">
-0.5779459
+0.5579459
 </td>
 <td style="text-align:right;">
 0.9632432
@@ -1367,7 +1409,7 @@ int
 0.0000000
 </td>
 <td style="text-align:right;">
-0.000
+300.000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1376,7 +1418,7 @@ int
 0.0000000
 </td>
 <td style="text-align:right;">
-0.000
+300.000
 </td>
 <td style="text-align:right;">
 51.58496
@@ -1394,7 +1436,10 @@ NA
 0.000
 </td>
 <td style="text-align:right;">
-0
+300
+</td>
+<td style="text-align:right;">
+0.0000000
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1403,10 +1448,13 @@ NA
 0.000
 </td>
 <td style="text-align:right;">
-0
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0000000
+300
+</td>
+<td style="text-align:right;">
+0.00
 </td>
 <td style="text-align:right;">
 1
@@ -1435,16 +1483,16 @@ int
 0.9496596
 </td>
 <td style="text-align:right;">
-0.5697957
+0.5503533
 </td>
 <td style="text-align:right;">
-87368.68
+87668.68
 </td>
 <td style="text-align:right;">
-88618.38
+88918.38
 </td>
 <td style="text-align:right;">
-0.5779459
+0.5579459
 </td>
 <td style="text-align:right;">
 0.9632432
@@ -1453,7 +1501,7 @@ int
 0.9431472
 </td>
 <td style="text-align:right;">
-0.5658883
+0.5464459
 </td>
 <td style="text-align:right;">
 86769.541
@@ -1462,7 +1510,7 @@ int
 0.9565434
 </td>
 <td style="text-align:right;">
-0.5739261
+0.5539261
 </td>
 <td style="text-align:right;">
 88001.995
@@ -1489,13 +1537,19 @@ NA
 0.5658883
 </td>
 <td style="text-align:right;">
+-0.0194424
+</td>
+<td style="text-align:right;">
 88001.995
+</td>
+<td style="text-align:right;">
+0.5739261
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-0.5739261
+-0.02
 </td>
 <td style="text-align:right;">
 1

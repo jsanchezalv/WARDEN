@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">April 24, 2024</h4>
+            <h4 data-toc-skip class="date">April 29, 2024</h4>
       
       
       <div class="d-none name"><code>example_markov.Rmd</code></div>
@@ -228,7 +228,13 @@ simulated, the transition matrices and the initial cycle time
 <span>                                                     <span class="fl">0.1</span>,<span class="fl">0.2</span>,<span class="fl">0.5</span>,<span class="fl">0.2</span>,</span>
 <span>                                                     <span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span>,nrow<span class="op">=</span><span class="fl">4</span>,byrow<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
 <span>                                              <span class="op">}</span>,</span>
-<span>                            cycle_time <span class="op">=</span> <span class="fl">0</span></span>
+<span>                            cycle_time <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>                            q_default <span class="op">=</span>  <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">util1</span>,<span class="va">util2</span>,<span class="va">util3</span>,<span class="va">util4</span><span class="op">)</span>,</span>
+<span>                            c_default <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">)</span><span class="op">{</span></span>
+<span>                               <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cost1</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost2</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost3</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost4</span><span class="op">)</span></span>
+<span>                             <span class="op">}</span> <span class="kw">else</span><span class="op">{</span></span>
+<span>                               <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cost1</span>,<span class="va">cost2</span>,<span class="va">cost3</span>,<span class="va">cost4</span><span class="op">)</span></span>
+<span>                             <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -276,7 +282,18 @@ events are over, we finish the simulation by setting
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"cycle"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"cycle_time"</span> <span class="op">=</span> <span class="va">cycle_time</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co">#Update cycle time</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">)</span><span class="op">{</span></span>
+<span>                   <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cost1</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost2</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost3</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost4</span><span class="op">)</span></span>
+<span>                 <span class="op">}</span> <span class="kw">else</span><span class="op">{</span></span>
+<span>                   <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cost1</span>,<span class="va">cost2</span>,<span class="va">cost3</span>,<span class="va">cost4</span><span class="op">)</span></span>
+<span>                 <span class="op">}</span></span>
+<span>                   </span>
+<span>                   </span>
+<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>                   q_default <span class="op">=</span> <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">util1</span>,<span class="va">util2</span>,<span class="va">util3</span>,<span class="va">util4</span><span class="op">)</span>,</span>
+<span>                   c_default <span class="op">=</span> <span class="va">c_default</span>,</span>
+<span>                   <span class="st">"cycle_time"</span> <span class="op">=</span> <span class="va">cycle_time</span> <span class="op">+</span> <span class="fl">1</span></span>
+<span>                   <span class="op">)</span><span class="op">)</span> <span class="co">#Update cycle time</span></span>
 <span>                 </span>
 <span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> <span class="st">"trace"</span> <span class="op">=</span> <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">transition</span><span class="op">)</span><span class="op">)</span> <span class="co">#Update trace</span></span>
 <span>                 </span>
@@ -303,12 +320,8 @@ utilities at each state.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
-<span><span class="va">util_ongoing</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_util.html">add_util</a></span><span class="op">(</span>evt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"start"</span>,<span class="st">"cycle"</span><span class="op">)</span>,</span>
-<span>                              arm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,</span>
-<span>                              util <span class="op">=</span> <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">util1</span>,<span class="va">util2</span>,<span class="va">util3</span>,<span class="va">util4</span><span class="op">)</span></span>
-<span><span class="op">)</span> <span class="co">#common utility across arms</span></span>
-<span><span class="co">#&gt; Warning in add_util(evt = c("start", "cycle"), arm = c("int", "noint"), : No</span></span>
-<span><span class="co">#&gt; utility category name assigned, used 'default'</span></span></code></pre></div>
+<span><span class="va">util_ongoing</span> <span class="op">&lt;-</span> <span class="st">"q_default"</span></span>
+<span>  </span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="costs">Costs<a class="anchor" aria-label="anchor" href="#costs"></a>
@@ -318,19 +331,7 @@ function, in a similar fashion to the utilities. In this case we add the
 costs in a continuous fashion.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">cost_ongoing</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu"><a href="../reference/add_cost.html">add_cost</a></span><span class="op">(</span></span>
-<span>    evt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"start"</span>,<span class="st">"cycle"</span><span class="op">)</span> ,</span>
-<span>    arm <span class="op">=</span> <span class="st">"noint"</span>,</span>
-<span>    cost <span class="op">=</span> <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cost1</span>,<span class="va">cost2</span>,<span class="va">cost3</span>,<span class="va">cost4</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/add_cost.html">add_cost</a></span><span class="op">(</span></span>
-<span>    evt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"start"</span>,<span class="st">"cycle"</span><span class="op">)</span> ,</span>
-<span>    arm <span class="op">=</span> <span class="st">"int"</span>,</span>
-<span>    cost <span class="op">=</span> <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cost1</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost2</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost3</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost4</span><span class="op">)</span> <span class="op">)</span> </span>
-<span><span class="co">#&gt; Warning in add_cost(., evt = c("start", "cycle"), arm = "int", cost = trace %*%</span></span>
-<span><span class="co">#&gt; : No cost category name assigned, used 'default'</span></span>
-<span><span class="co">#&gt; Warning in add_cost(evt = c("start", "cycle"), arm = "noint", cost = trace %*%</span></span>
-<span><span class="co">#&gt; : No cost category name assigned, used 'default'</span></span></code></pre></div>
+<span><span class="va">cost_ongoing</span> <span class="op">&lt;-</span> <span class="st">"c_default"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -379,9 +380,9 @@ to indicate <code>npats = 1</code>.</p>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; Warning in run_sim(npats = 1, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item util_v is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
 <span><span class="co">#&gt; Warning in run_sim(npats = 1, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item cost_v is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.08s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.08s"</span></span>
-<span><span class="co">#&gt; [1] "Total time to run: 0.08s"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.07s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.07s"</span></span>
+<span><span class="co">#&gt; [1] "Total time to run: 0.07s"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -403,35 +404,35 @@ can manually adjust this to get the correct life years.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#will print the last simulation!</span></span>
-<span><span class="co">#&gt;                                   int    noint</span></span>
-<span><span class="co">#&gt; costs                        25037.88 14268.77</span></span>
-<span><span class="co">#&gt; dcosts                           0.00 10769.11</span></span>
-<span><span class="co">#&gt; lys                             19.89    19.89</span></span>
-<span><span class="co">#&gt; dlys                             0.00     0.00</span></span>
-<span><span class="co">#&gt; qalys                            5.07     3.59</span></span>
-<span><span class="co">#&gt; dqalys                           0.00     1.49</span></span>
-<span><span class="co">#&gt; ICER                               NA      Inf</span></span>
-<span><span class="co">#&gt; ICUR                               NA  7251.17</span></span>
-<span><span class="co">#&gt; INMB                               NA 63488.68</span></span>
-<span><span class="co">#&gt; costs_undisc                 30679.83 16441.70</span></span>
-<span><span class="co">#&gt; dcosts_undisc                    0.00 14238.12</span></span>
-<span><span class="co">#&gt; lys_undisc                      30.00    30.00</span></span>
-<span><span class="co">#&gt; dlys_undisc                      0.00     0.00</span></span>
-<span><span class="co">#&gt; qalys_undisc                     6.03     4.00</span></span>
-<span><span class="co">#&gt; dqalys_undisc                    0.00     2.03</span></span>
-<span><span class="co">#&gt; ICER_undisc                        NA      Inf</span></span>
-<span><span class="co">#&gt; ICUR_undisc                        NA  7013.23</span></span>
-<span><span class="co">#&gt; INMB_undisc                        NA 87270.97</span></span>
-<span><span class="co">#&gt; cost_default_ongoing         25037.88 14268.77</span></span>
-<span><span class="co">#&gt; dcost_default_ongoing            0.00 10769.11</span></span>
-<span><span class="co">#&gt; cost_default_ongoing_undisc  30679.83 16441.70</span></span>
-<span><span class="co">#&gt; dcost_default_ongoing_undisc     0.00 14238.12</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing             5.07     3.59</span></span>
-<span><span class="co">#&gt; dqaly_default_ongoing            0.00     1.49</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing_undisc      6.03     4.00</span></span>
-<span><span class="co">#&gt; dqaly_default_ongoing_undisc     0.00     2.03</span></span>
-<span><span class="co">#&gt; cycle_time                      29.67    29.67</span></span>
-<span><span class="co">#&gt; dcycle_time                      0.00     0.00</span></span>
+<span><span class="co">#&gt;                        int     noint</span></span>
+<span><span class="co">#&gt; costs             18534.53  18935.84</span></span>
+<span><span class="co">#&gt; dcosts                0.00   -401.31</span></span>
+<span><span class="co">#&gt; lys                  19.89     19.89</span></span>
+<span><span class="co">#&gt; dlys                  0.00      0.00</span></span>
+<span><span class="co">#&gt; qalys                 5.07      3.59</span></span>
+<span><span class="co">#&gt; dqalys                0.00      1.49</span></span>
+<span><span class="co">#&gt; ICER                    NA      -Inf</span></span>
+<span><span class="co">#&gt; ICUR                    NA   -270.21</span></span>
+<span><span class="co">#&gt; INMB                    NA  74659.10</span></span>
+<span><span class="co">#&gt; costs_undisc      22891.52  21681.18</span></span>
+<span><span class="co">#&gt; dcosts_undisc         0.00   1210.34</span></span>
+<span><span class="co">#&gt; lys_undisc           30.00     30.00</span></span>
+<span><span class="co">#&gt; dlys_undisc           0.00      0.00</span></span>
+<span><span class="co">#&gt; qalys_undisc          6.03      4.00</span></span>
+<span><span class="co">#&gt; dqalys_undisc         0.00      2.03</span></span>
+<span><span class="co">#&gt; ICER_undisc             NA       Inf</span></span>
+<span><span class="co">#&gt; ICUR_undisc             NA    596.17</span></span>
+<span><span class="co">#&gt; INMB_undisc             NA 100298.75</span></span>
+<span><span class="co">#&gt; c_default         18534.53  18935.84</span></span>
+<span><span class="co">#&gt; dc_default            0.00   -401.31</span></span>
+<span><span class="co">#&gt; q_default             5.07      3.59</span></span>
+<span><span class="co">#&gt; dq_default            0.00      1.49</span></span>
+<span><span class="co">#&gt; c_default_undisc  22891.52  21681.18</span></span>
+<span><span class="co">#&gt; dc_default_undisc     0.00   1210.34</span></span>
+<span><span class="co">#&gt; q_default_undisc      6.03      4.00</span></span>
+<span><span class="co">#&gt; dq_default_undisc     0.00      2.03</span></span>
+<span><span class="co">#&gt; cycle_time           30.00     30.00</span></span>
+<span><span class="co">#&gt; dcycle_time           0.00      0.00</span></span>
 <span></span>
 <span><span class="va">psa_ipd_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">trace</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="op">)</span> </span>
 <span></span>
@@ -646,39 +647,39 @@ noint
 <span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"total_lys_noint"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">life_years</span><span class="op">$</span><span class="va">ly_final</span><span class="op">[</span><span class="va">life_years</span><span class="op">$</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">]</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#will print the last simulation!</span></span>
-<span><span class="co">#&gt;                                   int    noint</span></span>
-<span><span class="co">#&gt; costs                        25037.88 14268.77</span></span>
-<span><span class="co">#&gt; dcosts                           0.00 10769.11</span></span>
-<span><span class="co">#&gt; lys                             19.89    19.89</span></span>
-<span><span class="co">#&gt; dlys                             0.00     0.00</span></span>
-<span><span class="co">#&gt; qalys                            5.07     3.59</span></span>
-<span><span class="co">#&gt; dqalys                           0.00     1.49</span></span>
-<span><span class="co">#&gt; ICER                               NA      Inf</span></span>
-<span><span class="co">#&gt; ICUR                               NA  7251.17</span></span>
-<span><span class="co">#&gt; INMB                               NA 63488.68</span></span>
-<span><span class="co">#&gt; costs_undisc                 30679.83 16441.70</span></span>
-<span><span class="co">#&gt; dcosts_undisc                    0.00 14238.12</span></span>
-<span><span class="co">#&gt; lys_undisc                      30.00    30.00</span></span>
-<span><span class="co">#&gt; dlys_undisc                      0.00     0.00</span></span>
-<span><span class="co">#&gt; qalys_undisc                     6.03     4.00</span></span>
-<span><span class="co">#&gt; dqalys_undisc                    0.00     2.03</span></span>
-<span><span class="co">#&gt; ICER_undisc                        NA      Inf</span></span>
-<span><span class="co">#&gt; ICUR_undisc                        NA  7013.23</span></span>
-<span><span class="co">#&gt; INMB_undisc                        NA 87270.97</span></span>
-<span><span class="co">#&gt; cost_default_ongoing         25037.88 14268.77</span></span>
-<span><span class="co">#&gt; dcost_default_ongoing            0.00 10769.11</span></span>
-<span><span class="co">#&gt; cost_default_ongoing_undisc  30679.83 16441.70</span></span>
-<span><span class="co">#&gt; dcost_default_ongoing_undisc     0.00 14238.12</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing             5.07     3.59</span></span>
-<span><span class="co">#&gt; dqaly_default_ongoing            0.00     1.49</span></span>
-<span><span class="co">#&gt; qaly_default_ongoing_undisc      6.03     4.00</span></span>
-<span><span class="co">#&gt; dqaly_default_ongoing_undisc     0.00     2.03</span></span>
-<span><span class="co">#&gt; cycle_time                      29.67    29.67</span></span>
-<span><span class="co">#&gt; dcycle_time                      0.00     0.00</span></span>
-<span><span class="co">#&gt; total_lys_int                    2.95     2.95</span></span>
-<span><span class="co">#&gt; dtotal_lys_int                   0.00       NA</span></span>
-<span><span class="co">#&gt; total_lys_noint                  2.03     2.03</span></span>
-<span><span class="co">#&gt; dtotal_lys_noint                 0.00       NA</span></span></code></pre></div>
+<span><span class="co">#&gt;                        int     noint</span></span>
+<span><span class="co">#&gt; costs             18534.53  18935.84</span></span>
+<span><span class="co">#&gt; dcosts                0.00   -401.31</span></span>
+<span><span class="co">#&gt; lys                  19.89     19.89</span></span>
+<span><span class="co">#&gt; dlys                  0.00      0.00</span></span>
+<span><span class="co">#&gt; qalys                 5.07      3.59</span></span>
+<span><span class="co">#&gt; dqalys                0.00      1.49</span></span>
+<span><span class="co">#&gt; ICER                    NA      -Inf</span></span>
+<span><span class="co">#&gt; ICUR                    NA   -270.21</span></span>
+<span><span class="co">#&gt; INMB                    NA  74659.10</span></span>
+<span><span class="co">#&gt; costs_undisc      22891.52  21681.18</span></span>
+<span><span class="co">#&gt; dcosts_undisc         0.00   1210.34</span></span>
+<span><span class="co">#&gt; lys_undisc           30.00     30.00</span></span>
+<span><span class="co">#&gt; dlys_undisc           0.00      0.00</span></span>
+<span><span class="co">#&gt; qalys_undisc          6.03      4.00</span></span>
+<span><span class="co">#&gt; dqalys_undisc         0.00      2.03</span></span>
+<span><span class="co">#&gt; ICER_undisc             NA       Inf</span></span>
+<span><span class="co">#&gt; ICUR_undisc             NA    596.17</span></span>
+<span><span class="co">#&gt; INMB_undisc             NA 100298.75</span></span>
+<span><span class="co">#&gt; c_default         18534.53  18935.84</span></span>
+<span><span class="co">#&gt; dc_default            0.00   -401.31</span></span>
+<span><span class="co">#&gt; q_default             5.07      3.59</span></span>
+<span><span class="co">#&gt; dq_default            0.00      1.49</span></span>
+<span><span class="co">#&gt; c_default_undisc  22891.52  21681.18</span></span>
+<span><span class="co">#&gt; dc_default_undisc     0.00   1210.34</span></span>
+<span><span class="co">#&gt; q_default_undisc      6.03      4.00</span></span>
+<span><span class="co">#&gt; dq_default_undisc     0.00      2.03</span></span>
+<span><span class="co">#&gt; cycle_time           30.00     30.00</span></span>
+<span><span class="co">#&gt; dcycle_time           0.00      0.00</span></span>
+<span><span class="co">#&gt; total_lys_int         2.95      2.95</span></span>
+<span><span class="co">#&gt; dtotal_lys_int        0.00        NA</span></span>
+<span><span class="co">#&gt; total_lys_noint       2.03      2.03</span></span>
+<span><span class="co">#&gt; dtotal_lys_noint      0.00        NA</span></span></code></pre></div>
 <p>We can also check each of the cycles</p>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -737,16 +738,16 @@ costs_undisc
 cycle_time
 </th>
 <th style="text-align:right;">
-cost_default_ongoing
+c_default
 </th>
 <th style="text-align:right;">
-qaly_default_ongoing
+q_default
 </th>
 <th style="text-align:right;">
-cost_default_ongoing_undisc
+c_default_undisc
 </th>
 <th style="text-align:right;">
-qaly_default_ongoing_undisc
+q_default_undisc
 </th>
 <th style="text-align:right;">
 simulation
@@ -779,10 +780,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -853,10 +854,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -871,7 +872,7 @@ int
 0.8868286
 </td>
 <td style="text-align:right;">
-1970.730299
+985.365150
 </td>
 <td style="text-align:right;">
 1
@@ -880,19 +881,19 @@ int
 0.9000000
 </td>
 <td style="text-align:right;">
-2000.000000
+1000.000000
 </td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:right;">
-1970.730299
+985.365150
 </td>
 <td style="text-align:right;">
 0.8868286
 </td>
 <td style="text-align:right;">
-2000.000000
+1000.000000
 </td>
 <td style="text-align:right;">
 0.9000000
@@ -927,10 +928,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1001,10 +1002,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1019,7 +1020,7 @@ int
 0.7031489
 </td>
 <td style="text-align:right;">
-2774.329062
+1913.330387
 </td>
 <td style="text-align:right;">
 1
@@ -1028,19 +1029,19 @@ int
 0.7350000
 </td>
 <td style="text-align:right;">
-2900.000000
+2000.000000
 </td>
 <td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
-2774.329062
+1913.330387
 </td>
 <td style="text-align:right;">
 0.7031489
 </td>
 <td style="text-align:right;">
-2900.000000
+2000.000000
 </td>
 <td style="text-align:right;">
 0.7350000
@@ -1075,10 +1076,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1149,10 +1150,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1167,7 +1168,7 @@ int
 0.5753923
 </td>
 <td style="text-align:right;">
-2907.147628
+2164.106700
 </td>
 <td style="text-align:right;">
 1
@@ -1176,19 +1177,19 @@ int
 0.6195000
 </td>
 <td style="text-align:right;">
-3130.000000
+2330.000000
 </td>
 <td style="text-align:right;">
 3
 </td>
 <td style="text-align:right;">
-2907.147628
+2164.106700
 </td>
 <td style="text-align:right;">
 0.5753923
 </td>
 <td style="text-align:right;">
-3130.000000
+2330.000000
 </td>
 <td style="text-align:right;">
 0.6195000
@@ -1223,10 +1224,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1297,10 +1298,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1315,7 +1316,7 @@ int
 0.4772054
 </td>
 <td style="text-align:right;">
-2679.997131
+2047.871293
 </td>
 <td style="text-align:right;">
 1
@@ -1324,19 +1325,19 @@ int
 0.5292000
 </td>
 <td style="text-align:right;">
-2972.000000
+2271.000000
 </td>
 <td style="text-align:right;">
 4
 </td>
 <td style="text-align:right;">
-2679.997131
+2047.871293
 </td>
 <td style="text-align:right;">
 0.4772054
 </td>
 <td style="text-align:right;">
-2972.000000
+2271.000000
 </td>
 <td style="text-align:right;">
 0.5292000
@@ -1371,10 +1372,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1445,10 +1446,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1463,7 +1464,7 @@ int
 0.3981308
 </td>
 <td style="text-align:right;">
-2342.182808
+1808.575204
 </td>
 <td style="text-align:right;">
 1
@@ -1472,19 +1473,19 @@ int
 0.4547550
 </td>
 <td style="text-align:right;">
-2675.300000
+2065.800000
 </td>
 <td style="text-align:right;">
 5
 </td>
 <td style="text-align:right;">
-2342.182808
+1808.575204
 </td>
 <td style="text-align:right;">
 0.3981308
 </td>
 <td style="text-align:right;">
-2675.300000
+2065.800000
 </td>
 <td style="text-align:right;">
 0.4547550
@@ -1519,10 +1520,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1593,10 +1594,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1611,7 +1612,7 @@ int
 0.3330482
 </td>
 <td style="text-align:right;">
-2000.311338
+1551.536451
 </td>
 <td style="text-align:right;">
 1
@@ -1620,19 +1621,19 @@ int
 0.3918285
 </td>
 <td style="text-align:right;">
-2353.350000
+1825.370000
 </td>
 <td style="text-align:right;">
 6
 </td>
 <td style="text-align:right;">
-2000.311338
+1551.536451
 </td>
 <td style="text-align:right;">
 0.3330482
 </td>
 <td style="text-align:right;">
-2353.350000
+1825.370000
 </td>
 <td style="text-align:right;">
 0.3918285
@@ -1667,10 +1668,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1741,10 +1742,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1759,7 +1760,7 @@ int
 0.2789419
 </td>
 <td style="text-align:right;">
-1691.025449
+1314.242115
 </td>
 <td style="text-align:right;">
 1
@@ -1768,19 +1769,19 @@ int
 0.3380181
 </td>
 <td style="text-align:right;">
-2049.162000
+1592.581000
 </td>
 <td style="text-align:right;">
 7
 </td>
 <td style="text-align:right;">
-1691.025449
+1314.242115
 </td>
 <td style="text-align:right;">
 0.2789419
 </td>
 <td style="text-align:right;">
-2049.162000
+1592.581000
 </td>
 <td style="text-align:right;">
 0.3380181
@@ -1815,10 +1816,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1889,10 +1890,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -1907,7 +1908,7 @@ int
 0.2337538
 </td>
 <td style="text-align:right;">
-1423.056869
+1106.963135
 </td>
 <td style="text-align:right;">
 1
@@ -1916,19 +1917,19 @@ int
 0.2917575
 </td>
 <td style="text-align:right;">
-1776.174500
+1381.645200
 </td>
 <td style="text-align:right;">
 8
 </td>
 <td style="text-align:right;">
-1423.056869
+1106.963135
 </td>
 <td style="text-align:right;">
 0.2337538
 </td>
 <td style="text-align:right;">
-1776.174500
+1381.645200
 </td>
 <td style="text-align:right;">
 0.2917575
@@ -1963,10 +1964,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2037,10 +2038,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2055,7 +2056,7 @@ int
 0.1959348
 </td>
 <td style="text-align:right;">
-1195.093990
+930.008387
 </td>
 <td style="text-align:right;">
 1
@@ -2064,19 +2065,19 @@ int
 0.2518907
 </td>
 <td style="text-align:right;">
-1536.394210
+1195.604290
 </td>
 <td style="text-align:right;">
 9
 </td>
 <td style="text-align:right;">
-1195.093990
+930.008387
 </td>
 <td style="text-align:right;">
 0.1959348
 </td>
 <td style="text-align:right;">
-1536.394210
+1195.604290
 </td>
 <td style="text-align:right;">
 0.2518907
@@ -2111,10 +2112,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2185,10 +2186,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2203,7 +2204,7 @@ int
 0.1642530
 </td>
 <td style="text-align:right;">
-1002.717318
+780.444398
 </td>
 <td style="text-align:right;">
 1
@@ -2212,19 +2213,19 @@ int
 0.2174960
 </td>
 <td style="text-align:right;">
-1327.750092
+1033.426971
 </td>
 <td style="text-align:right;">
 10
 </td>
 <td style="text-align:right;">
-1002.717318
+780.444398
 </td>
 <td style="text-align:right;">
 0.1642530
 </td>
 <td style="text-align:right;">
-1327.750092
+1033.426971
 </td>
 <td style="text-align:right;">
 0.2174960
@@ -2259,10 +2260,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2333,10 +2334,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2351,7 +2352,7 @@ int
 0.1377011
 </td>
 <td style="text-align:right;">
-840.954209
+654.593094
 </td>
 <td style="text-align:right;">
 1
@@ -2360,19 +2361,19 @@ int
 0.1878073
 </td>
 <td style="text-align:right;">
-1146.957690
+892.784143
 </td>
 <td style="text-align:right;">
 11
 </td>
 <td style="text-align:right;">
-840.954209
+654.593094
 </td>
 <td style="text-align:right;">
 0.1377011
 </td>
 <td style="text-align:right;">
-1146.957690
+892.784143
 </td>
 <td style="text-align:right;">
 0.1878073
@@ -2407,10 +2408,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2481,10 +2482,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2499,7 +2500,7 @@ int
 0.1154440
 </td>
 <td style="text-align:right;">
-705.153125
+548.906845
 </td>
 <td style="text-align:right;">
 1
@@ -2508,19 +2509,19 @@ int
 0.1621750
 </td>
 <td style="text-align:right;">
-990.594035
+771.100386
 </td>
 <td style="text-align:right;">
 12
 </td>
 <td style="text-align:right;">
-705.153125
+548.906845
 </td>
 <td style="text-align:right;">
 0.1154440
 </td>
 <td style="text-align:right;">
-990.594035
+771.100386
 </td>
 <td style="text-align:right;">
 0.1621750
@@ -2555,10 +2556,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2629,10 +2630,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2647,7 +2648,7 @@ int
 0.0967855
 </td>
 <td style="text-align:right;">
-591.230750
+460.234894
 </td>
 <td style="text-align:right;">
 1
@@ -2656,19 +2657,19 @@ int
 0.1400425
 </td>
 <td style="text-align:right;">
-855.473404
+665.930708
 </td>
 <td style="text-align:right;">
 13
 </td>
 <td style="text-align:right;">
-591.230750
+460.234894
 </td>
 <td style="text-align:right;">
 0.0967855
 </td>
 <td style="text-align:right;">
-855.473404
+665.930708
 </td>
 <td style="text-align:right;">
 0.1400425
@@ -2703,10 +2704,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2777,10 +2778,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2795,7 +2796,7 @@ int
 0.0811430
 </td>
 <td style="text-align:right;">
-495.693917
+385.868597
 </td>
 <td style="text-align:right;">
 1
@@ -2804,19 +2805,19 @@ int
 0.1209310
 </td>
 <td style="text-align:right;">
-738.754795
+575.077213
 </td>
 <td style="text-align:right;">
 14
 </td>
 <td style="text-align:right;">
-495.693917
+385.868597
 </td>
 <td style="text-align:right;">
 0.0811430
 </td>
 <td style="text-align:right;">
-738.754795
+575.077213
 </td>
 <td style="text-align:right;">
 0.1209310
@@ -2851,10 +2852,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2925,10 +2926,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -2943,7 +2944,7 @@ int
 0.0680288
 </td>
 <td style="text-align:right;">
-415.587480
+323.511562
 </td>
 <td style="text-align:right;">
 1
@@ -2952,19 +2953,19 @@ int
 0.1044279
 </td>
 <td style="text-align:right;">
-637.949650
+496.608049
 </td>
 <td style="text-align:right;">
 15
 </td>
 <td style="text-align:right;">
-415.587480
+323.511562
 </td>
 <td style="text-align:right;">
 0.0680288
 </td>
 <td style="text-align:right;">
-637.949650
+496.608049
 </td>
 <td style="text-align:right;">
 0.1044279
@@ -2999,10 +3000,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3073,10 +3074,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3091,7 +3092,7 @@ int
 0.0570341
 </td>
 <td style="text-align:right;">
-348.423811
+271.228835
 </td>
 <td style="text-align:right;">
 1
@@ -3100,19 +3101,19 @@ int
 0.0901770
 </td>
 <td style="text-align:right;">
-550.895213
+428.841723
 </td>
 <td style="text-align:right;">
 16
 </td>
 <td style="text-align:right;">
-348.423811
+271.228835
 </td>
 <td style="text-align:right;">
 0.0570341
 </td>
 <td style="text-align:right;">
-550.895213
+428.841723
 </td>
 <td style="text-align:right;">
 0.0901770
@@ -3147,10 +3148,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3221,10 +3222,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3239,7 +3240,7 @@ int
 0.0478164
 </td>
 <td style="text-align:right;">
-292.113489
+227.394499
 </td>
 <td style="text-align:right;">
 1
@@ -3248,19 +3249,19 @@ int
 0.0778710
 </td>
 <td style="text-align:right;">
-475.718466
+370.321010
 </td>
 <td style="text-align:right;">
 17
 </td>
 <td style="text-align:right;">
-292.113489
+227.394499
 </td>
 <td style="text-align:right;">
 0.0478164
 </td>
 <td style="text-align:right;">
-475.718466
+370.321010
 </td>
 <td style="text-align:right;">
 0.0778710
@@ -3295,10 +3296,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3369,10 +3370,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3387,7 +3388,7 @@ int
 0.0400885
 </td>
 <td style="text-align:right;">
-244.903324
+190.644009
 </td>
 <td style="text-align:right;">
 1
@@ -3396,19 +3397,19 @@ int
 0.0672442
 </td>
 <td style="text-align:right;">
-410.799874
+319.785512
 </td>
 <td style="text-align:right;">
 18
 </td>
 <td style="text-align:right;">
-244.903324
+190.644009
 </td>
 <td style="text-align:right;">
 0.0400885
 </td>
 <td style="text-align:right;">
-410.799874
+319.785512
 </td>
 <td style="text-align:right;">
 0.0672442
@@ -3443,10 +3444,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3517,10 +3518,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3535,7 +3536,7 @@ int
 0.0336095
 </td>
 <td style="text-align:right;">
-205.322915
+159.832822
 </td>
 <td style="text-align:right;">
 1
@@ -3544,19 +3545,19 @@ int
 0.0580677
 </td>
 <td style="text-align:right;">
-354.740087
+276.146036
 </td>
 <td style="text-align:right;">
 19
 </td>
 <td style="text-align:right;">
-205.322915
+159.832822
 </td>
 <td style="text-align:right;">
 0.0336095
 </td>
 <td style="text-align:right;">
-354.740087
+276.146036
 </td>
 <td style="text-align:right;">
 0.0580677
@@ -3591,10 +3592,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3665,10 +3666,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3683,7 +3684,7 @@ int
 0.0281776
 </td>
 <td style="text-align:right;">
-172.139293
+134.001170
 </td>
 <td style="text-align:right;">
 1
@@ -3692,19 +3693,19 @@ int
 0.0501435
 </td>
 <td style="text-align:right;">
-306.330392
+238.461714
 </td>
 <td style="text-align:right;">
 20
 </td>
 <td style="text-align:right;">
-172.139293
+134.001170
 </td>
 <td style="text-align:right;">
 0.0281776
 </td>
 <td style="text-align:right;">
-306.330392
+238.461714
 </td>
 <td style="text-align:right;">
 0.0501435
@@ -3739,10 +3740,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3813,10 +3814,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3831,7 +3832,7 @@ int
 0.0236236
 </td>
 <td style="text-align:right;">
-144.318678
+112.344323
 </td>
 <td style="text-align:right;">
 1
@@ -3840,19 +3841,19 @@ int
 0.0433006
 </td>
 <td style="text-align:right;">
-264.526897
+205.919951
 </td>
 <td style="text-align:right;">
 21
 </td>
 <td style="text-align:right;">
-144.318678
+112.344323
 </td>
 <td style="text-align:right;">
 0.0236236
 </td>
 <td style="text-align:right;">
-264.526897
+205.919951
 </td>
 <td style="text-align:right;">
 0.0433006
@@ -3887,10 +3888,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3961,10 +3962,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -3979,7 +3980,7 @@ int
 0.0198057
 </td>
 <td style="text-align:right;">
-120.994336
+94.187579
 </td>
 <td style="text-align:right;">
 1
@@ -3988,19 +3989,19 @@ int
 0.0373916
 </td>
 <td style="text-align:right;">
-228.428117
+177.818996
 </td>
 <td style="text-align:right;">
 22
 </td>
 <td style="text-align:right;">
-120.994336
+94.187579
 </td>
 <td style="text-align:right;">
 0.0198057
 </td>
 <td style="text-align:right;">
-228.428117
+177.818996
 </td>
 <td style="text-align:right;">
 0.0373916
@@ -4035,10 +4036,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4109,10 +4110,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4127,7 +4128,7 @@ int
 0.0166047
 </td>
 <td style="text-align:right;">
-101.439598
+78.965269
 </td>
 <td style="text-align:right;">
 1
@@ -4136,19 +4137,19 @@ int
 0.0322889
 </td>
 <td style="text-align:right;">
-197.255566
+153.552843
 </td>
 <td style="text-align:right;">
 23
 </td>
 <td style="text-align:right;">
-101.439598
+78.965269
 </td>
 <td style="text-align:right;">
 0.0166047
 </td>
 <td style="text-align:right;">
-197.255566
+153.552843
 </td>
 <td style="text-align:right;">
 0.0322889
@@ -4183,10 +4184,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4257,10 +4258,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4275,7 +4276,7 @@ int
 0.0139211
 </td>
 <td style="text-align:right;">
-85.045237
+66.203141
 </td>
 <td style="text-align:right;">
 1
@@ -4284,19 +4285,19 @@ int
 0.0278826
 </td>
 <td style="text-align:right;">
-170.336990
+132.598181
 </td>
 <td style="text-align:right;">
 24
 </td>
 <td style="text-align:right;">
-85.045237
+66.203141
 </td>
 <td style="text-align:right;">
 0.0139211
 </td>
 <td style="text-align:right;">
-170.336990
+132.598181
 </td>
 <td style="text-align:right;">
 0.0278826
@@ -4331,10 +4332,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4405,10 +4406,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4423,7 +4424,7 @@ int
 0.0116712
 </td>
 <td style="text-align:right;">
-71.300483
+55.503589
 </td>
 <td style="text-align:right;">
 1
@@ -4432,19 +4433,19 @@ int
 0.0240776
 </td>
 <td style="text-align:right;">
-147.091869
+114.503105
 </td>
 <td style="text-align:right;">
 25
 </td>
 <td style="text-align:right;">
-71.300483
+55.503589
 </td>
 <td style="text-align:right;">
 0.0116712
 </td>
 <td style="text-align:right;">
-147.091869
+114.503105
 </td>
 <td style="text-align:right;">
 0.0240776
@@ -4479,10 +4480,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4553,10 +4554,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4571,7 +4572,7 @@ int
 0.0097850
 </td>
 <td style="text-align:right;">
-59.777114
+46.533267
 </td>
 <td style="text-align:right;">
 1
@@ -4580,19 +4581,19 @@ int
 0.0207918
 </td>
 <td style="text-align:right;">
-127.018905
+98.877383
 </td>
 <td style="text-align:right;">
 26
 </td>
 <td style="text-align:right;">
-59.777114
+46.533267
 </td>
 <td style="text-align:right;">
 0.0097850
 </td>
 <td style="text-align:right;">
-127.018905
+98.877383
 </td>
 <td style="text-align:right;">
 0.0207918
@@ -4627,10 +4628,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4701,10 +4702,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4719,7 +4720,7 @@ int
 0.0082035
 </td>
 <td style="text-align:right;">
-50.116117
+39.012701
 </td>
 <td style="text-align:right;">
 1
@@ -4728,19 +4729,19 @@ int
 0.0179545
 </td>
 <td style="text-align:right;">
-109.685207
+85.384032
 </td>
 <td style="text-align:right;">
 27
 </td>
 <td style="text-align:right;">
-50.116117
+39.012701
 </td>
 <td style="text-align:right;">
 0.0082035
 </td>
 <td style="text-align:right;">
-109.685207
+85.384032
 </td>
 <td style="text-align:right;">
 0.0179545
@@ -4775,10 +4776,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4849,10 +4850,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4867,7 +4868,7 @@ int
 0.0068777
 </td>
 <td style="text-align:right;">
-42.016501
+32.707586
 </td>
 <td style="text-align:right;">
 1
@@ -4876,19 +4877,19 @@ int
 0.0155043
 </td>
 <td style="text-align:right;">
-94.716961
+73.732058
 </td>
 <td style="text-align:right;">
 28
 </td>
 <td style="text-align:right;">
-42.016501
+32.707586
 </td>
 <td style="text-align:right;">
 0.0068777
 </td>
 <td style="text-align:right;">
-94.716961
+73.732058
 </td>
 <td style="text-align:right;">
 0.0155043
@@ -4923,10 +4924,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -4997,10 +4998,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -5015,7 +5016,7 @@ int
 0.0057662
 </td>
 <td style="text-align:right;">
-35.225921
+27.421484
 </td>
 <td style="text-align:right;">
 1
@@ -5024,19 +5025,19 @@ int
 0.0133885
 </td>
 <td style="text-align:right;">
-81.791364
+63.670176
 </td>
 <td style="text-align:right;">
 29
 </td>
 <td style="text-align:right;">
-35.225921
+27.421484
 </td>
 <td style="text-align:right;">
 0.0057662
 </td>
 <td style="text-align:right;">
-81.791364
+63.670176
 </td>
 <td style="text-align:right;">
 0.0133885
@@ -5071,10 +5072,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -5145,10 +5146,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -5163,7 +5164,7 @@ int
 0.0048342
 </td>
 <td style="text-align:right;">
-29.532814
+22.989707
 </td>
 <td style="text-align:right;">
 1
@@ -5172,19 +5173,19 @@ int
 0.0115614
 </td>
 <td style="text-align:right;">
-70.629665
+54.981394
 </td>
 <td style="text-align:right;">
 30
 </td>
 <td style="text-align:right;">
-29.532814
+22.989707
 </td>
 <td style="text-align:right;">
 0.0048342
 </td>
 <td style="text-align:right;">
-70.629665
+54.981394
 </td>
 <td style="text-align:right;">
 0.0115614
@@ -5219,10 +5220,10 @@ int
 5.073559
 </td>
 <td style="text-align:right;">
-25037.88
+18534.53
 </td>
 <td style="text-align:right;">
-30679.83
+22891.52
 </td>
 <td style="text-align:right;">
 6.032475
@@ -5293,10 +5294,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -5367,10 +5368,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -5385,7 +5386,7 @@ noint
 0.8868286
 </td>
 <td style="text-align:right;">
-985.365150
+1970.730299
 </td>
 <td style="text-align:right;">
 1
@@ -5394,19 +5395,19 @@ noint
 0.9000000
 </td>
 <td style="text-align:right;">
-1000.000000
+2000.000000
 </td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:right;">
-985.365150
+1970.730299
 </td>
 <td style="text-align:right;">
 0.8868286
 </td>
 <td style="text-align:right;">
-1000.000000
+2000.000000
 </td>
 <td style="text-align:right;">
 0.9000000
@@ -5441,10 +5442,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -5515,10 +5516,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -5533,7 +5534,7 @@ noint
 0.6744490
 </td>
 <td style="text-align:right;">
-2391.662984
+3252.661659
 </td>
 <td style="text-align:right;">
 1
@@ -5542,19 +5543,19 @@ noint
 0.7050000
 </td>
 <td style="text-align:right;">
-2500.000000
+3400.000000
 </td>
 <td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
-2391.662984
+3252.661659
 </td>
 <td style="text-align:right;">
 0.6744490
 </td>
 <td style="text-align:right;">
-2500.000000
+3400.000000
 </td>
 <td style="text-align:right;">
 0.7050000
@@ -5589,10 +5590,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -5663,10 +5664,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -5681,7 +5682,7 @@ noint
 0.5071254
 </td>
 <td style="text-align:right;">
-2424.171025
+3111.483883
 </td>
 <td style="text-align:right;">
 1
@@ -5690,19 +5691,19 @@ noint
 0.5460000
 </td>
 <td style="text-align:right;">
-2610.000000
+3350.000000
 </td>
 <td style="text-align:right;">
 3
 </td>
 <td style="text-align:right;">
-2424.171025
+3111.483883
 </td>
 <td style="text-align:right;">
 0.5071254
 </td>
 <td style="text-align:right;">
-2610.000000
+3350.000000
 </td>
 <td style="text-align:right;">
 0.5460000
@@ -5737,10 +5738,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -5811,10 +5812,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -5829,7 +5830,7 @@ noint
 0.3803576
 </td>
 <td style="text-align:right;">
-2028.032822
+2556.457559
 </td>
 <td style="text-align:right;">
 1
@@ -5838,19 +5839,19 @@ noint
 0.4218000
 </td>
 <td style="text-align:right;">
-2249.000000
+2835.000000
 </td>
 <td style="text-align:right;">
 4
 </td>
 <td style="text-align:right;">
-2028.032822
+2556.457559
 </td>
 <td style="text-align:right;">
 0.3803576
 </td>
 <td style="text-align:right;">
-2249.000000
+2835.000000
 </td>
 <td style="text-align:right;">
 0.4218000
@@ -5885,10 +5886,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -5959,10 +5960,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -5977,7 +5978,7 @@ noint
 0.2851802
 </td>
 <td style="text-align:right;">
-1585.414289
+1985.510556
 </td>
 <td style="text-align:right;">
 1
@@ -5986,19 +5987,19 @@ noint
 0.3257400
 </td>
 <td style="text-align:right;">
-1810.900000
+2267.900000
 </td>
 <td style="text-align:right;">
 5
 </td>
 <td style="text-align:right;">
-1585.414289
+1985.510556
 </td>
 <td style="text-align:right;">
 0.2851802
 </td>
 <td style="text-align:right;">
-1810.900000
+2267.900000
 </td>
 <td style="text-align:right;">
 0.3257400
@@ -6033,10 +6034,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6107,10 +6108,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6125,7 +6126,7 @@ noint
 0.2138340
 </td>
 <td style="text-align:right;">
-1207.666668
+1508.782224
 </td>
 <td style="text-align:right;">
 1
@@ -6134,19 +6135,19 @@ noint
 0.2515740
 </td>
 <td style="text-align:right;">
-1420.810000
+1775.070000
 </td>
 <td style="text-align:right;">
 6
 </td>
 <td style="text-align:right;">
-1207.666668
+1508.782224
 </td>
 <td style="text-align:right;">
 0.2138340
 </td>
 <td style="text-align:right;">
-1420.810000
+1775.070000
 </td>
 <td style="text-align:right;">
 0.2515740
@@ -6181,10 +6182,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6255,10 +6256,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6273,7 +6274,7 @@ noint
 0.1603515
 </td>
 <td style="text-align:right;">
-910.857562
+1136.965028
 </td>
 <td style="text-align:right;">
 1
@@ -6282,19 +6283,19 @@ noint
 0.1943118
 </td>
 <td style="text-align:right;">
-1103.765000
+1377.759000
 </td>
 <td style="text-align:right;">
 7
 </td>
 <td style="text-align:right;">
-910.857562
+1136.965028
 </td>
 <td style="text-align:right;">
 0.1603515
 </td>
 <td style="text-align:right;">
-1103.765000
+1377.759000
 </td>
 <td style="text-align:right;">
 0.1943118
@@ -6329,10 +6330,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6403,10 +6404,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6421,7 +6422,7 @@ noint
 0.1202519
 </td>
 <td style="text-align:right;">
-684.471258
+854.115179
 </td>
 <td style="text-align:right;">
 1
@@ -6430,19 +6431,19 @@ noint
 0.1500913
 </td>
 <td style="text-align:right;">
-854.316100
+1066.055500
 </td>
 <td style="text-align:right;">
 8
 </td>
 <td style="text-align:right;">
-684.471258
+854.115179
 </td>
 <td style="text-align:right;">
 0.1202519
 </td>
 <td style="text-align:right;">
-854.316100
+1066.055500
 </td>
 <td style="text-align:right;">
 0.1500913
@@ -6477,10 +6478,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6551,10 +6552,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6569,7 +6570,7 @@ noint
 0.0901824
 </td>
 <td style="text-align:right;">
-513.672289
+640.916099
 </td>
 <td style="text-align:right;">
 1
@@ -6578,19 +6579,19 @@ noint
 0.1159371
 </td>
 <td style="text-align:right;">
-660.369090
+823.951750
 </td>
 <td style="text-align:right;">
 9
 </td>
 <td style="text-align:right;">
-513.672289
+640.916099
 </td>
 <td style="text-align:right;">
 0.0901824
 </td>
 <td style="text-align:right;">
-660.369090
+823.951750
 </td>
 <td style="text-align:right;">
 0.1159371
@@ -6625,10 +6626,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6699,10 +6700,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6717,7 +6718,7 @@ noint
 0.0676327
 </td>
 <td style="text-align:right;">
-385.317508
+480.749312
 </td>
 <td style="text-align:right;">
 1
@@ -6726,19 +6727,19 @@ noint
 0.0895559
 </td>
 <td style="text-align:right;">
-510.218929
+636.585139
 </td>
 <td style="text-align:right;">
 10
 </td>
 <td style="text-align:right;">
-385.317508
+480.749312
 </td>
 <td style="text-align:right;">
 0.0676327
 </td>
 <td style="text-align:right;">
-510.218929
+636.585139
 </td>
 <td style="text-align:right;">
 0.0895559
@@ -6773,10 +6774,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6847,10 +6848,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6865,7 +6866,7 @@ noint
 0.0507216
 </td>
 <td style="text-align:right;">
-288.991814
+360.562665
 </td>
 <td style="text-align:right;">
 1
@@ -6874,19 +6875,19 @@ noint
 0.0691780
 </td>
 <td style="text-align:right;">
-394.149146
+491.762949
 </td>
 <td style="text-align:right;">
 11
 </td>
 <td style="text-align:right;">
-288.991814
+360.562665
 </td>
 <td style="text-align:right;">
 0.0507216
 </td>
 <td style="text-align:right;">
-394.149146
+491.762949
 </td>
 <td style="text-align:right;">
 0.0691780
@@ -6921,10 +6922,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -6995,10 +6996,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7013,7 +7014,7 @@ noint
 0.0380391
 </td>
 <td style="text-align:right;">
-216.736214
+270.411596
 </td>
 <td style="text-align:right;">
 1
@@ -7022,19 +7023,19 @@ noint
 0.0534370
 </td>
 <td style="text-align:right;">
-304.469473
+379.872265
 </td>
 <td style="text-align:right;">
 12
 </td>
 <td style="text-align:right;">
-216.736214
+270.411596
 </td>
 <td style="text-align:right;">
 0.0380391
 </td>
 <td style="text-align:right;">
-304.469473
+379.872265
 </td>
 <td style="text-align:right;">
 0.0534370
@@ -7069,10 +7070,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7143,10 +7144,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7161,7 +7162,7 @@ noint
 0.0285277
 </td>
 <td style="text-align:right;">
-162.544086
+202.798450
 </td>
 <td style="text-align:right;">
 1
@@ -7170,19 +7171,19 @@ noint
 0.0412778
 </td>
 <td style="text-align:right;">
-235.190985
+293.436496
 </td>
 <td style="text-align:right;">
 13
 </td>
 <td style="text-align:right;">
-162.544086
+202.798450
 </td>
 <td style="text-align:right;">
 0.0285277
 </td>
 <td style="text-align:right;">
-235.190985
+293.436496
 </td>
 <td style="text-align:right;">
 0.0412778
@@ -7217,10 +7218,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7291,10 +7292,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7309,7 +7310,7 @@ noint
 0.0213946
 </td>
 <td style="text-align:right;">
-121.901522
+152.090644
 </td>
 <td style="text-align:right;">
 1
@@ -7318,19 +7319,19 @@ noint
 0.0318854
 </td>
 <td style="text-align:right;">
-181.675285
+226.667483
 </td>
 <td style="text-align:right;">
 14
 </td>
 <td style="text-align:right;">
-121.901522
+152.090644
 </td>
 <td style="text-align:right;">
 0.0213946
 </td>
 <td style="text-align:right;">
-181.675285
+226.667483
 </td>
 <td style="text-align:right;">
 0.0318854
@@ -7365,10 +7366,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7439,10 +7440,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7457,7 +7458,7 @@ noint
 0.0160451
 </td>
 <td style="text-align:right;">
-91.421145
+114.061746
 </td>
 <td style="text-align:right;">
 1
@@ -7466,19 +7467,19 @@ noint
 0.0246301
 </td>
 <td style="text-align:right;">
-140.336489
+175.091057
 </td>
 <td style="text-align:right;">
 15
 </td>
 <td style="text-align:right;">
-91.421145
+114.061746
 </td>
 <td style="text-align:right;">
 0.0160451
 </td>
 <td style="text-align:right;">
-140.336489
+175.091057
 </td>
 <td style="text-align:right;">
 0.0246301
@@ -7513,10 +7514,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7587,10 +7588,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7605,7 +7606,7 @@ noint
 0.0120332
 </td>
 <td style="text-align:right;">
-68.562100
+85.541620
 </td>
 <td style="text-align:right;">
 1
@@ -7614,19 +7615,19 @@ noint
 0.0190257
 </td>
 <td style="text-align:right;">
-108.403994
+135.250426
 </td>
 <td style="text-align:right;">
 16
 </td>
 <td style="text-align:right;">
-68.562100
+85.541620
 </td>
 <td style="text-align:right;">
 0.0120332
 </td>
 <td style="text-align:right;">
-108.403994
+135.250426
 </td>
 <td style="text-align:right;">
 0.0190257
@@ -7661,10 +7662,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7735,10 +7736,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7753,7 +7754,7 @@ noint
 0.0090244
 </td>
 <td style="text-align:right;">
-51.418755
+64.152697
 </td>
 <td style="text-align:right;">
 1
@@ -7762,19 +7763,19 @@ noint
 0.0146966
 </td>
 <td style="text-align:right;">
-83.737493
+104.475225
 </td>
 <td style="text-align:right;">
 17
 </td>
 <td style="text-align:right;">
-51.418755
+64.152697
 </td>
 <td style="text-align:right;">
 0.0090244
 </td>
 <td style="text-align:right;">
-83.737493
+104.475225
 </td>
 <td style="text-align:right;">
 0.0146966
@@ -7809,10 +7810,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7883,10 +7884,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -7901,7 +7902,7 @@ noint
 0.0067679
 </td>
 <td style="text-align:right;">
-38.561952
+48.111885
 </td>
 <td style="text-align:right;">
 1
@@ -7910,19 +7911,19 @@ noint
 0.0113525
 </td>
 <td style="text-align:right;">
-64.683667
+80.702688
 </td>
 <td style="text-align:right;">
 18
 </td>
 <td style="text-align:right;">
-38.561952
+48.111885
 </td>
 <td style="text-align:right;">
 0.0067679
 </td>
 <td style="text-align:right;">
-64.683667
+80.702688
 </td>
 <td style="text-align:right;">
 0.0113525
@@ -7957,10 +7958,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8031,10 +8032,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8049,7 +8050,7 @@ noint
 0.0050757
 </td>
 <td style="text-align:right;">
-28.919879
+36.081937
 </td>
 <td style="text-align:right;">
 1
@@ -8058,19 +8059,19 @@ noint
 0.0087693
 </td>
 <td style="text-align:right;">
-49.965395
+62.339410
 </td>
 <td style="text-align:right;">
 19
 </td>
 <td style="text-align:right;">
-28.919879
+36.081937
 </td>
 <td style="text-align:right;">
 0.0050757
 </td>
 <td style="text-align:right;">
-49.965395
+62.339410
 </td>
 <td style="text-align:right;">
 0.0087693
@@ -8105,10 +8106,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8179,10 +8180,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8197,7 +8198,7 @@ noint
 0.0038065
 </td>
 <td style="text-align:right;">
-21.688721
+27.059970
 </td>
 <td style="text-align:right;">
 1
@@ -8206,19 +8207,19 @@ noint
 0.0067739
 </td>
 <td style="text-align:right;">
-38.596152
+48.154555
 </td>
 <td style="text-align:right;">
 20
 </td>
 <td style="text-align:right;">
-21.688721
+27.059970
 </td>
 <td style="text-align:right;">
 0.0038065
 </td>
 <td style="text-align:right;">
-38.596152
+48.154555
 </td>
 <td style="text-align:right;">
 0.0067739
@@ -8253,10 +8254,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8327,10 +8328,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8345,7 +8346,7 @@ noint
 0.0028547
 </td>
 <td style="text-align:right;">
-16.265649
+20.293865
 </td>
 <td style="text-align:right;">
 1
@@ -8354,19 +8355,19 @@ noint
 0.0052326
 </td>
 <td style="text-align:right;">
-29.813894
+37.197356
 </td>
 <td style="text-align:right;">
 21
 </td>
 <td style="text-align:right;">
-16.265649
+20.293865
 </td>
 <td style="text-align:right;">
 0.0028547
 </td>
 <td style="text-align:right;">
-29.813894
+37.197356
 </td>
 <td style="text-align:right;">
 0.0052326
@@ -8401,10 +8402,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8475,10 +8476,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8493,7 +8494,7 @@ noint
 0.0021409
 </td>
 <td style="text-align:right;">
-12.198569
+15.219565
 </td>
 <td style="text-align:right;">
 1
@@ -8502,19 +8503,19 @@ noint
 0.0040419
 </td>
 <td style="text-align:right;">
-23.029971
+28.733383
 </td>
 <td style="text-align:right;">
 22
 </td>
 <td style="text-align:right;">
-12.198569
+15.219565
 </td>
 <td style="text-align:right;">
 0.0021409
 </td>
 <td style="text-align:right;">
-23.029971
+28.733383
 </td>
 <td style="text-align:right;">
 0.0040419
@@ -8549,10 +8550,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8623,10 +8624,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8641,7 +8642,7 @@ noint
 0.0016056
 </td>
 <td style="text-align:right;">
-9.148425
+11.414048
 </td>
 <td style="text-align:right;">
 1
@@ -8650,19 +8651,19 @@ noint
 0.0031222
 </td>
 <td style="text-align:right;">
-17.789678
+22.195322
 </td>
 <td style="text-align:right;">
 23
 </td>
 <td style="text-align:right;">
-9.148425
+11.414048
 </td>
 <td style="text-align:right;">
 0.0016056
 </td>
 <td style="text-align:right;">
-17.789678
+22.195322
 </td>
 <td style="text-align:right;">
 0.0031222
@@ -8697,10 +8698,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8771,10 +8772,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8789,7 +8790,7 @@ noint
 0.0012041
 </td>
 <td style="text-align:right;">
-6.860943
+8.560067
 </td>
 <td style="text-align:right;">
 1
@@ -8798,19 +8799,19 @@ noint
 0.0024118
 </td>
 <td style="text-align:right;">
-13.741773
+17.144947
 </td>
 <td style="text-align:right;">
 24
 </td>
 <td style="text-align:right;">
-6.860943
+8.560067
 </td>
 <td style="text-align:right;">
 0.0012041
 </td>
 <td style="text-align:right;">
-13.741773
+17.144947
 </td>
 <td style="text-align:right;">
 0.0024118
@@ -8845,10 +8846,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8919,10 +8920,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -8937,7 +8938,7 @@ noint
 0.0009031
 </td>
 <td style="text-align:right;">
-5.145425
+6.419699
 </td>
 <td style="text-align:right;">
 1
@@ -8946,19 +8947,19 @@ noint
 0.0018630
 </td>
 <td style="text-align:right;">
-10.614938
+13.243746
 </td>
 <td style="text-align:right;">
 25
 </td>
 <td style="text-align:right;">
-5.145425
+6.419699
 </td>
 <td style="text-align:right;">
 0.0009031
 </td>
 <td style="text-align:right;">
-10.614938
+13.243746
 </td>
 <td style="text-align:right;">
 0.0018630
@@ -8993,10 +8994,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -9067,10 +9068,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -9085,7 +9086,7 @@ noint
 0.0006773
 </td>
 <td style="text-align:right;">
-3.858858
+4.814510
 </td>
 <td style="text-align:right;">
 1
@@ -9094,19 +9095,19 @@ noint
 0.0014391
 </td>
 <td style="text-align:right;">
-8.199590
+10.230233
 </td>
 <td style="text-align:right;">
 26
 </td>
 <td style="text-align:right;">
-3.858858
+4.814510
 </td>
 <td style="text-align:right;">
 0.0006773
 </td>
 <td style="text-align:right;">
-8.199590
+10.230233
 </td>
 <td style="text-align:right;">
 0.0014391
@@ -9141,10 +9142,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -9215,10 +9216,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -9233,7 +9234,7 @@ noint
 0.0005079
 </td>
 <td style="text-align:right;">
-2.893985
+3.610685
 </td>
 <td style="text-align:right;">
 1
@@ -9242,19 +9243,19 @@ noint
 0.0011116
 </td>
 <td style="text-align:right;">
-6.333837
+7.902422
 </td>
 <td style="text-align:right;">
 27
 </td>
 <td style="text-align:right;">
-2.893985
+3.610685
 </td>
 <td style="text-align:right;">
 0.0005079
 </td>
 <td style="text-align:right;">
-6.333837
+7.902422
 </td>
 <td style="text-align:right;">
 0.0011116
@@ -9289,10 +9290,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -9363,10 +9364,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -9381,7 +9382,7 @@ noint
 0.0003809
 </td>
 <td style="text-align:right;">
-2.170370
+2.707865
 </td>
 <td style="text-align:right;">
 1
@@ -9390,19 +9391,19 @@ noint
 0.0008587
 </td>
 <td style="text-align:right;">
-4.892621
+6.104286
 </td>
 <td style="text-align:right;">
 28
 </td>
 <td style="text-align:right;">
-2.170370
+2.707865
 </td>
 <td style="text-align:right;">
 0.0003809
 </td>
 <td style="text-align:right;">
-4.892621
+6.104286
 </td>
 <td style="text-align:right;">
 0.0008587
@@ -9437,10 +9438,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -9511,10 +9512,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -9529,7 +9530,7 @@ noint
 0.0002857
 </td>
 <td style="text-align:right;">
-1.627688
+2.030788
 </td>
 <td style="text-align:right;">
 1
@@ -9538,19 +9539,19 @@ noint
 0.0006633
 </td>
 <td style="text-align:right;">
-3.779342
+4.715303
 </td>
 <td style="text-align:right;">
 29
 </td>
 <td style="text-align:right;">
-1.627688
+2.030788
 </td>
 <td style="text-align:right;">
 0.0002857
 </td>
 <td style="text-align:right;">
-3.779342
+4.715303
 </td>
 <td style="text-align:right;">
 0.0006633
@@ -9585,10 +9586,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -9659,10 +9660,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293
@@ -9677,7 +9678,7 @@ noint
 0.0002142
 </td>
 <td style="text-align:right;">
-1.220699
+1.523007
 </td>
 <td style="text-align:right;">
 1
@@ -9686,19 +9687,19 @@ noint
 0.0005124
 </td>
 <td style="text-align:right;">
-2.919382
+3.642372
 </td>
 <td style="text-align:right;">
 30
 </td>
 <td style="text-align:right;">
-1.220699
+1.523007
 </td>
 <td style="text-align:right;">
 0.0002142
 </td>
 <td style="text-align:right;">
-2.919382
+3.642372
 </td>
 <td style="text-align:right;">
 0.0005124
@@ -9733,10 +9734,10 @@ noint
 3.588404
 </td>
 <td style="text-align:right;">
-14268.77
+18935.84
 </td>
 <td style="text-align:right;">
-16441.70
+21681.18
 </td>
 <td style="text-align:right;">
 4.002293

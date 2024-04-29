@@ -124,7 +124,16 @@ unique_pt_inputs <- add_item(
   fl.mbcs                  = 0,
   fl.mbcs_2ndline          = 0,
   fl.recurrence            = 0,
-  fl.remission             = rbinom(1,1,0.8) #80% probability of going into remission
+  fl.remission             = rbinom(1,1,0.8), #80% probability of going into remission
+  q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+  c_default = if(arm=="noint"){cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs}else{(cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs},
+  c_ae = 0
 )
 ```
 
@@ -141,7 +150,7 @@ Note that in our model, the initial list of events are `start, ttot, ttot.beva, 
 ```{r model_evts}
 init_event_list <- 
   add_tte(arm="int",
-               evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc"),
+               evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc","ae","2ndline_mbc"),
                other_inp = c("os.early","os.mbc"),
                input={ #intervention
     start <- 0
@@ -279,29 +288,69 @@ evt_react_list <-
                input = {}) %>%
   add_reactevt(name_evt = "ttot",
                input = {
-                 modify_item(list("fl.mbcs.ontx"= 0)) #Flag that patient is now off-treatment
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default = cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline,
+                              "fl.mbcs.ontx"= 0)) #Flag that patient is now off-treatment
                  
                }) %>%
   add_reactevt(name_evt = "ttot.beva",
                input = {
-                 modify_item(list("fl.tx.beva"= 0)) #Flag that patient is now off-treatment
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default =cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline,
+                              "fl.tx.beva"= 0)) #Flag that patient is now off-treatment
                  
                }) %>%
   add_reactevt(name_evt = "progression.mbc",
                input = {
-                 modify_item(list("fl.mbcs.progression.mbc"=0,"fl.mbcs_2ndline"=1)) #Flag that patient is progressed and going in 2nd line
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default = cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline,
+                              "fl.mbcs.progression.mbc"=0,"fl.mbcs_2ndline"=1)) #Flag that patient is progressed and going in 2nd line
                  
                  new_event(list("2ndline_mbc" = curtime + draw_tte(1,'exp', log(0.08))/12))
                  
                }) %>%
   add_reactevt(name_evt = "idfs",
                input = {
-                 modify_item(list("fl.idfs"= 0))
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default = if(arm=="noint"){cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs}else{(cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs},
+                              "fl.idfs"= 0))
                  
                }) %>%
   add_reactevt(name_evt = "ttot.early",
                input = {
-                 modify_item(list("fl.idfs.ontx"=0,"fl.tx.beva"=0)) #Flag that patient is now off-treatment
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default = if(arm=="noint"){cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs}else{(cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs},
+                              "fl.idfs.ontx"=0,"fl.tx.beva"=0)) #Flag that patient is now off-treatment
                  
                  n_ae <- rpois(1,lambda=0.25*(curtime -prevtime)) #1 AE every 4 years
                  
@@ -311,22 +360,54 @@ evt_react_list <-
                }) %>%
   add_reactevt(name_evt = "remission",
                input = {
-                 modify_item(list("fl.remission"= 1))
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default = cost.recurrence * fl.recurrence,
+                              "fl.remission"= 1))
                  
                }) %>%
   add_reactevt(name_evt = "recurrence",
                input = {
-                 modify_item(list("fl.recurrence"=1,"fl.remission"=0,"fl.mbcs"=1,"fl.mbcs.progression.mbc"=1)) #ad-hoc for plot
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default = cost.recurrence * fl.recurrence,
+                              "fl.recurrence"=1,"fl.remission"=0,"fl.mbcs"=1,"fl.mbcs.progression.mbc"=1)) #ad-hoc for plot
                  
                }) %>%
   add_reactevt(name_evt = "start.early.mbc",
                input = {
-                 modify_item(list("fl.mbcs"=1,"fl.mbcs.progression.mbc"=1))
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default = cost.recurrence * fl.recurrence,
+                              "fl.mbcs"=1,"fl.mbcs.progression.mbc"=1))
                  
                }) %>%
   add_reactevt(name_evt = "2ndline_mbc",
                input = {
-                 modify_item(list("fl.mbcs_2ndline"= 0))
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default = cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline,
+                              "fl.mbcs_2ndline"= 0))
                  
                  n_ae <- rpois(1,lambda=0.25*(curtime -prevtime)) #1 AE every 4 years
                  
@@ -336,11 +417,30 @@ evt_react_list <-
                }) %>%
   add_reactevt(name_evt = "ae",
                input = {
+                                  
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default = cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline,
+                              c_ae = cost.ae))
+                 
                  modify_event(list("os" =max(cur_evtlist[["os"]] - 0.125,curtime +0.0001) ))#each AE brings forward death by 1.5 months
                }) %>%
   add_reactevt(name_evt = "os",
                input = {
-                 modify_item(list("fl.tx.beva"=0,"fl.mbcs.ontx"=0,"fl.idfs"=0,"fl.mbcs"=0,"curtime"=Inf)) 
+                 modify_item(list(q_default = if (fl.idfs==1) {
+                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+                              } else if (fl.idfs==0 & fl.mbcs==0) {
+                                util.remission * fl.remission + fl.recurrence*util.recurrence
+                              } else if (fl.mbcs==1) {
+                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+                              },
+                              c_default = cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline,
+                              "fl.tx.beva"=0,"fl.mbcs.ontx"=0,"fl.idfs"=0,"fl.mbcs"=0,"curtime"=Inf)) 
                }) 
 
 ```
@@ -353,16 +453,7 @@ Utilities are defined using pipes with the `add_util` function. The first argume
 
 ```{r utilities}
 
-util_ongoing <- add_util(evt = c("start","ttot","ttot.beva","progression.mbc","os","idfs","ttot.early","remission","recurrence","start.early.mbc","2ndline_mbc","ae"),
-                              arm = c("int", "noint"),
-                              util = if (fl.idfs==1) {
-                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
-                              } else if (fl.idfs==0 & fl.mbcs==0) {
-                                util.remission * fl.remission + fl.recurrence*util.recurrence
-                              } else if (fl.mbcs==1) {
-                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
-                              }
-) #common utility across arms
+util_ongoing <- "q_default"
 
 ```
 ## Costs
@@ -370,30 +461,10 @@ Costs are defined using pipes with the `add_cost` function, in a similar fashion
 
 ```{r costs}
 
-cost_ongoing <-
-  add_cost(
-    evt = c("start","idfs","ttot.early") ,
-    arm = "noint",
-    cost = cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs) %>%
-  add_cost(
-    evt = c("start","idfs","ttot.early") ,
-    arm = "int",
-    cost = (cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs) %>%
-  add_cost(
-    evt = c("remission","recurrence","start.early.mbc"),
-    arm = c("noint","int"),
-    cost = cost.recurrence * fl.recurrence) %>%
-  add_cost(
-    evt = c("ttot","ttot.beva","progression.mbc","os","2ndline_mbc"),
-    arm = c("noint","int"),
-    cost = cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline  )
 
+cost_ongoing <- "c_default"
 
-cost_instant <-  add_cost(
-  evt = c("ae"),
-  arm = c("noint","int"),
-  cost = cost.ae)
-
+cost_instant <-  "c_ae"
 
 ```
 
