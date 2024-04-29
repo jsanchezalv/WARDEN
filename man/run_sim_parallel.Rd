@@ -104,6 +104,11 @@ Note that if ncores > 1, then results per simulation will only be exactly replic
 (as seeds are automatically transformed to be seven integer seeds -i.e, L'Ecuyer-CMRG seeds-)
 
 If no \code{drc} or \code{drq} parameters are passed within any of the input lists, these are assigned value 0.03.
+
+If the \code{cycle} lists are used, then it is expected the user will declare as well the name of the variable
+pasted with \code{cycle_l} and \code{cycle_starttime} (e.g., c_default_cycle_l and c_default_cycle_starttime) to
+ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime
+being the starting time in which the variable started counting.
 }
 \examples{
 \dontrun{

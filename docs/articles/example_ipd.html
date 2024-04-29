@@ -130,8 +130,8 @@ progression-free state and may move to the progressed state. At any
 point in time they can die, depending on the risk of each disease stage.
 Patients may also experience a disease event which accelerates
 progression.</p>
-<div id="htmlwidget-52ec6568e91d23358119" style="width:700px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-52ec6568e91d23358119">{"x":{"diagram":"\n  digraph graph1 {\n  \n  graph [layout = dot, rankdir = LR, nodesep=\"1\", fontsize = 12]\n  \n  # node definitions with substituted label text\n  \n  node [shape = oval]\n  a [label = \"Progression-free\"]\n  b [label = \"Progressed\"]\n  d [label = \"Death\"]\n  \n  node [shape = box]\n  c [label = \"Progression-accelerating event\", style = dashed]\n  \n  a -> d\n  a -> b\n  b -> d\n  c -> b [style = dashed]\n  \n  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-5396aaf9f50c506aed0e" style="width:700px;height:300px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5396aaf9f50c506aed0e">{"x":{"diagram":"\n  digraph graph1 {\n  \n  graph [layout = dot, rankdir = LR, nodesep=\"1\", fontsize = 12]\n  \n  # node definitions with substituted label text\n  \n  node [shape = oval]\n  a [label = \"Progression-free\"]\n  b [label = \"Progressed\"]\n  d [label = \"Death\"]\n  \n  node [shape = box]\n  c [label = \"Progression-accelerating event\", style = dashed]\n  \n  a -> d\n  a -> b\n  b -> d\n  c -> b [style = dashed]\n  \n  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
 <h2 id="generate-dummy-ipd-trial-data-and-fit-survival-models">Generate dummy IPD trial data and fit survival models<a class="anchor" aria-label="anchor" href="#generate-dummy-ipd-trial-data-and-fit-survival-models"></a>
@@ -321,6 +321,7 @@ can be replicated and updated at later time points.</p>
 <span>  <span class="co">#Events applicable to reference treatment</span></span>
 <span>  <span class="fu"><a href="../reference/add_tte.html">add_tte</a></span><span class="op">(</span>arm<span class="op">=</span><span class="st">"ref"</span>,</span>
 <span>          evts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Start"</span>, <span class="co">#Events are the same except that there will be no treatment discontinuation</span></span>
+<span>                   <span class="st">"TxDisc"</span>,</span>
 <span>                   <span class="st">"Progression"</span>,</span>
 <span>                   <span class="st">"PAE"</span>,</span>
 <span>                   <span class="st">"Death"</span><span class="op">)</span>,</span>
@@ -443,9 +444,9 @@ defined for each patient in the simulated data set.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.64s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.64s"</span></span>
-<span><span class="co">#&gt; [1] "Total time to run: 0.64s"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.67s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.67s"</span></span>
+<span><span class="co">#&gt; [1] "Total time to run: 0.67s"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

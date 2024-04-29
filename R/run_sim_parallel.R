@@ -51,6 +51,12 @@
 #' 
 #' If no `drc` or `drq` parameters are passed within any of the input lists, these are assigned value 0.03.
 #' 
+#' 
+#' If the `cycle` lists are used, then it is expected the user will declare as well the name of the variable
+#'  pasted with `cycle_l` and `cycle_starttime` (e.g., c_default_cycle_l and c_default_cycle_starttime) to 
+#'  ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime 
+#'  being the starting time in which the variable started counting.
+#' 
 #' @examples
 #' \dontrun{
 #' run_sim_parallel(arm_list=c("int","noint"),
