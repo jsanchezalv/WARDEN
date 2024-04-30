@@ -361,7 +361,11 @@ compute_outputs <- function(patdata,input_list) {
   
   for (cat in input_list$uc_lists$ongoing_inputs) {
     
+    #Set final observation to be considered as an update
+    set(patdata_dt, i = patdata_dt[,.I[.N],by=.(pat_id, arm)][['V1']], j = paste0(cat,"_lastupdate"), value = 1)
+    #Updated values are kept
     patdata_dt[get(paste0(cat,"_lastupdate")) == 1, value_new := get(cat)]
+    #Other values are overrwritten backwards
     patdata_dt[, value_new := zoo::na.locf(value_new,fromLast=TRUE), by=.(pat_id, arm)]
     patdata_dt[, paste0(cat) := value_new]
     patdata_dt[, value_new := NULL]
