@@ -105,6 +105,12 @@ Note that if ncores > 1, then results per simulation will only be exactly replic
 
 If no \code{drc} or \code{drq} parameters are passed within any of the input lists, these are assigned value 0.03.
 
+Ongoing items will look backward to the last time updated when performing the discounting and accumulation.
+This means that the user does not necessarily need to keep updating the value, but only add it when the value
+changes looking forward (e.g., o_q = utility at event 1, at event 2 utility does not change, but at event 3 it does,
+so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically
+look back until event 1)
+
 If the \code{cycle} lists are used, then it is expected the user will declare as well the name of the variable
 pasted with \code{cycle_l} and \code{cycle_starttime} (e.g., c_default_cycle_l and c_default_cycle_starttime) to
 ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime

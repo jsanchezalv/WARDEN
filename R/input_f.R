@@ -469,6 +469,8 @@ modify_item <- function(list_item){
   
   input_list_arm[names(list_item)] <- lapply(list_item, unname)
   
+  input_list_arm[paste0(names(list_item),"_lastupdate",recycle0=TRUE)] <- 1
+  
   list2env(list_item,envir = parent.frame())
   assign("input_list_arm",input_list_arm, envir = parent.frame())
 }

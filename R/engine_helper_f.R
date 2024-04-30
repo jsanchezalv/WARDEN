@@ -115,6 +115,13 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
   if(!is.null(input_list_arm$uc_lists$instant_inputs)){
     input_list_arm[input_list_arm$uc_lists$instant_inputs] <- 0
   }
+  
+  if(curtime == 0 & !is.null(input_list_arm$uc_lists$ongoing_inputs)){
+    input_list_arm[paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate")] <- 1
+  } else{
+    input_list_arm[paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate")] <- 0
+  }
+  
 
   #Evaluate the reaction to the event
   input_list_arm <- eval_reactevt(input_list_arm$evt_react_list, evt,input_list_arm)
@@ -323,7 +330,7 @@ compute_outputs <- function(patdata,input_list) {
     list_evts <- lapply(list_patdata,function(x) x[!names(x) %in% data_export_aslist])
   }
   
-  patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata)))
+  patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata,fill=TRUE)))
   
   #Extract only extra data that the user wants to export
   export_list_ipd <- lapply(list_patdata,function(x) x[data_export_aslist])
@@ -353,6 +360,12 @@ compute_outputs <- function(patdata,input_list) {
   #Discount and undiscount ongoing
   
   for (cat in input_list$uc_lists$ongoing_inputs) {
+    
+    patdata_dt[get(paste0(cat,"_lastupdate")) == 1, value_new := get(cat)]
+    patdata_dt[, value_new := zoo::na.locf(value_new,fromLast=TRUE), by=.(pat_id, arm)]
+    patdata_dt[, paste0(cat) := value_new]
+    patdata_dt[, value_new := NULL]
+    
     patdata_dt[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
                                                                         lclprvtime=prevtime,
                                                                         lclcurtime=evttime,
@@ -373,7 +386,9 @@ compute_outputs <- function(patdata,input_list) {
       patdata_dt[, "qalys_undisc" := qalys_undisc + get(paste0(cat,"_","undisc"))]
     }
     
+
   }
+  
   
   #Discount and undiscount instant
   for (cat in input_list$uc_lists$instant_inputs) {
