@@ -116,9 +116,7 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
     input_list_arm[input_list_arm$uc_lists$instant_inputs] <- 0
   }
   
-  if(curtime == 0 & !is.null(input_list_arm$uc_lists$ongoing_inputs)){
-    input_list_arm[paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate")] <- 1
-  } else{
+  if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
     input_list_arm[paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate")] <- 0
   }
   
