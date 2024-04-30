@@ -269,6 +269,8 @@ interval_out <- function(output_sim, element,round_digit=2) {
 #'
 #' @import data.table
 #' @importFrom utils tail
+#' @importFrom zoo na.locf
+
 #' 
 #' @details
 #' It computes the discounted and undiscounted lys/costs/qalys. 
