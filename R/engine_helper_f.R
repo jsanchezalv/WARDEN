@@ -365,6 +365,7 @@ compute_outputs <- function(patdata,input_list) {
     patdata_dt[, value_new := zoo::na.locf(value_new,fromLast=TRUE), by=.(pat_id, arm)]
     patdata_dt[, paste0(cat) := value_new]
     patdata_dt[, value_new := NULL]
+    patdata_dt[, paste0(paste0(cat,"_lastupdate")) := NULL]
     
     patdata_dt[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
                                                                         lclprvtime=prevtime,
