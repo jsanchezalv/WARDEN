@@ -280,11 +280,13 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     exported_items <- unique(c("input_list_sens",ls(.GlobalEnv),ls(parent.env(environment())),ls(environment())))
     options(future.rng.onMisuse = "ignore")
     output_sim[[sens]] <- foreach(simulation = 1:n_sim,
-                         .options.future = list(seed = TRUE),
+                         # .options.future = list(seed = TRUE),
                          .options.future = list(packages = .packages()),
                          .options.future = list(globals=structure(TRUE,add = exported_items)),
                          .combine = 'c') %dofuture% {
-
+                           
+      RNGkind("L'Ecuyer-CMRG") #repeat this here so parallel::RngStream does not malfunction
+                            
       print(paste0("Simulation number: ",simulation))
                            
       start_time_sim <-  proc.time()

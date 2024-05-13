@@ -282,6 +282,31 @@ rresgompertz <- function(n=1,shape,rate,lower_bound,seed=NULL){
   return(out)
 }
 
+
+#' Quantile function for restricted Gompertz distribution (lower bound only)
+#'
+#' @param rnd Vector of quantiles
+#' @param shape The shape parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
+#' @param rate The rate parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
+#' @param lower_bound The lower bound of the restricted distribution
+#'
+#' @return Estimate(s) from the restricted Gompertz distribution based on given parameters
+#'
+#' @importFrom stats runif
+#'
+#' @export
+#'
+#' @examples
+#' qresgompertz(rnd=0.5,shape=0.05,rate=0.01,lower_bound = 50)
+
+qresgompertz <- function(rnd=0.5,shape,rate,lower_bound){
+  
+  out <- (1/shape)*log(1- ((shape/rate)*log(1-rnd)/exp(shape*lower_bound)))
+  
+  return(out)
+}
+
+
 #' Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process
 #'
 #' @param n The number of observations to be drawn

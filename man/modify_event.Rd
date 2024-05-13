@@ -19,6 +19,8 @@ Modify the time of existing events
 \details{
 The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two \code{modify_event} with a list of one element, it's better to group them into a single \code{modify_event} with a list of two elements.
+
+This function does not evaluate sequentially.
 }
 \examples{
 \dontrun{

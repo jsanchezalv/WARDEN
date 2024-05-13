@@ -404,6 +404,7 @@ new_event <- function(evt){
 #' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 #' So rather than use two `modify_event` with a list of one element, it's better to group them into a single `modify_event` with a list of two elements.
 #'
+#' This function does not evaluate sequentially.
 #'
 #' @examples
 #' \dontrun{
@@ -475,7 +476,45 @@ modify_item <- function(list_item){
   assign("input_list_arm",input_list_arm, envir = parent.frame())
 }
 
+# Modify item in input list  evaluating sequentially -------------------------------------------------------------------------------------------------------------------------------
 
+#' Modify the value of existing items
+#'
+#' @param list_item A list of items and their values or expressions. Will be evaluated sequentially (so one could have list(a= 1, b = a +2 ))
+#'
+#' @export
+#'
+#' @details
+#' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
+#' So rather than use two `modify_item` with a list of one element, it's better to group them into a single `modify_item` with a list of two elements.
+#'
+#' Costs and utilities can be modified by using the construction `type_name_category`, where type is either "qaly" or "cost",
+#'  name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
+#'  This will overwrite the value defined in the corresponding cost/utility section.
+#'  
+#'  The function is different from modify_item in that this function evaluates sequentially the arguments within the list passed.
+#'   This implies a slower performance relative to modify_item, but it can be more cleaner and convenient in certain instances.
+#'
+#' @examples
+#' \dontrun{
+#' modify_item_seq(list(cost.idfs = 500, cost.tx = cost.idfs + 4000))
+#' }
+#' 
+modify_item_seq <- function(...){
+  
+  input_list_arm <- parent.frame()$input_list_arm
+  input_list <- as.list(substitute(...))[-1]
+  list_out <- list()
+  for (inp in 1:length(input_list)) {
+    list_out[[ names(input_list)[inp] ]] <- eval(input_list[[inp]], input_list_arm)
+    input_list_arm <- c(input_list_arm,list_out[inp])
+  }
+  list2env(list_out,envir = parent.frame())
+  
+  input_list_arm[paste0(names(input_list),"_lastupdate",recycle0=TRUE)] <- 1
+  assign("input_list_arm",input_list_arm, envir = parent.frame())
+  
+}
 
 # Add_reactevt -------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -874,3 +913,53 @@ revert_list <- function(ls) {
   x <- lapply(ls,`[`, names(ls[[1]]))
   apply(do.call(rbind, x), 2, as.list)
 }
+
+
+#' Creates a random uniform 0-1 for a given random seed substream and updates the value
+#'
+#' @param n Number of elements
+#' @param random_seed Substream to be used
+#' @param gen Context in which the function is applied.
+#'  Can be values "event" (reaction to an event), 
+#'  "add_item" (when used within add_item for unique_pt_inputs argument in run_sim),
+#'  or "initialize" (if used within the "add_tte" function)
+#'
+#' @return A vector of uniform values between 0 and 1
+#'
+#' @examples \dontrun{
+#' x <- .Random.seed
+#' runif_stream(n=1, x, gen="event")
+#' }
+#'
+#' @export
+runif_stream <- function(n=1,random_seed,gen="event"){
+  gen <- switch(gen,
+           event = 1,
+           add_item = 5,
+           initialize = 5
+           )
+  
+  if(!is.null(parent.frame(gen)$input_list_arm)){
+    input_list_arm <- parent.frame(gen)$input_list_arm
+    temp_seed <- .Random.seed
+    assign(".Random.seed", random_seed, envir = .GlobalEnv)
+    out <- runif(n=n)
+    name_temp <- as.character((substitute(random_seed)))
+    input_list_arm[[name_temp]] <- .Random.seed
+    assign(name_temp, .Random.seed, envir = parent.frame(gen))
+    assign("input_list_arm", input_list_arm, envir = parent.frame(gen))
+    assign(".Random.seed", temp_seed, envir = .GlobalEnv)
+  }else{
+    input_list_pt <- parent.frame(gen)$input_list_pt
+    temp_seed <- .Random.seed
+    assign(".Random.seed", random_seed, envir = .GlobalEnv)
+    out <- runif(n=n)
+    name_temp <- as.character((substitute(random_seed)))
+    input_list_pt[[name_temp]] <- .Random.seed
+    assign(name_temp, .Random.seed, envir = parent.frame(gen))
+    assign("input_list_pt", input_list_pt, envir = parent.frame(gen))
+    assign(".Random.seed", temp_seed, envir = .GlobalEnv)
+  }
+
+  out
+} 

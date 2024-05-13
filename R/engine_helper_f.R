@@ -123,7 +123,7 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
 
   #Evaluate the reaction to the event
   input_list_arm <- eval_reactevt(input_list_arm$evt_react_list, evt,input_list_arm)
-  
+
 
   return(input_list_arm)
 
@@ -497,7 +497,7 @@ compute_outputs <- function(patdata,input_list) {
     }
   }
   
-  final_output$arm_list <- arm_list
+  final_output <- c(list(arm_list=arm_list),final_output)
 
   #Exports IPD values either fully IPD or aggregated for events
   if (input_list$ipd==1) {

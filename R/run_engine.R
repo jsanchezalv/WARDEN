@@ -32,7 +32,7 @@ run_engine <- function(arm_list,
   patdata <- vector("list", length=npats) # empty list with npats elements
 
   for (i in 1:npats) {
-
+    set.seed(i*simulation)
     #Create empty pat data for each arm
     this_patient <- list()
     input_list_pt <- c(input_list,list(i=i))
@@ -61,12 +61,15 @@ run_engine <- function(arm_list,
     #2 Loop per treatment ------------------------------------------------------
 
     for (arm in arm_list) {
+      set.seed(i*simulation)
       # Initialize values to prevent errors
       output_list <- list(curtime = 0)
       
       #Extract the inputs that are unique for each patient-intervention
       input_list_arm <- NULL
       input_list_arm <- c(input_list_pt,list(arm=arm))
+      
+      
       if(!is.null(unique_pt_inputs)){
         for (inp in 1:length(unique_pt_inputs)) {
           list.unique_pt_inputs <- lapply(unique_pt_inputs[inp],function(x) eval(x, input_list_arm))
