@@ -178,7 +178,6 @@ rdirichlet_prob <- function(n=1,alpha,se,seed=NULL) {
 #' rbeta_mse(n=1,mean_v=0.8,se=0.2)
 
 rbeta_mse <- function(n=1,mean_v,se,seed=NULL) {
-  out <- NULL
 
   if(!is.null(seed)){
     set.seed(seed)
@@ -188,6 +187,30 @@ rbeta_mse <- function(n=1,mean_v,se,seed=NULL) {
     beta <- alpha * ((1 / mean_v) - 1)
     out <- rbeta(length(mean_v)*n,alpha,beta)
 
+  return(out)
+}
+
+
+#' Draw from a beta distribution based on mean and se (quantile)
+#'
+#' @param q Quantiles to be used
+#' @param mean_v A vector of the mean values
+#' @param se A vector of the standard errors of the means
+#'
+#' @return A single estimate from the beta distribution based on given parameters
+#'
+#' @importFrom stats qbeta
+#'
+#' @export
+#'
+#' @examples
+#' qbeta_mse(q=0.5,mean_v=0.8,se=0.2)
+
+qbeta_mse <- function(q,mean_v,se) {
+  alpha <- ((1 - mean_v) / (se^2) - (1 / mean_v)) * mean_v ^ 2
+  beta <- alpha * ((1 / mean_v) - 1)
+  out <- qbeta(q,alpha,beta)
+  
   return(out)
 }
 

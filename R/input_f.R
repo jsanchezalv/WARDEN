@@ -506,8 +506,9 @@ modify_item_seq <- function(...){
   input_list <- as.list(substitute(...))[-1]
   list_out <- list()
   for (inp in 1:length(input_list)) {
-    list_out[[ names(input_list)[inp] ]] <- eval(input_list[[inp]], input_list_arm)
-    input_list_arm[names(list_out[inp])] <- list_out[inp]
+    name_temp <- names(input_list[inp])
+    list_out[[ name_temp ]] <- eval(input_list[[inp]], input_list_arm)
+    input_list_arm[name_temp] <- list_out[name_temp]
   }
   list2env(list_out,envir = parent.frame())
   
