@@ -334,7 +334,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
         final_output$merged_df$sensitivity <- sens
       }
       
-      final_output[["sensitivity_name"]] <- sens_name_used
+      final_output <- c(list(sensitivity_name = sens_name_used), final_output)
       
       return(list(final_output))
       
