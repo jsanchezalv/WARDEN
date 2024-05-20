@@ -327,10 +327,10 @@ compute_outputs <- function(patdata,input_list) {
   data_export_summarized_nonumeric <- data_export_summarized_nonumeric[!data_export_summarized_nonumeric %in% c(data_export_aslist,data_export_tobesummarized)]
   
   if (length(data_export_aslist)>0) {
-    list_evts <- lapply(list_patdata,function(x) x[!names(x) %in% data_export_aslist])
-  }
+    list_patdata <- lapply(list_patdata,function(x) x[!names(x) %in% data_export_aslist])
+  } 
   
-  patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_evts,fill=TRUE)))
+  patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata,fill=TRUE)))
   
   #Extract only extra data that the user wants to export
   export_list_ipd <- lapply(list_patdata,function(x) x[data_export_aslist])
@@ -551,7 +551,7 @@ compute_outputs <- function(patdata,input_list) {
     }
   } else{
     if (sens==1 & simulation==1) {
-      message("Data aggregated across events and patients by selecting the last value for input_out numeric items and then averaging across patients. Only last value in simulation of non-numeric and length > 1 items is displayed. ")
+      message("Data aggregated across events and patients by selecting the last value for input_out numeric items and then averaging across patients. Only last value of non-numeric and length > 1 items in simulation is displayed. ")
     }
   }
   
