@@ -328,7 +328,9 @@ compute_outputs <- function(patdata,input_list) {
   
   if (length(data_export_aslist)>0) {
     list_patdata2 <- lapply(list_patdata,function(x) x[!names(x) %in% data_export_aslist])
-  } 
+  } else{
+    list_patdata2 <- list_patdata
+  }
   
   patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata2,fill=TRUE)))
   
