@@ -504,7 +504,7 @@ compute_outputs <- function(patdata,input_list) {
     for (output_i in data_export_aslist) {
       #Get last value
       temp <- Filter(function(sublist) sublist[["arm"]] == arm_i, list_patdata)
-      final_output[[output_i]][arm_i] <- temp[[length(temp)]][output_i]
+      final_output[[output_i]][[arm_i]] <- temp[[length(temp)]][[output_i]]
     }
   }
   
