@@ -327,10 +327,10 @@ compute_outputs <- function(patdata,input_list) {
   data_export_summarized_nonumeric <- data_export_summarized_nonumeric[!data_export_summarized_nonumeric %in% c(data_export_aslist,data_export_tobesummarized)]
   
   if (length(data_export_aslist)>0) {
-    list_patdata <- lapply(list_patdata,function(x) x[!names(x) %in% data_export_aslist])
+    list_patdata2 <- lapply(list_patdata,function(x) x[!names(x) %in% data_export_aslist])
   } 
   
-  patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata,fill=TRUE)))
+  patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata2,fill=TRUE)))
   
   #Extract only extra data that the user wants to export
   export_list_ipd <- lapply(list_patdata,function(x) x[data_export_aslist])
