@@ -281,7 +281,6 @@ evt_react_list <-
 Costs and utilities are introduced below.
 
 ## Utilities
-Utilities relating to progression-free and progressed states are common across arms.
 
 ```{r utilities}
 
@@ -293,7 +292,6 @@ util_instant <- "q_default_inst"
 ```
 
 ## Costs
-Costs are defined specific to each arm due to differences in drug, administration and AE costs. A one-off cost for oral administration of the reference arm is also applied.
 
 ```{r costs}
 

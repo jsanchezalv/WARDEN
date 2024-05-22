@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,6 +31,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a>
+    <a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Substreams</a>
     <a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a>
     <a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a>
     <a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a>
@@ -149,6 +150,11 @@
         <dd>Modify the value of existing items</dd>
       </dl><dl><dt>
           
+          <code><a href="modify_item_seq.html">modify_item_seq()</a></code> 
+        </dt>
+        <dd>Modify the value of existing items</dd>
+      </dl><dl><dt>
+          
           <code><a href="new_event.html">new_event()</a></code> 
         </dt>
         <dd>Generate new events to be added to existing vector of events</dd>
@@ -162,6 +168,16 @@
           <code><a href="pick_val_v.html">pick_val_v()</a></code> 
         </dt>
         <dd>Select which values should be applied in the corresponding loop for several values (vector or list).</dd>
+      </dl><dl><dt>
+          
+          <code><a href="qbeta_mse.html">qbeta_mse()</a></code> 
+        </dt>
+        <dd>Draw from a beta distribution based on mean and se (quantile)</dd>
+      </dl><dl><dt>
+          
+          <code><a href="qresgompertz.html">qresgompertz()</a></code> 
+        </dt>
+        <dd>Quantile function for restricted Gompertz distribution (lower bound only)</dd>
       </dl><dl><dt>
           
           <code><a href="rbeta_mse.html">rbeta_mse()</a></code> 
@@ -207,6 +223,11 @@
           <code><a href="rresgompertz_lu.html">rresgompertz_lu()</a></code> 
         </dt>
         <dd>Draw from a restricted Gompertz distribution (lower and upper bound)</dd>
+      </dl><dl><dt>
+          
+          <code><a href="runif_stream.html">runif_stream()</a></code> 
+        </dt>
+        <dd>Creates a random uniform 0-1 for a given random seed substream and updates the value</dd>
       </dl><dl><dt>
           
           <code><a href="run_sim.html">run_sim()</a></code> 

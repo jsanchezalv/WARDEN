@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,6 +31,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a>
+    <a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Substreams</a>
     <a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a>
     <a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a>
     <a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a>
@@ -83,6 +84,7 @@ If FALSE, it will ignore those.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two <code>modify_event</code> with a list of one element, it's better to group them into a single <code>modify_event</code> with a list of two elements.</p>
+<p>This function does not evaluate sequentially.</p>
     </div>
 
     <div class="section level2">

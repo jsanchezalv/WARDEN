@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a>
+    <a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Substreams</a>
     <a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a>
     <a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a>
     <a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a>
@@ -82,7 +83,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">April 29, 2024</h4>
+            <h4 data-toc-skip class="date">May 22, 2024</h4>
       
       
       <div class="d-none name"><code>example_uncertainty.Rmd</code></div>
@@ -537,13 +538,13 @@ from the fact that we are simulating a finite sample.</p>
 <h3 id="structural-uncertainty">Structural Uncertainty<a class="anchor" aria-label="anchor" href="#structural-uncertainty"></a>
 </h3>
 <p>One way to test this is to run a few simulations for an increasing
-number of patients simulated. For example, below we run 50 deterministic
-simulations for 100, 1,000, 5,000 and 10,000 patients, to show how the
-model outcome can change depending on the random seed used. Note that
-this exercise can be very time consuming. It’s important to note that
-the optimal number of patients simulated will depend on the dispersion
-of the distributions, the patient pathway, the number of possible
-outcomes and the difference among these. For example, an event with low
+number of patients simulated. For example, below we run 6 deterministic
+simulations for 50, 100, 500, and 1,000 patients, to show how the model
+outcome can change depending on the random seed used. Note that this
+exercise can be very time consuming. It’s important to note that the
+optimal number of patients simulated will depend on the dispersion of
+the distributions, the patient pathway, the number of possible outcomes
+and the difference among these. For example, an event with low
 probability but high impact and variability implies a higher number of
 patients simulated in order to obtain stable outcomes.</p>
 <p>To do this test, we set <code>psa_bool = FALSE</code> and (optional)
@@ -639,13 +640,13 @@ ICUR
 50
 </td>
 <td style="text-align:right;">
-135794.54
+119161.38
 </td>
 <td style="text-align:right;">
-104475.47
+20975.88
 </td>
 <td style="text-align:right;">
-76.94
+17.60
 </td>
 </tr>
 <tr>
@@ -656,13 +657,13 @@ ICUR
 100
 </td>
 <td style="text-align:right;">
-119107.25
+105261.08
 </td>
 <td style="text-align:right;">
-46662.04
+19773.50
 </td>
 <td style="text-align:right;">
-39.18
+18.79
 </td>
 </tr>
 <tr>
@@ -673,13 +674,13 @@ ICUR
 500
 </td>
 <td style="text-align:right;">
-99404.32
+99302.80
 </td>
 <td style="text-align:right;">
-14334.98
+5569.49
 </td>
 <td style="text-align:right;">
-14.42
+5.61
 </td>
 </tr>
 <tr>
@@ -690,13 +691,13 @@ ICUR
 1000
 </td>
 <td style="text-align:right;">
-97884.08
+100883.05
 </td>
 <td style="text-align:right;">
-10982.59
+5349.11
 </td>
 <td style="text-align:right;">
-11.22
+5.30
 </td>
 </tr>
 <tr>
@@ -707,13 +708,13 @@ total_costs
 50
 </td>
 <td style="text-align:right;">
-268909.65
+268311.94
 </td>
 <td style="text-align:right;">
-7897.76
+3155.84
 </td>
 <td style="text-align:right;">
-2.94
+1.18
 </td>
 </tr>
 <tr>
@@ -724,13 +725,13 @@ total_costs
 100
 </td>
 <td style="text-align:right;">
-270478.48
+269320.10
 </td>
 <td style="text-align:right;">
-7644.47
+4067.09
 </td>
 <td style="text-align:right;">
-2.83
+1.51
 </td>
 </tr>
 <tr>
@@ -741,13 +742,13 @@ total_costs
 500
 </td>
 <td style="text-align:right;">
-271155.77
+269144.50
 </td>
 <td style="text-align:right;">
-2397.17
+941.34
 </td>
 <td style="text-align:right;">
-0.88
+0.35
 </td>
 </tr>
 <tr>
@@ -758,13 +759,13 @@ total_costs
 1000
 </td>
 <td style="text-align:right;">
-271579.34
+269241.85
 </td>
 <td style="text-align:right;">
-1517.40
+521.27
 </td>
 <td style="text-align:right;">
-0.56
+0.19
 </td>
 </tr>
 <tr>
@@ -775,13 +776,13 @@ total_lys
 50
 </td>
 <td style="text-align:right;">
-12.16
+12.53
 </td>
 <td style="text-align:right;">
-0.43
+0.21
 </td>
 <td style="text-align:right;">
-3.51
+1.66
 </td>
 </tr>
 <tr>
@@ -792,13 +793,13 @@ total_lys
 100
 </td>
 <td style="text-align:right;">
-12.14
+12.35
 </td>
 <td style="text-align:right;">
-0.39
+0.18
 </td>
 <td style="text-align:right;">
-3.23
+1.49
 </td>
 </tr>
 <tr>
@@ -809,7 +810,7 @@ total_lys
 500
 </td>
 <td style="text-align:right;">
-12.23
+12.21
 </td>
 <td style="text-align:right;">
 0.07
@@ -826,13 +827,13 @@ total_lys
 1000
 </td>
 <td style="text-align:right;">
-12.26
+12.25
 </td>
 <td style="text-align:right;">
-0.08
+0.06
 </td>
 <td style="text-align:right;">
-0.62
+0.49
 </td>
 </tr>
 <tr>
@@ -843,13 +844,13 @@ total_qalys
 50
 </td>
 <td style="text-align:right;">
-8.98
+9.41
 </td>
 <td style="text-align:right;">
-0.47
+0.24
 </td>
 <td style="text-align:right;">
-5.26
+2.57
 </td>
 </tr>
 <tr>
@@ -860,13 +861,13 @@ total_qalys
 100
 </td>
 <td style="text-align:right;">
-9.11
+9.26
 </td>
 <td style="text-align:right;">
-0.41
+0.14
 </td>
 <td style="text-align:right;">
-4.48
+1.56
 </td>
 </tr>
 <tr>
@@ -877,13 +878,13 @@ total_qalys
 500
 </td>
 <td style="text-align:right;">
-9.25
+9.13
 </td>
 <td style="text-align:right;">
-0.10
+0.06
 </td>
 <td style="text-align:right;">
-1.04
+0.66
 </td>
 </tr>
 <tr>
@@ -894,13 +895,13 @@ total_qalys
 1000
 </td>
 <td style="text-align:right;">
-9.26
+9.17
 </td>
 <td style="text-align:right;">
-0.10
+0.06
 </td>
 <td style="text-align:right;">
-1.04
+0.64
 </td>
 </tr>
 </tbody>
@@ -994,13 +995,13 @@ ICUR
 structural
 </td>
 <td style="text-align:right;">
-97884.08
+100883.05
 </td>
 <td style="text-align:right;">
-10982.59
+5349.11
 </td>
 <td style="text-align:right;">
-11.22
+5.30
 </td>
 </tr>
 <tr>
@@ -1014,13 +1015,13 @@ ICUR
 structural + parameter
 </td>
 <td style="text-align:right;">
-114547.14
+101554.72
 </td>
 <td style="text-align:right;">
-31492.38
+4905.20
 </td>
 <td style="text-align:right;">
-27.49
+4.83
 </td>
 </tr>
 <tr>
@@ -1034,13 +1035,13 @@ total_costs
 structural
 </td>
 <td style="text-align:right;">
-271579.34
+269241.85
 </td>
 <td style="text-align:right;">
-1517.40
+521.27
 </td>
 <td style="text-align:right;">
-0.56
+0.19
 </td>
 </tr>
 <tr>
@@ -1054,13 +1055,13 @@ total_costs
 structural + parameter
 </td>
 <td style="text-align:right;">
-240153.94
+265912.39
 </td>
 <td style="text-align:right;">
-24739.90
+28531.29
 </td>
 <td style="text-align:right;">
-10.30
+10.73
 </td>
 </tr>
 <tr>
@@ -1074,13 +1075,13 @@ total_lys
 structural
 </td>
 <td style="text-align:right;">
-12.26
+12.25
 </td>
 <td style="text-align:right;">
-0.08
+0.06
 </td>
 <td style="text-align:right;">
-0.62
+0.49
 </td>
 </tr>
 <tr>
@@ -1094,13 +1095,13 @@ total_lys
 structural + parameter
 </td>
 <td style="text-align:right;">
-12.00
+12.24
 </td>
 <td style="text-align:right;">
-0.32
+0.41
 </td>
 <td style="text-align:right;">
-2.67
+3.36
 </td>
 </tr>
 <tr>
@@ -1114,13 +1115,13 @@ total_qalys
 structural
 </td>
 <td style="text-align:right;">
-9.26
+9.17
 </td>
 <td style="text-align:right;">
-0.10
+0.06
 </td>
 <td style="text-align:right;">
-1.04
+0.64
 </td>
 </tr>
 <tr>
@@ -1134,13 +1135,13 @@ total_qalys
 structural + parameter
 </td>
 <td style="text-align:right;">
-9.05
+9.15
 </td>
 <td style="text-align:right;">
-0.34
+0.39
 </td>
 <td style="text-align:right;">
-3.76
+4.24
 </td>
 </tr>
 </tbody>

@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a>
+    <a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Substreams</a>
     <a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a>
     <a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a>
     <a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a>
@@ -82,7 +83,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">April 29, 2024</h4>
+            <h4 data-toc-skip class="date">May 22, 2024</h4>
       
       
       <div class="d-none name"><code>example_markov.Rmd</code></div>
@@ -307,16 +308,10 @@ events are over, we finish the simulation by setting
 <h2 id="costs-and-utilities">Costs and Utilities<a class="anchor" aria-label="anchor" href="#costs-and-utilities"></a>
 </h2>
 <p>Costs and utilities are introduced below. However, it’s worth noting
-that the model is able to run without costs or utilities. One would just
-need to define the all the utility and costs related objects as
-<code>NULL</code> and the model would automatically assume they take
-value <code>0</code>.</p>
+that the model is able to run without costs or utilities.</p>
 <div class="section level4">
 <h4 id="utilities">Utilities<a class="anchor" aria-label="anchor" href="#utilities"></a>
 </h4>
-<p>Utilities are defined using pipes with the <code>add_util</code>
-function. In this case case, we are just multiplying the trace times the
-utilities at each state.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
@@ -326,9 +321,6 @@ utilities at each state.</p>
 <div class="section level4">
 <h4 id="costs">Costs<a class="anchor" aria-label="anchor" href="#costs"></a>
 </h4>
-<p>Costs are defined using pipes with the <code>add_cost</code>
-function, in a similar fashion to the utilities. In this case we add the
-costs in a continuous fashion.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">cost_ongoing</span> <span class="op">&lt;-</span> <span class="st">"c_default"</span></span></code></pre></div>
@@ -343,10 +335,9 @@ costs in a continuous fashion.</p>
 <p>The model can be run using the function <code>run_sim</code> below.
 We must define the number of patients to be simulated, the number of
 simulations, whether we want to run a PSA or not, the strategy list, the
-inputs, events and reactions defined above, the number of cores to be
-used (by default uses 1 core), the discount rate for costs and the
-discount rate for qalys. It is recommended not to use all the cores in
-the machine.</p>
+inputs, events and reactions defined above, utilities, costs and also if
+we want any extra output and the level of ipd data desired to be
+exported.</p>
 <p>It is worth noting that the <code>psa_bool</code> argument does not
 run a PSA automatically, but is rather an additional input/flag of the
 model that we use as a reference to determine whether we want to use a
@@ -380,9 +371,9 @@ to indicate <code>npats = 1</code>.</p>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; Warning in run_sim(npats = 1, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item util_v is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
 <span><span class="co">#&gt; Warning in run_sim(npats = 1, n_sim = 1, psa_bool = FALSE, arm_list = c("int", : Item cost_v is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.07s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.07s"</span></span>
-<span><span class="co">#&gt; [1] "Total time to run: 0.07s"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.06s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.06s"</span></span>
+<span><span class="co">#&gt; [1] "Total time to run: 0.06s"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -400,128 +391,517 @@ generated by the simulation, which we collect here in the
 <code>psa_ipd</code> object. Note that the data for life years is wrong,
 as the model assumes we are running a patient simulation data and
 therefore it’s adding the 4 states, inflating the total life years. We
-can manually adjust this to get the correct life years.</p>
+can manually adjust this to get the correct life years. Note that the
+trace data is exported separately as it’s of length &gt; 1.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#will print the last simulation!</span></span>
-<span><span class="co">#&gt;                        int     noint</span></span>
-<span><span class="co">#&gt; costs             18534.53  18935.84</span></span>
-<span><span class="co">#&gt; dcosts                0.00   -401.31</span></span>
-<span><span class="co">#&gt; lys                  19.89     19.89</span></span>
-<span><span class="co">#&gt; dlys                  0.00      0.00</span></span>
-<span><span class="co">#&gt; qalys                 5.07      3.59</span></span>
-<span><span class="co">#&gt; dqalys                0.00      1.49</span></span>
-<span><span class="co">#&gt; ICER                    NA      -Inf</span></span>
-<span><span class="co">#&gt; ICUR                    NA   -270.21</span></span>
-<span><span class="co">#&gt; INMB                    NA  74659.10</span></span>
-<span><span class="co">#&gt; costs_undisc      22891.52  21681.18</span></span>
-<span><span class="co">#&gt; dcosts_undisc         0.00   1210.34</span></span>
-<span><span class="co">#&gt; lys_undisc           30.00     30.00</span></span>
-<span><span class="co">#&gt; dlys_undisc           0.00      0.00</span></span>
-<span><span class="co">#&gt; qalys_undisc          6.03      4.00</span></span>
-<span><span class="co">#&gt; dqalys_undisc         0.00      2.03</span></span>
-<span><span class="co">#&gt; ICER_undisc             NA       Inf</span></span>
-<span><span class="co">#&gt; ICUR_undisc             NA    596.17</span></span>
-<span><span class="co">#&gt; INMB_undisc             NA 100298.75</span></span>
-<span><span class="co">#&gt; c_default         18534.53  18935.84</span></span>
-<span><span class="co">#&gt; dc_default            0.00   -401.31</span></span>
-<span><span class="co">#&gt; q_default             5.07      3.59</span></span>
-<span><span class="co">#&gt; dq_default            0.00      1.49</span></span>
-<span><span class="co">#&gt; c_default_undisc  22891.52  21681.18</span></span>
-<span><span class="co">#&gt; dc_default_undisc     0.00   1210.34</span></span>
-<span><span class="co">#&gt; q_default_undisc      6.03      4.00</span></span>
-<span><span class="co">#&gt; dq_default_undisc     0.00      2.03</span></span>
-<span><span class="co">#&gt; cycle_time           30.00     30.00</span></span>
-<span><span class="co">#&gt; dcycle_time           0.00      0.00</span></span>
+<span><span class="co">#&gt;                    int     noint</span></span>
+<span><span class="co">#&gt; costs         18534.53  18935.84</span></span>
+<span><span class="co">#&gt; dcosts            0.00   -401.31</span></span>
+<span><span class="co">#&gt; lys              19.89     19.89</span></span>
+<span><span class="co">#&gt; dlys              0.00      0.00</span></span>
+<span><span class="co">#&gt; qalys             5.07      3.59</span></span>
+<span><span class="co">#&gt; dqalys            0.00      1.49</span></span>
+<span><span class="co">#&gt; ICER                NA      -Inf</span></span>
+<span><span class="co">#&gt; ICUR                NA   -270.21</span></span>
+<span><span class="co">#&gt; INMB                NA  74659.10</span></span>
+<span><span class="co">#&gt; costs_undisc  22891.52  21681.18</span></span>
+<span><span class="co">#&gt; dcosts_undisc     0.00   1210.34</span></span>
+<span><span class="co">#&gt; lys_undisc       30.00     30.00</span></span>
+<span><span class="co">#&gt; dlys_undisc       0.00      0.00</span></span>
+<span><span class="co">#&gt; qalys_undisc      6.03      4.00</span></span>
+<span><span class="co">#&gt; dqalys_undisc     0.00      2.03</span></span>
+<span><span class="co">#&gt; ICER_undisc         NA       Inf</span></span>
+<span><span class="co">#&gt; ICUR_undisc         NA    596.17</span></span>
+<span><span class="co">#&gt; INMB_undisc         NA 100298.75</span></span>
 <span></span>
-<span><span class="va">psa_ipd_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">trace</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="op">)</span> </span>
+<span><span class="va">psa_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">psa_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="va">traces</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">extradata_raw</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">trace_t</span> <span class="op">&lt;-</span> <span class="va">psa_ipd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span>,<span class="fl">62</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">arm</span>,<span class="va">trace</span>,<span class="va">state</span>,<span class="va">evttime</span><span class="op">)</span> </span>
+<span><span class="va">trace_t</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">traces</span>, </span>
+<span><span class="va">psa_ipd</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">psa_ipd</span><span class="op">)</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span>,<span class="fl">62</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">trace_t</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,<span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
-<th style="text-align:left;">
-arm
-</th>
 <th style="text-align:right;">
 trace
 </th>
-<th style="text-align:right;">
-state
+<th style="text-align:left;">
+evtname
 </th>
 <th style="text-align:right;">
 evttime
 </th>
+<th style="text-align:right;">
+prevtime
+</th>
+<th style="text-align:right;">
+pat_id
+</th>
+<th style="text-align:left;">
+arm
+</th>
+<th style="text-align:right;">
+total_lys
+</th>
+<th style="text-align:right;">
+total_qalys
+</th>
+<th style="text-align:right;">
+total_costs
+</th>
+<th style="text-align:right;">
+total_costs_undisc
+</th>
+<th style="text-align:right;">
+total_qalys_undisc
+</th>
+<th style="text-align:right;">
+total_lys_undisc
+</th>
+<th style="text-align:right;">
+lys
+</th>
+<th style="text-align:right;">
+qalys
+</th>
+<th style="text-align:right;">
+costs
+</th>
+<th style="text-align:right;">
+lys_undisc
+</th>
+<th style="text-align:right;">
+qalys_undisc
+</th>
+<th style="text-align:right;">
+costs_undisc
+</th>
+<th style="text-align:right;">
+cycle_time
+</th>
+<th style="text-align:right;">
+c_default
+</th>
+<th style="text-align:right;">
+q_default
+</th>
+<th style="text-align:right;">
+c_default_undisc
+</th>
+<th style="text-align:right;">
+q_default_undisc
+</th>
+<th style="text-align:right;">
+simulation
+</th>
+<th style="text-align:right;">
+sensitivity
+</th>
+<th style="text-align:right;">
+state
+</th>
 </tr></thead>
 <tbody>
 <tr>
-<td style="text-align:left;">
-int
-</td>
 <td style="text-align:right;">
 1.00
 </td>
+<td style="text-align:left;">
+start
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+int
+</td>
+<td style="text-align:right;">
+19.893
+</td>
+<td style="text-align:right;">
+5.073559
+</td>
+<td style="text-align:right;">
+18534.53
+</td>
+<td style="text-align:right;">
+22891.52
+</td>
+<td style="text-align:right;">
+6.032475
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:right;">
-0
+1
+</td>
+<td style="text-align:right;">
+1
 </td>
 </tr>
 <tr>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:left;">
+start
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-0.00
+19.893
+</td>
+<td style="text-align:right;">
+5.073559
+</td>
+<td style="text-align:right;">
+18534.53
+</td>
+<td style="text-align:right;">
+22891.52
+</td>
+<td style="text-align:right;">
+6.032475
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 2
 </td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:left;">
+start
+</td>
 <td style="text-align:right;">
 0
 </td>
-</tr>
-<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-0.00
+19.893
+</td>
+<td style="text-align:right;">
+5.073559
+</td>
+<td style="text-align:right;">
+18534.53
+</td>
+<td style="text-align:right;">
+22891.52
+</td>
+<td style="text-align:right;">
+6.032475
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 3
 </td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:left;">
+start
+</td>
 <td style="text-align:right;">
 0
 </td>
-</tr>
-<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-0.00
+19.893
+</td>
+<td style="text-align:right;">
+5.073559
+</td>
+<td style="text-align:right;">
+18534.53
+</td>
+<td style="text-align:right;">
+22891.52
+</td>
+<td style="text-align:right;">
+6.032475
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 4
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
-<td style="text-align:left;">
-int
-</td>
 <td style="text-align:right;">
 0.50
 </td>
+<td style="text-align:left;">
+cycle
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+int
+</td>
+<td style="text-align:right;">
+19.893
+</td>
+<td style="text-align:right;">
+5.073559
+</td>
+<td style="text-align:right;">
+18534.53
+</td>
+<td style="text-align:right;">
+22891.52
+</td>
+<td style="text-align:right;">
+6.032475
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+0.9853651
+</td>
+<td style="text-align:right;">
+0.8868286
+</td>
+<td style="text-align:right;">
+985.3651
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.900
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+985.3651
+</td>
+<td style="text-align:right;">
+0.8868286
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0.900
+</td>
+<td style="text-align:right;">
+1
+</td>
 <td style="text-align:right;">
 1
 </td>
@@ -530,70 +910,400 @@ int
 </td>
 </tr>
 <tr>
+<td style="text-align:right;">
+0.30
+</td>
+<td style="text-align:left;">
+cycle
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-0.30
+19.893
+</td>
+<td style="text-align:right;">
+5.073559
+</td>
+<td style="text-align:right;">
+18534.53
+</td>
+<td style="text-align:right;">
+22891.52
+</td>
+<td style="text-align:right;">
+6.032475
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+0.9853651
+</td>
+<td style="text-align:right;">
+0.8868286
+</td>
+<td style="text-align:right;">
+985.3651
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.900
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+985.3651
+</td>
+<td style="text-align:right;">
+0.8868286
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0.900
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 2
 </td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.10
+</td>
+<td style="text-align:left;">
+cycle
+</td>
 <td style="text-align:right;">
 1
 </td>
-</tr>
-<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-0.10
+19.893
+</td>
+<td style="text-align:right;">
+5.073559
+</td>
+<td style="text-align:right;">
+18534.53
+</td>
+<td style="text-align:right;">
+22891.52
+</td>
+<td style="text-align:right;">
+6.032475
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+0.9853651
+</td>
+<td style="text-align:right;">
+0.8868286
+</td>
+<td style="text-align:right;">
+985.3651
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.900
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+985.3651
+</td>
+<td style="text-align:right;">
+0.8868286
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0.900
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 3
 </td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.10
+</td>
+<td style="text-align:left;">
+cycle
+</td>
 <td style="text-align:right;">
 1
 </td>
-</tr>
-<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-0.10
+19.893
+</td>
+<td style="text-align:right;">
+5.073559
+</td>
+<td style="text-align:right;">
+18534.53
+</td>
+<td style="text-align:right;">
+22891.52
+</td>
+<td style="text-align:right;">
+6.032475
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+0.9853651
+</td>
+<td style="text-align:right;">
+0.8868286
+</td>
+<td style="text-align:right;">
+985.3651
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.900
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+985.3651
+</td>
+<td style="text-align:right;">
+0.8868286
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0.900
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 4
 </td>
-<td style="text-align:right;">
-1
-</td>
 </tr>
 <tr>
-<td style="text-align:left;">
-int
-</td>
 <td style="text-align:right;">
 0.32
 </td>
+<td style="text-align:left;">
+cycle
+</td>
+<td style="text-align:right;">
+2
+</td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:right;">
-2
+1
 </td>
-</tr>
-<tr>
 <td style="text-align:left;">
 int
 </td>
 <td style="text-align:right;">
-0.29
+19.893
+</td>
+<td style="text-align:right;">
+5.073559
+</td>
+<td style="text-align:right;">
+18534.53
+</td>
+<td style="text-align:right;">
+22891.52
+</td>
+<td style="text-align:right;">
+6.032475
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+0.9566652
+</td>
+<td style="text-align:right;">
+0.7031489
+</td>
+<td style="text-align:right;">
+1913.3304
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.735
+</td>
+<td style="text-align:right;">
+2000
 </td>
 <td style="text-align:right;">
 2
+</td>
+<td style="text-align:right;">
+1913.3304
+</td>
+<td style="text-align:right;">
+0.7031489
+</td>
+<td style="text-align:right;">
+2000
+</td>
+<td style="text-align:right;">
+0.735
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0.29
+</td>
+<td style="text-align:left;">
+cycle
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+int
+</td>
+<td style="text-align:right;">
+19.893
+</td>
+<td style="text-align:right;">
+5.073559
+</td>
+<td style="text-align:right;">
+18534.53
+</td>
+<td style="text-align:right;">
+22891.52
+</td>
+<td style="text-align:right;">
+6.032475
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+0.9566652
+</td>
+<td style="text-align:right;">
+0.7031489
+</td>
+<td style="text-align:right;">
+1913.3304
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.735
+</td>
+<td style="text-align:right;">
+2000
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1913.3304
+</td>
+<td style="text-align:right;">
+0.7031489
+</td>
+<td style="text-align:right;">
+2000
+</td>
+<td style="text-align:right;">
+0.735
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 2
@@ -603,8 +1313,7 @@ int
 </table>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">life_years</span> <span class="op">&lt;-</span>  <span class="va">psa_ipd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span>,<span class="fl">62</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span><span class="va">life_years</span> <span class="op">&lt;-</span>  <span class="va">trace_t</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">arm</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">state</span><span class="op">!=</span><span class="fl">4</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="co">#erase death state for LY computation</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>ly_final <span class="op">=</span> <span class="va">lys</span><span class="op">*</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">trace</span>,<span class="fl">3L</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="co">#multiply by previous trace</span></span>
@@ -628,7 +1337,7 @@ ly_final
 int
 </td>
 <td style="text-align:right;">
-2.945366
+6.503353
 </td>
 </tr>
 <tr>
@@ -636,50 +1345,36 @@ int
 noint
 </td>
 <td style="text-align:right;">
-2.029567
+4.667071
 </td>
 </tr>
 </tbody>
 </table>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"total_lys_int"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">life_years</span><span class="op">$</span><span class="va">ly_final</span><span class="op">[</span><span class="va">life_years</span><span class="op">$</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">]</span></span>
-<span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"total_lys_noint"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">life_years</span><span class="op">$</span><span class="va">ly_final</span><span class="op">[</span><span class="va">life_years</span><span class="op">$</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">]</span></span>
+<span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"total_lys"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"int"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">life_years</span><span class="op">$</span><span class="va">ly_final</span><span class="op">[</span><span class="va">life_years</span><span class="op">$</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">]</span></span>
+<span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"total_lys"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"noint"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">life_years</span><span class="op">$</span><span class="va">ly_final</span><span class="op">[</span><span class="va">life_years</span><span class="op">$</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">]</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#will print the last simulation!</span></span>
-<span><span class="co">#&gt;                        int     noint</span></span>
-<span><span class="co">#&gt; costs             18534.53  18935.84</span></span>
-<span><span class="co">#&gt; dcosts                0.00   -401.31</span></span>
-<span><span class="co">#&gt; lys                  19.89     19.89</span></span>
-<span><span class="co">#&gt; dlys                  0.00      0.00</span></span>
-<span><span class="co">#&gt; qalys                 5.07      3.59</span></span>
-<span><span class="co">#&gt; dqalys                0.00      1.49</span></span>
-<span><span class="co">#&gt; ICER                    NA      -Inf</span></span>
-<span><span class="co">#&gt; ICUR                    NA   -270.21</span></span>
-<span><span class="co">#&gt; INMB                    NA  74659.10</span></span>
-<span><span class="co">#&gt; costs_undisc      22891.52  21681.18</span></span>
-<span><span class="co">#&gt; dcosts_undisc         0.00   1210.34</span></span>
-<span><span class="co">#&gt; lys_undisc           30.00     30.00</span></span>
-<span><span class="co">#&gt; dlys_undisc           0.00      0.00</span></span>
-<span><span class="co">#&gt; qalys_undisc          6.03      4.00</span></span>
-<span><span class="co">#&gt; dqalys_undisc         0.00      2.03</span></span>
-<span><span class="co">#&gt; ICER_undisc             NA       Inf</span></span>
-<span><span class="co">#&gt; ICUR_undisc             NA    596.17</span></span>
-<span><span class="co">#&gt; INMB_undisc             NA 100298.75</span></span>
-<span><span class="co">#&gt; c_default         18534.53  18935.84</span></span>
-<span><span class="co">#&gt; dc_default            0.00   -401.31</span></span>
-<span><span class="co">#&gt; q_default             5.07      3.59</span></span>
-<span><span class="co">#&gt; dq_default            0.00      1.49</span></span>
-<span><span class="co">#&gt; c_default_undisc  22891.52  21681.18</span></span>
-<span><span class="co">#&gt; dc_default_undisc     0.00   1210.34</span></span>
-<span><span class="co">#&gt; q_default_undisc      6.03      4.00</span></span>
-<span><span class="co">#&gt; dq_default_undisc     0.00      2.03</span></span>
-<span><span class="co">#&gt; cycle_time           30.00     30.00</span></span>
-<span><span class="co">#&gt; dcycle_time           0.00      0.00</span></span>
-<span><span class="co">#&gt; total_lys_int         2.95      2.95</span></span>
-<span><span class="co">#&gt; dtotal_lys_int        0.00        NA</span></span>
-<span><span class="co">#&gt; total_lys_noint       2.03      2.03</span></span>
-<span><span class="co">#&gt; dtotal_lys_noint      0.00        NA</span></span></code></pre></div>
+<span><span class="co">#&gt;                    int     noint</span></span>
+<span><span class="co">#&gt; costs         18534.53  18935.84</span></span>
+<span><span class="co">#&gt; dcosts            0.00   -401.31</span></span>
+<span><span class="co">#&gt; lys               6.50      4.67</span></span>
+<span><span class="co">#&gt; dlys              0.00      1.84</span></span>
+<span><span class="co">#&gt; qalys             5.07      3.59</span></span>
+<span><span class="co">#&gt; dqalys            0.00      1.49</span></span>
+<span><span class="co">#&gt; ICER                NA   -218.55</span></span>
+<span><span class="co">#&gt; ICUR                NA   -270.21</span></span>
+<span><span class="co">#&gt; INMB                NA  74659.10</span></span>
+<span><span class="co">#&gt; costs_undisc  22891.52  21681.18</span></span>
+<span><span class="co">#&gt; dcosts_undisc     0.00   1210.34</span></span>
+<span><span class="co">#&gt; lys_undisc       30.00     30.00</span></span>
+<span><span class="co">#&gt; dlys_undisc       0.00      0.00</span></span>
+<span><span class="co">#&gt; qalys_undisc      6.03      4.00</span></span>
+<span><span class="co">#&gt; dqalys_undisc     0.00      2.03</span></span>
+<span><span class="co">#&gt; ICER_undisc         NA       Inf</span></span>
+<span><span class="co">#&gt; ICUR_undisc         NA    596.17</span></span>
+<span><span class="co">#&gt; INMB_undisc         NA 100298.75</span></span></code></pre></div>
 <p>We can also check each of the cycles</p>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -910,80 +1605,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
@@ -1045,80 +1666,6 @@ int
 </td>
 <td style="text-align:right;">
 0.7350000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -1206,80 +1753,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 4
 </td>
 <td style="text-align:right;">
@@ -1341,80 +1814,6 @@ int
 </td>
 <td style="text-align:right;">
 0.5292000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -1502,80 +1901,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 6
 </td>
 <td style="text-align:right;">
@@ -1637,80 +1962,6 @@ int
 </td>
 <td style="text-align:right;">
 0.3918285
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -1798,80 +2049,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 8
 </td>
 <td style="text-align:right;">
@@ -1933,80 +2110,6 @@ int
 </td>
 <td style="text-align:right;">
 0.2917575
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -2094,80 +2197,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 10
 </td>
 <td style="text-align:right;">
@@ -2229,80 +2258,6 @@ int
 </td>
 <td style="text-align:right;">
 0.2174960
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -2390,80 +2345,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-11
-</td>
-<td style="text-align:right;">
-11
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-11
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 12
 </td>
 <td style="text-align:right;">
@@ -2525,80 +2406,6 @@ int
 </td>
 <td style="text-align:right;">
 0.1621750
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-12
-</td>
-<td style="text-align:right;">
-12
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-12
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -2686,80 +2493,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 14
 </td>
 <td style="text-align:right;">
@@ -2821,80 +2554,6 @@ int
 </td>
 <td style="text-align:right;">
 0.1209310
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -2982,80 +2641,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-15
-</td>
-<td style="text-align:right;">
-15
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-15
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 16
 </td>
 <td style="text-align:right;">
@@ -3117,80 +2702,6 @@ int
 </td>
 <td style="text-align:right;">
 0.0901770
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-16
-</td>
-<td style="text-align:right;">
-16
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-16
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -3278,80 +2789,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-17
-</td>
-<td style="text-align:right;">
-17
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-17
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 18
 </td>
 <td style="text-align:right;">
@@ -3413,80 +2850,6 @@ int
 </td>
 <td style="text-align:right;">
 0.0672442
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-18
-</td>
-<td style="text-align:right;">
-18
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-18
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -3574,80 +2937,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-19
-</td>
-<td style="text-align:right;">
-19
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-19
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 20
 </td>
 <td style="text-align:right;">
@@ -3709,80 +2998,6 @@ int
 </td>
 <td style="text-align:right;">
 0.0501435
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-20
-</td>
-<td style="text-align:right;">
-20
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-20
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -3870,80 +3085,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-21
-</td>
-<td style="text-align:right;">
-21
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-21
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 22
 </td>
 <td style="text-align:right;">
@@ -4005,80 +3146,6 @@ int
 </td>
 <td style="text-align:right;">
 0.0373916
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-22
-</td>
-<td style="text-align:right;">
-22
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-22
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -4166,80 +3233,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-23
-</td>
-<td style="text-align:right;">
-23
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-23
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 24
 </td>
 <td style="text-align:right;">
@@ -4301,80 +3294,6 @@ int
 </td>
 <td style="text-align:right;">
 0.0278826
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-24
-</td>
-<td style="text-align:right;">
-24
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-24
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -4462,80 +3381,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-25
-</td>
-<td style="text-align:right;">
-25
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-25
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 26
 </td>
 <td style="text-align:right;">
@@ -4597,80 +3442,6 @@ int
 </td>
 <td style="text-align:right;">
 0.0207918
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-26
-</td>
-<td style="text-align:right;">
-26
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-26
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -4758,80 +3529,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-27
-</td>
-<td style="text-align:right;">
-27
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-27
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 28
 </td>
 <td style="text-align:right;">
@@ -4893,80 +3590,6 @@ int
 </td>
 <td style="text-align:right;">
 0.0155043
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-28
-</td>
-<td style="text-align:right;">
-28
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-28
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -5054,80 +3677,6 @@ int
 cycle
 </td>
 <td style="text-align:right;">
-29
-</td>
-<td style="text-align:right;">
-29
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-29
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 30
 </td>
 <td style="text-align:right;">
@@ -5189,80 +3738,6 @@ int
 </td>
 <td style="text-align:right;">
 0.0115614
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-5.073559
-</td>
-<td style="text-align:right;">
-18534.53
-</td>
-<td style="text-align:right;">
-22891.52
-</td>
-<td style="text-align:right;">
-6.032475
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -5424,80 +3899,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
@@ -5559,80 +3960,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.7050000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -5720,80 +4047,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 4
 </td>
 <td style="text-align:right;">
@@ -5855,80 +4108,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.4218000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -6016,80 +4195,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 6
 </td>
 <td style="text-align:right;">
@@ -6151,80 +4256,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.2515740
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -6312,80 +4343,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 8
 </td>
 <td style="text-align:right;">
@@ -6447,80 +4404,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.1500913
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -6608,80 +4491,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-9
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 10
 </td>
 <td style="text-align:right;">
@@ -6743,80 +4552,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0895559
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -6904,80 +4639,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-11
-</td>
-<td style="text-align:right;">
-11
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-11
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 12
 </td>
 <td style="text-align:right;">
@@ -7039,80 +4700,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0534370
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-12
-</td>
-<td style="text-align:right;">
-12
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-12
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -7200,80 +4787,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-13
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 14
 </td>
 <td style="text-align:right;">
@@ -7335,80 +4848,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0318854
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-14
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -7496,80 +4935,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-15
-</td>
-<td style="text-align:right;">
-15
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-15
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 16
 </td>
 <td style="text-align:right;">
@@ -7631,80 +4996,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0190257
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-16
-</td>
-<td style="text-align:right;">
-16
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-16
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -7792,80 +5083,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-17
-</td>
-<td style="text-align:right;">
-17
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-17
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 18
 </td>
 <td style="text-align:right;">
@@ -7927,80 +5144,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0113525
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-18
-</td>
-<td style="text-align:right;">
-18
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-18
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -8088,80 +5231,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-19
-</td>
-<td style="text-align:right;">
-19
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-19
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 20
 </td>
 <td style="text-align:right;">
@@ -8223,80 +5292,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0067739
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-20
-</td>
-<td style="text-align:right;">
-20
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-20
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -8384,80 +5379,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-21
-</td>
-<td style="text-align:right;">
-21
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-21
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 22
 </td>
 <td style="text-align:right;">
@@ -8519,80 +5440,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0040419
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-22
-</td>
-<td style="text-align:right;">
-22
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-22
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -8680,80 +5527,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-23
-</td>
-<td style="text-align:right;">
-23
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-23
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 24
 </td>
 <td style="text-align:right;">
@@ -8815,80 +5588,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0024118
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-24
-</td>
-<td style="text-align:right;">
-24
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-24
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -8976,80 +5675,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-25
-</td>
-<td style="text-align:right;">
-25
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-25
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 26
 </td>
 <td style="text-align:right;">
@@ -9111,80 +5736,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0014391
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-26
-</td>
-<td style="text-align:right;">
-26
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-26
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -9272,80 +5823,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-27
-</td>
-<td style="text-align:right;">
-27
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-27
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 28
 </td>
 <td style="text-align:right;">
@@ -9407,80 +5884,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0008587
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-28
-</td>
-<td style="text-align:right;">
-28
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-28
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1
@@ -9568,80 +5971,6 @@ noint
 cycle
 </td>
 <td style="text-align:right;">
-29
-</td>
-<td style="text-align:right;">
-29
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-29
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
 30
 </td>
 <td style="text-align:right;">
@@ -9703,80 +6032,6 @@ noint
 </td>
 <td style="text-align:right;">
 0.0005124
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cycle
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-noint
-</td>
-<td style="text-align:right;">
-19.893
-</td>
-<td style="text-align:right;">
-3.588404
-</td>
-<td style="text-align:right;">
-18935.84
-</td>
-<td style="text-align:right;">
-21681.18
-</td>
-<td style="text-align:right;">
-4.002293
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-30
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
 </td>
 <td style="text-align:right;">
 1

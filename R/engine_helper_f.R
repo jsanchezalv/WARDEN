@@ -503,6 +503,7 @@ compute_outputs <- function(patdata,input_list) {
       final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i),n=1,na.rm=TRUE)),by=.(pat_id)][,tail(out,n=1,na.rm=TRUE)]
     }
     
+    
     for (output_i in data_export_aslist) {
       #Get last value
       temp <- Filter(function(sublist) sublist[["arm"]] == arm_i, list_patdata)
@@ -510,8 +511,10 @@ compute_outputs <- function(patdata,input_list) {
     }
   }
   
-  final_output <- c(list(arm_list=arm_list),final_output)
-
+  final_out_sorted <- names(final_output)[!names(final_output) %in% vector_total_outputs]
+  order_final_output <- c(vector_total_outputs,final_out_sorted[order(final_out_sorted)])
+  final_output <- c(list(arm_list=arm_list),final_output[order_final_output])
+  
   #Exports IPD values either fully IPD or aggregated for events
   if (input_list$ipd==1) {
     final_output$merged_df <- patdata_dt
