@@ -545,8 +545,8 @@ compute_outputs <- function(patdata,input_list) {
       final_output$merged_df <- patdata_temp
     }
     
-    colnames(final_output$merged_df)[colnames(final_output$merged_df) %in% c("qalys","costs","lys")] <- paste0("total_",colnames(final_output$merged_df)[colnames(final_output$merged_df) %in% c("qalys","costs","lys")])
-    
+    colnames(final_output$merged_df)[colnames(final_output$merged_df) %in% c("qalys","costs","lys","qalys_undisc","costs_undisc","lys_undisc")] <- paste0("total_",colnames(final_output$merged_df)[colnames(final_output$merged_df) %in% c("qalys","costs","lys","qalys_undisc","costs_undisc","lys_undisc")])
+
 
     if (sens==1 & simulation==1) {
       message("Patient-arm data aggregated across events by selecting the last value for input_out items.")
