@@ -523,7 +523,6 @@ compute_outputs <- function(patdata,input_list) {
     }
     
   } else if (input_list$ipd==2) {
-    
     #Get names of columns that will be used, 
     other_cols <- c("pat_id", "arm")
     #Columns that will not be summarized (event related columns, time and total_)
@@ -545,6 +544,8 @@ compute_outputs <- function(patdata,input_list) {
     } else{
       final_output$merged_df <- patdata_temp
     }
+    
+    colnames(final_output$merged_df)[colnames(final_output$merged_df) %in% c("qalys","costs","lys")] <- paste0("total_",colnames(final_output$merged_df)[colnames(final_output$merged_df) %in% c("qalys","costs","lys")])
     
 
     if (sens==1 & simulation==1) {
