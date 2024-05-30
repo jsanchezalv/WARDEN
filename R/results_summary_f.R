@@ -25,7 +25,7 @@ summary_results_det <- function(out = results[[1]][[1]], arm = NULL, wtp = 50000
 
   other_outputs <- names(out)[!names(out)%in% remove_outputs_list]
   other_outputs <- other_outputs[!other_outputs=="extradata_raw"]
-  other_outputs <- other_outputs[is.numeric(out[other_outputs])]
+  other_outputs <- other_outputs[sapply(out[other_outputs],is.numeric)]
   
   for (arm_i in 1:length(out$arm_list)) { #add reference arm costs/lys/qalys to compare with the other arms
     
@@ -122,7 +122,7 @@ summary_results_sim <- function(out = results[[1]], arm=NULL, wtp = 50000){
   
   other_outputs <- names(out[[1]])[!names(out[[1]])%in% remove_outputs_list]
   other_outputs <- other_outputs[!other_outputs=="extradata_raw"]
-  other_outputs <- other_outputs[is.numeric(out[[1]][other_outputs])]
+  other_outputs <- other_outputs[sapply(out[[1]][other_outputs],is.numeric)]
   
   for (sim in 1:length(out)) {
 
@@ -222,7 +222,7 @@ summary_results_sens <- function(out = results, arm=NULL, wtp = 50000){
   
   other_outputs <- names(out[[1]][[1]])[!names(out[[1]][[1]])%in% remove_outputs_list]
   other_outputs <- other_outputs[!other_outputs=="extradata_raw"]
-  other_outputs <- other_outputs[is.numeric(out[[1]][[1]][other_outputs])]
+  other_outputs <- other_outputs[sapply(out[[1]][[1]][other_outputs],is.numeric)]
   
   
   data_final <- data.frame()
