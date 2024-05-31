@@ -7,7 +7,7 @@
 modify_item_seq(...)
 }
 \arguments{
-\item{list_item}{A list of items and their values or expressions. Will be evaluated sequentially (so one could have list(a= 1, b = a +2 ))}
+\item{...}{A list of items and their values or expressions. Will be evaluated sequentially (so one could have list(a= 1, b = a +2 ))}
 }
 \description{
 Modify the value of existing items

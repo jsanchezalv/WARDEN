@@ -480,7 +480,7 @@ modify_item <- function(list_item){
 
 #' Modify the value of existing items
 #'
-#' @param list_item A list of items and their values or expressions. Will be evaluated sequentially (so one could have list(a= 1, b = a +2 ))
+#' @param ... A list of items and their values or expressions. Will be evaluated sequentially (so one could have list(a= 1, b = a +2 ))
 #'
 #' @export
 #'
