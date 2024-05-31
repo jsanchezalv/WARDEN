@@ -304,12 +304,24 @@ compute_outputs_timseq <- function(freq,
                                            time_points = rep(rep(time_points,length(unique(patdata_dt$pat_id))),length(unique(patdata_dt$arm))))
   
   
-  # Function to find the closest observation below each time point, use dplyr as it's faster than the data.table implementation
   final_filtered <- patdata_dt[evttime <= time_points[1]][,time_points:= time_points[1]]
+  #Loop over the timepoints, and get the relevant events that apply to that timepoint, for events whose previous time is below threshold (so overflow to another timepoint),
+  #make sure that we don't over count values if their previoustime is exactly at some threshold, e.g., prevtime 2 to threshold 2, and make sure to remove their instantaneous values
+  #Then get also all events that are contained within the timepoint
   for (i in 2:length(time_points)) {
-    temp_data1 <- patdata_dt[evttime > time_points[i], .SD[which.min(evttime[prevtime<time_points[i-1]])], by = .(pat_id,arm)][
+    # temp_data1 <- patdata_dt[evttime > time_points[i], .SD[which.min(evttime[prevtime!=time_points[i-1]])], by = .(pat_id,arm)][ #[prevtime<time_points[i-1]] [prevtime!=time_points[i-1]]
+    #   ,evttime:=time_points[i]][
+    #     ,prevtime:=pmax(prevtime,time_points[i-1])]
+    
+    temp_data1 <- patdata_dt[evttime > time_points[i], .SD[which.min(evttime)], by = .(pat_id,arm)][ #[prevtime<time_points[i-1]] [prevtime!=time_points[i-1]]
       ,evttime:=time_points[i]][
-        ,prevtime:=pmax(prevtime,time_points[i-1])]
+        ,prevtime:=pmax(prevtime,time_points[i-1])][evttime!=time_points[i-1]]
+    
+    #I need to remove instantaneous from temp1 to avoid double counting
+    for (cat in input_list$uc_lists$instant_inputs) {
+      temp_data1[,paste0(cat,"_","undisc") := 0]
+      temp_data1[,paste0(cat) := 0]
+    }
     
     temp_data2 <- patdata_dt[evttime <= time_points[i] & evttime > time_points[i-1]][
       ,prevtime:=ifelse(.I[1] & prevtime < time_points[i-1],time_points[i-1], prevtime), by = .(pat_id,arm)]
@@ -454,11 +466,10 @@ compute_outputs_timseq <- function(freq,
     }
     
     for (output_i in data_export_tobesummarized) {
-      if(output_i=="utility"){browser()}
       #Gets last value from patient and time, removes the accumulation, computes the average over population, then does the cumulative outcome
       timed_output[[output_i]][arm_i] <- list(final_filtered[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][
         ,out:=out-shift(out,fill=0),by=.(pat_id)][
-          ,.(out=sum(out,na.rm=TRUE)/input_list$npats),by=.(time_points)][
+          ,.(out=sum(out,na.rm=TRUE)/(input_list$npats-sum(is.na(out)))),by=.(time_points)][
             ,cumsum(out)]
       )
     }
