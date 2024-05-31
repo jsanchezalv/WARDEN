@@ -28,7 +28,8 @@ run_sim_parallel(
   n_sensitivity = 1,
   ncores = 1,
   input_out = NULL,
-  ipd = 1
+  ipd = 1,
+  timed_freq = NULL
 )
 }
 \arguments{
@@ -79,6 +80,8 @@ run_sim_parallel(
 \item{input_out}{A vector of variables to be returned in the output data frame}
 
 \item{ipd}{Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events}
+
+\item{timed_freq}{If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)}
 }
 \value{
 A list of lists with the analysis results

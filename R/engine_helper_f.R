@@ -302,34 +302,34 @@ compute_outputs_timseq <- function(freq,
   time_points_dt <- data.table::data.table(pat_id = rep(rep(unique(patdata_dt$pat_id),each=length(time_points)),length(unique(patdata_dt$arm))),
                                            arm = rep(rep(unique(patdata_dt$arm),each=length(unique(patdata_dt$pat_id))),each=length(unique(time_points))),
                                            time_points = rep(rep(time_points,length(unique(patdata_dt$pat_id))),length(unique(patdata_dt$arm))))
-
+  
   
   # Function to find the closest observation below each time point, use dplyr as it's faster than the data.table implementation
- final_filtered <- patdata_dt[evttime <= time_points[1]][,time_points:= time_points[1]]
+  final_filtered <- patdata_dt[evttime <= time_points[1]][,time_points:= time_points[1]]
   for (i in 2:length(time_points)) {
-    temp_data1 <- patdata_dt[evttime > time_points[i], .SD[which.min(evttime)], by = .(pat_id,arm)][
+    temp_data1 <- patdata_dt[evttime > time_points[i], .SD[which.min(evttime[prevtime<time_points[i-1]])], by = .(pat_id,arm)][
       ,evttime:=time_points[i]][
-      ,prevtime:=pmax(prevtime,time_points[i-1])]
+        ,prevtime:=pmax(prevtime,time_points[i-1])]
     
     temp_data2 <- patdata_dt[evttime <= time_points[i] & evttime > time_points[i-1]][
       ,prevtime:=ifelse(.I[1] & prevtime < time_points[i-1],time_points[i-1], prevtime), by = .(pat_id,arm)]
     
     temp_data <- rbindlist(
       list(temp_data1,
-      temp_data2),use.names=TRUE
+           temp_data2),use.names=TRUE
     )[,time_points:= time_points[i]]
     
     final_filtered <- rbindlist(list(final_filtered, temp_data),use.names=TRUE)
   }
   
- setorder(final_filtered, pat_id, arm, evttime)
- 
+  setorder(final_filtered, pat_id, arm, evttime)
+  
   # Discounting of Outcomes-------------------------------------------------------------
   
   #Discount and undiscount ongoing
   
   for (cat in input_list$uc_lists$ongoing_inputs) {
-
+    
     
     final_filtered[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
                                                                lclprvtime=prevtime,
@@ -454,13 +454,18 @@ compute_outputs_timseq <- function(freq,
     }
     
     for (output_i in data_export_tobesummarized) {
-      #Gets last value from patient, then take mean per time point for numeric
-      timed_output[[output_i]][arm_i] <- as.vector(final_filtered[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][,.(out=sum(out,na.rm=TRUE)/.N),by=.(time_points)][,.(out)])
+      if(output_i=="utility"){browser()}
+      #Gets last value from patient and time, removes the accumulation, computes the average over population, then does the cumulative outcome
+      timed_output[[output_i]][arm_i] <- list(final_filtered[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][
+        ,out:=out-shift(out,fill=0),by=.(pat_id)][
+          ,.(out=sum(out,na.rm=TRUE)/input_list$npats),by=.(time_points)][
+            ,cumsum(out)]
+      )
     }
     
     for (output_i in data_export_summarized_nonumeric) {
       #Gets last value 
-      timed_output[[output_i]][arm_i] <- as.vector(final_filtered[arm==arm_i,.(out=tail(get(output_i),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][,.(out=tail(out,n=1,na.rm=TRUE)),by=.(time_points)][,.(out)])
+      timed_output[[output_i]][arm_i] <- list(final_filtered[arm==arm_i,.(out=tail(get(output_i),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][,.(out=tail(out,n=1,na.rm=TRUE)),by=.(time_points)]$out)
     }
     
   }
