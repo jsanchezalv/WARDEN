@@ -24,6 +24,7 @@
 #' @param ncores The number of cores to use for parallel computing
 #' @param input_out A vector of variables to be returned in the output data frame
 #' @param ipd Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events
+#' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #'
 #' @return A list of lists with the analysis results
 #' @importFrom doFuture `%dofuture%`
@@ -104,7 +105,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                              n_sensitivity = 1,
                              ncores=1,
                              input_out = NULL,
-                             ipd = 1){
+                             ipd = 1,
+                             timed_freq = NULL){
   
   
   # Set-up basics -----------------------------------------------------------
@@ -249,7 +251,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        n_sensitivity = n_sensitivity,
                        sens = sens,
                        sensitivity_names = sensitivity_names,
-                       sens_name_used = sens_name_used
+                       sens_name_used = sens_name_used,
+                       timed_freq = timed_freq
                       )
     
     # Draw Common parameters  -------------------------------

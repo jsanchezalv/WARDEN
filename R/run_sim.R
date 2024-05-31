@@ -23,6 +23,8 @@
 #' @param n_sensitivity Number of sensitivity analysis (DSA or Scenarios) to run. It will be interacted with sensitivity_names argument if not null (n_sensitivityitivity = n_sensitivity * length(sensitivity_names)). For DSA, it should be as many parameters as there are. For scenario, it should be 1.
 #' @param input_out A vector of variables to be returned in the output data frame
 #' @param ipd Integer taking value 1 for full IPD data returned, and 2 IPD data but aggregating events (returning last value for numeric/character/factor variables. For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear). Other values mean no IPD data returned (removes non-numerical or length>1 items)
+#' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
+
 #'
 #' @return A list of data frames with the simulation results
 #'
@@ -96,7 +98,8 @@ run_sim <- function(arm_list=c("int","noint"),
                    sensitivity_names = NULL,
                    n_sensitivity = 1,
                    input_out = NULL,
-                   ipd = 1){
+                   ipd = 1,
+                   timed_freq = NULL){
 
 
 
@@ -239,7 +242,8 @@ run_sim <- function(arm_list=c("int","noint"),
                        n_sensitivity = n_sensitivity,
                        sens = sens,
                        sensitivity_names = sensitivity_names,
-                       sens_name_used = sens_name_used
+                       sens_name_used = sens_name_used,
+                       timed_freq = timed_freq
                       )
     
     # Draw Common parameters  -------------------------------

@@ -258,6 +258,224 @@ interval_out <- function(output_sim, element,round_digit=2) {
 }
 
 
+
+# Compute and Format outputs for specific timepoints -------------------------
+
+#' Compute the discounting and format the outputs from the simulation at specific timepoints
+#'
+#' @param freq The time frequency used
+#' @param patdata_dt The list with the data from the patient-treatment iterations for a single simulation
+#' @param input_list The list that contains the main inputs used for the simulation
+#' @param prepared_outputs_v Character vector indicating the relevant variables to be exported by type
+#' @param data_export_tobesummarized Character vector indicating the relevant variables to be exported by type
+#' @param data_export_summarized_nonumeric Character vector indicating the relevant variables to be exported by type
+#'
+#' @return List with the outputs formatted 
+#'
+#' @import data.table
+#' @importFrom utils tail
+#' @importFrom zoo na.locf
+
+#' 
+#' @details
+#' It computes the discounted and undiscounted lys/costs/qalys at specific timepoints in an aggregated format.
+#' 
+#' @examples
+#' compute_outputs_timseq(patdata=patdata,input_list=input_list, freq = 1)
+#'
+#' @keywords internal
+#' @noRd
+
+compute_outputs_timseq <- function(freq,
+                                   patdata_dt,
+                                   input_list,
+                                   prepared_outputs_v,
+                                   data_export_tobesummarized,
+                                   data_export_summarized_nonumeric) {
+  
+  arm_list <- input_list$arm_list
+  
+  adjusted_to <- ceiling(max(patdata_dt$evttime)) + (freq - ceiling(max(patdata_dt$evttime)) %% freq) %% freq
+  
+  time_points <- seq(from=0,to=adjusted_to,by=freq)
+  
+  time_points_dt <- data.table::data.table(pat_id = rep(rep(unique(patdata_dt$pat_id),each=length(time_points)),length(unique(patdata_dt$arm))),
+                                           arm = rep(rep(unique(patdata_dt$arm),each=length(unique(patdata_dt$pat_id))),each=length(unique(time_points))),
+                                           time_points = rep(rep(time_points,length(unique(patdata_dt$pat_id))),length(unique(patdata_dt$arm))))
+
+  
+  # Function to find the closest observation below each time point, use dplyr as it's faster than the data.table implementation
+ final_filtered <- patdata_dt[evttime <= time_points[1]][,time_points:= time_points[1]]
+  for (i in 2:length(time_points)) {
+    temp_data1 <- patdata_dt[evttime > time_points[i], .SD[which.min(evttime)], by = .(pat_id,arm)][
+      ,evttime:=time_points[i]][
+      ,prevtime:=pmax(prevtime,time_points[i-1])]
+    
+    temp_data2 <- patdata_dt[evttime <= time_points[i] & evttime > time_points[i-1]][
+      ,prevtime:=ifelse(.I[1] & prevtime < time_points[i-1],time_points[i-1], prevtime), by = .(pat_id,arm)]
+    
+    temp_data <- rbindlist(
+      list(temp_data1,
+      temp_data2),use.names=TRUE
+    )[,time_points:= time_points[i]]
+    
+    final_filtered <- rbindlist(list(final_filtered, temp_data),use.names=TRUE)
+  }
+  
+ setorder(final_filtered, pat_id, arm, evttime)
+ 
+  # Discounting of Outcomes-------------------------------------------------------------
+  
+  #Discount and undiscount ongoing
+  
+  for (cat in input_list$uc_lists$ongoing_inputs) {
+
+    
+    final_filtered[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
+                                                               lclprvtime=prevtime,
+                                                               lclcurtime=evttime,
+                                                               lclval=get(cat))]
+    
+    final_filtered[,paste0(cat) := disc_ongoing_v(lcldr=input_list$drc,
+                                                  lclprvtime=prevtime,
+                                                  lclcurtime=evttime,
+                                                  lclval=get(cat))]
+    
+    if(cat %in% input_list$uc_lists$cost_categories_ongoing){
+      final_filtered[, "costs" := costs + get(cat)]
+      final_filtered[, "costs_undisc" := costs_undisc + get(paste0(cat,"_","undisc"))]
+    }
+    
+    if(cat %in% input_list$uc_lists$util_categories_ongoing){
+      final_filtered[, "qalys" := qalys+ get(cat)]
+      final_filtered[, "qalys_undisc" := qalys_undisc + get(paste0(cat,"_","undisc"))]
+    }
+    
+    
+  }
+  
+  
+  #Discount and undiscount instant
+  for (cat in input_list$uc_lists$instant_inputs) {
+    final_filtered[,paste0(cat,"_","undisc") := disc_instant_v(lcldr=0,
+                                                               lclcurtime=evttime,
+                                                               lclval=get(cat))]
+    
+    final_filtered[,paste0(cat) := disc_instant_v(lcldr=input_list$drc,
+                                                  lclcurtime=evttime,
+                                                  lclval=get(cat))]
+    
+    if(cat %in% input_list$uc_lists$cost_categories_instant){
+      final_filtered[, "costs" := costs + get(cat)]
+      final_filtered[, "costs_undisc" := costs_undisc + get(paste0(cat,"_","undisc"))]
+    }
+    
+    if(cat %in% input_list$uc_lists$util_categories_instant){
+      final_filtered[, "qalys" := qalys + get(cat)]
+      final_filtered[, "qalys_undisc" := qalys_undisc + get(paste0(cat,"_","undisc"))]
+    }
+    
+  }
+  
+  #Discount and undiscount cycle
+  for (cat in input_list$uc_lists$cycle_inputs) {
+    final_filtered[,paste0(cat,"_","undisc") := disc_cycle_v(lcldr=0,
+                                                             lclprvtime=prevtime,
+                                                             cyclelength = get(paste0(cat,"_","cycle_l")),
+                                                             lclcurtime=evttime,
+                                                             lclval= get(cat),
+                                                             starttime = get(paste0(cat,"_","cycle_starttime")))] 
+    
+    final_filtered[,paste0(cat) := disc_cycle_v(lcldr=input_list$drc,
+                                                lclprvtime=prevtime,
+                                                cyclelength = get(paste0(cat,"_","cycle_l")),
+                                                lclcurtime=evttime,
+                                                lclval= get(cat),
+                                                starttime = get(paste0(cat,"_","cycle_starttime")))]
+    
+    if(cat %in% input_list$uc_lists$cost_categories_cycle){
+      final_filtered[, "costs" := costs + get(cat)]
+      final_filtered[, "costs_undisc" := costs_undisc + get(paste0(cat,"_","undisc"))]
+    }
+    
+    if(cat %in% input_list$uc_lists$util_categories_cycle){
+      final_filtered[, "qalys" := qalys + get(cat)]
+      final_filtered[, "qalys_undisc" := qalys_undisc + get(paste0(cat,"_","undisc"))]
+    }
+    
+  }
+  
+  
+  #Discount and undiscount LYs
+  final_filtered[,"lys" := disc_ongoing_v(lcldr=input_list$drq,
+                                          lclprvtime=prevtime,
+                                          lclcurtime=evttime,
+                                          lclval=1)]
+  
+  final_filtered[,"lys_undisc" := disc_ongoing_v(lcldr=0,
+                                                 lclprvtime=prevtime,
+                                                 lclcurtime=evttime,
+                                                 lclval=1)]
+  
+  #Calculate total outcomes
+  final_filtered[,"total_costs" := sum(costs),by=.(pat_id,arm)]
+  final_filtered[,"total_qalys" := sum(qalys),by=.(pat_id,arm)]
+  final_filtered[,"total_lys" := sum(lys),by=.(pat_id,arm)]
+  final_filtered[,"total_costs_undisc" := sum(costs_undisc),by=.(pat_id,arm)]
+  final_filtered[,"total_qalys_undisc" := sum(qalys_undisc),by=.(pat_id,arm)]
+  final_filtered[,"total_lys_undisc" := sum(lys_undisc),by=.(pat_id,arm)]
+  
+  #Partially order the data
+  data.table::setcolorder(final_filtered,   c("evtname","time_points","evttime", "prevtime", "pat_id", "arm",
+                                              "total_lys","total_qalys","total_costs",
+                                              "total_costs_undisc", "total_qalys_undisc", "total_lys_undisc",
+                                              "lys","qalys","costs",
+                                              "lys_undisc", "qalys_undisc",  "costs_undisc"))
+  
+  
+  # Organize and create output -----------------------------------------------------------
+  
+  timed_output <- list()
+  
+  #Create total outputs and user-defined costs/utilities from IPD
+  vector_total_outputs <- c("total_lys","total_qalys","total_costs","total_lys_undisc","total_qalys_undisc","total_costs_undisc")
+  vector_total_outputs_search <- c("lys","qalys","costs","lys_undisc","qalys_undisc","costs_undisc")
+  
+  #Add to final outputs the total outcomes as well as the cost/utility categories totals
+  vector_other_outputs <- c(input_list$categories_for_export,prepared_outputs_v)
+  
+  for (arm_i in arm_list) {
+    for (output_i in 1:length(vector_total_outputs)) {
+      timed_output[[vector_total_outputs[output_i]]][arm_i] <- list(final_filtered[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]),na.rm=TRUE)/input_list$npats),by=.(time_points)][,cumsum(out)])
+    }
+    
+    for (output_i in vector_other_outputs) {
+      timed_output[[output_i]][arm_i] <- list(final_filtered[arm==arm_i,.(out=sum(get(output_i),na.rm=TRUE)/input_list$npats),by=.(time_points)][,cumsum(out)])
+    }
+    
+    for (output_i in data_export_tobesummarized) {
+      #Gets last value from patient, then take mean per time point for numeric
+      timed_output[[output_i]][arm_i] <- as.vector(final_filtered[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][,.(out=sum(out,na.rm=TRUE)/.N),by=.(time_points)][,.(out)])
+    }
+    
+    for (output_i in data_export_summarized_nonumeric) {
+      #Gets last value 
+      timed_output[[output_i]][arm_i] <- as.vector(final_filtered[arm==arm_i,.(out=tail(get(output_i),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][,.(out=tail(out,n=1,na.rm=TRUE)),by=.(time_points)][,.(out)])
+    }
+    
+  }
+  
+  final_out_sorted <- names(timed_output)[!names(timed_output) %in% vector_total_outputs]
+  order_final_output <- c(vector_total_outputs,final_out_sorted[order(final_out_sorted)])
+  timed_output <- c(list(arm_list=arm_list),list(timepoints=time_points),timed_output[order_final_output])
+  
+  
+  
+  return(timed_output)
+}
+
+
+
 # Compute and Format outputs -------------------------
 
 #' Compute the discounting and format the outputs from the simulation
@@ -357,12 +575,7 @@ compute_outputs <- function(patdata,input_list) {
                  )
   patdata_dt[,(cols_init):=0]
   
-  # Discounting of Outcomes-------------------------------------------------------------
-  
-  #Discount and undiscount ongoing
-  
   for (cat in input_list$uc_lists$ongoing_inputs) {
-    
     #Set final observation to be considered as an update
     set(patdata_dt, i = patdata_dt[,.I[.N],by=.(pat_id, arm)][['V1']], j = paste0(cat,"_lastupdate"), value = 1)
     #Updated values are kept
@@ -372,7 +585,23 @@ compute_outputs <- function(patdata,input_list) {
     patdata_dt[, paste0(cat) := value_new]
     patdata_dt[, value_new := NULL]
     patdata_dt[, paste0(paste0(cat,"_lastupdate")) := NULL]
-    
+  }
+  
+  if(!is.null(input_list$timed_freq)){
+  timed_outputs <- compute_outputs_timseq(input_list$timed_freq,
+                                          patdata_dt,
+                                          input_list,
+                                          prepared_outputs_v,
+                                          data_export_tobesummarized,
+                                          data_export_summarized_nonumeric)
+  }
+  
+  # Discounting of Outcomes-------------------------------------------------------------
+  
+  #Discount and undiscount ongoing
+  
+  for (cat in input_list$uc_lists$ongoing_inputs) {
+
     patdata_dt[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
                                                                         lclprvtime=prevtime,
                                                                         lclcurtime=evttime,
@@ -474,7 +703,6 @@ compute_outputs <- function(patdata,input_list) {
                                           "lys","qalys","costs",
                                           "lys_undisc", "qalys_undisc",  "costs_undisc"))
   
-  
   # Organize and create output -----------------------------------------------------------
   
   final_output <- list()
@@ -561,5 +789,11 @@ compute_outputs <- function(patdata,input_list) {
     }
   }
   
+  if(!is.null(input_list$timed_freq)){
+    final_output$timed_outputs <- timed_outputs
+  }
+  
   return(final_output)
 }
+
+
