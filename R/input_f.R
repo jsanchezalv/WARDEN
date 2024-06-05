@@ -378,6 +378,31 @@ new_event <- function(evt){
   
   evtlist_temp <- list(cur_evtlist = c(input_list_arm$cur_evtlist,
                                   new_evt))
+  if(input_list_arm$debug){ #only works correctly with create_if_null==TRUE, to be modified in later versions
+    loc <- paste0("Analysis: ", input_list_arm$sens,
+                  "; Sim: ", input_list_arm$sim,
+                  "; Patient: ", input_list_arm$i,
+                  "; Arm: ", input_list_arm$arm,
+                  "; Event: ", input_list_arm$evt,
+                  "; Time: ", round(input_list_arm$curtime,3)
+    )
+    if(!is.null(input_list_arm$log_list[[loc]])){
+      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value,setNames(rep(Inf, length(new_evt_name)),new_evt_name))
+      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,new_evt)
+      
+    }else{
+      dump_info <- list(
+        list(prev_value = setNames(rep(Inf, length(new_event_name))),
+             cur_value = new_evt
+        )
+      )
+      names(dump_info) <- loc
+      
+      input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
+      
+    }
+  }
+  
   
   input_list_arm[["cur_evtlist"]] <- evtlist_temp$cur_evtlist
   
@@ -419,6 +444,36 @@ modify_event <- function(evt,create_if_null=TRUE){
       stop("Modify event times are not all numeric, please review")
   }
   names_evt <- names(evt)
+  
+  if(input_list_arm$debug){ #only works correctly with create_if_null==TRUE, to be modified in later versions
+    loc <- paste0("Analysis: ", input_list_arm$sens,
+                  "; Sim: ", input_list_arm$sim,
+                  "; Patient: ", input_list_arm$i,
+                  "; Arm: ", input_list_arm$arm,
+                  "; Event: ", input_list_arm$evt,
+                  "; Time: ", round(input_list_arm$curtime,3)
+                  )
+    temp_cur <- input_list_arm$cur_evtlist[names_evt]
+    isna_evt <- is.na(temp_cur)
+    temp_cur[isna_evt] <- Inf
+    names(temp_cur)[isna_evt] <- names_evt[isna_evt]
+    
+    if(!is.null(input_list_arm$log_list[[loc]])){
+      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value,temp_cur)
+      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,evt_unlist)
+        
+    }else{
+    dump_info <- list(
+      list(prev_value = temp_cur,
+           cur_value = evt_unlist
+           )
+      )
+    names(dump_info) <- loc
+    
+    input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
+    
+    }
+  }
   
   if (create_if_null==FALSE) {
     names_obj_temp <- names(input_list_arm$cur_evtlist)
@@ -468,6 +523,33 @@ modify_event <- function(evt,create_if_null=TRUE){
 modify_item <- function(list_item){
   input_list_arm <- parent.frame()$input_list_arm
   
+  if(input_list_arm$debug){ 
+    
+    loc <- paste0("Analysis: ", input_list_arm$sens,
+                  "; Sim: ", input_list_arm$sim,
+                  "; Patient: ", input_list_arm$i,
+                  "; Arm: ", input_list_arm$arm,
+                  "; Event: ", input_list_arm$evt,
+                  "; Time: ", round(input_list_arm$curtime,3)
+    )
+    if(!is.null(input_list_arm$log_list[[loc]])){
+      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value, input_list_arm[names(list_item)])
+      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,list_item)
+      
+    }else{
+    dump_info <- list(
+      list(
+        prev_value = input_list_arm[names(list_item)],
+        cur_value = list_item
+      )
+    )
+    names(dump_info) <- loc
+    
+    input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
+    }
+  }
+  
+  
   input_list_arm[names(list_item)] <- lapply(list_item, unname)
   
   input_list_arm[paste0(names(list_item),"_lastupdate",recycle0=TRUE)] <- 1
@@ -505,11 +587,42 @@ modify_item_seq <- function(...){
   input_list_arm <- parent.frame()$input_list_arm
   input_list <- as.list(substitute(...))[-1]
   list_out <- list()
+  
+  if(input_list_arm$debug){ 
+    temp_dump <- input_list_arm[names(input_list)]
+  }
+  
   for (inp in 1:length(input_list)) {
     name_temp <- names(input_list[inp])
     list_out[[ name_temp ]] <- eval(input_list[[inp]], input_list_arm)
     input_list_arm[name_temp] <- list_out[name_temp]
   }
+  
+  if(input_list_arm$debug){ 
+    
+    loc <- paste0("Analysis: ", input_list_arm$sens,
+                  "; Sim: ", input_list_arm$sim,
+                  "; Patient: ", input_list_arm$i,
+                  "; Arm: ", input_list_arm$arm,
+                  "; Event: ", input_list_arm$evt,
+                  "; Time: ", round(input_list_arm$curtime,3)
+    )
+    if(!is.null(input_list_arm$log_list[[loc]])){
+      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value, temp_dump)
+      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,list_out)
+      
+    }else{
+    dump_info <- list(
+      list(prev_value = temp_dump,
+           cur_value = list_out
+      )
+    )
+    names(dump_info) <-loc
+    input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
+    }
+  }
+  
+  
   list2env(list_out,envir = parent.frame())
   
   input_list_arm[paste0(names(input_list),"_lastupdate",recycle0=TRUE)] <- 1

@@ -24,7 +24,7 @@
 #' @param input_out A vector of variables to be returned in the output data frame
 #' @param ipd Integer taking value 1 for full IPD data returned, and 2 IPD data but aggregating events (returning last value for numeric/character/factor variables. For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear). Other values mean no IPD data returned (removes non-numerical or length>1 items)
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
-
+#' @param debug If TRUE, will generate a log file
 #'
 #' @return A list of data frames with the simulation results
 #'
@@ -99,7 +99,8 @@ run_sim <- function(arm_list=c("int","noint"),
                    n_sensitivity = 1,
                    input_out = NULL,
                    ipd = 1,
-                   timed_freq = NULL){
+                   timed_freq = NULL,
+                   debug = FALSE){
 
 
 
@@ -161,6 +162,7 @@ run_sim <- function(arm_list=c("int","noint"),
     ))
   
   output_sim <- list()
+  
 
   start_time <-  proc.time()
   
@@ -243,8 +245,11 @@ run_sim <- function(arm_list=c("int","noint"),
                        sens = sens,
                        sensitivity_names = sensitivity_names,
                        sens_name_used = sens_name_used,
-                       timed_freq = timed_freq
+                       timed_freq = timed_freq,
+                       debug = debug,
+                       log_list = list()
                       )
+    
     
     # Draw Common parameters  -------------------------------
     if(!is.null(sensitivity_inputs)){
@@ -319,7 +324,6 @@ run_sim <- function(arm_list=c("int","noint"),
       
       output_sim[[sens]][[simulation]] <- final_output
   
-  
       print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
     }
     
@@ -331,6 +335,8 @@ run_sim <- function(arm_list=c("int","noint"),
 
   # Export results ----------------------------------------------------------
 
+  
+  
 
   results <- output_sim
   

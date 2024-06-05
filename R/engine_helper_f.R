@@ -257,6 +257,35 @@ interval_out <- function(output_sim, element,round_digit=2) {
   return(out)
 }
 
+# Helper function to transform the parameters exported in debug -------------------------
+
+#' Helper function to transform the parameters exported in debu
+#'
+#' @param debug_data List with each of the events in the debug mode
+#'
+#' @return Retrasnformed debug data
+#'
+#'
+#' @keywords internal
+#' @noRd
+
+transform_debug <- function(debug_data) {
+  new_event <- list()
+  prev_value <- debug_data$prev_value
+  cur_value <- debug_data$cur_value
+  
+  all_keys <- unique(c(names(prev_value), names(cur_value)))
+  
+  for (key in all_keys) {
+    new_event[[key]] <- list(
+      prev_value = prev_value[[key]],
+      cur_value = cur_value[[key]]
+    )
+  }
+  
+  return(new_event)
+}
+
 
 
 # Compute and Format outputs for specific timepoints -------------------------

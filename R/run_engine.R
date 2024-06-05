@@ -31,6 +31,7 @@ run_engine <- function(arm_list,
   #1 Loop per patient ----------------------------------------------------------
   patdata <- vector("list", length=npats) # empty list with npats elements
 
+  temp_log_pt <- list()
   for (i in 1:npats) {
     set.seed(i*simulation)
     #Create empty pat data for each arm
@@ -59,7 +60,8 @@ run_engine <- function(arm_list,
     input_list_pt <- input_list_pt[!duplic]
 
     #2 Loop per treatment ------------------------------------------------------
-
+    temp_log <- list()
+    
     for (arm in arm_list) {
       set.seed(i*simulation)
       # Initialize values to prevent errors
@@ -146,19 +148,28 @@ run_engine <- function(arm_list,
         
         
       }
-
+      
+      temp_log <- c(temp_log,input_list_arm$log_list)
     }
+    temp_log_pt <- c(temp_log_pt,temp_log)
 
     patdata[[i]] <- this_patient
+    
   }
-
+  
+  input_list$log_list <- lapply(temp_log_pt,transform_debug)
+  
+  
 # Compute outputs ---------------------------------------------------------
 
 
   #Compute the outputs and format the data
   final_output <- compute_outputs(patdata, input_list)
   
+  if(input_list$debug){
+    final_output$log_list <- input_list$log_list
+  }
+    return(final_output)
 
-  return(final_output)
 
 }

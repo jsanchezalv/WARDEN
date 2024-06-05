@@ -329,6 +329,28 @@ qresgompertz <- function(rnd=0.5,shape,rate,lower_bound){
   return(out)
 }
 
+#' Survival Probaility function for restricted Gompertz distribution (lower bound only)
+#'
+#' @param time Vector of times
+#' @param shape The shape parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
+#' @param rate The rate parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
+#' @param lower_bound The lower bound of the restricted distribution
+#'
+#' @return Estimate(s) from the restricted Gompertz distribution based on given parameters
+#'
+#' @importFrom stats runif
+#'
+#' @export
+#'
+#' @examples
+#' presgompertz(time=1,shape=0.05,rate=0.01,lower_bound = 50)
+
+presgompertz <- function(time=1,shape,rate,lower_bound){
+  
+  out <- exp(-(rate/shape) * exp(shape*lower_bound)*(exp(shape * time)-1))
+    
+  return(out)
+}
 
 #' Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process
 #'

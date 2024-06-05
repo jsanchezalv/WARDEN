@@ -25,6 +25,7 @@
 #' @param input_out A vector of variables to be returned in the output data frame
 #' @param ipd Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
+#' @param debug If TRUE, will generate a log file
 #'
 #' @return A list of lists with the analysis results
 #' @importFrom doFuture `%dofuture%`
@@ -106,7 +107,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                              ncores=1,
                              input_out = NULL,
                              ipd = 1,
-                             timed_freq = NULL){
+                             timed_freq = NULL,
+                             debug = FALSE){
   
   
   # Set-up basics -----------------------------------------------------------
@@ -252,7 +254,9 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        sens = sens,
                        sensitivity_names = sensitivity_names,
                        sens_name_used = sens_name_used,
-                       timed_freq = timed_freq
+                       timed_freq = timed_freq,
+                       debug = debug,
+                       log_list = list()
                       )
     
     # Draw Common parameters  -------------------------------
