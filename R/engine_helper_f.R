@@ -338,9 +338,6 @@ compute_outputs_timseq <- function(freq,
   #make sure that we don't over count values if their previoustime is exactly at some threshold, e.g., prevtime 2 to threshold 2, and make sure to remove their instantaneous values
   #Then get also all events that are contained within the timepoint
   for (i in 2:length(time_points)) {
-    # temp_data1 <- patdata_dt[evttime > time_points[i], .SD[which.min(evttime[prevtime!=time_points[i-1]])], by = .(pat_id,arm)][ #[prevtime<time_points[i-1]] [prevtime!=time_points[i-1]]
-    #   ,evttime:=time_points[i]][
-    #     ,prevtime:=pmax(prevtime,time_points[i-1])]
     
     temp_data1 <- patdata_dt[evttime > time_points[i], .SD[which.min(evttime)], by = .(pat_id,arm)][ #[prevtime<time_points[i-1]] [prevtime!=time_points[i-1]]
       ,evttime:=time_points[i]][
