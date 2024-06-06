@@ -347,7 +347,7 @@ qresgompertz <- function(rnd=0.5,shape,rate,lower_bound){
 
 presgompertz <- function(time=1,shape,rate,lower_bound){
   
-  out <- exp(-(rate/shape) * exp(shape*lower_bound)*(exp(shape * time)-1))
+  out <- 1- exp(-(rate/shape) * exp(shape*lower_bound)*(exp(shape * time)-1))
     
   return(out)
 }
