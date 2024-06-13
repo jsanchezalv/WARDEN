@@ -259,7 +259,7 @@ interval_out <- function(output_sim, element,round_digit=2) {
 
 # Helper function to transform the parameters exported in debug -------------------------
 
-#' Helper function to transform the parameters exported in debu
+#' Helper function to transform the parameters exported in debug for easier readibility
 #'
 #' @param debug_data List with each of the events in the debug mode
 #'
@@ -310,7 +310,7 @@ transform_debug <- function(debug_data) {
 #' It computes the discounted and undiscounted lys/costs/qalys at specific timepoints in an aggregated format.
 #' 
 #' @examples
-#' compute_outputs_timseq(patdata=patdata,input_list=input_list, freq = 1)
+#' compute_outputs_timseq(patdata_dt=patdata_dt,input_list=input_list, freq = 1)
 #'
 #' @keywords internal
 #' @noRd
@@ -324,9 +324,19 @@ compute_outputs_timseq <- function(freq,
   
   arm_list <- input_list$arm_list
   
-  adjusted_to <- ceiling(max(patdata_dt$evttime)) + (freq - ceiling(max(patdata_dt$evttime)) %% freq) %% freq
+  adjusted_to <- floor(max(patdata_dt$evttime)) + (freq - ceiling(max(patdata_dt$evttime)) %% freq) %% freq
   
-  time_points <- seq(from=0,to=adjusted_to,by=freq)
+  if (adjusted_to> max(patdata_dt$evttime)) {
+    adjusted_to <- floor(max(patdata_dt$evttime))
+  } # if adjusted_to is greater than max_time
+  
+  time_points <- seq(from=0,to=adjusted_to, by=freq)
+  
+  if (adjusted_to< max(patdata_dt$evttime)) {
+    time_points <- c(time_points, max(patdata_dt$evttime))
+  } # if adjusted_to is less than max event time
+  
+  
   
   time_points_dt <- data.table::data.table(pat_id = rep(rep(unique(patdata_dt$pat_id),each=length(time_points)),length(unique(patdata_dt$arm))),
                                            arm = rep(rep(unique(patdata_dt$arm),each=length(unique(patdata_dt$pat_id))),each=length(unique(time_points))),
@@ -566,9 +576,10 @@ compute_outputs <- function(patdata,input_list) {
   data_export_summarized_nonumeric <- data_export_aslist
     
   for (arm_i in arm_list) {
-    list_evts <- unlist(map(map(patdata,arm_i),"evtlist"), recursive = FALSE)
-    list_patdata <- c(list_patdata,list_evts)
+    list_patdata <- c(list_patdata,unlist(map(map(patdata,arm_i),"evtlist"), recursive = FALSE))
   }  
+  
+  # rm(patdata)
 
   #We exclude the extra data the user described that has a length > 1 (e.g., a matrix) from the data.table
   #as there could be matrices or other objects not suitable for data.table
@@ -593,6 +604,8 @@ compute_outputs <- function(patdata,input_list) {
   }
   
   patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata2,fill=TRUE)))
+  
+  # rm(list_patdata2)
   
   #Extract only extra data that the user wants to export
   export_list_ipd <- lapply(list_patdata,function(x) x[data_export_aslist])
