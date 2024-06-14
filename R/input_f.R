@@ -1036,7 +1036,8 @@ revert_list <- function(ls) {
 #' @param gen Context in which the function is applied.
 #'  Can be values "event" (reaction to an event), 
 #'  "add_item" (when used within add_item for unique_pt_inputs argument in run_sim),
-#'  or "initialize" (if used within the "add_tte" function)
+#'  "initialize" (if used within the "add_tte" function), "event" if used in modify_item,
+#'  and "event_seq" (assumed that by default, so no need to be declared explicitly) for modify_item_seq
 #'
 #' @return A vector of uniform values between 0 and 1
 #'
@@ -1046,9 +1047,10 @@ revert_list <- function(ls) {
 #' }
 #'
 #' @export
-runif_stream <- function(n=1,random_seed,gen="event"){
+runif_stream <- function(n=1,random_seed,gen="event_seq"){
   gen <- switch(gen,
            event = 1,
+           event_seq = 3,
            add_item = 5,
            initialize = 5
            )
