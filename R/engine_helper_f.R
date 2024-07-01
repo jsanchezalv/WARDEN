@@ -494,25 +494,47 @@ compute_outputs_timseq <- function(freq,
   
   for (arm_i in arm_list) {
     for (output_i in 1:length(vector_total_outputs)) {
-      timed_output[[vector_total_outputs[output_i]]][arm_i] <- list(final_filtered[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]),na.rm=TRUE)/input_list$npats),by=.(time_points)][,cumsum(out)])
+      temp_vec <- final_filtered[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]),na.rm=TRUE)/input_list$npats),by=.(time_points)][,cumsum(out)]
+      if(length(time_points)> length(temp_vec)){
+        last_value <- tail(temp_vec,1)
+        temp_vec <- c(temp_vec,rep(last_value,length(time_points) - length(temp_vec)))
+      }
+      timed_output[[vector_total_outputs[output_i]]][arm_i] <- list(temp_vec)
     }
     
     for (output_i in vector_other_outputs) {
-      timed_output[[output_i]][arm_i] <- list(final_filtered[arm==arm_i,.(out=sum(get(output_i),na.rm=TRUE)/input_list$npats),by=.(time_points)][,cumsum(out)])
+      temp_vec <- final_filtered[arm==arm_i,.(out=sum(get(output_i),na.rm=TRUE)/input_list$npats),by=.(time_points)][,cumsum(out)]
+      if(length(time_points)> length(temp_vec)){
+        last_value <- tail(temp_vec,1)
+        temp_vec <- c(temp_vec,rep(last_value,length(time_points) - length(temp_vec)))
+      }
+      timed_output[[output_i]][arm_i]  <- list(temp_vec)
     }
     
     for (output_i in data_export_tobesummarized) {
       #Gets last value from patient and time, removes the accumulation, computes the average over population, then does the cumulative outcome
-      timed_output[[output_i]][arm_i] <- list(final_filtered[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][
+      temp_vec <- final_filtered[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][
         ,out:=out-shift(out,fill=0),by=.(pat_id)][
           ,.(out=sum(out,na.rm=TRUE)/(input_list$npats-sum(is.na(out)))),by=.(time_points)][
             ,cumsum(out)]
-      )
+      
+      if(length(time_points)> length(temp_vec)){
+        last_value <- tail(temp_vec,1)
+        temp_vec <- c(temp_vec,rep(last_value,length(time_points) - length(temp_vec)))
+      }
+      
+      timed_output[[output_i]][arm_i] <- list(temp_vec)
     }
     
     for (output_i in data_export_summarized_nonumeric) {
       #Gets last value 
-      timed_output[[output_i]][arm_i] <- list(final_filtered[arm==arm_i,.(out=tail(get(output_i),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][,.(out=tail(out,n=1,na.rm=TRUE)),by=.(time_points)]$out)
+      temp_vec <- final_filtered[arm==arm_i,.(out=tail(get(output_i),n=1,na.rm=TRUE)),by=.(time_points,pat_id)][,.(out=tail(out,n=1,na.rm=TRUE)),by=.(time_points)]$out
+      
+      if(length(time_points)> length(temp_vec)){
+        last_value <- tail(temp_vec,1)
+        temp_vec <- c(temp_vec,rep(last_value,length(time_points) - length(temp_vec)))
+      }
+      timed_output[[output_i]][arm_i] <- list(temp_vec)
     }
     
   }
