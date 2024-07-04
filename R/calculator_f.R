@@ -470,3 +470,122 @@ rpoisgamma <- function(n, rate, theta=NULL, obs_time=1, t_reps, seed=NULL,return
   }
 }
 
+#' Calculate conditional multivariate normal values
+#'
+#' @param mu: mean vector
+#' @param Sigma: covariance matrix
+#' @param i: index of the known parameter (1-based index)
+#' @param xi: known value of the i-th parameter
+#' @param full_output: boolean indicating whether to return the full list of parameters
+#' 
+#' @return List of length 2, one with new mu and other with covariance parameters
+#'
+#' @export
+#' 
+#' @details
+#'Function to compute conditional multivariate normal values
+#'
+#' @examples
+#' mu <- c(1, 2, 3)
+#' Sigma <- matrix(c(0.2, 0.05, 0.1, 
+#'                   0.05, 0.3, 0.05, 
+#'                   0.1, 0.05, 0.4), nrow = 3)
+#' 
+#' i <- 1:2  # Index of the known parameter
+#' xi <- c(1.2,2.3)  # Known value of the first parameter
+#'
+#'result <- conditional_mvn(mu, Sigma, i, xi,full_output = TRUE)
+
+conditional_mvn <- function(mu, Sigma, i, xi, full_output = FALSE) {
+  
+  if(length(mu)==length(i)){stop("Trying to condition on all parameters")}
+  
+  N <- length(mu)
+  
+  # Create index vectors
+  all_indices <- 1:N
+  not_i_indices <- all_indices[-i]
+  
+  # Extract necessary submatrices and subvectors
+  mu_i <- mu[i]
+  mu_not_i <- mu[not_i_indices]
+  
+  Sigma_ii <- Sigma[i, i]
+  Sigma_i_not_i <- Sigma[i, not_i_indices]
+  Sigma_not_i_i <- Sigma[not_i_indices, i]
+  Sigma_not_i_not_i <- Sigma[not_i_indices, not_i_indices]
+  
+  # Compute the conditional mean and covariance
+  mu_cond <- mu_not_i + Sigma_not_i_i %*% solve(Sigma_ii) %*% (xi - mu_i)
+  Sigma_cond <- Sigma_not_i_not_i - Sigma_not_i_i %*% solve(Sigma_ii) %*% Sigma_i_not_i
+  
+  if (full_output) {
+    # Create the full mean vector including the known value
+    mu_full <- mu
+    mu_full[not_i_indices] <- mu_cond
+    mu_full[i] <- xi
+    
+    # Create the full mean vector including the known value
+    Sigma_full <- Sigma
+    Sigma_full[not_i_indices, not_i_indices] <- Sigma_cond
+    Sigma_full[i, ] <- 0
+    Sigma_full[, i] <- 0
+    Sigma_full[i, i] <- 0  # Variance of the known value is zero
+    
+    # Return the full mean vector and conditional covariance matrix
+    return(list(mean = mu_full, covariance = Sigma_full))
+  } else {
+    # Return only the conditional mean and covariance matrix
+    return(list(mean = mu_cond, covariance = Sigma_cond))
+  }
+}
+
+#' Calculate conditional multivariate normal values
+#'
+#' @param alpha: mean vector
+#' @param i: index of the known parameter (1-based index)
+#' @param xi: known value of the i-th parameter
+#' @param full_output: boolean indicating whether to return the full list of parameters
+#' 
+#' @return List of length 2, one with new mu and other with covariance parameters
+#'
+#' @export
+#' 
+#' @details
+#'Function to compute conditional multivariate normal values
+#'
+#' @examples
+#' alpha <- c(2, 3, 4)
+#' i <- 2  # Index of the known parameter
+#' xi <- 0.5  # Known value of the second parameter
+#' 
+#' # Compute the conditional alpha parameters with full output
+#' alpha_full <- conditional_dirichlet(alpha, i, xi, full_output = TRUE)
+
+conditional_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
+  
+  if(length(alpha)==length(i)){stop("Trying to condition on all parameters")}
+  
+  # Create index vectors
+  all_indices <- 1:length(alpha)
+  not_i_indices <- all_indices[-i]
+  
+  # Remove the i-th alpha parameter
+  alpha_not_i <- alpha[not_i_indices]
+  
+  # Adjust the remaining alpha parameters
+  alpha_cond <- alpha_not_i * (1 - sum(xi)) / sum(alpha_not_i)
+  
+  if (full_output) {
+    # Create the full alpha vector including the known value
+    alpha_full <- numeric(length(alpha))
+    alpha_full[not_i_indices] <- alpha_cond
+    alpha_full[i] <- xi
+    
+    # Return the full alpha vector
+    return(alpha_full)
+  } else {
+    # Return only the conditional alpha parameters
+    return(alpha_cond)
+  }
+}
