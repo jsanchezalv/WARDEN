@@ -28,7 +28,8 @@ run_sim(
   n_sensitivity = 1,
   input_out = NULL,
   ipd = 1,
-  timed_freq = NULL
+  timed_freq = NULL,
+  debug = FALSE
 )
 }
 \arguments{
@@ -79,6 +80,8 @@ run_sim(
 \item{ipd}{Integer taking value 1 for full IPD data returned, and 2 IPD data but aggregating events (returning last value for numeric/character/factor variables. For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear). Other values mean no IPD data returned (removes non-numerical or length>1 items)}
 
 \item{timed_freq}{If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)}
+
+\item{debug}{If TRUE, will generate a log file}
 }
 \value{
 A list of data frames with the simulation results

@@ -4,7 +4,7 @@
 \alias{runif_stream}
 \title{Creates a random uniform 0-1 for a given random seed substream and updates the value}
 \usage{
-runif_stream(n = 1, random_seed, gen = "event")
+runif_stream(n = 1, random_seed, gen = "event_seq")
 }
 \arguments{
 \item{n}{Number of elements}
@@ -14,7 +14,8 @@ runif_stream(n = 1, random_seed, gen = "event")
 \item{gen}{Context in which the function is applied.
 Can be values "event" (reaction to an event),
 "add_item" (when used within add_item for unique_pt_inputs argument in run_sim),
-or "initialize" (if used within the "add_tte" function)}
+"initialize" (if used within the "add_tte" function), "event" if used in modify_item,
+and "event_seq" (assumed that by default, so no need to be declared explicitly) for modify_item_seq}
 }
 \value{
 A vector of uniform values between 0 and 1

@@ -34,7 +34,7 @@ If NULL, it's assumed to be a vector of 1s of length equal to length(indicator)}
 \item{names_out}{Names to give the output list}
 }
 \value{
-List of used for the inputs
+List used for the inputs
 }
 \description{
 Select which values should be applied in the corresponding loop for several values (vector or list).
@@ -61,20 +61,20 @@ sens_ind = TRUE,
 indicator=c(1,0),
 indicator_psa=c(0,1)
 )
-pick_val_v(base = c(c(2,3),list(c(1,2))),
-            psa =sapply(1:3,
-                        function(x) eval(call(
-                          c("rnorm","rnorm","mvrnorm")[[x]],
-                          1,
-                          c(c(2,3),list(c(1,2)))[[x]],
-                          c(c(0.1,0.1),list(matrix(c(1,0.1,0.1,1),2,2)))[[x]]
-                        ))),
-            sens = c(c(2,3),list(c(1,2))),
-            psa_ind = TRUE,
-            sens_ind = FALSE,
-            indicator=c(1,0,0),
-            names_out=c("util","util2","correlated_vector")
-           )
+pick_val_v(base = list(2,3,c(1,2)),
+           psa =lapply(1:3,
+                       function(x) eval(call(
+                         c("rnorm","rnorm","mvrnorm")[[x]],
+                         1,
+                         c(c(2,3),list(c(1,2)))[[x]],
+                         c(c(0.1,0.1),list(matrix(c(1,0.1,0.1,1),2,2)))[[x]]
+                       ))),
+           sens = list(2,3,c(1,2)),
+           psa_ind = TRUE,
+           sens_ind = FALSE,
+           indicator=list(1,0,0),
+           names_out=c("util","util2","correlated_vector")
+)
 
 pick_val_v(base        = df_par[,"base_value"],
            psa         = sapply(1:nrow(df_par), function(x)

@@ -29,7 +29,8 @@ run_sim_parallel(
   ncores = 1,
   input_out = NULL,
   ipd = 1,
-  timed_freq = NULL
+  timed_freq = NULL,
+  debug = FALSE
 )
 }
 \arguments{
@@ -82,6 +83,8 @@ run_sim_parallel(
 \item{ipd}{Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events}
 
 \item{timed_freq}{If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)}
+
+\item{debug}{If TRUE, will generate a log file}
 }
 \value{
 A list of lists with the analysis results
