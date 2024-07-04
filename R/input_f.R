@@ -183,7 +183,7 @@ pick_psa <- function(f,...){
 #'  If NULL, it's assumed to be a vector of 1s of length equal to length(indicator)
 #' @param names_out Names to give the output list
 #'
-#' @return List of used for the inputs
+#' @return List used for the inputs
 #' @export
 #' 
 #' @details
@@ -208,20 +208,20 @@ pick_psa <- function(f,...){
 #' indicator=c(1,0),
 #' indicator_psa=c(0,1)
 #' )
-#' pick_val_v(base = c(c(2,3),list(c(1,2))),
-#'             psa =sapply(1:3,
-#'                         function(x) eval(call(
-#'                           c("rnorm","rnorm","mvrnorm")[[x]],
-#'                           1,
-#'                           c(c(2,3),list(c(1,2)))[[x]],
-#'                           c(c(0.1,0.1),list(matrix(c(1,0.1,0.1,1),2,2)))[[x]]
-#'                         ))),
-#'             sens = c(c(2,3),list(c(1,2))),
-#'             psa_ind = TRUE,
-#'             sens_ind = FALSE,
-#'             indicator=c(1,0,0),
-#'             names_out=c("util","util2","correlated_vector")
-#'            )
+#' pick_val_v(base = list(2,3,c(1,2)),
+#'            psa =lapply(1:3,
+#'                        function(x) eval(call(
+#'                          c("rnorm","rnorm","mvrnorm")[[x]],
+#'                          1,
+#'                          c(c(2,3),list(c(1,2)))[[x]],
+#'                          c(c(0.1,0.1),list(matrix(c(1,0.1,0.1,1),2,2)))[[x]]
+#'                        ))),
+#'            sens = list(2,3,c(1,2)),
+#'            psa_ind = TRUE,
+#'            sens_ind = FALSE,
+#'            indicator=list(1,0,0),
+#'            names_out=c("util","util2","correlated_vector")
+#' )
 #' 
 #' pick_val_v(base        = df_par[,"base_value"],
 #'            psa         = sapply(1:nrow(df_par), function(x)
@@ -287,6 +287,154 @@ pick_val_v <- function(base,
     
   return(output)
 }
+
+
+# Select which values to apply --------------------------------------------------------
+#' Select which values should be applied in the corresponding loop for several values (vector or list).
+#'
+#' @param base Value if no PSA/DSA/Scenario
+#' @param psa Value if PSA
+#' @param sens Value if DSA/Scenario
+#' @param psa_ind Boolean whether PSA is active
+#' @param sens_ind Boolean whether Scenario/DSA is active
+#' @param indicator Indicator which checks whether the specific parameter/parameters is/are active in the DSA or Scenario loop 
+#' @param indicator_psa Indicator which checks whether the specific parameter/parameters is/are active in the PSA loop.
+#'  If NULL, it's assumed to be a vector of 1s of length equal to length(indicator)
+#' @param names_out Names to give the output list
+#' @param indicator_sens_binary Boolean, TRUE if parameters will be varied fully, FALSE if some elements of the parameters may be changed but not all
+#' @param sens_iterator Current iterator number of the DSA/scenario being run, e.g., 5 if it corresponds to the 5th DSA parameter being changed
+#' @param distributions List with length equal to length of base where the distributions are stored
+#' @param covariances List with length equal to length of base where the variance/covariances are stored (only relevant if multivariate normal are being used)
+#'
+#' @return List used for the inputs
+#' @export
+#' 
+#' @details
+#' This function can be used with vectors or lists, but will always return a list.
+#' Lists should be used when correlated variables are introduced to make sure the selector knows how to choose among those
+#' This function allows to choose between using an approach where only the full parameters are varied, and an approach where subelements of the parameters can be changed
+#'
+#' @examples
+#' \dontrun{
+#' pick_val_v_2(base = list(0,0),
+#'              psa =list(rnorm(1,0,0.1),rnorm(1,0,0.1)),
+#'              sens = list(2,3),
+#'              psa_ind = FALSE,
+#'              sens_ind = TRUE,
+#'              indicator=list(1,2),
+#'              indicator_sens_binary = FALSE,
+#'              sens_iterator = 2,
+#'              distributions = list("rnorm","rnorm")
+#' )
+#' 
+#' pick_val_v_2(base = list(2,3,c(1,2)),
+#'              psa =sapply(1:3,
+#'                          function(x) eval(call(
+#'                            c("rnorm","rnorm","mvrnorm")[[x]],
+#'                            1,
+#'                            c(2,3,list(c(1,2)))[[x]],
+#'                            c(0.1,0.1,list(matrix(c(1,0.1,0.1,1),2,2)))[[x]]
+#'                          ))),
+#'              sens = list(4,5,c(1.3,2.3)),
+#'              psa_ind = FALSE,
+#'              sens_ind = TRUE,
+#'              indicator=list(1,2,c(3,4)),
+#'              names_out=c("util","util2","correlated_vector") ,
+#'              indicator_sens_binary = FALSE,
+#'              sens_iterator = 4,
+#'              distributions = list("rnorm","rnorm","mvrnorm"),
+#'              covariances = list(0.1,0.1,matrix(c(1,0.1,0.1,1),2,2))
+#' )
+#'  
+#'} 
+pick_val_v_2 <- function(base,
+                         psa,
+                         sens,
+                         psa_ind = psa_bool,
+                         sens_ind = sens_bool,
+                         indicator,
+                         indicator_psa = NULL,
+                         names_out=NULL,
+                         indicator_sens_binary = TRUE,
+                         sens_iterator = NULL,
+                         distributions = NULL,
+                         covariances = NULL
+){
+  
+  output <- list()
+  
+  if(indicator_sens_binary == FALSE & sens_ind == TRUE){ #if the indicators for the sensitivity analyses are not 0/1 but instead a list of integers (elements of parameters)
+    
+    if(is.null(sens_iterator)|is.null(distributions)){
+      stop("sens_iterator nor distributions arguments cannot be NULL if indicator_sens_binary argument is FALSE. sens_indicator should take the value of the corresponding DSA/scenario iterator")
+    }
+    
+    if(psa_ind){
+      temp_data <- psa #preassign base value
+    }else{
+      temp_data <- base #preassign base value
+    }
+    output <- temp_data #preassign base value
+    
+    
+    #Iterate over each parameter, check which elements are active in the current iterator, then check if an adjustment needs to be done 
+    for (i in 1:length(base)) {
+      ind <- indicator[[i]]==sens_iterator
+      
+      if(sum(ind)==0){next}
+      
+      #If not mvrnorm or dirichlet, just update relevant value and leave remaining as they are 
+      #Adjustment to mvrnorm or dirichlet is needed only if sum of parameters that need adjustment is < than length of elements in parameter
+      if(!distributions[[i]] %in% c("mvrnorm","rdirichlet") | sum(ind)==length(temp_data[[i]])){
+        output[[i]][ind] <- sens[[i]][ind] 
+        
+      } else if(distributions[[i]]=="mvrnorm"){
+        #If distribution is mvrnorm, recalculate remaining values using conditional
+        output[[i]] <- conditional_mvn(temp_data[[i]], covariances[[i]], which(ind), sens[[i]][ind], full_output = TRUE)[[1]]
+        
+      } else { 
+        #If distribution is dirichlet, recalculate remaining values using conditional
+        output[[i]] <- conditional_dirichlet(temp_data[[i]], which(ind), sens[[i]][ind], full_output = TRUE)[[1]]
+      }
+    }
+    
+  } else{ #If using old approach of single parameters being changed simultaneously
+    
+    if ((any(!indicator %in% c(0,1)) & indicator_sens_binary == TRUE) | (!psa_ind %in% c(0,1)) | (!sens_ind %in% c(0,1)) ) {
+      stop("Indicator, psa_ind or sens_ind are not FALSE/TRUE (or 0/1)")
+    }
+    
+    len_ind <- length(indicator)
+    
+    if (is.null(indicator_psa)) {
+      indicator_psa <- rep(1,len_ind)
+    }else{
+      if(len_ind != length(indicator_psa)){
+        stop("Length of indicator vector is different than length of indicator_psa")
+      }
+    }
+    
+    #if the parameter is out of the dsa/scenario specific iteration, or not in DSA/scenario, use PSA/normal. 
+    for (it in 1:len_ind) {
+      output[[it]] <-  if (indicator[it]==0 | sens_ind==F ) { 
+        if (psa_ind==T & indicator_psa[it]==1) {
+          psa[[it]]
+        } else {
+          base[[it]]
+        }
+      } else {#If active, use DSA if DSA and scenario if scenario
+        sens[[it]]
+      } 
+    }
+    
+  }
+  
+  if (!is.null(names_out)) {
+    names(output) <- names_out
+  }
+  
+  return(output)
+} 
 
 
 # Add item/parameter to list --------------------------------------------------------

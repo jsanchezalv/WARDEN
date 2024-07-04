@@ -494,7 +494,7 @@ rpoisgamma <- function(n, rate, theta=NULL, obs_time=1, t_reps, seed=NULL,return
 #' i <- 1:2  # Index of the known parameter
 #' xi <- c(1.2,2.3)  # Known value of the first parameter
 #'
-#'result <- conditional_mvn(mu, Sigma, i, xi,full_output = TRUE)
+#'conditional_mvn(mu, Sigma, i, xi,full_output = TRUE)
 
 conditional_mvn <- function(mu, Sigma, i, xi, full_output = FALSE) {
   
@@ -560,7 +560,7 @@ conditional_mvn <- function(mu, Sigma, i, xi, full_output = FALSE) {
 #' xi <- 0.5  # Known value of the second parameter
 #' 
 #' # Compute the conditional alpha parameters with full output
-#' alpha_full <- conditional_dirichlet(alpha, i, xi, full_output = TRUE)
+#' conditional_dirichlet(alpha, i, xi, full_output = TRUE)
 
 conditional_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
   
