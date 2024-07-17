@@ -601,7 +601,7 @@ compute_outputs <- function(patdata,input_list) {
     list_patdata <- c(list_patdata,unlist(map(map(patdata,arm_i),"evtlist"), recursive = FALSE))
   }  
   
-  # rm(patdata)
+  rm(patdata)
 
   #We exclude the extra data the user described that has a length > 1 (e.g., a matrix) from the data.table
   #as there could be matrices or other objects not suitable for data.table
@@ -627,7 +627,7 @@ compute_outputs <- function(patdata,input_list) {
   
   patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata2,fill=TRUE)))
   
-  # rm(list_patdata2)
+  rm(list_patdata2)
   
   #Extract only extra data that the user wants to export
   export_list_ipd <- lapply(list_patdata,function(x) x[data_export_aslist])
@@ -652,16 +652,21 @@ compute_outputs <- function(patdata,input_list) {
                  )
   patdata_dt[,(cols_init):=0]
   
+
   for (cat in input_list$uc_lists$ongoing_inputs) {
-    #Set final observation to be considered as an update
-    set(patdata_dt, i = patdata_dt[,.I[.N],by=.(pat_id, arm)][['V1']], j = paste0(cat,"_lastupdate"), value = 1)
-    #Updated values are kept
-    patdata_dt[get(paste0(cat,"_lastupdate")) == 1, value_new := get(cat)]
-    #Other values are overrwritten backwards
-    patdata_dt[, value_new := zoo::na.locf(value_new,fromLast=TRUE), by=.(pat_id, arm)]
-    patdata_dt[, paste0(cat) := value_new]
-    patdata_dt[, value_new := NULL]
-    patdata_dt[, paste0(paste0(cat,"_lastupdate")) := NULL]
+    cat_lastupdate <- paste0(cat, "_lastupdate")
+
+    # Calculate last observation index and set the last update flag in one step
+    patdata_dt[patdata_dt[, .I[.N], by = .(pat_id, arm)]$V1, (cat_lastupdate) := 1L]
+
+    # Keep updated values and fill NA values backwards within each group
+    patdata_dt[, (cat) := {
+      value_new <- ifelse(get(cat_lastupdate) == 1, get(cat), NA_real_)
+      zoo::na.locf(value_new, fromLast = TRUE, na.rm = FALSE)
+    }, by = .(pat_id, arm)]
+
+    # Remove the last update flag column
+    patdata_dt[, (cat_lastupdate) := NULL]
   }
   
   if(!is.null(input_list$timed_freq)){
@@ -815,6 +820,8 @@ compute_outputs <- function(patdata,input_list) {
       final_output[[output_i]][[arm_i]] <- temp[[length(temp)]][[output_i]]
     }
   }
+  
+  rm(list_patdata)
   
   final_out_sorted <- names(final_output)[!names(final_output) %in% vector_total_outputs]
   order_final_output <- c(vector_total_outputs,final_out_sorted[order(final_out_sorted)])

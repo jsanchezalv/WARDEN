@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculator_f.R
 \name{conditional_dirichlet}
 \alias{conditional_dirichlet}
-\title{Calculate conditional multivariate normal values}
+\title{Calculate conditional dirichlet values}
 \usage{
 conditional_dirichlet(alpha, i, xi, full_output = FALSE)
 }
@@ -11,7 +11,7 @@ conditional_dirichlet(alpha, i, xi, full_output = FALSE)
 
 \item{i:}{index of the known parameter (1-based index)}
 
-\item{xi:}{known value of the i-th parameter}
+\item{xi:}{known value of the i-th parameter (should be >0)}
 
 \item{full_output:}{boolean indicating whether to return the full list of parameters}
 }
@@ -19,10 +19,10 @@ conditional_dirichlet(alpha, i, xi, full_output = FALSE)
 List of length 2, one with new mu and other with covariance parameters
 }
 \description{
-Calculate conditional multivariate normal values
+Calculate conditional dirichlet values
 }
 \details{
-Function to compute conditional multivariate normal values
+Function to compute conditional dirichlet values
 }
 \examples{
 alpha <- c(2, 3, 4)

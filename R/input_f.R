@@ -170,124 +170,6 @@ pick_psa <- function(f,...){
   })
 }
 
-# Select which values to apply --------------------------------------------------------
-#' Select which values should be applied in the corresponding loop for several values (vector or list).
-#'
-#' @param base Value if no PSA/DSA/Scenario
-#' @param psa Value if PSA
-#' @param sens Value if DSA/Scenario
-#' @param psa_ind Boolean whether PSA is active
-#' @param sens_ind Boolean whether Scenario/DSA is active
-#' @param indicator Indicator which checks whether the specific parameter/parameters is/are active in the DSA or Scenario loop 
-#' @param indicator_psa Indicator which checks whether the specific parameter/parameters is/are active in the PSA loop.
-#'  If NULL, it's assumed to be a vector of 1s of length equal to length(indicator)
-#' @param names_out Names to give the output list
-#'
-#' @return List used for the inputs
-#' @export
-#' 
-#' @details
-#' This function can be used with vectors or lists, but will always return a list.
-#' Lists should be used when correlated variables are introduced to make sure the selector knows how to choose among those
-#'
-#' @examples
-#' \dontrun{
-#' pick_val_v(base = c(0,0),
-#'            psa =c(rnorm(1,0,0.1),rnorm(1,0,0.1)),
-#'            sens = c(2,3),
-#'            psa_ind = TRUE,
-#'            sens_ind = FALSE,
-#'            indicator=c(1,0)
-#'            )
-#'            
-#' pick_val_v(base = c(0,0),
-#' psa =c(rnorm(1,0,0.1),rnorm(1,0,0.1)),
-#' sens = c(2,3),
-#' psa_ind = TRUE,
-#' sens_ind = TRUE,
-#' indicator=c(1,0),
-#' indicator_psa=c(0,1)
-#' )
-#' pick_val_v(base = list(2,3,c(1,2)),
-#'            psa =lapply(1:3,
-#'                        function(x) eval(call(
-#'                          c("rnorm","rnorm","mvrnorm")[[x]],
-#'                          1,
-#'                          c(c(2,3),list(c(1,2)))[[x]],
-#'                          c(c(0.1,0.1),list(matrix(c(1,0.1,0.1,1),2,2)))[[x]]
-#'                        ))),
-#'            sens = list(2,3,c(1,2)),
-#'            psa_ind = TRUE,
-#'            sens_ind = FALSE,
-#'            indicator=list(1,0,0),
-#'            names_out=c("util","util2","correlated_vector")
-#' )
-#' 
-#' pick_val_v(base        = df_par[,"base_value"],
-#'            psa         = sapply(1:nrow(df_par), function(x)
-#'                            eval(call(df_par[x,"PSA_dist"],1,df_par[x,"a"],df_par[x,"b"]))),
-#'            sens        = df_par[,sensitivity_names[sens_sel]],
-#'            psa_ind     = TRUE, sens_ind = FALSE,
-#'            indicator   = indicators,
-#'            names_out   = df_par[,"parameter_name"]
-#'            )
-#'            
-#'  pick_val_v(
-#'   base = c(0,0),
-#'   psa =c(rnorm(1,0,0.1),rnorm(1,0,0.1)),
-#'   sens = c(2,3),
-#'   psa_ind = TRUE,
-#'   sens_ind = TRUE,
-#'   indicator=create_indicators(sens=1,n_sensitivity=2,n_elem = 2)
-#'  )
-#'  
-#' }
-pick_val_v <- function(base,
-                       psa,
-                       sens,
-                       psa_ind = psa_bool,
-                       sens_ind = sens_bool,
-                       indicator,
-                       indicator_psa = NULL,
-                       names_out=NULL
-){
-
-
-  if ((any(!indicator %in% c(0,1))) | (!psa_ind %in% c(0,1)) | (!sens_ind %in% c(0,1)) ) {
-    stop("Indicator, psa_ind or sens_ind are not FALSE/TRUE (or 0/1)")
-  }
-  
-  len_ind <- length(indicator)
-  
-  if (is.null(indicator_psa)) {
-    indicator_psa <- rep(1,len_ind)
-  }else{
-    if(len_ind != length(indicator_psa)){
-      stop("Length of indicator vector is different than length of indicator_psa")
-    }
-  }
-  
-  output <- list()
-    #if the parameter is out of the dsa/scenario specific iteration, or not in DSA/scenario, use PSA/normal. 
-  for (it in 1:len_ind) {
-    output[[it]] <-  if (indicator[it]==0 | sens_ind==F ) { 
-      if (psa_ind==T & indicator_psa[it]==1) {
-        psa[[it]]
-        } else {
-          base[[it]]
-          }
-      } else {#If active, use DSA if DSA and scenario if scenario
-        sens[[it]]
-      } 
-  }
-  
-  if (!is.null(names_out)) {
-    names(output) <- names_out
-  }
-    
-  return(output)
-}
-
 
 # Select which values to apply --------------------------------------------------------
 #' Select which values should be applied in the corresponding loop for several values (vector or list).
@@ -316,7 +198,7 @@ pick_val_v <- function(base,
 #'
 #' @examples
 #' \dontrun{
-#' pick_val_v_2(base = list(0,0),
+#' pick_val_v(base = list(0,0),
 #'              psa =list(rnorm(1,0,0.1),rnorm(1,0,0.1)),
 #'              sens = list(2,3),
 #'              psa_ind = FALSE,
@@ -327,7 +209,7 @@ pick_val_v <- function(base,
 #'              distributions = list("rnorm","rnorm")
 #' )
 #' 
-#' pick_val_v_2(base = list(2,3,c(1,2)),
+#' pick_val_v(base = list(2,3,c(1,2)),
 #'              psa =sapply(1:3,
 #'                          function(x) eval(call(
 #'                            c("rnorm","rnorm","mvrnorm")[[x]],
@@ -347,7 +229,7 @@ pick_val_v <- function(base,
 #' )
 #'  
 #'} 
-pick_val_v_2 <- function(base,
+pick_val_v <- function(base,
                          psa,
                          sens,
                          psa_ind = psa_bool,

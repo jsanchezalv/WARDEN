@@ -540,11 +540,11 @@ conditional_mvn <- function(mu, Sigma, i, xi, full_output = FALSE) {
   }
 }
 
-#' Calculate conditional multivariate normal values
+#' Calculate conditional dirichlet values
 #'
 #' @param alpha: mean vector
 #' @param i: index of the known parameter (1-based index)
-#' @param xi: known value of the i-th parameter
+#' @param xi: known value of the i-th parameter (should be >0)
 #' @param full_output: boolean indicating whether to return the full list of parameters
 #' 
 #' @return List of length 2, one with new mu and other with covariance parameters
@@ -552,7 +552,7 @@ conditional_mvn <- function(mu, Sigma, i, xi, full_output = FALSE) {
 #' @export
 #' 
 #' @details
-#'Function to compute conditional multivariate normal values
+#'Function to compute conditional dirichlet values
 #'
 #' @examples
 #' alpha <- c(2, 3, 4)
@@ -565,6 +565,8 @@ conditional_mvn <- function(mu, Sigma, i, xi, full_output = FALSE) {
 conditional_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
   
   if(length(alpha)==length(i)){stop("Trying to condition on all parameters")}
+  if(sum(xi) > 1){stop("Sum of xi should be <= 1")}
+  if(any(xi < 0)){stop("At least one xi is negative, and should be >=0")}
   
   # Create index vectors
   all_indices <- 1:length(alpha)
