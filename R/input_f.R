@@ -298,7 +298,7 @@ pick_val_v <- function(base,
     
     #if the parameter is out of the dsa/scenario specific iteration, or not in DSA/scenario, use PSA/normal. 
     for (it in 1:len_ind) {
-      output[[it]] <-  if (indicator[it]==0 | sens_ind==F ) { 
+      output[[it]] <-  if (indicator[[it]][1]==0 | sens_ind==F ) { 
         if (psa_ind==T & indicator_psa[it]==1) {
           psa[[it]]
         } else {
