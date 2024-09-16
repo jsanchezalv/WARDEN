@@ -11,6 +11,7 @@
 #' @importFrom purrr map
 #' @importFrom purrr map_dbl
 #' @importFrom data.table rbindlist
+#' @importFrom progressr progressor
 #'
 #' @keywords internal
 
@@ -32,8 +33,14 @@ run_engine <- function(arm_list,
   patdata <- vector("list", length=npats) # empty list with npats elements
 
   temp_log_pt <- list()
+
+    
+  pb <- progressr::progressor(10) 
+  
   for (i in 1:npats) {
     set.seed(i*simulation)
+    if(i %% ceiling(npats / 10) == 0 | i == npats){pb(sprintf("Simulation %g", simulation))}
+    
     #Create empty pat data for each arm
     this_patient <- list()
     input_list_pt <- c(input_list,list(i=i))

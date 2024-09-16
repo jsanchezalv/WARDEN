@@ -32,6 +32,7 @@
 #' @importFrom future plan
 #' @importFrom future multisession
 #' @importFrom foreach foreach
+#' @importFrom progressr with_progress
 #'
 #' @export
 #' 
@@ -307,6 +308,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     # Outer loop, repeat for each patient
     exported_items <- unique(c("input_list_sens",ls(.GlobalEnv),ls(parent.env(environment())),ls(environment())))
     options(future.rng.onMisuse = "ignore")
+    
+    progressr::with_progress({  
     output_sim[[sens]] <- foreach(simulation = 1:n_sim,
                          # .options.future = list(seed = TRUE),
                          .options.future = list(packages = .packages()),
@@ -393,7 +396,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       return(list(final_output))
       
       print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
-    }
+     }
+    }, enable=TRUE) 
     
 
     print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))

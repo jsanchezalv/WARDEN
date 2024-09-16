@@ -27,7 +27,8 @@
 #' @param debug If TRUE, will generate a log file
 #'
 #' @return A list of data frames with the simulation results
-#'
+#' @importFrom progressr with_progress
+#' 
 #' @export
 #' @details This function is slightly different from `run_sim_parallel`.
 #' `run_sim_parallel` only runs multiple-core at the simulation level.
@@ -298,7 +299,8 @@ run_sim <- function(arm_list=c("int","noint"),
 
 # Simulation loop ---------------------------------------------------------
 
-
+    progressr::with_progress({  
+      
     for (simulation in 1:n_sim) {
       print(paste0("Simulation number: ",simulation))
       
@@ -374,7 +376,8 @@ run_sim <- function(arm_list=c("int","noint"),
   
       print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
     }
-    
+  }, enable=TRUE) 
+
     print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
   }

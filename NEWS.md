@@ -1,3 +1,9 @@
+# RDICE 0.92
+*Progress bar added for both parallel and standard computing model
+
+# RDICE 0.91
+* Debug mode exports a txt file
+
 # RDICE 0.9
 * Warning, this commit will change previous results. 
 * Sensitivity-level and simulaton-level seeds have been moved outside the input loading loop as this caused correlation between inputs loaded at those stages. 

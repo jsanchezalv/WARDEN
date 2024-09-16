@@ -1,6 +1,6 @@
 Package: RDICE
 Title: Discrete Event Simulation for Cost-Effectiveness Modelling
-Version: 0.91
+Version: 0.92
 Authors@R: 
     c(person(given = "Javier",
            family = "Sanchez Alvarez",
@@ -41,6 +41,7 @@ Imports:
     flexsurv,
     MASS,
     parallel,
-    zoo
+    zoo,
+    progressr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
