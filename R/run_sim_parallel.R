@@ -33,6 +33,8 @@
 #' @importFrom future multisession
 #' @importFrom foreach foreach
 #' @importFrom progressr with_progress
+#' @importFrom progressr handlers
+#' @importFrom progressr handler_progress
 #'
 #' @export
 #' 
@@ -309,6 +311,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     exported_items <- unique(c("input_list_sens",ls(.GlobalEnv),ls(parent.env(environment())),ls(environment())))
     options(future.rng.onMisuse = "ignore")
     
+    progressr::handlers(progressr::handler_progress())
     progressr::with_progress({  
     output_sim[[sens]] <- foreach(simulation = 1:n_sim,
                          # .options.future = list(seed = TRUE),

@@ -39,7 +39,9 @@ run_engine <- function(arm_list,
   
   for (i in 1:npats) {
     set.seed(i*simulation)
-    if(i %% ceiling(npats / 10) == 0 | i == npats){pb(sprintf("Simulation %g", simulation))}
+    if(i %% ceiling(npats / 10) == 0 | i == npats){
+      pb(sprintf("Simulation %g", simulation))
+      }
     
     #Create empty pat data for each arm
     this_patient <- list()

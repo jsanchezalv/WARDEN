@@ -28,6 +28,8 @@
 #'
 #' @return A list of data frames with the simulation results
 #' @importFrom progressr with_progress
+#' @importFrom progressr handlers
+#' @importFrom progressr handler_progress
 #' 
 #' @export
 #' @details This function is slightly different from `run_sim_parallel`.
@@ -298,7 +300,7 @@ run_sim <- function(arm_list=c("int","noint"),
     input_list_sens <- input_list_sens[!duplic]
 
 # Simulation loop ---------------------------------------------------------
-
+    progressr::handlers(progressr::handler_progress())
     progressr::with_progress({  
       
     for (simulation in 1:n_sim) {
