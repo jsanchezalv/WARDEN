@@ -174,6 +174,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   
   output_sim <- list()
   
+  log_list <- list()
+  
   start_time <-  proc.time()
   
   # Analysis loop ---------------------------------------------------------
@@ -275,6 +277,24 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
         input_list_sens <- c(input_list_sens,list.sensitivity_inputs)
         }
       }
+      
+      if(input_list_sens$debug){ 
+        names_sens_input <- names(sensitivity_inputs)
+        prev_value <- setNames(vector("list", length(sensitivity_inputs)), names_sens_input)
+        dump_info <- list(
+          list(
+            prev_value = prev_value,
+            cur_value  = input_list_sens[names_sens_input]
+          )
+        )
+        
+        names(dump_info) <- paste0("Analysis: ", input_list_sens$sens,
+                                   "; Structural"
+        )
+        
+        log_list <- c(log_list,dump_info)
+      }
+      
     }
     
     #Make sure there are no duplicated inputs in the model, if so, take the last one
@@ -319,6 +339,25 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
           input_list <- c(input_list,list.common_all_inputs)
           }
         }
+        
+        if(input_list_sens$debug){ 
+          names_all_input <- names(common_all_inputs)
+          prev_value <- setNames(vector("list", length(common_all_inputs)), names_all_input)
+          prev_value[names_all_input] <- input_list_sens[names_all_input]
+          dump_info <- list(
+            list(
+              prev_value = prev_value,
+              cur_value  = input_list[names_all_input]
+            )
+          )
+          
+          names(dump_info) <- paste0("Analysis: ", input_list$sens,
+                                     "; Sim: ", input_list$sim,
+                                     "; Statics"
+          )
+          
+          log_list <- c(log_list,dump_info)
+        }
       }
   
       #Make sure there are no duplicated inputs in the model, if so, take the last one
@@ -344,6 +383,12 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       }
       
       final_output <- c(list(sensitivity_name = sens_name_used), final_output)
+      
+      if(input_list$debug){
+        final_output$log_list <- c(log_list,final_output$log_list)
+        
+        export_log(final_output$log_list,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+      }
       
       return(list(final_output))
       

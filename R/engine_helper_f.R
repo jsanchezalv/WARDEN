@@ -263,7 +263,7 @@ interval_out <- function(output_sim, element,round_digit=2) {
 #'
 #' @param debug_data List with each of the events in the debug mode
 #'
-#' @return Retrasnformed debug data
+#' @return Transformed debug data
 #'
 #'
 #' @keywords internal
@@ -286,6 +286,65 @@ transform_debug <- function(debug_data) {
   return(new_event)
 }
 
+# Helper function to export debug log to a txt file
+
+#' Helper function to export debug log to a txt file
+#' 
+#' @param log_list name of the debug list object to be exported
+#' @param log_name name of the file to be exported to (e.g., "log_list.txt")
+#' @param main_byline description
+#' 
+#' @return None, writes txt called log_name
+#' 
+#' @keywords internal
+#' @noRd
+
+export_log <- function(log_list, log_name, main_byline = FALSE) {
+  
+  file_conn <- file(log_name)
+  
+  # Precompute the total number of lines for efficiency
+  log_size <- sum(sapply(log_list, function(sublist) {
+    length(sublist) * 3 + 2  # Each sublist key has 3 lines (key, prev_value, cur_value) + 2 extra lines for header and blank
+  }))
+  
+  output_lines <- character(log_size)
+  
+  line_index <- 1
+  
+  # Loop through the list and construct the data to be written
+  for (main_key in names(log_list)) {
+    # Handle the main key header
+    if (main_byline) {
+      header_parts <- unlist(strsplit(main_key, "; "))
+      output_lines[line_index] <- paste0(header_parts, collapse = "\n")
+    } else {
+      output_lines[line_index] <- main_key
+    }
+    line_index <- line_index + 1
+    
+    # Handle the second-level key-value pairs (each containing prev_value and cur_value)
+    sublist <- log_list[[main_key]]
+    for (sub_key in names(sublist)) {
+      output_lines[line_index] <- paste0("   ", sub_key)
+      line_index <- line_index + 1
+      
+      # Add prev_value and cur_value indented under the sub_key
+      output_lines[line_index] <- paste0("     prev_value = ", sublist[[sub_key]]$prev_value)
+      line_index <- line_index + 1
+      output_lines[line_index] <- paste0("     cur_value  = ", sublist[[sub_key]]$cur_value)
+      line_index <- line_index + 1
+    }
+    
+    # Add a blank line after each block
+    output_lines[line_index] <- ""
+    line_index <- line_index + 1
+  }
+  
+  writeLines(output_lines, file_conn)
+  
+  close(file_conn)
+}
 
 
 # Compute and Format outputs for specific timepoints -------------------------

@@ -52,6 +52,27 @@ run_engine <- function(arm_list,
         input_list_pt <- c(input_list_pt,list.common_pt_inputs)
         }
       }
+      
+      if(input_list$debug){ 
+        names_pt_input <- names(common_pt_inputs)
+        prev_value <- setNames(vector("list", length(common_pt_inputs)), names_pt_input)
+        prev_value[names_pt_input] <- input_list[names_pt_input]
+        dump_info <- list(
+          list(
+            prev_value = prev_value,
+            cur_value  = input_list_pt[names_pt_input]
+          )
+        )
+        
+        names(dump_info) <- paste0("Analysis: ", input_list_pt$sens,
+                                   "; Sim: ", input_list_pt$sim,
+                                   "; Patient: ", input_list_pt$i,
+                                   "; Initial Patient Conditions"
+        )
+        
+        temp_log_pt <- c(temp_log_pt,dump_info)
+      }
+      
     }
 
     #Make sure there are no duplicated inputs in the model, if so, take the last one
@@ -84,7 +105,26 @@ run_engine <- function(arm_list,
           }
           input_list_arm <- c(input_list_arm,list.unique_pt_inputs)
           }
+        }
+        
+        if(input_list_pt$debug){ 
+          names_pt_input <- names(unique_pt_inputs)
+          prev_value <- setNames(vector("list", length(unique_pt_inputs)), names_pt_input)
+          prev_value[names_pt_input] <- input_list_pt[names_pt_input]
+          dump_info <- list(
+            list(
+              prev_value = prev_value,
+              cur_value  = input_list_arm[names_pt_input]
+            )
+          )
 
+          names(dump_info) <- paste0("Analysis: ", input_list_arm$sens,
+                                     "; Sim: ", input_list_arm$sim,
+                                     "; Patient: ", input_list_arm$i,
+                                     "; Initial Patient-Arm Conditions"
+          )
+          
+          temp_log <- c(temp_log,dump_info)
         }
       }
 
