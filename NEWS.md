@@ -1,3 +1,7 @@
+# RDICE 0.9
+* Warning, this commit will change previous results. 
+* Sensitivity-level and simulaton-level seeds have been moved outside the input loading loop as this caused correlation between inputs loaded at those stages. 
+
 # RDICE 0.5
 
 * Initial set-up of news file

@@ -250,11 +250,11 @@ run_sim <- function(arm_list=c("int","noint"),
                        log_list = list()
                       )
     
+    set.seed(sens)
     
     # Draw Common parameters  -------------------------------
     if(!is.null(sensitivity_inputs)){
       for (inp in 1:length(sensitivity_inputs)) {
-        set.seed(sens)
         list.sensitivity_inputs <- lapply(sensitivity_inputs[inp],function(x) eval(x, input_list_sens))
         
         #If using pick_eval_v or other expressions, the lists are not deployed, so this is necessary to do so
@@ -284,10 +284,11 @@ run_sim <- function(arm_list=c("int","noint"),
       
       input_list <- c(input_list_sens,list(simulation=simulation))
       
+      set.seed(simulation)
+      
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
         for (inp in 1:length(common_all_inputs)) {
-          set.seed(simulation)
           list.common_all_inputs <- lapply(common_all_inputs[inp],function(x) eval(x, input_list))
           #If using pick_eval_v or other expressions, the lists are not deployed, so this is necessary to do so
           if(any(is.null(names(list.common_all_inputs)), names(list.common_all_inputs)=="") & length(list.common_all_inputs)==1) {
