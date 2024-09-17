@@ -35,11 +35,11 @@ run_engine <- function(arm_list,
   temp_log_pt <- list()
 
     
-  pb <- progressr::progressor(10) 
+  pb <- progressr::progressor(50) 
   
   for (i in 1:npats) {
     set.seed(i*simulation)
-    if(i %% ceiling(npats / 10) == 0 | i == npats){
+    if(i %% ceiling(npats / 50) == 0 | i == npats){
       pb(sprintf("Simulation %g", simulation))
       }
     
