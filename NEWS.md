@@ -1,5 +1,10 @@
 # RDICE 0.92
-*Progress bar added for both parallel and standard computing model
+* Progress bar added for both parallel and standard computing model
+* To use progress bar while in batch mode for a quarto document, make sure to add in the knitr options 
+knitr:
+  opts_chunk:
+    R.options:
+      progressr.enable: true
 
 # RDICE 0.91
 * Debug mode exports a txt file
