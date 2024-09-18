@@ -315,8 +315,6 @@ rresgompertz <- function(n=1,shape,rate,lower_bound,seed=NULL){
 #'
 #' @return Estimate(s) from the restricted Gompertz distribution based on given parameters
 #'
-#' @importFrom stats runif
-#'
 #' @export
 #'
 #' @examples
@@ -338,7 +336,6 @@ qresgompertz <- function(rnd=0.5,shape,rate,lower_bound){
 #'
 #' @return Estimate(s) from the restricted Gompertz distribution based on given parameters
 #'
-#' @importFrom stats runif
 #'
 #' @export
 #'
@@ -590,4 +587,60 @@ conditional_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
     # Return only the conditional alpha parameters
     return(alpha_cond)
   }
+}
+
+#' Conditional quantile function for weibull distribution 
+#'
+#' @param rnd Vector of quantiles
+#' @param shape The shape parameter
+#' @param scale The scale parameter
+#' @param lower_bound The lower bound to be used (current time)
+#'
+#' @return Estimate(s) from the conditional weibull distribution based on given parameters
+#'
+#' @export
+#'
+#' @examples
+#' conditional_qweibull(rnd = 0.5,shape = 1,scale = 1,lower_bound = 1)
+conditional_qweibull <- function(rnd = 0.5, shape, scale, lower_bound) {
+  (lower_bound^shape + -log(1-rnd)/scale)^(1/shape) - lower_bound
+}
+
+#' Conditional quantile function for loglogistic distribution 
+#'
+#' @param rnd Vector of quantiles
+#' @param shape The shape parameter
+#' @param scale The scale parameter
+#' @param lower_bound The lower bound to be used (current time)
+#'
+#' @return Estimate(s) from the conditional loglogistic distribution based on given parameters
+#'
+#' @export
+#'
+#' @examples
+#' conditional_qllogis(rnd = 0.5,shape = 1,scale = 1,lower_bound = 1)
+conditional_qllogis <- function(rnd = 0.5, shape, scale, lower_bound) {
+  ((scale^shape + lower_bound^shape)/(1-rnd) - scale^shape )^(1/shape)- lower_bound
+}
+
+#' Conditional quantile function for lognormal distribution 
+#'
+#' @param rnd Vector of quantiles
+#' @param meanlog The meanlog parameter
+#' @param sdlog The sdlog parameter
+#' @param lower_bound The lower bound to be used (current time)
+#'
+#' @importFrom stats plnorm
+#'
+#' @return Estimate(s) from the conditional lognormal distribution based on given parameters
+#'
+#' @export
+#'
+#' @examples
+#' conditional_qlnorm(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1)
+conditional_qlnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound) {
+  
+  s_obs <- 1 - plnorm(q = lower_bound, meanlog, sdlog)
+  
+  exp(meanlog + sdlog * qnorm(1 - s_obs * (1-rnd))) - lower_bound
 }
