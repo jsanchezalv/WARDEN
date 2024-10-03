@@ -820,8 +820,8 @@ add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
 #'  condq = FALSE) #different results
 #' 
 #' #Unconditional approach, timepoint of change is 25,
-#'  parameter goes from 0.02 at time 10 to 0.025 to 0.015 at time 25,
-#'   starting luck is 0.37
+#' # parameter goes from 0.02 at time 10 to 0.025 to 0.015 at time 25,
+#' #  starting luck is 0.37
 #' new_luck <- luck_adj(prevsurv = 1 - pweibull(q=10,3,1/0.02),
 #'  cursurv = 1 - pweibull(q=10,3,1/0.025),
 #'  luck = 0.37,
