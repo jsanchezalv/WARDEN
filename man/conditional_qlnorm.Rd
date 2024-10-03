@@ -4,7 +4,7 @@
 \alias{conditional_qlnorm}
 \title{Conditional quantile function for lognormal distribution}
 \usage{
-conditional_qlnorm(rnd = 0.5, meanlog, sdlog, lower_bound)
+conditional_qlnorm(rnd = 0.5, meanlog, sdlog, lower_bound, s_obs)
 }
 \arguments{
 \item{rnd}{Vector of quantiles}
@@ -14,6 +14,9 @@ conditional_qlnorm(rnd = 0.5, meanlog, sdlog, lower_bound)
 \item{sdlog}{The sdlog parameter}
 
 \item{lower_bound}{The lower bound to be used (current time)}
+
+\item{s_obs}{is the survival observed up to lower_bound time,
+normally defined from time 0 as 1 - plnorm(q = lower_bound, meanlog, sdlog) but may be different if parametrization has changed previously}
 }
 \value{
 Estimate(s) from the conditional lognormal distribution based on given parameters

@@ -9,9 +9,9 @@ conditional_qweibull(rnd = 0.5, shape, scale, lower_bound)
 \arguments{
 \item{rnd}{Vector of quantiles}
 
-\item{shape}{The shape parameter}
+\item{shape}{The shape parameter as in R stats package weibull}
 
-\item{scale}{The scale parameter}
+\item{scale}{The scale parameter as in R stats package weibull}
 
 \item{lower_bound}{The lower bound to be used (current time)}
 }
@@ -22,5 +22,5 @@ Estimate(s) from the conditional weibull distribution based on given parameters
 Conditional quantile function for weibull distribution
 }
 \examples{
-conditional_qweibull(rnd = 0.5,shape = 1,scale = 1,lower_bound = 1)
+conditional_qweibull(rnd = 0.5,shape = 3,scale = 66.66,lower_bound = 50)
 }

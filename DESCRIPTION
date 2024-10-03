@@ -1,6 +1,6 @@
 Package: RDICE
 Title: Discrete Event Simulation for Cost-Effectiveness Modelling
-Version: 0.92
+Version: 0.93
 Authors@R: 
     c(person(given = "Javier",
            family = "Sanchez Alvarez",

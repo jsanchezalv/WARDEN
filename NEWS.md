@@ -1,3 +1,7 @@
+# RDICE 0.93
+* Conditional quantile functions added and adjusted
+* Luck adjustment function added with instructions for user
+
 # RDICE 0.92
 * Progress bar added for both parallel and standard computing model
 * To use progress bar while in batch mode for a quarto document, make sure to add in the knitr options 
