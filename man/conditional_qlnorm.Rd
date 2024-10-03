@@ -25,5 +25,5 @@ Estimate(s) from the conditional lognormal distribution based on given parameter
 Conditional quantile function for lognormal distribution
 }
 \examples{
-conditional_qlnorm(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1)
+conditional_qlnorm(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1, s_obs=0.8)
 }

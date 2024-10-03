@@ -29,7 +29,9 @@ Suggests:
     kableExtra,
     DiagrammeR,
     testthat (>= 3.0.0),
-    survminer
+    survminer,
+    survival,
+    flexsurvPlus
 Imports: 
     purrr,
     data.table,
@@ -40,7 +42,6 @@ Imports:
     utils,
     flexsurv,
     MASS,
-    parallel,
     zoo,
     progressr
 VignetteBuilder: knitr

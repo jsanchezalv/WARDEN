@@ -469,11 +469,11 @@ rpoisgamma <- function(n, rate, theta=NULL, obs_time=1, t_reps, seed=NULL,return
 
 #' Calculate conditional multivariate normal values
 #'
-#' @param mu: mean vector
-#' @param Sigma: covariance matrix
-#' @param i: index of the known parameter (1-based index)
-#' @param xi: known value of the i-th parameter
-#' @param full_output: boolean indicating whether to return the full list of parameters
+#' @param mu mean vector
+#' @param Sigma covariance matrix
+#' @param i index of the known parameter (1-based index)
+#' @param xi known value of the i-th parameter
+#' @param full_output boolean indicating whether to return the full list of parameters
 #' 
 #' @return List of length 2, one with new mu and other with covariance parameters
 #'
@@ -539,10 +539,10 @@ conditional_mvn <- function(mu, Sigma, i, xi, full_output = FALSE) {
 
 #' Calculate conditional dirichlet values
 #'
-#' @param alpha: mean vector
-#' @param i: index of the known parameter (1-based index)
-#' @param xi: known value of the i-th parameter (should be >0)
-#' @param full_output: boolean indicating whether to return the full list of parameters
+#' @param alpha mean vector
+#' @param i index of the known parameter (1-based index)
+#' @param xi known value of the i-th parameter (should be >0)
+#' @param full_output boolean indicating whether to return the full list of parameters
 #' 
 #' @return List of length 2, one with new mu and other with covariance parameters
 #'
@@ -653,14 +653,14 @@ conditional_qllogis <- function(rnd = 0.5, shape, scale, lower_bound) {
 #' @param s_obs is the survival observed up to lower_bound time,
 #'  normally defined from time 0 as 1 - plnorm(q = lower_bound, meanlog, sdlog) but may be different if parametrization has changed previously
 #'
-#' @importFrom stats plnorm
+#' @importFrom stats qnorm
 #'
 #' @return Estimate(s) from the conditional lognormal distribution based on given parameters
 #'
 #' @export
 #'
 #' @examples
-#' conditional_qlnorm(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1)
+#' conditional_qlnorm(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1, s_obs=0.8)
 
 conditional_qlnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound, s_obs) {
   
@@ -677,7 +677,7 @@ conditional_qlnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound, s_obs) {
 #' @param s_obs is the survival observed up to lower_bound time,
 #'  normally defined from time 0 as 1 - pnorm(q = lower_bound, mean, sd) but may be different if parametrization has changed previously
 #'
-#' @importFrom stats pnorm
+#' @importFrom stats qnorm
 #'
 #' @return Estimate(s) from the conditional normal distribution based on given parameters
 #'

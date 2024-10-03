@@ -8,7 +8,7 @@ output:
     toc: true
     toc_float: true
 vignette: >
-  %\VignetteIndexEntry{example_ssd}
+  %\VignetteIndexEntry{example_ssd_stream}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

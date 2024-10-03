@@ -33,17 +33,49 @@ which makes this approach computationally more efficient.
 This function can also work with vectors, which could allow to update multiple lucks in a single approach, and it can preserve names
 }
 \examples{
-luck_adj(prevsurv = 0.8, cursurv = 0.7, luck = 0.5, condq = TRUE)
-luck_adj(prevsurv = c(1,0.8,0.7), cursurv = c(0.7,0.6,0.5), luck = setNames(c(0.5,0.6,0.7),c("A","B","C")), condq = TRUE)
-luck_adj(prevsurv = 0.8, cursurv = 0.7, luck = 0.5, condq = FALSE) #different results
+luck_adj(prevsurv = 0.8,
+ cursurv = 0.7,
+ luck = 0.5,
+ condq = TRUE)
+ 
+luck_adj(prevsurv = c(1,0.8,0.7),
+ cursurv = c(0.7,0.6,0.5),
+ luck = setNames(c(0.5,0.6,0.7),c("A","B","C")),
+ condq = TRUE)
+ 
+luck_adj(prevsurv = 0.8,
+ cursurv = 0.7,
+ luck = 0.5,
+ condq = FALSE) #different results
 
-#Unconditional approach, timepoint of change is 25, parameter goes from 0.02 at time 10 to 0.025 to 0.015 at time 25, starting luck is 0.37
-new_luck <- luck_adj(prevsurv = 1 - pweibull(q=10,3,1/0.02), cursurv = 1 - pweibull(q=10,3,1/0.025), luck = 0.37, condq = FALSE) #time 10 change
-new_luck <- luck_adj(prevsurv = 1 - pweibull(q=25,3,1/0.025), cursurv = 1 - pweibull(q=25,3,1/0.015), luck = new_luck, condq = FALSE) #time 25 change
+#Unconditional approach, timepoint of change is 25,
+ parameter goes from 0.02 at time 10 to 0.025 to 0.015 at time 25,
+  starting luck is 0.37
+new_luck <- luck_adj(prevsurv = 1 - pweibull(q=10,3,1/0.02),
+ cursurv = 1 - pweibull(q=10,3,1/0.025),
+ luck = 0.37,
+ condq = FALSE) #time 10 change
+ 
+new_luck <- luck_adj(prevsurv = 1 - pweibull(q=25,3,1/0.025),
+ cursurv = 1 - pweibull(q=25,3,1/0.015),
+ luck = new_luck,
+ condq = FALSE) #time 25 change
+ 
 qweibull(new_luck, 3, 1/0.015) #final TTE 
 
-#Conditional quantile approach, 
-new_luck <- luck_adj(prevsurv = 1-pweibull(q=0,3,1/0.02), cursurv = 1- pweibull(q=10,3,1/0.02), luck = 0.37, condq = TRUE) #time 10 change, previous time is 0 so prevsurv will be 1
-new_luck <- luck_adj(prevsurv = 1-pweibull(q=10,3,1/0.025), cursurv = 1- pweibull(q=25,3,1/0.025), luck = new_luck, condq = TRUE) #time 25 change
-conditional_qweibull(rnd = new_luck, shape = 3, scale = 0.015^3, lower_bound = 25) + 25 #final TTE
+#Conditional quantile approach 
+new_luck <- luck_adj(prevsurv = 1-pweibull(q=0,3,1/0.02),
+ cursurv = 1- pweibull(q=10,3,1/0.02),
+ luck = 0.37,
+ condq = TRUE) #time 10 change, previous time is 0 so prevsurv will be 1
+ 
+new_luck <- luck_adj(prevsurv = 1-pweibull(q=10,3,1/0.025),
+ cursurv = 1- pweibull(q=25,3,1/0.025),
+ luck = new_luck,
+ condq = TRUE) #time 25 change
+ 
+conditional_qweibull(rnd = new_luck,
+ shape = 3,
+ scale = 0.015^3,
+ lower_bound = 25) + 25 #final TTE
 }

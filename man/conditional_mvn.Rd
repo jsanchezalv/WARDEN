@@ -7,15 +7,15 @@
 conditional_mvn(mu, Sigma, i, xi, full_output = FALSE)
 }
 \arguments{
-\item{mu:}{mean vector}
+\item{mu}{mean vector}
 
-\item{Sigma:}{covariance matrix}
+\item{Sigma}{covariance matrix}
 
-\item{i:}{index of the known parameter (1-based index)}
+\item{i}{index of the known parameter (1-based index)}
 
-\item{xi:}{known value of the i-th parameter}
+\item{xi}{known value of the i-th parameter}
 
-\item{full_output:}{boolean indicating whether to return the full list of parameters}
+\item{full_output}{boolean indicating whether to return the full list of parameters}
 }
 \value{
 List of length 2, one with new mu and other with covariance parameters

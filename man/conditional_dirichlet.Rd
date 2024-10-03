@@ -7,13 +7,13 @@
 conditional_dirichlet(alpha, i, xi, full_output = FALSE)
 }
 \arguments{
-\item{alpha:}{mean vector}
+\item{alpha}{mean vector}
 
-\item{i:}{index of the known parameter (1-based index)}
+\item{i}{index of the known parameter (1-based index)}
 
-\item{xi:}{known value of the i-th parameter (should be >0)}
+\item{xi}{known value of the i-th parameter (should be >0)}
 
-\item{full_output:}{boolean indicating whether to return the full list of parameters}
+\item{full_output}{boolean indicating whether to return the full list of parameters}
 }
 \value{
 List of length 2, one with new mu and other with covariance parameters
