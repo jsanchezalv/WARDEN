@@ -592,27 +592,27 @@ conditional_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
 #' Conditional quantile function for exponential distribution 
 #'
 #' @param rnd Vector of quantiles
-#' @param shape The shape parameter
-#' @param scale The scale parameter
-#' @param lower_bound The lower bound to be used (current time)
+#' @param rate The rate parameter
+#' 
+#' Note taht the conditional quantile for an exponential is independent of time due to constant hazard
 #'
 #' @return Estimate(s) from the conditional exponential distribution based on given parameters
 #'
 #' @export
 #'
 #' @examples
-#' conditional_qexp(rnd = 0.5,rate = 3,lower_bound = 1)
+#' conditional_qexp(rnd = 0.5,rate = 3)
 
-conditional_qexp <- function(rnd = 0.5, rate, lower_bound) {
-  -log(1-rnd)/rate - lower_bound
+conditional_qexp <- function(rnd = 0.5, rate) {
+  -log(1-rnd)/rate
 }
 
 
 #' Conditional quantile function for weibull distribution 
 #'
 #' @param rnd Vector of quantiles
-#' @param shape The shape parameter
-#' @param scale The scale parameter
+#' @param shape The shape parameter as in R stats package weibull
+#' @param scale The scale parameter as in R stats package weibull
 #' @param lower_bound The lower bound to be used (current time)
 #'
 #' @return Estimate(s) from the conditional weibull distribution based on given parameters
@@ -620,10 +620,10 @@ conditional_qexp <- function(rnd = 0.5, rate, lower_bound) {
 #' @export
 #'
 #' @examples
-#' conditional_qweibull(rnd = 0.5,shape = 3,scale = 0.02,lower_bound = 1)
+#' conditional_qweibull(rnd = 0.5,shape = 3,scale = 66.66,lower_bound = 50)
 
 conditional_qweibull <- function(rnd = 0.5, shape, scale, lower_bound) {
-  (lower_bound^shape - log(1-rnd)/scale)^(1/shape) - lower_bound
+  (lower_bound^shape - log(1-rnd)*scale^shape)^(1/shape) - lower_bound
 }
 
 #' Conditional quantile function for loglogistic distribution 
@@ -650,6 +650,8 @@ conditional_qllogis <- function(rnd = 0.5, shape, scale, lower_bound) {
 #' @param meanlog The meanlog parameter
 #' @param sdlog The sdlog parameter
 #' @param lower_bound The lower bound to be used (current time)
+#' @param s_obs is the survival observed up to lower_bound time,
+#'  normally defined from time 0 as 1 - plnorm(q = lower_bound, meanlog, sdlog) but may be different if parametrization has changed previously
 #'
 #' @importFrom stats plnorm
 #'
@@ -660,9 +662,55 @@ conditional_qllogis <- function(rnd = 0.5, shape, scale, lower_bound) {
 #' @examples
 #' conditional_qlnorm(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1)
 
-conditional_qlnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound) {
-  
-  s_obs <- 1 - plnorm(q = lower_bound, meanlog, sdlog)
+conditional_qlnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound, s_obs) {
   
   exp(meanlog + sdlog * qnorm(1 - s_obs * (1-rnd))) - lower_bound
+}
+
+
+#' Conditional quantile function for normal distribution 
+#'
+#' @param rnd Vector of quantiles
+#' @param mean The mean parameter
+#' @param sd The sd parameter
+#' @param lower_bound The lower bound to be used (current time)
+#' @param s_obs is the survival observed up to lower_bound time,
+#'  normally defined from time 0 as 1 - pnorm(q = lower_bound, mean, sd) but may be different if parametrization has changed previously
+#'
+#' @importFrom stats pnorm
+#'
+#' @return Estimate(s) from the conditional normal distribution based on given parameters
+#'
+#' @export
+#'
+#' @examples
+#' conditional_qnorm(rnd = 0.5, mean = 1,sd = 1,lower_bound = 1, s_obs=0.8)
+
+conditional_qnorm <- function(rnd = 0.5, mean,sd, lower_bound, s_obs) {
+
+  qnorm(1 - s_obs*(1-rnd),mean,sd) - lower_bound
+}
+
+
+#' Conditional quantile function for gamma distribution 
+#'
+#' @param rnd Vector of quantiles
+#' @param rate The rate parameter
+#' @param shape The shape parameter
+#' @param lower_bound The lower bound to be used (current time)
+#' @param s_obs is the survival observed up to lower_bound time,
+#'  normally defined from time 0 as 1 - pgamma(q = lower_bound, rate, shape) but may be different if parametrization has changed previously
+#'
+#' @importFrom stats qgamma
+#'
+#' @return Estimate(s) from the conditional gamma distribution based on given parameters
+#'
+#' @export
+#'
+#' @examples
+#' conditional_qgamma(rnd = 0.5, rate = 1.06178, shape = 0.01108,lower_bound = 1, s_obs=0.8)
+
+conditional_qgamma <- function(rnd = 0.5, rate,shape, lower_bound, s_obs) {
+  
+  qgamma(1 - s_obs*(1-rnd),rate,shape) - lower_bound
 }
