@@ -344,6 +344,10 @@ extract_psa_result <- function(x, element) {
 #' @param sensitivity_used Integer signaling which sensitivity analysis to use
 #'
 #' @return A data frame with the CEAC results
+#' 
+#' @importFrom tidyr gather
+#' @importFrom magrittr %>%
+#' 
 #' @export
 #'
 #' @examples
@@ -401,6 +405,10 @@ ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 #' @param sensitivity_used Integer signaling which sensitivity analysis to use
 #'
 #' @return A data frame with the EVPI results
+#' 
+#' @importFrom tidyr gather
+#' @importFrom magrittr %>%
+#' 
 #' @export
 #'
 #' @examples

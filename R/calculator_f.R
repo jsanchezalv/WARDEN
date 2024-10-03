@@ -139,10 +139,10 @@ rdirichlet_prob <- function(n=1,alpha,se,seed=NULL) {
     alpha <- matrix(alpha, nrow = 1)
   }
   if (prod(dim(alpha)) == 0) {
-    stop2("alpha should be non-empty.")
+    stop("alpha should be non-empty.")
   }
   if (isTRUE(any(alpha < 0))) {
-    stop2("alpha must be positive.")
+    stop("alpha must be positive.")
   }
   if (n == 1) {
     out <- matrix(suppressWarnings(rgamma_mse(1, c(alpha),c(se))), ncol = ncol(alpha))
