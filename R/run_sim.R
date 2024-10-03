@@ -301,7 +301,7 @@ run_sim <- function(arm_list=c("int","noint"),
 # Simulation loop ---------------------------------------------------------
     progressr::handlers(progressr::handler_txtprogressbar(width=100))
     
-    progressr::with_progress({  
+    progressr::with_progress({
       
     for (simulation in 1:n_sim) {
       print(paste0("Simulation number: ",simulation))
@@ -378,7 +378,7 @@ run_sim <- function(arm_list=c("int","noint"),
   
       print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
     }
-  }, enable=TRUE) 
+  }, enable=TRUE)
 
     print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     

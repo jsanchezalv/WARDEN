@@ -589,6 +589,25 @@ conditional_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
   }
 }
 
+#' Conditional quantile function for exponential distribution 
+#'
+#' @param rnd Vector of quantiles
+#' @param shape The shape parameter
+#' @param scale The scale parameter
+#' @param lower_bound The lower bound to be used (current time)
+#'
+#' @return Estimate(s) from the conditional exponential distribution based on given parameters
+#'
+#' @export
+#'
+#' @examples
+#' conditional_qexp(rnd = 0.5,rate = 3,lower_bound = 1)
+
+conditional_qexp <- function(rnd = 0.5, rate, lower_bound) {
+  -log(1-rnd)/rate - lower_bound
+}
+
+
 #' Conditional quantile function for weibull distribution 
 #'
 #' @param rnd Vector of quantiles
@@ -601,9 +620,10 @@ conditional_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
 #' @export
 #'
 #' @examples
-#' conditional_qweibull(rnd = 0.5,shape = 1,scale = 1,lower_bound = 1)
+#' conditional_qweibull(rnd = 0.5,shape = 3,scale = 0.02,lower_bound = 1)
+
 conditional_qweibull <- function(rnd = 0.5, shape, scale, lower_bound) {
-  (lower_bound^shape + -log(1-rnd)/scale)^(1/shape) - lower_bound
+  (lower_bound^shape - log(1-rnd)/scale)^(1/shape) - lower_bound
 }
 
 #' Conditional quantile function for loglogistic distribution 
@@ -619,6 +639,7 @@ conditional_qweibull <- function(rnd = 0.5, shape, scale, lower_bound) {
 #'
 #' @examples
 #' conditional_qllogis(rnd = 0.5,shape = 1,scale = 1,lower_bound = 1)
+
 conditional_qllogis <- function(rnd = 0.5, shape, scale, lower_bound) {
   ((scale^shape + lower_bound^shape)/(1-rnd) - scale^shape )^(1/shape)- lower_bound
 }
@@ -638,6 +659,7 @@ conditional_qllogis <- function(rnd = 0.5, shape, scale, lower_bound) {
 #'
 #' @examples
 #' conditional_qlnorm(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1)
+
 conditional_qlnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound) {
   
   s_obs <- 1 - plnorm(q = lower_bound, meanlog, sdlog)
