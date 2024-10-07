@@ -1,3 +1,18 @@
+
+# Global variables for CRAN check -----------------------------------------
+
+if(getRversion() >= "2.15.1") {
+  utils::globalVariables(
+    c(
+      c("t_btw_evt", #rpoisgamma
+        "tte",
+        "evt_num",
+        ".id",
+        "evt_count"),
+      c("stop2") #rdirichlet
+    )) 
+}
+
 # Draw TTE -------------------------------------------------------------------------
 
 #' Draw a time to event from a list of parametric survival functions

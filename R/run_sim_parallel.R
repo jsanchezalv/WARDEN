@@ -1,3 +1,13 @@
+
+# Global variables for CRAN check -----------------------------------------
+
+if(getRversion() >= "2.15.1") {
+  utils::globalVariables(
+    c(
+      c('simulation')
+    )) 
+}
+
 #' Run simulations in parallel mode (at the simulation level)
 #'
 #' @param arm_list A vector of the names of the interventions evaluated in the simulation

@@ -1,3 +1,27 @@
+
+# Global variables for CRAN check -----------------------------------------
+
+if(getRversion() >= "2.15.1") {
+  utils::globalVariables(
+    c(
+      c('prevtime', #compute_outputs and compute_outputs_timeseq
+        'evttime',
+        '.',
+        'pat_id',
+        'arm',
+        'costs',
+        'costs_undisc',
+        'qalys',
+        'qalys_undisc',
+        'lys',
+        'lys_undisc',
+        'out',
+        'number_events',
+        'evt_arm',
+        'input_list_arm')
+    )) 
+}
+
 # Initial event list --------------------------------------------------------------------------------------------------------------------------------------
 
 #' Execute the initial time to events and separate the events from other inputs that are stored

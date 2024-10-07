@@ -1,3 +1,24 @@
+
+# Global variables for CRAN check -----------------------------------------
+
+if(getRversion() >= "2.15.1") {
+  utils::globalVariables(
+    c(
+      c('iteration',
+        'best_nmb',
+        'n',
+        'prob_best',
+        'results',
+        'iteration',
+        'mean_nmb',
+        'max_nmb',
+        'mean_max_nmb',
+        'max_mean_nmb',
+        'evpi')
+    )) 
+}
+
+
 # Summary for deterministic/last created output for specific treatment ---------------------------
 
 #' Deterministic results for a specific treatment

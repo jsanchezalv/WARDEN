@@ -1,3 +1,17 @@
+
+# Global variables for CRAN check -----------------------------------------
+
+if(getRversion() >= "2.15.1") {
+  utils::globalVariables(
+    c(
+      c('psa_bool',
+        'sens_bool',
+        'evt_arm',
+        'input_list_arm',
+        'new_event_name')
+    )) 
+}
+
 # Replicate profiles --------------------------------------------------------
 #' Replicate profiles data.frame
 #'

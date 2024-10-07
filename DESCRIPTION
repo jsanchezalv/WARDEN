@@ -21,7 +21,6 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Suggests: 
-    tidyr,
     dplyr,
     ggplot2,
     knitr,
@@ -43,6 +42,8 @@ Imports:
     flexsurv,
     MASS,
     zoo,
-    progressr
+    progressr,
+    magrittr,
+    tidyr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
