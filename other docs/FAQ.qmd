@@ -42,11 +42,15 @@ In RDICE, the engine does not constrain the event queue to contain the full even
 
 RDICE will compute automatically total LYs, total QALYs and total costs. Total QALYs and total costs are computed by by adding up the items identified as QALYs (for QALYs) and costs (for costs). Other outputs that need to be discounted (continuously or instantaneous) must be explicitly declared but will not be aggregated together.
 
-### Time of event vs. time to event
+### Random Seeds
 
 RDICE time is considered from start. This means that when a new event is generated at a given event,
 
-### Time of event vs. time to event
+### Monte Carlo Error
+
+RDICE time is considered from start. This means that when a new event is generated at a given event,
+
+### Interpretation of Luck
 
 RDICE time is considered from start. This means that when a new event is generated at a given event,
 

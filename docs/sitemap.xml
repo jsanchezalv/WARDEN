@@ -58,6 +58,30 @@
     <loc>/reference/ceac_des.html</loc>
   </url>
   <url>
+    <loc>/reference/conditional_dirichlet.html</loc>
+  </url>
+  <url>
+    <loc>/reference/conditional_mvn.html</loc>
+  </url>
+  <url>
+    <loc>/reference/conditional_qexp.html</loc>
+  </url>
+  <url>
+    <loc>/reference/conditional_qgamma.html</loc>
+  </url>
+  <url>
+    <loc>/reference/conditional_qllogis.html</loc>
+  </url>
+  <url>
+    <loc>/reference/conditional_qlnorm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/conditional_qnorm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/conditional_qweibull.html</loc>
+  </url>
+  <url>
     <loc>/reference/create_indicators.html</loc>
   </url>
   <url>
@@ -106,6 +130,9 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/luck_adj.html</loc>
+  </url>
+  <url>
     <loc>/reference/modify_event.html</loc>
   </url>
   <url>
@@ -125,6 +152,9 @@
   </url>
   <url>
     <loc>/reference/pick_val_v.html</loc>
+  </url>
+  <url>
+    <loc>/reference/presgompertz.html</loc>
   </url>
   <url>
     <loc>/reference/qbeta_mse.html</loc>
