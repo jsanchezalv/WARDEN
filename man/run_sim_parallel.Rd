@@ -30,7 +30,8 @@ run_sim_parallel(
   input_out = NULL,
   ipd = 1,
   timed_freq = NULL,
-  debug = FALSE
+  debug = FALSE,
+  accum_backwards = FALSE
 )
 }
 \arguments{
@@ -85,6 +86,8 @@ run_sim_parallel(
 \item{timed_freq}{If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)}
 
 \item{debug}{If TRUE, will generate a log file}
+
+\item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.}
 }
 \value{
 A list of lists with the analysis results
