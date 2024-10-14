@@ -49,7 +49,7 @@ The dummy data for costs and utility is generated below.
 
 ```{r load_data}
 #Utilities
-util.data <- data.frame( name = c("util.idfs.ontx" ,"util.idfs.offtx" ,"util.remission" ,"util.recurrence" ,"util.mbc.progression.mbc" ,"util.mbc.pps"),
+df_util <- data.frame( name = c("util.idfs.ontx" ,"util.idfs.offtx" ,"util.remission" ,"util.recurrence" ,"util.mbc.progression.mbc" ,"util.mbc.pps"),
                          value = c(0.75, 0.8,0.9,0.7,0.6,0.5),
                          se=rep(0.02,6),
                          stringsAsFactors = FALSE
@@ -57,7 +57,7 @@ util.data <- data.frame( name = c("util.idfs.ontx" ,"util.idfs.offtx" ,"util.rem
 
 
 #Costs
-cost.data <- data.frame( name = c("cost.idfs.tx" ,"cost.recurrence" ,"cost.mbc.tx" ,"cost.tx.beva" ,"cost.idfs.txnoint",
+df_cost <- data.frame( name = c("cost.idfs.tx" ,"cost.recurrence" ,"cost.mbc.tx" ,"cost.tx.beva" ,"cost.idfs.txnoint",
                                   "cost.idfs","cost.mbc.progression.mbc","cost.mbc.pps","cost.2ndline","cost.ae"),
                          value = c(40000,5000,3000,10000,30000,
                                    10000,20000,30000,20000,1000),
@@ -80,32 +80,27 @@ We also define here the specific utilities and costs that will be used in the mo
 #In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.
 
 #Put objects here that do not change on any patient or intervention loop
-common_all_inputs <- add_item( #utilities
-    util_v = if(psa_bool){
-                     setNames(MASS::mvrnorm(1,util.data$value,diag(util.data$se^2)),util.data$name) #in this case I choose a multivariate normal with no correlation
-             } else{setNames(util.data$value,util.data$name)},
-    util.idfs.ontx = util_v[["util.idfs.ontx"]], 
-    util.idfs.offtx  = util_v[["util.idfs.offtx"]],
-    util.remission = util_v[["util.remission"]],
-    util.recurrence = util_v[["util.recurrence"]],
-    util.mbc.progression.mbc = util_v[["util.mbc.progression.mbc"]],
-    util.mbc.pps = util_v[["util.mbc.pps"]]
-    ) %>%
-  add_item( #costs
-    cost_v = if(psa_bool){
-                     setNames(rgamma_mse(cost.data$value,cost.data$se),cost.data$name) #in this case I choose a gamma distribution
-             } else{setNames(cost.data$value,cost.data$name)},
-    cost.idfs.tx  = cost_v[["cost.idfs.tx"]],
-    cost.recurrence  = cost_v[["cost.recurrence"]],
-    cost.mbc.tx  = cost_v[["cost.mbc.tx"]],
-    cost.tx.beva  = cost_v[["cost.tx.beva"]],
-    cost.idfs.txnoint = cost_v[["cost.idfs.txnoint"]],
-    cost.idfs = cost_v[["cost.idfs"]],
-    cost.mbc.progression.mbc = cost_v[["cost.mbc.progression.mbc"]],
-    cost.mbc.pps = cost_v[["cost.mbc.pps"]],
-    cost.2ndline = cost_v[["cost.2ndline"]],
-    cost.ae = cost_v[["cost.ae"]]
-    )
+common_all_inputs <- add_item() %>%
+  add_item( #utilities
+  pick_val_v(
+    base =  df_util$value,
+    psa = MASS::mvrnorm(1,df_util$value,diag(df_util$se^2)),
+    sens = df_util$value,
+    psa_ind = psa_bool,
+    sens_ind = sensitivity_bool,
+    indicator = rep(0, nrow(df_util)),
+    names_out =df_util$name
+  ),#costs
+  pick_val_v(
+    base =  df_cost$value,
+    psa = rgamma_mse(1,df_cost$value,df_cost$se),
+    sens = df_cost$value,
+    psa_ind = psa_bool,
+    sens_ind = sensitivity_bool,
+    indicator = rep(0, nrow(df_cost)),
+    names_out =df_cost$name
+  )
+)
 #Put objects here that do not change as we loop through interventions for a patient
 common_pt_inputs <- add_item(sex_pt = ifelse(rbinom(1,1,p=0.01),"male","female"),
                              nat.os.s = rresgompertz(1,

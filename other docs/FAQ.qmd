@@ -1,6 +1,6 @@
 ---
 title: "RDICE FAQ"
-subtitle: 'Version 0.1. Made for RDICE v0.81'
+subtitle: 'Version 1.0. Made for RDICE v0.94'
 author: "Javier Sanchez Alvarez"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 bibliography: [packages.bib, references.bib]
@@ -32,7 +32,7 @@ This was created as the R DICE was designed independently from DICE, as well as 
 
 ### Time of event vs. time to event
 
-RDICE time is considered from start. This means that when a new event is generated at a given event, the elapsed time from start should be added (*curtime*). For example, if at time 1.5 a new event is created, then that new event will be defined as `modify_event(list(new_evt_name = curtime + 1))`.
+RDICE time is considered from start. This means that when a new event is generated at a given event, the elapsed time from start should be added (*curtime*). For example, if at time 1.5 a new event is created which takes place one year from now, then that new event will be defined as `modify_event(list(new_evt_name = curtime + 1))`.
 
 ### Events removed/repeated in queue vs. events always exist only once
 
@@ -40,18 +40,32 @@ In RDICE, the engine does not constrain the event queue to contain the full even
 
 ### Explicitly declaring QALYs, Costs and Other discounted outputs
 
-RDICE will compute automatically total LYs, total QALYs and total costs. Total QALYs and total costs are computed by by adding up the items identified as QALYs (for QALYs) and costs (for costs). Other outputs that need to be discounted (continuously or instantaneous) must be explicitly declared but will not be aggregated together.
+RDICE will compute automatically total LYs, total QALYs and total costs, both discounted and undiscounted. Total QALYs and total costs are computed by adding up the items identified as QALYs (for QALYs) and costs (for costs). Other outputs that need to be discounted (continuously or instantaneous) must be explicitly declared as such but will not be aggregated together.
 
-### Random Seeds
+### Random Seeds, Monte Carlo Error and Probabilistic DSA
 
-RDICE time is considered from start. This means that when a new event is generated at a given event,
+All the DICE tools use a specific set of random seeds to ensure outcomes are replicable across the different engines (ROLL, EviDICE, pyDICE). The starting seed set in DICE is a L'Ecuyer seed set as value 123456 (6 times) in each simulation. RDICE uses a L'Ecuyer seed, but does not force the starting seed to be the same value as in DICE. There are a few reasons for that:
 
-### Monte Carlo Error
+1\) DICE does not include Monte Carlo Sampling Error. This means that if one runs a PSA with no parametric uncertainty, no sampling uncertainty would be included (all the simulations would give the same value). RDICE does include this type of uncertainty, which requires the starting seed to change at each simulation. Values will be replicable over runs, as at each simulation i the seed is always set to a specific value.
 
-RDICE time is considered from start. This means that when a new event is generated at a given event,
+2\) RDICE allows to run probabilistic DSA analysis. This means that a seed must be set also for the potential structural parameters that change only on different iterations of the DSA.
+
+3\) RDICE has two type of engines: a parallel engine, and a single core engine. While handling of the seed is straightforward in a single core engine, it's harder to control explicitly in a parallel engine.
 
 ### Interpretation of Luck
 
-RDICE time is considered from start. This means that when a new event is generated at a given event,
+In DICE, luck is interpreted as the "lack of luck", i.e., a high value (e.g., 0.99) implies an almost immediate time to event, while RDICE is aligned with the R way of interpreting "luck", so high luck would imply long time to events.
+
+### Language
+
+DICE uses its own type of pseudolanguage, which can differ from what RDICE uses. The process in RDICE is always "set inputs in their correct loading order (sensitivity, simulation, common for all arms, specific patient-arm), set reactions to events, set initial time to events, determine type of outcomes, and execute main function". Please make sure to review the existing examples and function documentation to understand how to use these functions.
 
 # Things to be aware of
+
+### Backward vs Forward Accumulation of Continuous Outcomes
+
+Continuous outcomes in DICE at Evidera follow a "backward" approach to their accumulation, i.e., the value set for a continuous outcome at event X is applied backwards until the last previous time that outcome was updated. For example, if the previous time it was updated was time 2, and now we update it at time 5, it will apply the value set at time 5 between 2 and 5. RDICE allows for an alternative approach to be implemented, in which the value set at event X is applied forward until the next event. This implies a more "intuitive" approach to how outcomes are implemented, as they work in the same way as any other conditions.
+
+The change in terms of implementations means that if o_q is the accumulator, which is o_q = utility, and utility value changes at event X, in the backward approach one would set 1) o_q = utility (previous value of utility), and then 2) utility = new_value. Instead, in the forward approach one would set 1) utility = new_value, 2) o_q = utility (reversing the order).
+
+This option can be modified in the `run_sim` and `run_sim_parallel` functions.
