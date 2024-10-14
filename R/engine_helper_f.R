@@ -140,8 +140,10 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
     input_list_arm[input_list_arm$uc_lists$instant_inputs] <- 0
   }
   
-  if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
-    input_list_arm[paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate")] <- 0
+  if(input_list_arm$accum_backwards){
+    if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
+      input_list_arm[paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate")] <- 0
+    }
   }
   
 
@@ -310,6 +312,54 @@ transform_debug <- function(debug_data) {
   return(new_event)
 }
 
+#Expand events for time frequency approach
+
+#' Helper function to export debug log to a txt file
+#' 
+#' @param row row to apply function to
+#' @param time_points time points to use
+#' @param reset_columns Columns that need reset (instantaneous)
+#' 
+#' @return Expanded datatable
+#' 
+#' @keywords internal
+#' @noRd
+
+expand_event <- function(row, time_points, reset_columns) {
+  
+  evttime <- row$evttime
+  nexttime <- row$nexttime
+  
+  # Get time_points that fall between evttime and nexttime
+  relevant_timepoints <- time_points[time_points > evttime & time_points < nexttime]
+  
+  # Combine the start (evttime), end (nexttime), and time_points in between
+  start_times <- c(evttime, relevant_timepoints)
+  end_times <- c(relevant_timepoints, nexttime)
+
+  # Create expanded rows
+  expanded <- rbindlist(lapply(seq_along(start_times), function(i) {
+    # Copy the row and modify the evttime/nexttime
+    new_row <- copy(row)
+    new_row$evttime <- start_times[i]
+    new_row$nexttime <- end_times[i]
+    new_row$time_points <- time_points[i]
+    
+    # If not the first occurrence, reset specified columns to 0
+    if (i > 1) {
+      for (col in reset_columns) {
+        new_row[[col]] <- 0
+        new_row[[paste0(col,"_","undisc")]] <- 0
+      }
+    }
+    
+    return(new_row)
+  }))
+  
+  return(expanded)
+}
+
+
 # Helper function to export debug log to a txt file
 
 #' Helper function to export debug log to a txt file
@@ -370,6 +420,128 @@ export_log <- function(log_list, log_name, main_byline = FALSE) {
   close(file_conn)
 }
 
+# Helper function to expand events over time frequency in a fast way for backward accumulation
+
+#'  Helper function to expand events over time frequency in a fast way for backward accumulation
+#' 
+#' @param data name of the debug list object to be exported
+#' @param time_points Time points used for the frequency expansion
+#' @param reset_columns Column names to be reset after first occurence, normally instantaneous variables
+#' 
+#' @return expanded data.table dataset
+#' 
+#' @keywords internal
+#' @noRd
+expand_evts_bwd <- function(data, time_points, reset_columns = NULL) {
+  # Ensure data is a data.table
+  setDT(data)
+  
+  data[,evt_id := .I]
+  
+  # Get the relevant time_points for each evttime and prevtime, vectorized
+  relevant_timepoints <- lapply(1:nrow(data), function(i) {
+    time_points[time_points < data$evttime[i] & time_points > data$prevtime[i]]
+  })
+  
+  # Create start_times and end_times based on prevtime, relevant time_points, and evttime
+  start_times <- mapply(c, data$prevtime, relevant_timepoints)
+  end_times <- mapply(c, relevant_timepoints,data$evttime)
+  
+  num_expanded_rows <- lengths(start_times)
+  
+  # Replicate rows according to the number of expanded time intervals
+  expanded_data <- data[rep(seq_len(nrow(data)), num_expanded_rows), ]
+  
+  # Assign the flattened start_times and end_times back to evttime and prevtime
+  expanded_data[, evttime := unlist(end_times)]
+  expanded_data[, prevtime := unlist(start_times)]
+  
+  max_time <- max(time_points)
+  # Add the time_points column (rounded up to the nearest time point)
+  expanded_data[, time_points := ceiling(evttime)]
+  expanded_data[time_points > max_time, time_points := max_time]
+  
+  # Reset specified columns for all but the first expanded row for each original row
+  if (!is.null(reset_columns)) {
+    reset_columns_undisc <- paste0(reset_columns, "_undisc")
+    columns_to_reset <- c(reset_columns, reset_columns_undisc)
+    
+    # Create a vector indicating which rows are the last in their expanded series
+    is_last_expansion <- rep(FALSE,nrow(expanded_data))
+    is_last_expansion[cumsum(num_expanded_rows)] <- TRUE
+    
+    is_last_expansion <- sequence(num_expanded_rows) == num_expanded_rows
+    
+    # Reset the specified columns for all non-last expanded rows
+    expanded_data[!is_last_expansion, (columns_to_reset) := 0, with = FALSE]
+  }
+  
+  # Make sure prevtime doesn't exceed evttime
+  expanded_data[, prevtime := pmin(prevtime, evttime)]
+  
+  setorder(expanded_data, pat_id, arm, evttime, evt_id)
+  
+  return(expanded_data)
+}
+
+# Helper function to expand events over time frequency in a fast way for forward accumulation
+
+#'  Helper function to expand events over time frequency in a fast way for forward accumulation
+#' 
+#' @param data name of the debug list object to be exported
+#' @param time_points Time points used for the frequency expansion
+#' @param reset_columns Column names to be reset after first occurence, normally instantaneous variables
+#' 
+#' @return expanded data.table dataset
+#' 
+#' @keywords internal
+#' @noRd
+expand_evts_fwd <- function(data, time_points, reset_columns = NULL) {
+  # Ensure data is a data.table
+  setDT(data)
+  
+  data[,evt_id := .I]
+  
+  # Get the relevant time_points for each evttime and nexttime, vectorized
+  relevant_timepoints <- lapply(1:nrow(data), function(i) {
+    time_points[time_points > data$evttime[i] & time_points < data$nexttime[i]]
+  })
+  
+  # Create start_times and end_times based on evttime, relevant time_points, and nexttime
+  start_times <- mapply(c, data$evttime, relevant_timepoints)
+  end_times <- mapply(c, relevant_timepoints, data$nexttime)
+  
+  num_expanded_rows <- lengths(start_times)
+  
+  # Replicate rows according to the number of expanded time intervals
+  expanded_data <- data[rep(seq_len(nrow(data)), num_expanded_rows), ]
+  
+  expanded_data[, evttime     := unlist(start_times)]
+  expanded_data[, nexttime    := unlist(end_times)]
+  
+  max_time <- max(time_points)
+  # Add the time_points column (rounded up to the nearest time point)
+  expanded_data[, time_points := ceiling(evttime)]
+  expanded_data[time_points > max_time, time_points := max_time]
+
+  # Reset specified columns for all but the first expanded row for each original row
+  if (!is.null(reset_columns)) {
+    reset_columns_undisc <- paste0(reset_columns, "_undisc")
+    columns_to_reset <- c(reset_columns, reset_columns_undisc)
+    
+    # Create a vector indicating which rows are the first in their expanded series
+    is_first_expansion <- sequence(num_expanded_rows) == 1
+    
+    expanded_data[!is_first_expansion, (columns_to_reset) := 0, with = FALSE]
+  }
+  
+  expanded_data[, prevtime := shift(evttime, fill = 0), by = .(pat_id, arm)]
+  
+  setorder(expanded_data, pat_id, arm, evttime, evt_id)
+  
+  return(expanded_data)
+}
+
 
 # Compute and Format outputs for specific timepoints -------------------------
 
@@ -426,35 +598,13 @@ compute_outputs_timseq <- function(freq,
                                            time_points = rep(rep(time_points,length(unique(patdata_dt$pat_id))),length(unique(patdata_dt$arm))))
   
   
-  final_filtered <- patdata_dt[evttime <= time_points[1]][,time_points:= time_points[1]]
-  #Loop over the timepoints, and get the relevant events that apply to that timepoint, for events whose previous time is below threshold (so overflow to another timepoint),
-  #make sure that we don't over count values if their previoustime is exactly at some threshold, e.g., prevtime 2 to threshold 2, and make sure to remove their instantaneous values
-  #Then get also all events that are contained within the timepoint
-  for (i in 2:length(time_points)) {
-    
-    temp_data1 <- patdata_dt[evttime > time_points[i], .SD[which.min(evttime)], by = .(pat_id,arm)][ #[prevtime<time_points[i-1]] [prevtime!=time_points[i-1]]
-      ,evttime:=time_points[i]][
-        ,prevtime:=pmax(prevtime,time_points[i-1])][evttime!=time_points[i-1]]
-    
-    #I need to remove instantaneous from temp1 to avoid double counting
-    for (cat in input_list$uc_lists$instant_inputs) {
-      temp_data1[,paste0(cat,"_","undisc") := 0]
-      temp_data1[,paste0(cat) := 0]
-    }
-    
-    temp_data2 <- patdata_dt[evttime <= time_points[i] & evttime > time_points[i-1]][
-      ,prevtime:=ifelse(.I[1] & prevtime < time_points[i-1],time_points[i-1], prevtime), by = .(pat_id,arm)]
-    
-    temp_data <- rbindlist(
-      list(temp_data1,
-           temp_data2),use.names=TRUE
-    )[,time_points:= time_points[i]]
-    
-    final_filtered <- rbindlist(list(final_filtered, temp_data),use.names=TRUE)
+  if(input_list$accum_backwards){
+    final_filtered <- expand_evts_bwd(patdata_dt, time_points, input_list$uc_lists$instant_inputs)
+  }else{
+    final_filtered <- expand_evts_fwd(patdata_dt, time_points, input_list$uc_lists$instant_inputs)
   }
   
-  setorder(final_filtered, pat_id, arm, evttime)
-  
+
   # Discounting of Outcomes-------------------------------------------------------------
   
   #Discount and undiscount ongoing
@@ -463,13 +613,13 @@ compute_outputs_timseq <- function(freq,
     
     
     final_filtered[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
-                                                               lclprvtime=prevtime,
-                                                               lclcurtime=evttime,
+                                                               lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
+                                                               lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                                lclval=get(cat))]
     
     final_filtered[,paste0(cat) := disc_ongoing_v(lcldr=input_list$drc,
-                                                  lclprvtime=prevtime,
-                                                  lclcurtime=evttime,
+                                                  lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
+                                                  lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                   lclval=get(cat))]
     
     if(cat %in% input_list$uc_lists$cost_categories_ongoing){
@@ -511,16 +661,16 @@ compute_outputs_timseq <- function(freq,
   #Discount and undiscount cycle
   for (cat in input_list$uc_lists$cycle_inputs) {
     final_filtered[,paste0(cat,"_","undisc") := disc_cycle_v(lcldr=0,
-                                                             lclprvtime=prevtime,
+                                                             lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                              cyclelength = get(paste0(cat,"_","cycle_l")),
-                                                             lclcurtime=evttime,
+                                                             lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                              lclval= get(cat),
                                                              starttime = get(paste0(cat,"_","cycle_starttime")))] 
     
     final_filtered[,paste0(cat) := disc_cycle_v(lcldr=input_list$drc,
-                                                lclprvtime=prevtime,
+                                                lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                 cyclelength = get(paste0(cat,"_","cycle_l")),
-                                                lclcurtime=evttime,
+                                                lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                 lclval= get(cat),
                                                 starttime = get(paste0(cat,"_","cycle_starttime")))]
     
@@ -539,13 +689,13 @@ compute_outputs_timseq <- function(freq,
   
   #Discount and undiscount LYs
   final_filtered[,"lys" := disc_ongoing_v(lcldr=input_list$drq,
-                                          lclprvtime=prevtime,
-                                          lclcurtime=evttime,
+                                          lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
+                                          lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                           lclval=1)]
   
   final_filtered[,"lys_undisc" := disc_ongoing_v(lcldr=0,
-                                                 lclprvtime=prevtime,
-                                                 lclcurtime=evttime,
+                                                 lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
+                                                 lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                  lclval=1)]
   
   #Calculate total outcomes
@@ -736,21 +886,28 @@ compute_outputs <- function(patdata,input_list) {
   patdata_dt[,(cols_init):=0]
   
 
-  for (cat in input_list$uc_lists$ongoing_inputs) {
-    cat_lastupdate <- paste0(cat, "_lastupdate")
-
-    # Calculate last observation index and set the last update flag in one step
-    patdata_dt[patdata_dt[, .I[.N], by = .(pat_id, arm)]$V1, (cat_lastupdate) := 1L]
-
-    # Keep updated values and fill NA values backwards within each group
-    patdata_dt[, (cat) := {
-      value_new <- ifelse(get(cat_lastupdate) == 1, get(cat), NA_real_)
-      zoo::na.locf(value_new, fromLast = TRUE, na.rm = FALSE)
-    }, by = .(pat_id, arm)]
-
-    # Remove the last update flag column
-    patdata_dt[, (cat_lastupdate) := NULL]
-  }
+  if(input_list$accum_backwards){ #if accumulating backwards, need to rewrite values
+  
+    for (cat in input_list$uc_lists$ongoing_inputs) {
+      cat_lastupdate <- paste0(cat, "_lastupdate")
+  
+      # Calculate last observation index and set the last update flag in one step
+      patdata_dt[patdata_dt[, .I[.N], by = .(pat_id, arm)]$V1, (cat_lastupdate) := 1L]
+  
+      # Keep updated values and fill NA values backwards within each group
+      patdata_dt[, (cat) := {
+        value_new <- ifelse(get(cat_lastupdate) == 1, get(cat), NA_real_)
+        zoo::na.locf(value_new, fromLast = TRUE, na.rm = FALSE)
+      }, by = .(pat_id, arm)]
+  
+      # Remove the last update flag column
+      patdata_dt[, (cat_lastupdate) := NULL]
+    }
+  
+  } else{
+    patdata_dt[, nexttime:=data.table::shift(evttime,fill=0,n=-1L)]
+    patdata_dt[, nexttime := ifelse(nexttime<evttime,evttime,nexttime)]
+    }
   
   if(!is.null(input_list$timed_freq)){
   timed_outputs <- compute_outputs_timseq(input_list$timed_freq,
@@ -768,13 +925,13 @@ compute_outputs <- function(patdata,input_list) {
   for (cat in input_list$uc_lists$ongoing_inputs) {
 
     patdata_dt[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
-                                                                        lclprvtime=prevtime,
-                                                                        lclcurtime=evttime,
+                                                                        lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
+                                                                        lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                                         lclval=get(cat))]
     
     patdata_dt[,paste0(cat) := disc_ongoing_v(lcldr=input_list$drc,
-                                                                 lclprvtime=prevtime,
-                                                                 lclcurtime=evttime,
+                                                                 lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
+                                                                 lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                                  lclval=get(cat))]
 
     if(cat %in% input_list$uc_lists$cost_categories_ongoing){
@@ -816,16 +973,16 @@ compute_outputs <- function(patdata,input_list) {
   #Discount and undiscount cycle
   for (cat in input_list$uc_lists$cycle_inputs) {
     patdata_dt[,paste0(cat,"_","undisc") := disc_cycle_v(lcldr=0,
-                                                                    lclprvtime=prevtime,
+                                                                    lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                                     cyclelength = get(paste0(cat,"_","cycle_l")),
-                                                                    lclcurtime=evttime,
+                                                                    lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                                     lclval= get(cat),
                                                                     starttime = get(paste0(cat,"_","cycle_starttime")))] 
     
     patdata_dt[,paste0(cat) := disc_cycle_v(lcldr=input_list$drc,
-                                                             lclprvtime=prevtime,
+                                                             lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                              cyclelength = get(paste0(cat,"_","cycle_l")),
-                                                             lclcurtime=evttime,
+                                                             lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                              lclval= get(cat),
                                                              starttime = get(paste0(cat,"_","cycle_starttime")))]
     
@@ -844,13 +1001,13 @@ compute_outputs <- function(patdata,input_list) {
   
   #Discount and undiscount LYs
   patdata_dt[,"lys" := disc_ongoing_v(lcldr=input_list$drq,
-                                      lclprvtime=prevtime,
-                                      lclcurtime=evttime,
+                                      lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
+                                      lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                       lclval=1)]
   
   patdata_dt[,"lys_undisc" := disc_ongoing_v(lcldr=0,
-                                             lclprvtime=prevtime,
-                                             lclcurtime=evttime,
+                                             lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
+                                             lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                              lclval=1)]
   
   #Calculate total outcomes

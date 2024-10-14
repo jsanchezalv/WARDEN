@@ -596,7 +596,9 @@ modify_item <- function(list_item){
   
   input_list_arm[names(list_item)] <- lapply(list_item, unname)
   
+  if(input_list_arm$accum_backwards){
   input_list_arm[paste0(names(list_item),"_lastupdate",recycle0=TRUE)] <- 1
+  }
   
   list2env(list_item,envir = parent.frame())
   assign("input_list_arm",input_list_arm, envir = parent.frame())
@@ -669,7 +671,10 @@ modify_item_seq <- function(...){
   
   list2env(list_out,envir = parent.frame())
   
+  if(input_list_arm$accum_backwards){
   input_list_arm[paste0(names(input_list),"_lastupdate",recycle0=TRUE)] <- 1
+  }
+  
   assign("input_list_arm",input_list_arm, envir = parent.frame())
   
 }

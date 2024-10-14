@@ -36,6 +36,7 @@ if(getRversion() >= "2.15.1") {
 #' @param ipd Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
+#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
 #'
 #' @return A list of lists with the analysis results
 #' @importFrom doFuture `%dofuture%`
@@ -121,7 +122,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                              input_out = NULL,
                              ipd = 1,
                              timed_freq = NULL,
-                             debug = FALSE){
+                             debug = FALSE,
+                             accum_backwards = FALSE){
   
   
   # Set-up basics -----------------------------------------------------------
@@ -271,6 +273,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        sens_name_used = sens_name_used,
                        timed_freq = timed_freq,
                        debug = debug,
+                       accum_backwards = accum_backwards,
                        log_list = list()
                       )
     

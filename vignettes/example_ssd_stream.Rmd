@@ -76,9 +76,8 @@ common_pt_inputs <- add_item(substream_sick   = parallel::nextRNGSubStream(.Rand
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
 unique_pt_inputs <- add_item(fl.sick = 1,
-                             q_default = 1,
-                             c_default = 0
-                             ) 
+                             q_default = util.sick,
+                             c_default = cost.sick + if(arm=="int"){cost.int}else{0}) 
 
 ```
 
@@ -144,14 +143,14 @@ evt_react_list <-
                input = {}) %>%
   add_reactevt(name_evt = "sicker",
                input = {
-                 modify_item(list(q_default = util.sick * fl.sick + util.sicker * (1-fl.sick),
-                                  c_default = cost.sick * fl.sick + cost.sicker * (1-fl.sick) + if(arm=="int"){cost.int * fl.sick }else{0},
+                 modify_item(list(q_default = util.sicker,
+                                  c_default = cost.sicker + if(arm=="int"){cost.int}else{0},
                                   fl.sick = 0)) 
                }) %>%
   add_reactevt(name_evt = "death",
                input = {
-                 modify_item(list(q_default = util.sick * fl.sick + util.sicker * (1-fl.sick),
-                                  c_default = cost.sick * fl.sick + cost.sicker * (1-fl.sick) + if(arm=="int"){cost.int * fl.sick }else{0}, 
+                 modify_item(list(q_default = 0,
+                                  c_default = 0, 
                                   curtime = Inf)) 
                }) 
 

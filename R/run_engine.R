@@ -179,9 +179,14 @@ run_engine <- function(arm_list,
           input_list_arm <- react_evt(Evt, arm, input_list_arm)
           
           #Get extra objects to be exported
+          
+          if(input_list$accum_backwards){
           extra_data <- input_list_arm[c(input_list_arm$input_out,
                                          paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate",recycle0 = TRUE)
                                          )]
+          }else{
+            extra_data <- input_list_arm[c(input_list_arm$input_out)]
+          }
           extra_data <- extra_data[!sapply(extra_data,is.null)]
  
               this_patient[[arm]]$evtlist[[n_evt]] <- c(evtname = Evt$evt ,
