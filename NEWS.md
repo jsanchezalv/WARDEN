@@ -1,3 +1,6 @@
+# RDICE 0.94
+* Added possibility of accumulating outputs continuously backward or forward using the accum_backward option in run_sim and run_sim_parallel
+
 # RDICE 0.93
 * Conditional quantile functions added and adjusted
 * Luck adjustment function added with instructions for user
