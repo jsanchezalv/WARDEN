@@ -7,6 +7,8 @@ output:
     number_sections: true
     toc: true
     toc_float: true
+    embed-resources: true
+    self-contained-math: true
 vignette: >
   %\VignetteIndexEntry{example_eBC}
   %\VignetteEngine{knitr::rmarkdown}
@@ -24,16 +26,14 @@ knitr::opts_chunk$set(
 # Introduction
 This document runs a discrete event simulation model in the context of early breast cancer to show how the functions can be used to generate a model in only a few steps.
 
-When running a DES, it's important to consider speed. Simulation based models can be computationally expensive, which means that using efficient coding can have a substantial impact on performance. Because the model is using parallel computing, in order to debug the model one can simply use browser() where needed and set the number of patients to be simulated equal to 1.
+When running a DES, it's important to consider speed. Simulation based models can be computationally expensive, which means that using efficient coding can have a substantial impact on performance.
 
 ## Main options
 ```{r setup}
 library(RDICE)
 
-library(dplyr)
 library(purrr)
-library(tidyr)
-library(flexsurv)
+library(dplyr)
 library(ggplot2)
 library(kableExtra)
 
@@ -247,7 +247,7 @@ init_event_list <-
 ```
 
 ## Add Reaction to Those Events
-Once the initial times of the events have been defined, we also need to declare how events react and affect each other. To do so, we use the `evt_react_list` object and the `add_reactevt` function. This function just needs to state which event is affected and the actual reaction (usually setting flags to 1 or 0, or creating new/adjusting events). This example contains the addition of a number of events (e.g. adverse events) based on a Poisson distribution and also the modification of a specific event (e.g. modifying the time to death by subtracting 1.5 months from it for each adverse event).
+Once the initial times of the events have been defined, we also need to declare how events react and affect each other. To do so, we use the `evt_react_list` object and the `add_reactevt` function. This function just needs to state which event is affected, and the actual reaction (usually setting flags to 1 or 0, or creating new/adjusting events).
 
 There are a series of objects that can be used in this context to help with the reactions. Apart from the global objects and flags defined above, we can also use `curtime` for the current event time, `prevtime` for the time of the previous event, `cur_evtlist` for the named vector of events that is yet to happen for that patient, `arm` for the current treatment in the loop, `evt` for the current event being processed, `i` expresses the patient iteration, and `simulation` the specific simulation (relevant when the number of simulations is greater than 1). Furthermore, one can also call any other input/item that has been created before or create new ones. For example, we could even modify a cost/utility item by changing it directly, e.g. through `modify_item(list(cost.idfs.tx=500))`.
 
@@ -257,26 +257,30 @@ Item | What does it do
 `prevtime` | Time of the previous event (numeric)
 `cur_evtlist` | Named vector of events that is yet to happen for that patient (named numeric vector)
 `evt` | Current event being processed (character)
-`i` | Patient being iterated (character)
+`i` | Patient being iterated (numeric)
+`arm` | Intervention being iterated (character)
 `simulation` | Simulation being iterated (numeric)
+`sens` | Sensitivity analysis being iterated (numeric)
 
 The functions to add/modify events and inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost. So rather than use two `modify_item` with a list of one element, it's better to group them into a single `modify_item` with a list of two elements. 
 
 `new_event`allows to generate events and add them to the vector of events. It accepts more than one event. 
-`modify_event` allows to modify events (e.g. delay death). When adding an event, the name of the events and the time of the events must be defined. When using `modify_event`, one must indicate which events are affected and what are the new times of the events. If the event specified does not exist or has already occurred, it will be ignored. Note that one could potentially omit part of the modeling set in `init_event_list` and actually define new events dynamically through the reactions (we do that below for the `"ae"` event). However, this can have an impact in computation time, so if possible it's always better to use `init_event_list`.
-`modify_item` allows to modify and add items. Elements defined within this function are not evaluated sequentially (i.e. defining `modify_item(list(fl.new = 1, var1 = fl.new * 5)))` will give an error if `fl.new` was not defined outside this function).
+`modify_event` allows to modify events (e.g. delay death). When adding an event, the name of the events and the time of the events must be defined. When using `modify_event`, one must indicate which events are affected and what are the new times of the events. If the event specified does not exist or has already occurred, it will be ignored. `modify_event` with `create_if_null = TRUE` argument will also generate events if they don't exist. Note that one could potentially omit part of the modeling set in `init_event_list` and actually define new events dynamically through the reactions (we do that below for the `"ae"` event). However, this can have an impact in computation time, so if possible it's always better to use `init_event_list`.
 
-Note that `modify_item` does not evaluate sequentially. For that functionality, `modify_item_seq` can be used. This version of the function is slower, so both are left as options for the user.
+`modify_item` and `modify_item_seq`allow to modify and add items. Elements defined within this function are not evaluated sequentially in `modify_item` (i.e. defining `modify_item(list(fl.new = 1, var1 = fl.new * 5)))` will give an error if `fl.new` was not defined outside this function), while `modify_item_seq` will do it sequentially at a slightly bigger computational cost, so both are left as choices for the user. Note that one can modify costs/utilities by using the construction `type_name_category`, where type is either "qaly" or "cost", name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
 
 The list of relevant functions to be used within `add_reactevt` are:
 
 Function | What does it do | How to use it
 ------------ | ------------- | -------------
 `modify_item()` | Adds & Modifies items/flags/variables for future events | `modify_item(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))`
+`modify_item_seq()` | Adds & Modifies items/flags/variables for future events sequentially | `modify_item_seq(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))`
 `new_event()` | Adds events to the vector of events for that patient | `new_event(rep(list("ae"=curtime + 0.001),5))`
-`modify_event()` | Modifies existing events by changing their time | `modify_event(list("os"=curtime +5, "ttot"=curtime+0.0001))`
+`modify_event()` | Modifies (or creates, with `create_if_null = TRUE`) existing events by changing their time | `modify_event(list("os"=curtime +5, "ttot"=curtime+0.0001))`
 
 The model will run until `curtime` is set to `Inf`, so the event that terminates the model (in this case, `os`), should modify `curtime` and set it to `Inf`.
+
+Finally, note that there could be two different ways of accumulating continuous outcomes, backwards (i.e., in the example below, we would set q_default = util.sick at the sicker event, and modify the `q_default` value in the death event) and forwards (as in the example below). This option can be modified in the `run_sim` function using the `accum_backwards` argument, which assumes forwards by default.
 
 ```{r model_reaction}
 
@@ -533,7 +537,6 @@ We now use the data output to plot the histograms/densities of the simulation.
 ```{r post-processing_plots1, fig.width=7, fig.height=4, fig.align = 'center'}
 
 data_plot <- results[[1]][[1]]$merged_df %>%
-  # mutate(evttime = ifelse(evttime > 99, NA, evttime)) %>%
   filter(evtname != "start") %>%
   group_by(arm,evtname,simulation) %>%
   mutate(median = median(evttime)) %>%

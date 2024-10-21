@@ -58,7 +58,7 @@ if(getRversion() >= "2.15.1") {
 #' To do so, the program automatically adds a sequence from to 0 to the (number of events - 1) times 1e-10 to add to the event times when selecting the event with minimum time.
 #' This time has been selected as it's relatively small yet not so small as to be ignored by which.min (see .Machine for more details)
 #'  
-#' A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
+#' A list of protected objects that should not be used by the user as input names or in the global environment to avoid the risk of overwriting them is as follows:
 #' c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").
 #' 
 #' The engine uses the L'Ecuyer-CMRG for the random number generator.
@@ -71,7 +71,7 @@ if(getRversion() >= "2.15.1") {
 #' This means that the user does not necessarily need to keep updating the value, but only add it when the value 
 #' changes looking forward (e.g., o_q = utility at event 1, at event 2 utility does not change, but at event 3 it does, 
 #' so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically 
-#' look back until event 1)
+#' look back until event 1). Note that in previous versions of the package backward was the default, and now this has switched to forward.
 #' 
 #' If the `cycle` lists are used, then it is expected the user will declare as well the name of the variable
 #'  pasted with `cycle_l` and `cycle_starttime` (e.g., c_default_cycle_l and c_default_cycle_starttime) to 
@@ -146,7 +146,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   )
   
   if(  length(matched_list_forbidden)>0){
-    stop(paste0("Name(s) or object ", list_forbidden_names[matched_list_forbidden]," defined belong to the list of forbidden names, which can cause issues in the model.
+    stop(paste0("Name(s) or object `", list_forbidden_names[matched_list_forbidden],"` defined belong to the list of forbidden names, which can cause issues in the model.
          Please remove or rename those names. See run_sim or run_sim_parallel for a full list of these names.\n"))
   }
   

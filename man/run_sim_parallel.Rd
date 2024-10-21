@@ -105,7 +105,7 @@ Event ties are processed in the order declared within the \code{init_event_list}
 To do so, the program automatically adds a sequence from to 0 to the (number of events - 1) times 1e-10 to add to the event times when selecting the event with minimum time.
 This time has been selected as it's relatively small yet not so small as to be ignored by which.min (see .Machine for more details)
 
-A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
+A list of protected objects that should not be used by the user as input names or in the global environment to avoid the risk of overwriting them is as follows:
 c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").
 
 The engine uses the L'Ecuyer-CMRG for the random number generator.

@@ -24,10 +24,12 @@ Perform luck adjustment
 \details{
 This function performs the luck adjustment automatically for the user, returning the adjusted luck number.
 Luck is interpreted in the same fashion as is standard in R (higher luck, higher time to event).
+
 Note that if TTE is predicted using a conditional quantile function (e.g., restricted gompertz, conditional quantile weibull...) \code{prevsurv} and \code{cursurv}
 are the unconditional survival using the "previous" parametrization but at the previous time for \code{presurv} and at the current time for \code{cursurv}.
 For other distributions, \code{presurv} is the survival up to current time using the previous parametrization, and \code{cursurv}
 is the survival up to current time using the current parametrization.
+
 Note that the advantage of the conditional quantile function is that it does not need the new parametrization to update the luck,
 which makes this approach computationally more efficient.
 This function can also work with vectors, which could allow to update multiple lucks in a single approach, and it can preserve names
@@ -65,17 +67,17 @@ qweibull(new_luck, 3, 1/0.015) #final TTE
 
 #Conditional quantile approach 
 new_luck <- luck_adj(prevsurv = 1-pweibull(q=0,3,1/0.02),
- cursurv = 1- pweibull(q=10,3,1/0.02),
- luck = 0.37,
- condq = TRUE) #time 10 change, previous time is 0 so prevsurv will be 1
- 
+                      cursurv = 1- pweibull(q=10,3,1/0.02),
+                      luck = 0.37,
+                      condq = TRUE) #time 10 change, previous time is 0 so prevsurv will be 1
+
 new_luck <- luck_adj(prevsurv = 1-pweibull(q=10,3,1/0.025),
- cursurv = 1- pweibull(q=25,3,1/0.025),
- luck = new_luck,
- condq = TRUE) #time 25 change
- 
+                      cursurv = 1- pweibull(q=25,3,1/0.025),
+                      luck = new_luck,
+                      condq = TRUE) #time 25 change
+
 conditional_qweibull(rnd = new_luck,
- shape = 3,
- scale = 0.015^3,
- lower_bound = 25) + 25 #final TTE
+                     shape = 3,
+                     scale = 1/0.015,
+                     lower_bound = 25) + 25 #final TTE
 }

@@ -7,6 +7,8 @@ output:
     number_sections: true
     toc: true
     toc_float: true
+    embed-resources: true
+    self-contained-math: true
 vignette: >
   %\VignetteIndexEntry{example_simtrial}
   %\VignetteEngine{knitr::rmarkdown}
@@ -29,13 +31,12 @@ This document runs a discrete event simulation model using simulated individual 
 ```{r setup,message=FALSE}
 library(RDICE)
 library(dplyr)
-library(tidyr)
 library(survival)
 library(survminer)
-library(flexsurv)
 library(flexsurvPlus)
-library(purrr)
 library(kableExtra)
+library(tidyr)
+library(purrr)
 
 ```
 
@@ -198,7 +199,7 @@ The seed argument is being used in the `draw_tte()` function which uses the `i` 
 ```{r model_evts}
 init_event_list <- 
   #Events applicable to intervention
-  add_tte(arm="int",
+  add_tte(arm=c("int","ref"),
           evts = c("Start",
                    "TxDisc",
                    "Progression",
@@ -206,24 +207,10 @@ init_event_list <-
                    "Death"),
                input={
     Start <- 0
-    Progression <- draw_tte(1,'weibull',coef1=TTP.shape, coef2= TTP.scale + TTP.coef.int,seed = as.numeric(paste0(1,i,simulation)))
+    Progression <- draw_tte(1,'weibull',coef1=TTP.shape, coef2= TTP.scale + ifelse(arm=="int",TTP.coef.int,0),seed = as.numeric(paste0(1,i,simulation)))
     TxDisc <- Inf #Treatment discontinuation will occur at progression
-    Death <- min(draw_tte(1,'weibull',coef1=OS.shape, coef2= OS.scale + OS.coef.int, seed = as.numeric(paste0(42,i,simulation))), nat.death) #Death occurs at earliest of disease-related death or non-disease-related death
-    PAE <- draw_tte(1,'exp',coef1=-log(1-0.05)) #Occurrence of the progression-accelerating event has a 5% probability for the intervention arm
-  }) %>%  
-  
-  #Events applicable to reference treatment
-  add_tte(arm="ref",
-          evts = c("Start", #Events are the same except that there will be no treatment discontinuation
-                   "TxDisc",
-                   "Progression",
-                   "PAE",
-                   "Death"),
-               input={
-    Start <- 0
-    Progression <- draw_tte(1,'weibull',coef1=TTP.shape, coef2= TTP.scale,seed = as.numeric(paste0(1,i,simulation)))
-    Death <- min(draw_tte(1,'weibull', coef1=OS.shape, coef2= OS.scale, seed = as.numeric(paste0(42,i,simulation))), nat.death) #Death occurs at earliest of disease-related death or non-disease-related death
-    PAE <- draw_tte(1,'exp',coef1=-log(1-0.15)) #Occurrence of the progression-accelerating event has a 15% probability for the reference arm
+    Death <- min(draw_tte(1,'weibull',coef1=OS.shape, coef2= OS.scale + ifelse(arm=="int",OS.coef.int,0), seed = as.numeric(paste0(42,i,simulation))), nat.death) #Death occurs at earliest of disease-related death or non-disease-related death
+    PAE <- draw_tte(1,'exp',coef1=-log(1-ifelse(arm=="int",0.05,0.15))) #Occurrence of the progression-accelerating event has a 5% or 15% probability for the intervention arm
   })
 
 ```

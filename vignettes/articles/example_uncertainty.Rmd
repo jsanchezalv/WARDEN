@@ -7,6 +7,8 @@ output:
     number_sections: true
     toc: true
     toc_float: true
+    embed-resources: true
+    self-contained-math: true
 vignette: >
   %\VignetteIndexEntry{example_uncertainty}
   %\VignetteEngine{knitr::rmarkdown}
@@ -70,33 +72,28 @@ Initial inputs and flags that will be used in the model can be defined below. Th
 #In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.
 
 #Put objects here that do not change on any patient or intervention loop
-common_all_inputs <- add_item( #utilities
-    util_v = if(psa_bool){
-                     setNames(MASS::mvrnorm(1,util.data$value,diag(util.data$se^2)),util.data$name) #in this case I choose a multivariate normal with no correlation
-             } else{setNames(util.data$value,util.data$name)},
-    util.idfs.ontx = util_v[["util.idfs.ontx"]], 
-    util.idfs.offtx  = util_v[["util.idfs.offtx"]],
-    util.remission = util_v[["util.remission"]],
-    util.recurrence = util_v[["util.recurrence"]],
-    util.mbc.progression.mbc = util_v[["util.mbc.progression.mbc"]],
-    util.mbc.pps = util_v[["util.mbc.pps"]]
-    ) %>%
-  add_item( #costs
-    cost_v = if(psa_bool){
-                     setNames(rgamma_mse(1,cost.data$value,cost.data$se),cost.data$name) #in this case I choose a gamma distribution
-             } else{setNames(cost.data$value,cost.data$name)},
-    cost.idfs.tx  = cost_v[["cost.idfs.tx"]],
-    cost.recurrence  = cost_v[["cost.recurrence"]],
-    cost.mbc.tx  = cost_v[["cost.mbc.tx"]],
-    cost.tx.beva  = cost_v[["cost.tx.beva"]],
-    cost.idfs.txnoint = cost_v[["cost.idfs.txnoint"]],
-    cost.idfs = cost_v[["cost.idfs"]],
-    cost.mbc.progression.mbc = cost_v[["cost.mbc.progression.mbc"]],
-    cost.mbc.pps = cost_v[["cost.mbc.pps"]],
-    cost.2ndline = cost_v[["cost.2ndline"]],
-    cost.ae = cost_v[["cost.ae"]]
-    ) %>%
-  add_item( #parameter uncertainty
+common_all_inputs <- add_item() %>%
+  add_item( #utilities
+  pick_val_v(
+    base =  util.data$value,
+    psa = MASS::mvrnorm(1,util.data$value,diag(util.data$se^2)),
+    sens = util.data$value,
+    psa_ind = psa_bool,
+    sens_ind = sensitivity_bool,
+    indicator = rep(0, nrow(util.data)),
+    names_out =util.data$name
+  ),#costs
+  pick_val_v(
+    base =  cost.data$value,
+    psa = rgamma_mse(1,cost.data$value,cost.data$se),
+    sens = cost.data$value,
+    psa_ind = psa_bool,
+    sens_ind = sensitivity_bool,
+    indicator = rep(0, nrow(cost.data)),
+    names_out =cost.data$name
+  )
+) %>%
+  add_item( #parameter uncertainty, alternative approach to using pick_val_v, it also does work
     coef11_psa = ifelse(psa_bool,rnorm(1,2,0.1),2),
     coef12_psa = ifelse(psa_bool,rnorm(1,3,0.1),3),
     coef13_psa = ifelse(psa_bool,rnorm(1,0.8,0.05),0.8),

@@ -103,7 +103,7 @@ Event ties are processed in the order declared within the \code{init_event_list}
 To do so, the program automatically adds a sequence from to 0 to the (number of events - 1) times 1e-10 to add to the event times when selecting the event with minimum time.
 This time has been selected as it's relatively small yet not so small as to be ignored by which.min (see .Machine for more details)
 
-A list of protected objects that should not be used by the user as input names to avoid the risk of overwriting them is as follows:
+A list of protected objects that should not be used by the user as input names  or in the global environment to avoid the risk of overwriting them is as follows:
 c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").
 
 The engine uses the L'Ecuyer-CMRG for the random number generator
@@ -114,7 +114,12 @@ Ongoing items will look backward to the last time updated when performing the di
 This means that the user does not necessarily need to keep updating the value, but only add it when the value
 changes looking forward (e.g., o_q = utility at event 1, at event 2 utility does not change, but at event 3 it does,
 so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically
-look back until event 1)
+look back until event 1).
+
+It is important to note that the QALYs and Costs (ongoing or instant or per cycle) used should be of length 1.
+If they were of length > 1, the model would expand the data,
+so instead of having each event as a row, the event would have N rows (equal to the length of the costs/qalys to discount passed).
+This means more processing of the results data would be needed in order for it to provide the correct results.
 
 If the \code{cycle} lists are used, then it is expected the user will declare as well the name of the variable
 pasted with \code{cycle_l} and \code{cycle_starttime} (e.g., c_default_cycle_l and c_default_cycle_starttime) to

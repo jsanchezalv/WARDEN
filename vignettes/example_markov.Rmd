@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 
 # Introduction
-This document runs a discrete event simulation model in the context of a simple cohort Markov model with 4 states. Note that this same exercise could be done from a patient simulation approach rather than the cohort one.
+This document runs a discrete event simulation model in the context of a simple cohort Markov model with 4 states. Note that this same exercise could be done from a patient simulation approach (microsimulation) rather than the cohort one.
 
 ## Main options
 
@@ -31,11 +31,9 @@ This document runs a discrete event simulation model in the context of a simple 
 library(RDICE)
 
 library(dplyr)
-library(flexsurv)
 library(ggplot2)
 library(kableExtra)
 library(purrr)
-library(tidyr)
 
 #Show all numbers, no scientific notation
 options(scipen = 999)
@@ -74,32 +72,37 @@ We also define here the specific utilities and costs that will be used in the mo
 
 We define here our initial trace, the number of cycles to be simulated, the transition matrices and the initial cycle time (i.e. 0). 
 
+It is important to note that the QALYs and Costs used are of length 1. If they were of length > 1, the model would expand the data, so instead of having each event as a row, the event would have 4 rows (1 per state). This means more processing of the results data would be needed in order for it to provide the correct results.
+
 ```{r input_delayed}
-#Put objects here that do not change on any patient or intervention loop, for example a HR
+#Put objects here that do not change on any patient or intervention loop, for example costs and utilities
 common_all_inputs <- add_item(max_n_cycles = 30) %>%
   add_item( #utilities
-    util_v = if(psa_bool){
-      setNames(rgamma_mse(util.data$value,util.data$se^2),util.data$name) #in this case I choose a gamma distribution
-    } else{setNames(util.data$value,util.data$name)},
-    util1 = util_v[["util1"]], 
-    util2 = util_v[["util2"]],
-    util3 = util_v[["util3"]],
-    util4 = util_v[["util4"]]) %>%
+     pick_val_v(base        = util.data$value,
+                psa         = pick_psa(rep("rbeta_mse",nrow(util.data)),rep(1,nrow(util.data)),util.data$value,util.data$se),
+                sens        = util.data$value,
+                psa_ind     = psa_bool,
+                sens_ind    = sensitivity_bool,
+                indicator   = rep(0, nrow(util.data)),
+                names_out   = util.data[,"name"]
+                )
+     ) %>%
   add_item( #costs
-    cost_v = if(psa_bool){
-      setNames(rgamma_mse(cost.data$value,cost.data$se),cost.data$name) #in this case I choose a gamma distribution
-    } else{setNames(cost.data$value,cost.data$name)},
-    cost1    = cost_v[["cost1"]],
-    cost2    = cost_v[["cost2"]],
-    cost3    = cost_v[["cost3"]],
-    cost4    = cost_v[["cost4"]],
-    cost_int = cost_v[["cost_int"]])
+    pick_val_v(base         = cost.data$value,
+                psa         = pick_psa(rep("rgamma_mse",nrow(cost.data)),rep(1,nrow(cost.data)),cost.data$value,cost.data$se),
+                sens        = cost.data$value,
+                psa_ind     = psa_bool,
+                sens_ind    = sensitivity_bool,
+                indicator   = rep(0, nrow(cost.data)),
+                names_out   = cost.data[,"name"]
+                )
+    )
 
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
 #common across arm but changes per pt could be implemented here (if (arm==)... )
 unique_pt_inputs <- add_item(
-                            trace = c(1,0,0,0),
+                            trace = c(1,0,0,0), #initialize trace, everyone at state 1
                             transition = if( arm=="noint"){ 
                                             matrix(c(0.4,0.3,0.2,0.1,
                                             0.1,0.4,0.3,0.2,
@@ -110,9 +113,17 @@ unique_pt_inputs <- add_item(
                                                      0.2,0.4,0.3,0.1,
                                                      0.1,0.2,0.5,0.2,
                                                      0,0,0,1),nrow=4,byrow=T)
-                                              },
+                                              }, # In this case we have two different matrices, note this could also be a single matrix using symbolic RRs or similar
+                            
+                            #Alternative approach
+                            # rr = ifelse(arm=="noint",1,0.9),
+                            # transition_2 = matrix(c(0.4,0.3,0.2,0.1,
+                            #                 0.1,0.4,0.3,0.2,
+                            #                 0.1,0.1,0.5,0.3,
+                            #                 0,0,0,1),nrow=4,byrow=T) * rr,
+                            # transition_2 = cbind(1-rowSums(transition_2[,-1]),transition_2[,-1]) ,
                             cycle_time = 0,
-                            q_default =  trace %*% c(util1,util2,util3,util4),
+                            q_default =  trace %*% c(util1,util2,util3,util4), #utilities weighted by state to get QALY
                             c_default = if(arm=="noint"){
                                trace %*% c(cost1+ cost_int,cost2+ cost_int,cost3+ cost_int,cost4)
                              } else{
@@ -128,25 +139,21 @@ In our model, the events are `start and cycle`.
 
 ```{r model_evts}
 init_event_list <- 
-  add_tte(arm="noint",evts=c("start","cycle"),input={ #intervention
+  add_tte(arm=c("noint","int"),evts=c("start","cycle"),input={ #intervention
     start <- 0
-    
     cycle <- 1
     
-  }) %>%
-  add_tte(arm="int",evts=c("start","cycle"),input={ #intervention
-    start <- 0
-    
-    cycle <- 1
-   
-    })
+  }) 
 
 ```
 
 ## Add Reaction to Those Events
-The explanation on how these part works can be seen in the early breast cancer tutorial.
+The explanation on how these part works can be seen in any of the other models.
 
 In this Markov model case, in the event `start` we generate as many cycles as we need. At each `cycle` event we update the time of the cycle to keep track of it when we produce the output of the model and we update the trace. Finally, when all the events are over, we finish the simulation by setting `curtime` to infinity.
+
+Alternatively, we could just use the start event and iterate over each cycle, saving everything into an array. That alternative option is not described here as it would involve some tweaking after running the model (as we would not be using the time dimension, so e.g., the discounting would be assuming previous time of 0 and current time of 0 instead of a vector of times, so the results would require post-processing to be adequate).
+
 ```{r model_reaction}
 
 evt_react_list <-
@@ -159,23 +166,20 @@ evt_react_list <-
                }) %>%
   add_reactevt(name_evt = "cycle",
                input = {
-                 c_default <- if(arm=="noint"){
-                   trace %*% c(cost1+ cost_int,cost2+ cost_int,cost3+ cost_int,cost4)
-                 } else{
-                   trace %*% c(cost1,cost2,cost3,cost4)
-                 }
-                   
-                   
-                 modify_item(list(
+
+                 modify_item_seq(list(
                    q_default = trace %*% c(util1,util2,util3,util4),
-                   c_default = c_default,
-                   "cycle_time" = cycle_time + 1
-                   )) #Update cycle time
-                 
-                 modify_item(list( "trace" = trace %*% transition)) #Update trace
+                   c_default = if(arm=="noint"){
+                                 trace %*% c(cost1+ cost_int,cost2+ cost_int,cost3+ cost_int,cost4)
+                               } else{
+                                 trace %*% c(cost1,cost2,cost3,cost4)
+                               },
+                   cycle_time = cycle_time + 1,
+                   trace = trace %*% transition #or transition_2
+                   )) 
                  
                  if (max_n_cycles == cycle_time) {
-                   modify_item(list("curtime" = Inf)) #Indicate end of simulation for patient
+                   modify_item(list(curtime = Inf)) #Indicate end of simulation for patient
                  }
                }) 
 
@@ -233,7 +237,7 @@ results <- run_sim(
 # Post-processing of Model Outputs
 ## Summary of Results
 
-Once the model has been run, we can use the results and summarize them using the `summary_results_det` to print the results of the last simulation (if nsim=1, it's the deterministic case), and `summary_results_sim` to show the PSA results (with the confidence intervals). We can also use the individual patient data generated by the simulation, which we collect here in the `psa_ipd` object.  Note that the data for life years is wrong, as the model assumes we are running a patient simulation data and therefore it's adding the 4 states, inflating the total life years. We can manually adjust this to get the correct life years. Note that the trace data is exported separately as it's of length > 1.
+Once the model has been run, we can use the results and summarize them using the `summary_results_det` to print the results of the last simulation (if nsim=1, it's the deterministic case), and `summary_results_sim` to show the PSA results (with the confidence intervals). We can also use the individual patient data generated by the simulation, which we collect here in the `psa_ipd` object.  Note that the data for life years is wrong, as the model assumes we are running a patient simulation data and therefore it's adding the 4 states together, inflating the total life years. We can manually adjust this to get the correct life years. Note that the trace data is exported separately as it's of length > 1.
 
 ```{r post-processing_summary}
 

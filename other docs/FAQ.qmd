@@ -69,3 +69,7 @@ Continuous outcomes in DICE at Evidera follow a "backward" approach to their acc
 The change in terms of implementations means that if o_q is the accumulator, which is o_q = utility, and utility value changes at event X, in the backward approach one would set 1) o_q = utility (previous value of utility), and then 2) utility = new_value. Instead, in the forward approach one would set 1) utility = new_value, 2) o_q = utility (reversing the order).
 
 This option can be modified in the `run_sim` and `run_sim_parallel` functions.
+
+### Debugging
+
+Log files are created both in RDICE and DICE, but the details included are different, and log files are not created on error in RDICE, as R has a debug method which would allow the user to navigate live through the code at the moment of error. A log file will be created if debug option is activated.

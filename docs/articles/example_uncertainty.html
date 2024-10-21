@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.93</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.94</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,7 +83,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">October 10, 2024</h4>
+            <h4 data-toc-skip class="date">October 21, 2024</h4>
       
       
       <div class="d-none name"><code>example_uncertainty.Rmd</code></div>
@@ -152,33 +152,28 @@ utilities and costs also have a distribution.</p>
 <span><span class="co">#In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.</span></span>
 <span></span>
 <span><span class="co">#Put objects here that do not change on any patient or intervention loop</span></span>
-<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#utilities</span></span>
-<span>    util_v <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">psa_bool</span><span class="op">)</span><span class="op">{</span></span>
-<span>                     <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,<span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">$</span><span class="va">se</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="co">#in this case I choose a multivariate normal with no correlation</span></span>
-<span>             <span class="op">}</span> <span class="kw">else</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span><span class="op">}</span>,</span>
-<span>    util.idfs.ontx <span class="op">=</span> <span class="va">util_v</span><span class="op">[[</span><span class="st">"util.idfs.ontx"</span><span class="op">]</span><span class="op">]</span>, </span>
-<span>    util.idfs.offtx  <span class="op">=</span> <span class="va">util_v</span><span class="op">[[</span><span class="st">"util.idfs.offtx"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    util.remission <span class="op">=</span> <span class="va">util_v</span><span class="op">[[</span><span class="st">"util.remission"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    util.recurrence <span class="op">=</span> <span class="va">util_v</span><span class="op">[[</span><span class="st">"util.recurrence"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    util.mbc.progression.mbc <span class="op">=</span> <span class="va">util_v</span><span class="op">[[</span><span class="st">"util.mbc.progression.mbc"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    util.mbc.pps <span class="op">=</span> <span class="va">util_v</span><span class="op">[[</span><span class="st">"util.mbc.pps"</span><span class="op">]</span><span class="op">]</span></span>
-<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#costs</span></span>
-<span>    cost_v <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">psa_bool</span><span class="op">)</span><span class="op">{</span></span>
-<span>                     <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="../reference/rgamma_mse.html">rgamma_mse</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="co">#in this case I choose a gamma distribution</span></span>
-<span>             <span class="op">}</span> <span class="kw">else</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">name</span><span class="op">)</span><span class="op">}</span>,</span>
-<span>    cost.idfs.tx  <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.idfs.tx"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    cost.recurrence  <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.recurrence"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    cost.mbc.tx  <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.mbc.tx"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    cost.tx.beva  <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.tx.beva"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    cost.idfs.txnoint <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.idfs.txnoint"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    cost.idfs <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.idfs"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    cost.mbc.progression.mbc <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.mbc.progression.mbc"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    cost.mbc.pps <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.mbc.pps"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    cost.2ndline <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.2ndline"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>    cost.ae <span class="op">=</span> <span class="va">cost_v</span><span class="op">[[</span><span class="st">"cost.ae"</span><span class="op">]</span><span class="op">]</span></span>
-<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#parameter uncertainty</span></span>
+<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#utilities</span></span>
+<span>  <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
+<span>    base <span class="op">=</span>  <span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>    psa <span class="op">=</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,<span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">$</span><span class="va">se</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    sens <span class="op">=</span> <span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>    psa_ind <span class="op">=</span> <span class="va">psa_bool</span>,</span>
+<span>    sens_ind <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
+<span>    indicator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    names_out <span class="op">=</span><span class="va">util.data</span><span class="op">$</span><span class="va">name</span></span>
+<span>  <span class="op">)</span>,<span class="co">#costs</span></span>
+<span>  <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
+<span>    base <span class="op">=</span>  <span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>    psa <span class="op">=</span> <span class="fu"><a href="../reference/rgamma_mse.html">rgamma_mse</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,</span>
+<span>    sens <span class="op">=</span> <span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>    psa_ind <span class="op">=</span> <span class="va">psa_bool</span>,</span>
+<span>    sens_ind <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
+<span>    indicator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    names_out <span class="op">=</span><span class="va">cost.data</span><span class="op">$</span><span class="va">name</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#parameter uncertainty, alternative approach to using pick_val_v, it also does work</span></span>
 <span>    coef11_psa <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">psa_bool</span>,<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">0.1</span><span class="op">)</span>,<span class="fl">2</span><span class="op">)</span>,</span>
 <span>    coef12_psa <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">psa_bool</span>,<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">0.1</span><span class="op">)</span>,<span class="fl">3</span><span class="op">)</span>,</span>
 <span>    coef13_psa <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">psa_bool</span>,<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.8</span>,<span class="fl">0.05</span><span class="op">)</span>,<span class="fl">0.8</span><span class="op">)</span>,</span>
@@ -640,13 +635,13 @@ ICUR
 50
 </td>
 <td style="text-align:right;">
-119161.38
+246922.69
 </td>
 <td style="text-align:right;">
-20975.88
+35866.70
 </td>
 <td style="text-align:right;">
-17.60
+14.53
 </td>
 </tr>
 <tr>
@@ -657,13 +652,13 @@ ICUR
 100
 </td>
 <td style="text-align:right;">
-105261.08
+196285.33
 </td>
 <td style="text-align:right;">
-19773.50
+35001.45
 </td>
 <td style="text-align:right;">
-18.79
+17.83
 </td>
 </tr>
 <tr>
@@ -674,13 +669,13 @@ ICUR
 500
 </td>
 <td style="text-align:right;">
-99302.80
+173317.76
 </td>
 <td style="text-align:right;">
-5569.49
+10957.33
 </td>
 <td style="text-align:right;">
-5.61
+6.32
 </td>
 </tr>
 <tr>
@@ -691,13 +686,13 @@ ICUR
 1000
 </td>
 <td style="text-align:right;">
-100883.05
+177430.52
 </td>
 <td style="text-align:right;">
-5349.11
+8582.55
 </td>
 <td style="text-align:right;">
-5.30
+4.84
 </td>
 </tr>
 <tr>
@@ -708,13 +703,13 @@ total_costs
 50
 </td>
 <td style="text-align:right;">
-268311.94
+239439.32
 </td>
 <td style="text-align:right;">
-3155.84
+5432.85
 </td>
 <td style="text-align:right;">
-1.18
+2.27
 </td>
 </tr>
 <tr>
@@ -725,13 +720,13 @@ total_costs
 100
 </td>
 <td style="text-align:right;">
-269320.10
+240382.24
 </td>
 <td style="text-align:right;">
-4067.09
+3234.21
 </td>
 <td style="text-align:right;">
-1.51
+1.35
 </td>
 </tr>
 <tr>
@@ -742,13 +737,13 @@ total_costs
 500
 </td>
 <td style="text-align:right;">
-269144.50
+240655.76
 </td>
 <td style="text-align:right;">
-941.34
+1995.27
 </td>
 <td style="text-align:right;">
-0.35
+0.83
 </td>
 </tr>
 <tr>
@@ -759,13 +754,13 @@ total_costs
 1000
 </td>
 <td style="text-align:right;">
-269241.85
+239886.59
 </td>
 <td style="text-align:right;">
-521.27
+1014.77
 </td>
 <td style="text-align:right;">
-0.19
+0.42
 </td>
 </tr>
 <tr>
@@ -844,13 +839,13 @@ total_qalys
 50
 </td>
 <td style="text-align:right;">
-9.41
+10.02
 </td>
 <td style="text-align:right;">
-0.24
+0.29
 </td>
 <td style="text-align:right;">
-2.57
+2.94
 </td>
 </tr>
 <tr>
@@ -861,13 +856,13 @@ total_qalys
 100
 </td>
 <td style="text-align:right;">
-9.26
+9.82
 </td>
 <td style="text-align:right;">
-0.14
+0.21
 </td>
 <td style="text-align:right;">
-1.56
+2.10
 </td>
 </tr>
 <tr>
@@ -878,13 +873,13 @@ total_qalys
 500
 </td>
 <td style="text-align:right;">
-9.13
+9.66
 </td>
 <td style="text-align:right;">
-0.06
+0.10
 </td>
 <td style="text-align:right;">
-0.66
+1.04
 </td>
 </tr>
 <tr>
@@ -895,13 +890,13 @@ total_qalys
 1000
 </td>
 <td style="text-align:right;">
-9.17
+9.73
 </td>
 <td style="text-align:right;">
-0.06
+0.08
 </td>
 <td style="text-align:right;">
-0.64
+0.83
 </td>
 </tr>
 </tbody>
@@ -995,13 +990,13 @@ ICUR
 structural
 </td>
 <td style="text-align:right;">
-100883.05
+177430.52
 </td>
 <td style="text-align:right;">
-5349.11
+8582.55
 </td>
 <td style="text-align:right;">
-5.30
+4.84
 </td>
 </tr>
 <tr>
@@ -1015,13 +1010,13 @@ ICUR
 structural + parameter
 </td>
 <td style="text-align:right;">
-115771.03
+207518.19
 </td>
 <td style="text-align:right;">
-37191.48
+45403.00
 </td>
 <td style="text-align:right;">
-32.13
+21.88
 </td>
 </tr>
 <tr>
@@ -1035,13 +1030,13 @@ total_costs
 structural
 </td>
 <td style="text-align:right;">
-269241.85
+239886.59
 </td>
 <td style="text-align:right;">
-521.27
+1014.77
 </td>
 <td style="text-align:right;">
-0.19
+0.42
 </td>
 </tr>
 <tr>
@@ -1055,13 +1050,13 @@ total_costs
 structural + parameter
 </td>
 <td style="text-align:right;">
-269895.50
+235432.71
 </td>
 <td style="text-align:right;">
-26438.97
+27934.56
 </td>
 <td style="text-align:right;">
-9.80
+11.87
 </td>
 </tr>
 <tr>
@@ -1115,13 +1110,13 @@ total_qalys
 structural
 </td>
 <td style="text-align:right;">
-9.17
+9.73
 </td>
 <td style="text-align:right;">
-0.06
+0.08
 </td>
 <td style="text-align:right;">
-0.64
+0.83
 </td>
 </tr>
 <tr>
@@ -1135,13 +1130,13 @@ total_qalys
 structural + parameter
 </td>
 <td style="text-align:right;">
-9.14
+9.69
 </td>
 <td style="text-align:right;">
-0.32
+0.29
 </td>
 <td style="text-align:right;">
-3.46
+3.01
 </td>
 </tr>
 </tbody>

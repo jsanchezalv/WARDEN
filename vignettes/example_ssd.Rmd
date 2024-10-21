@@ -7,6 +7,8 @@ output:
     number_sections: true
     toc: true
     toc_float: true
+    embed-resources: true
+    self-contained-math: true
 vignette: >
   %\VignetteIndexEntry{example_ssd}
   %\VignetteEngine{knitr::rmarkdown}
@@ -22,9 +24,9 @@ knitr::opts_chunk$set(
 ```
 
 # Introduction
-This document runs a discrete event simulation model in the context of early breast cancer to show how the functions can be used to generate a model in only a few steps.
+This document runs a discrete event simulation model in the context of a late oncology model to show how the functions can be used to generate a model in only a few steps.
 
-When running a DES, it's important to consider speed. Simulation based models can be computationally expensive, which means that using efficient coding can have a substantial impact on performance. Because the model is using parallel computing, in order to debug the model one can simply use browser() where needed and set the number of patients to be simulated equal to 1.
+When running a DES, it's important to consider speed. Simulation based models can be computationally expensive, which means that using efficient coding can have a substantial impact on performance. 
 
 ## Main options
 
@@ -32,11 +34,9 @@ When running a DES, it's important to consider speed. Simulation based models ca
 library(RDICE)
 
 library(dplyr)
-library(flexsurv)
 library(ggplot2)
 library(kableExtra)
 library(purrr)
-library(tidyr)
 
 ```
 
@@ -47,11 +47,15 @@ options(tibble.print_max = 50)
 ```
 
 # General inputs with delayed execution
-Initial inputs and flags that will be used in the model can be defined below. We can define inputs that are common to all patients (`common_all_inputs`) within a simulation, inputs that are unique to a patient independently of the treatment (e.g. natural death, defined in `common_pt_inputs`), and inputs that are unique to that patient and that treatment (`unique_pt_inputs`). Items can be included through the `add_item` function, and can be used in subsequent items. All these inputs are generated before the events and the reaction to events are executed. Furthermore, the program first executes `common_all_inputs`, then `common_pt_inputs` and then `unique_pt_inputs`. So one could use the items generated in `common_all_inputs` in `unique_pt_inputs`.
+Initial inputs and flags that will be used in the model can be defined below. We can define inputs that will only change across scenarios (`sensitivity_inputs`), inputs which are common to all patients (`common_all_inputs`) within a simulation, inputs that are unique to a patient independently of the treatment (e.g. natural time to death, defined in `common_pt_inputs`), and inputs that are unique to that patient and that treatment (`unique_pt_inputs`). Items can be included through the `add_item` function, and can be used in subsequent items. All these inputs are generated before the events and the reaction to events are executed. Furthermore, the program first executes `common_all_inputs`, then `common_pt_inputs` and then `unique_pt_inputs`. So one could use the items generated in `common_all_inputs` in `unique_pt_inputs`. Note that inputs are "reset" after each patient, so if patient 1 arm "noint" changes `util.sick` to be = 2, even if it's a common parameter for everyone, it would be reset to 1 for patient 1 arm "int".
+
+Note that time to death is set in the common_pt_inputs, but it could also just be set in the `add_tte` function explained below. The user has full flexibility on how to implement this type of inputs.
+
+There are some auxiliary functions to help setting up inputs, like `pick_val_v` and `pick_val` (and `pick_psa`, see below the section on [Sensitivity Analysis](#sensitivity-analysis)). Note that `pick_val_v` and `pick_val` can be directly loaded as parameters (in fact, a named list will be loaded directly by R). A small tweak is needed if it's the first item added, in which the item list must be initiated by using `add_item()` (see below).
+
 
 ```{r input_delayed}
-#Each patient is identified through "i"
-#psa_bool is the indicator of whether we want to apply a PSA or not
+#We don't need to use sensitivity_inputs here, so we don't add that object
 
 #Put objects here that do not change on any patient or intervention loop
 common_all_inputs <-add_item(
@@ -78,22 +82,22 @@ unique_pt_inputs <- add_item(fl.sick = 1,
 
 # Events
 ## Add Initial Events
-Events are added below through the `add_tte` function. We use this function twice, one per intervention. We must define several arguments: one to indicate the intervention, one to define the names of the events used, one to define the names of other objects created that we would like to store (optional, maybe we generate an intermediate input which is not an event but that we want to save) and the actual input in which we generate the time to event. Events and other objects will be automatically initialized to `Inf`. We draw the times to event for the patients. This chunk is a bit more complex, so it's worth spending a bit of time explaining it.
+Events are added below through the `add_tte` function. We use this function once applying to both interventions. We must define several arguments: one to indicate the intervention, one to define the names of the events used, one to define the names of other objects created that we would like to store (optional, maybe we generate an intermediate input which is not an event but that we want to save) and the actual input in which we generate the time to event. Events and other objects will be automatically initialized to `Inf`. We draw the times to event for the patients. Note: the order of the `evts` argument that appears first will be used as a reference of the order in which to process events in the case of ties (so "sick" would be processed before "sicker" if there is a tie in time to event.) 
 
-The `init_event_list` object is populated by using the `add_tte` function twice, one for the "int" strategy and other for the "noint" strategy. We first declare the `start` time to be `0`.
+Note that the model will use the evnets defined in `evts` argument to look for the objects both defined in the input list and in this expression to allocate time to events. If an event is declared in `evts` but not defined elsewhere, then they would be assumed TTE of `Inf` by default.
 
-We then proceed to generate the actual time to event. We use the `draw_tte()` function to generate the time to event. One should always be aware of how the competing risks interact with each other. While we have abstracted from these type of corrections here, it is recommended to have an understanding about how these affect the results and have a look at the competing risks/semi-competing risks literature.
+This chunk is a bit more complex, so it's worth spending a bit of time explaining it.
+
+The `init_event_list` object is populated by using the `add_tte` function which applies to both arms, "int" strategy and "noint" strategy. We first declare the `start` time to be `0`. Note this could also be separated by arm if the user wants to have more clarity using two `add_tte` functions (i.e., `add_tte(arm="noint"...) %>% add_tte(arm="int"...)`).
+
+We then proceed to generate the actual time to event. We use the `draw_tte()` function to generate the time to event, though one can set this up in any other way (e.g., using `rexp`). One should always be aware of how the competing risks interact with each other. While we have abstracted from these type of corrections here, it is recommended to have an understanding about how these affect the results and have a look at the competing risks/semi-competing risks literature.
 
 ```{r model_evts}
 init_event_list <- 
-  add_tte(arm="noint", evts = c("sick","sicker","death") ,input={ #intervention
+  add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={
     sick <- 0
-    sicker <- draw_tte(1,dist="exp", coef1=coef_noint)
+    sicker <- draw_tte(1,dist="exp", coef1=coef_noint, beta_tx = ifelse(arm=="int",HR_int,1))
     
-  }) %>%  add_tte(arm="int", evts = c("sick","sicker","death") ,input={  
-    sick <- 0
-    sicker <- draw_tte(1,dist="exp", coef1=coef_noint, beta_tx = HR_int)
-
   })
 
 ```
@@ -109,26 +113,30 @@ Item | What does it do
 `prevtime` | Time of the previous event (numeric)
 `cur_evtlist` | Named vector of events that is yet to happen for that patient (named numeric vector)
 `evt` | Current event being processed (character)
-`i` | Patient being iterated (character)
+`i` | Patient being iterated (numeric)
+`arm` | Intervention being iterated (character)
 `simulation` | Simulation being iterated (numeric)
+`sens` | Sensitivity analysis being iterated (numeric)
 
 The functions to add/modify events and inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost. So rather than use two `modify_item` with a list of one element, it's better to group them into a single `modify_item` with a list of two elements. 
 
 `new_event`allows to generate events and add them to the vector of events. It accepts more than one event. 
-`modify_event` allows to modify events (e.g. delay death). When adding an event, the name of the events and the time of the events must be defined. When using `modify_event`, one must indicate which events are affected and what are the new times of the events. If the event specified does not exist or has already occurred, it will be ignored. Note that one could potentially omit part of the modeling set in `init_event_list` and actually define new events dynamically through the reactions (we do that below for the `"ae"` event). However, this can have an impact in computation time, so if possible it's always better to use `init_event_list`.
-`modify_item` allows to modify and add items. Elements defined within this function are not evaluated sequentially (i.e. defining `modify_item(list(fl.new = 1, var1 = fl.new * 5)))` will give an error if `fl.new` was not defined outside this function). Note that one can modify costs/utilities by using the construction `type_name_category`, where type is either "qaly" or "cost", name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
+`modify_event` allows to modify events (e.g. delay death). When adding an event, the name of the events and the time of the events must be defined. When using `modify_event`, one must indicate which events are affected and what are the new times of the events. If the event specified does not exist or has already occurred, it will be ignored. `modify_event` with `create_if_null = TRUE` argument will also generate events if they don't exist. Note that one could potentially omit part of the modeling set in `init_event_list` and actually define new events dynamically through the reactions (we do that below for the `"ae"` event). However, this can have an impact in computation time, so if possible it's always better to use `init_event_list`.
 
-Note that `modify_item` does not evaluate sequentially. For that functionality, `modify_item_seq` can be used. This version of the function is slower, so both are left as options for the user.
+`modify_item` and `modify_item_seq`allow to modify and add items. Elements defined within this function are not evaluated sequentially in `modify_item` (i.e. defining `modify_item(list(fl.new = 1, var1 = fl.new * 5)))` will give an error if `fl.new` was not defined outside this function), while `modify_item_seq` will do it sequentially at a slightly bigger computational cost, so both are left as choices for the user. Note that one can modify costs/utilities by using the construction `type_name_category`, where type is either "qaly" or "cost", name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
 
 The list of relevant functions to be used within `add_reactevt` are:
 
 Function | What does it do | How to use it
 ------------ | ------------- | -------------
 `modify_item()` | Adds & Modifies items/flags/variables for future events | `modify_item(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))`
+`modify_item_seq()` | Adds & Modifies items/flags/variables for future events sequentially | `modify_item_seq(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))`
 `new_event()` | Adds events to the vector of events for that patient | `new_event(rep(list("ae"=curtime + 0.001),5))`
-`modify_event()` | Modifies existing events by changing their time | `modify_event(list("os"=curtime +5, "ttot"=curtime+0.0001))`
+`modify_event()` | Modifies (or creates, with `create_if_null = TRUE`) existing events by changing their time | `modify_event(list("os"=curtime +5, "ttot"=curtime+0.0001))`
 
 The model will run until `curtime` is set to `Inf`, so the event that terminates the model (in this case, `os`), should modify `curtime` and set it to `Inf`.
+
+Finally, note that there could be two different ways of accumulating continuous outcomes, backwards (i.e., in the example below, we would set q_default = util.sick at the sicker event, and modify the `q_default` value in the death event) and forwards (as in the example below). This option can be modified in the `run_sim` function using the `accum_backwards` argument, which assumes forwards by default.
 
 ```{r model_reaction}
 evt_react_list <-
@@ -177,6 +185,8 @@ It is worth noting that the `psa_bool` argument does not run a PSA automatically
 
 Note that the distribution chosen, the number of events and the interaction between events can have a substantial impact on the running time of the model.
 
+Debugging can be implemented using the argument `debug` in the `run_sim` function.
+
 ```{r model_run}
 #Logic is: per patient, per intervention, per event, react to that event.
 results <- run_sim(  
@@ -197,7 +207,7 @@ results <- run_sim(
 # Post-processing of Model Outputs
 ## Summary of Results
 
-Once the model has been run, we can use the results and summarize them using the `summary_results_det` to print the results of the last simulation (if nsim=1, it's the deterministic case), and `summary_results_sim` to show the PSA results (with the confidence intervals). We can also use the individual patient data generated by the simulation, which we collect here to plot in the `psa_ipd` object. 
+Once the model has been run, we can use the results and summarize them using the `summary_results_det` to print the results of the last simulation (if `nsim = 1`, it's the deterministic case), and `summary_results_sim` to show the PSA results (with the confidence intervals). We can also use the individual patient data generated by the simulation, which we collect here to plot in the `psa_ipd` object. 
 
 ```{r post-processing_summary}
 
@@ -250,7 +260,7 @@ ggplot(data_plot) +
 
 ```
 
-We can also plot the patient level incremental QALY/costs. Note that there are several clusters in the distribution of patients according to their QALY/costs based on the pathway they took (early metastatic vs. remission and cure or recurrence). 
+We can also plot the patient level incremental QALY/costs.
 
 ```{r post-processing_plots, fig.width=10, fig.height=8, message=FALSE}
 
@@ -272,22 +282,27 @@ ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = arm)) +
 
 # Sensitivity Analysis
 ## Inputs
-In this case, inputs must be created first to change across sensitivity analysis. To do so, the item list `sensitivity_inputs` can be used. In this case, we also use `pick_val_v` which allows the model to automatically pick the relevant value (no PSA, PSA or sensitivity) based on the corresponding boolean flags of psa_bool and sensitivity_bool. In this case we also use the `sens` iterator for each sensitivity analysis and the `n_sensitivity` which is an argument in `run_sim`. 
+In this case, inputs must be created first to change across sensitivity analysis. To do so, the item list `sensitivity_inputs` can be used. In this case, we also use `pick_val_v` which allows the model to automatically pick the relevant value (no PSA, PSA or sensitivity analysis) based on the corresponding boolean flags of psa_bool and sensitivity_bool. In this case we also use the `sens` iterator for each sensitivity analysis and the `n_sensitivity` which is an argument in `run_sim`. 
 
 Note that we have then just changed how the inputs are handled in common_all_inputs, but the same could be done with unique_pt_inputs, but in those cases, as the inputs change per patient, the `pick_val_v` or `pick_val` functions should be applied within unique_pt_inputs to make sure they are evaluated when it correspond.
 
-Note that for the psa we are directly calling the distributions and passing the parameters.Note also that the `sens_name_used` is automatically computed by the engine and is accesible to the user.
+Note that for the psa we are directly calling the distributions and passing the parameters.Note also that the `sens_name_used` is automatically computed by the engine and is accesible to the user (it's the name of the sensitivity analysis, e.g., "scenario 1").
 
-The indicator parameter in `pick_val_v` and `pick_val` is used to determine which parameters are left "as is" and which ones are to be substituted with the sensitivity value.
+The indicator parameter in `pick_val_v` and `pick_val` is used to determine which parameters are left "as is" and which ones are to be substituted with the sensitivity value. There are two ways to do this, either by setting it in a binary way (1 or 0), or by using the indicator as the number of the parameter values to be varied (useful when several parameters are varied at the same time, or only specific values of a vector are varied). This can be set by using `indicator_sens_binary` argument.
+
+Note that `pick_val_v` and `pick_val` can be directly loaded as parameters (in fact, a named list will be loaded directly by R). A small tweak is needed if it's the first item added, in which the item list must be initiated by using `add_item()` (see below).
+
+`pick_psa` can be used to select the correct PSA distributions.
+
 ```{r dsa_inputs}
 #Load some data
 df_par <- data.frame(parameter_name = c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
                               base_value = c(0.8,0.5,3000,7000,1000,log(0.2),0.8),
                               DSA_min = c(0.6,0.3,1000,5000,800,log(0.1),0.5),
                               DSA_max = c(0.9,0.7,5000,9000,2000,log(0.4),0.9),
-                              PSA_dist = c("rnorm","rbeta","rgamma","rgamma","rgamma","rnorm","rlnorm"),
+                              PSA_dist = c("rnorm","rbeta_mse","rgamma_mse","rgamma_mse","rgamma_mse","rnorm","rlnorm"),
                               a=c(0.8,0.5,3000,7000,1000,log(0.2),0.8),
-                              b=rep(0.1,7),
+                              b=c(0.8,0.5,3000,7000,1000,0.1,0.8)/5,
                               scenario_1=c(0.6,0.3,1000,5000,800,log(0.1),0.5),
                               scenario_2=c(0.9,0.7,5000,9000,2000,log(0.4),0.9)
                               )
@@ -298,22 +313,17 @@ sensitivity_inputs <-add_item(
             indicators = append(rep(0, nrow(df_par))[-pos_indicator],1,pos_indicator-1), #vector of indicators, value 0 everywhere except at sens, where it takes value 1
                               )
 
-common_all_inputs <-add_item(
-            par_used = pick_val_v(base        = df_par[,"base_value"],
-                                  psa         = sapply(1:nrow(df_par), function(x) eval(call(df_par[x,"PSA_dist"],1,df_par[x,"a"],df_par[x,"b"]))),
-                                  sens        = df_par[,sens_name_used],
-                                  psa_ind     = psa_bool,
-                                  sens_ind    = sensitivity_bool,
-                                  indicator   = indicators,
-                                  names_out   = df_par[,"parameter_name"]
-                                  ),
-  util.sick = par_used[["util.sick"]],
-  util.sicker = par_used[["util.sicker"]],
-  cost.sick = par_used[["cost.sick"]],
-  cost.sicker = par_used[["cost.sicker"]],
-  cost.int = par_used[["cost.int"]],
-  coef_noint = par_used[["coef_noint"]],
-  HR_int = par_used[["HR_int"]])
+common_all_inputs <-add_item() %>% 
+  add_item(
+            pick_val_v(base        = df_par[,"base_value"],
+                       psa         = pick_psa(df_par[,"PSA_dist"],rep(1,length(df_par[,"PSA_dist"])),df_par[,"a"],df_par[,"b"]),
+                       sens        = df_par[,sens_name_used],
+                       psa_ind     = psa_bool,
+                       sens_ind    = sensitivity_bool,
+                       indicator   = indicators,
+                       names_out   = df_par[,"parameter_name"]
+                       )
+            )
 
 ```
 ## Model Execution
@@ -352,20 +362,20 @@ data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.
 
 ```
 
-## Model Execution with PSA
+## Model Execution, probabilistic DSA
 The model is executed as before, just activating the psa_bool option
 
 ```{r run_dsa_psa}
 results <- run_sim(  
-  npats=100,                               # number of patients to be simulated
-  n_sim=6,                                  # number of simulations to run
-  psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
-  arm_list = c("int", "noint"),             # intervention list
-  common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
-  common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
-  unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
-  init_event_list = init_event_list,        # initial event list
-  evt_react_list = evt_react_list,          # reaction of events
+  npats=100,                               
+  n_sim=6,                                  
+  psa_bool = TRUE,                         
+  arm_list = c("int", "noint"),             
+  common_all_inputs = common_all_inputs,    
+  common_pt_inputs = common_pt_inputs,      
+  unique_pt_inputs = unique_pt_inputs,      
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,          
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   sensitivity_inputs = sensitivity_inputs,
