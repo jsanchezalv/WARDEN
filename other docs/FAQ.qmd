@@ -3,7 +3,6 @@ title: "RDICE FAQ"
 subtitle: 'Version 1.0. Made for RDICE v0.94'
 author: "Javier Sanchez Alvarez"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
-bibliography: [packages.bib, references.bib]
 nocite: '@*'
 format: 
     html:
@@ -33,6 +32,10 @@ This was created as the R DICE was designed independently from DICE, as well as 
 ### Time of event vs. time to event
 
 RDICE time is considered from start. This means that when a new event is generated at a given event, the elapsed time from start should be added (*curtime*). For example, if at time 1.5 a new event is created which takes place one year from now, then that new event will be defined as `modify_event(list(new_evt_name = curtime + 1))`.
+
+### Parallel Computing
+
+DICE (at least PyDICE) applies parallelization at the patient level, i.e., splitting patients across threads. Instead, RDICE can use parallelization when running multiple simulations (i.e., in a PSA). The reason for this is that in R it's more efficient to split the tasks across the different threads when they take some time to run, and each patient may take too little time to take full advantage of this process. However, note that the parallelization in R is limited by the RAM available, so depending on the size of the simulation the benefits in terms of run speed can be more limited.
 
 ### Events removed/repeated in queue vs. events always exist only once
 
