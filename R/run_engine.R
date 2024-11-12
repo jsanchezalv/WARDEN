@@ -38,7 +38,7 @@ run_engine <- function(arm_list,
   pb <- progressr::progressor(50) 
   
   for (i in 1:npats) {
-    set.seed(i*simulation)
+    set.seed(sens*100000037 + simulation*10007 + i*53)
     if(i %% ceiling(npats / 50) == 0 | i == npats){
       pb(sprintf("Simulation %g", simulation))
       }
@@ -93,7 +93,7 @@ run_engine <- function(arm_list,
     temp_log <- list()
     
     for (arm in arm_list) {
-      set.seed(i*simulation)
+      set.seed(sens*100000037 + simulation*10007 + i*53 + which(arm==arm_list))
       # Initialize values to prevent errors
       output_list <- list(curtime = 0)
       

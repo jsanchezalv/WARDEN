@@ -66,7 +66,8 @@ if(getRversion() >= "2.15.1") {
 #' (as seeds are automatically transformed to be seven integer seeds -i.e, L'Ecuyer-CMRG seeds-)
 #' 
 #' If no `drc` or `drq` parameters are passed within any of the input lists, these are assigned value 0.03.
-#' 
+#' Note that the random seeds are set to be unique in their category (i.e., at patient level, patient-arm level, etc.)
+#'
 #' Ongoing items will look backward to the last time updated when performing the discounting and accumulation. 
 #' This means that the user does not necessarily need to keep updating the value, but only add it when the value 
 #' changes looking forward (e.g., o_q = utility at event 1, at event 2 utility does not change, but at event 3 it does, 
@@ -277,7 +278,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        log_list = list()
                       )
     
-    set.seed(sens)
+    set.seed(sens*100000037)
     
     # Draw Common parameters  -------------------------------
     if(!is.null(sensitivity_inputs)){
@@ -343,7 +344,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       input_list <- c(input_list_sens,
                       simulation = simulation)
       
-      set.seed(simulation)
+      set.seed(sens*100000037 + simulation*10007)
       
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){

@@ -67,7 +67,8 @@ common_all_inputs <-add_item(
                       coef_noint = log(0.2),
                       HR_int = 0.8,
                       drc = 0.035, #different values than what's assumed by default
-                      drq = 0.035) #different values than what's assumed by default
+                      drq = 0.035,
+                      random_seed_sicker_i = sample.int(100000,1000,replace = FALSE))  #to be used as seeds to draw the time to event for sicker, to ensure same luck for the same patient independently of the arm
 
 
 #Put objects here that do not change as we loop through treatments for a patient
@@ -96,7 +97,7 @@ We then proceed to generate the actual time to event. We use the `draw_tte()` fu
 init_event_list <- 
   add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={
     sick <- 0
-    sicker <- draw_tte(1,dist="exp", coef1=coef_noint, beta_tx = ifelse(arm=="int",HR_int,1))
+    sicker <- draw_tte(1,dist="exp", coef1=coef_noint, beta_tx = ifelse(arm=="int",HR_int,1), seed = random_seed_sicker_i[i]) #this way the value would be the same if it wasn't for the HR, effectively "cloning" patients luck
     
   })
 
@@ -309,8 +310,7 @@ df_par <- data.frame(parameter_name = c("util.sick","util.sicker","cost.sick","c
 rownames(df_par) <- df_par$parameter_name
 
 sensitivity_inputs <-add_item(
-            pos_indicator = sens - n_sensitivity*floor((sens-1)/n_sensitivity), # which position to use to put the value 1 in indicator
-            indicators = append(rep(0, nrow(df_par))[-pos_indicator],1,pos_indicator-1), #vector of indicators, value 0 everywhere except at sens, where it takes value 1
+            indicators = create_indicators(sens,n_sensitivity*length(sensitivity_names),rep(1,nrow(df_par))), #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max)
                               )
 
 common_all_inputs <-add_item() %>% 
@@ -323,7 +323,8 @@ common_all_inputs <-add_item() %>%
                        indicator   = indicators,
                        names_out   = df_par[,"parameter_name"]
                        )
-            )
+            ) %>%
+  add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE)) #we don't add this variable ot the sensitivity analysis
 
 ```
 ## Model Execution

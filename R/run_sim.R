@@ -45,7 +45,8 @@
 #'  A list of protected objects that should not be used by the user as input names  or in the global environment to avoid the risk of overwriting them is as follows:
 #'  c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").
 #'  
-#'  The engine uses the L'Ecuyer-CMRG for the random number generator
+#'  The engine uses the L'Ecuyer-CMRG for the random number generator. 
+#'  Note that the random seeds are set to be unique in their category (i.e., at patient level, patient-arm level, etc.)
 #'  
 #'  If no `drc` or `drq parameters are passed within any of the input lists, these are assigned value 0.03.
 #'  
@@ -262,7 +263,7 @@ run_sim <- function(arm_list=c("int","noint"),
                        log_list = list()
                       )
     
-    set.seed(sens)
+    set.seed(sens*100000037)
     
     
     # Draw Common parameters  -------------------------------
@@ -318,7 +319,7 @@ run_sim <- function(arm_list=c("int","noint"),
       
       input_list <- c(input_list_sens,list(simulation=simulation))
       
-      set.seed(simulation)
+      set.seed(sens*100000037 + simulation*10007)
       
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
