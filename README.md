@@ -23,28 +23,28 @@ The current version supports:
 
 It is recommended that the user checks the vignettes, first the simple
 [Sick-Sicker-Dead
-model](https://github.com/javiersanchezalvarezevidera/RDICE/articles/example_ssd.html)
+model](https://github.com/jsanchezalv/RDICE/articles/example_ssd.html)
 and then the more complex model for [early breast
-cancer](https://github.com/javiersanchezalvarezevidera/RDICE/articles/example_eBC.html).
+cancer](https://github.com/jsanchezalv/RDICE/articles/example_eBC.html).
 The
-[markov](https://github.com/javiersanchezalvarezevidera/RDICE/articles/example_markov.html)
+[markov](https://github.com/jsanchezalv/RDICE/articles/example_markov.html)
 example shows how to run a cohort Markov model while using the same
 modeling framework. Similarly, a simulation based Markov model could be
 run. Structural and parametric uncertainty are explored in the
 [corresponding
-vignette](https://github.com/javiersanchezalvarezevidera/RDICE/articles/example_uncertainty.html).
+vignette](https://github.com/jsanchezalv/RDICE/articles/example_uncertainty.html).
 The [IPD
-vignette](https://github.com/javiersanchezalvarezevidera/RDICE/articles/example_ipd.html)
+vignette](https://github.com/jsanchezalv/RDICE/articles/example_ipd.html)
 shows how RDICE can be used when individual patient data is available.
 
 ## Documentation
 
 Have a look at the [package home
-site](https://github.com/javiersanchezalvarezevidera/RDICE/index.html)
+site](https://github.com/jsanchezalv/RDICE/index.html)
 for more details on documentation and specific tutorials.
 
 For more details on the code, check our [Github
-repository](https://github.com/javiersanchezalvarezevidera/RDICE).
+repository](https://github.com/jsanchezalv/RDICE).
 
 ## Installation
 
@@ -52,7 +52,7 @@ repository](https://github.com/javiersanchezalvarezevidera/RDICE).
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("javiersanchezalvarezevidera/RDICE", ref="main")
+devtools::install_github("jsanchezalv/RDICE", ref="main")
 ```
 
 ## Citation
