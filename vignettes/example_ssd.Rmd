@@ -291,37 +291,37 @@ Note that for the psa we are directly calling the distributions and passing the 
 
 The indicator parameter in `pick_val_v` and `pick_val` is used to determine which parameters are left "as is" and which ones are to be substituted with the sensitivity value. There are two ways to do this, either by setting it in a binary way (1 or 0), or by using the indicator as the number of the parameter values to be varied (useful when several parameters are varied at the same time, or only specific values of a vector are varied). This can be set by using `indicator_sens_binary` argument.
 
-Note that `pick_val_v` and `pick_val` can be directly loaded as parameters (in fact, a named list will be loaded directly by R). A small tweak is needed if it's the first item added, in which the item list must be initiated by using `add_item()` (see below).
+Note that `pick_val_v` and `pick_val` can be directly loaded as parameters (in fact, a named list will be loaded directly by R). A small tweak is needed if it's the first item added, in which the item list must be initiated by using `add_item()` (see below). Note that one can use a list of lists in the case where the base_value or any of the other parameters are vectors instead of elements of length 1. In this case, we showcase a list but it could also use a data.frame.
 
 `pick_psa` can be used to select the correct PSA distributions.
 
 ```{r dsa_inputs}
 #Load some data
-df_par <- data.frame(parameter_name = c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
-                              base_value = c(0.8,0.5,3000,7000,1000,log(0.2),0.8),
-                              DSA_min = c(0.6,0.3,1000,5000,800,log(0.1),0.5),
-                              DSA_max = c(0.9,0.7,5000,9000,2000,log(0.4),0.9),
-                              PSA_dist = c("rnorm","rbeta_mse","rgamma_mse","rgamma_mse","rgamma_mse","rnorm","rlnorm"),
-                              a=c(0.8,0.5,3000,7000,1000,log(0.2),0.8),
-                              b=c(0.8,0.5,3000,7000,1000,0.1,0.8)/5,
-                              scenario_1=c(0.6,0.3,1000,5000,800,log(0.1),0.5),
-                              scenario_2=c(0.9,0.7,5000,9000,2000,log(0.4),0.9)
+list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
+                              base_value = list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
+                              DSA_min = list(0.6,0.3,1000,5000,800,log(0.1),0.5),
+                              DSA_max = list(0.9,0.7,5000,9000,2000,log(0.4),0.9),
+                              PSA_dist = list("rnorm","rbeta_mse","rgamma_mse","rgamma_mse","rgamma_mse","rnorm","rlnorm"),
+                              a=list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
+                              b=lapply(list(0.8,0.5,3000,7000,1000,log(0.2),0.8), function(x) abs(x/5)),
+                              scenario_1=list(0.6,0.3,1000,5000,800,log(0.1),0.5),
+                              scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),0.9)
                               )
-rownames(df_par) <- df_par$parameter_name
 
 sensitivity_inputs <-add_item(
-            indicators = create_indicators(sens,n_sensitivity*length(sensitivity_names),rep(1,nrow(df_par))), #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max)
+            indicators = if(sensitivity_bool){ create_indicators(sens,n_sensitivity*length(sensitivity_names),rep(1,length(list_par[[1]])))}else{
+                                rep(1,length(list_par[[1]]))} #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max, if not sensitivity analysis, then we activate all of them, i.e., in a PSA)
                               )
 
 common_all_inputs <-add_item() %>% 
   add_item(
-            pick_val_v(base        = df_par[,"base_value"],
-                       psa         = pick_psa(df_par[,"PSA_dist"],rep(1,length(df_par[,"PSA_dist"])),df_par[,"a"],df_par[,"b"]),
-                       sens        = df_par[,sens_name_used],
+            pick_val_v(base        = list_par[["base_value"]],
+                       psa         = pick_psa(list_par[["PSA_dist"]],rep(1,length(list_par[["PSA_dist"]])),list_par[["a"]],list_par[["b"]]),
+                       sens        = list_par[[sens_name_used]],
                        psa_ind     = psa_bool,
                        sens_ind    = sensitivity_bool,
                        indicator   = indicators,
-                       names_out   = df_par[,"parameter_name"]
+                       names_out   = list_par[["parameter_name"]]
                        )
             ) %>%
   add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE)) #we don't add this variable ot the sensitivity analysis
@@ -346,8 +346,8 @@ results <- run_sim(
   sensitivity_inputs = sensitivity_inputs,
   sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = nrow(df_par),
-  input_out = c(df_par[,"parameter_name"])
+  n_sensitivity = length(list_par[[1]]),
+  input_out = unlist(list_par[["parameter_name"]])
 )
 
 ```
@@ -382,8 +382,8 @@ results <- run_sim(
   sensitivity_inputs = sensitivity_inputs,
   sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = nrow(df_par),
-  input_out = c(df_par[,"parameter_name"])
+  n_sensitivity = length(list_par[[1]]),
+  input_out = unlist(list_par[["parameter_name"]])
 )
 
 ```
@@ -397,5 +397,39 @@ data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
 data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
+
+```
+## Model Execution, Simple PSA
+The model is executed as before, just activating the psa_bool option and deactivating the sensitivity_bool and removing sensitivity_names and setting n_sensitivity = 1
+
+```{r run_psa}
+results <- run_sim(  
+  npats=100,                               
+  n_sim=10,                                  
+  psa_bool = TRUE,                         
+  arm_list = c("int", "noint"),             
+  common_all_inputs = common_all_inputs,    
+  common_pt_inputs = common_pt_inputs,      
+  unique_pt_inputs = unique_pt_inputs,      
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,          
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  sensitivity_inputs = sensitivity_inputs,
+  sensitivity_bool = FALSE,
+  n_sensitivity = 1,
+  input_out = unlist(list_par[["parameter_name"]])
+)
+
+```
+
+## Check results
+We briefly check below that indeed the engine has been changing the corresponding parameter values.
+```{r check_psa}
+
+data_simulation <- bind_rows(map_depth(results,2, "merged_df"))
+
+#Check mean value across iterations as PSA is off
+data_simulation %>% group_by(simulation) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
 
 ```
