@@ -423,7 +423,7 @@ new_event <- function(evt){
   evtlist_temp <- list(cur_evtlist = c(input_list_arm$cur_evtlist,
                                   new_evt))
   if(input_list_arm$debug){ #only works correctly with create_if_null==TRUE, to be modified in later versions
-    loc <- paste0("Analysis: ", input_list_arm$sens,
+    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                   "; Sim: ", input_list_arm$sim,
                   "; Patient: ", input_list_arm$i,
                   "; Arm: ", input_list_arm$arm,
@@ -490,7 +490,7 @@ modify_event <- function(evt,create_if_null=TRUE){
   names_evt <- names(evt)
   
   if(input_list_arm$debug){ #only works correctly with create_if_null==TRUE, to be modified in later versions
-    loc <- paste0("Analysis: ", input_list_arm$sens,
+    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                   "; Sim: ", input_list_arm$sim,
                   "; Patient: ", input_list_arm$i,
                   "; Arm: ", input_list_arm$arm,
@@ -569,7 +569,7 @@ modify_item <- function(list_item){
   
   if(input_list_arm$debug){ 
     
-    loc <- paste0("Analysis: ", input_list_arm$sens,
+    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                   "; Sim: ", input_list_arm$sim,
                   "; Patient: ", input_list_arm$i,
                   "; Arm: ", input_list_arm$arm,
@@ -646,7 +646,7 @@ modify_item_seq <- function(...){
   
   if(input_list_arm$debug){ 
     
-    loc <- paste0("Analysis: ", input_list_arm$sens,
+    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                   "; Sim: ", input_list_arm$sim,
                   "; Patient: ", input_list_arm$i,
                   "; Arm: ", input_list_arm$arm,

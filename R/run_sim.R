@@ -26,6 +26,7 @@
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
 #' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
+#' @param continue_on_error If TRUE, on error will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1)
 #'
 #' @return A list of data frames with the simulation results
 #' @importFrom progressr with_progress
@@ -110,7 +111,8 @@ run_sim <- function(arm_list=c("int","noint"),
                    ipd = 1,
                    timed_freq = NULL,
                    debug = FALSE,
-                   accum_backwards = FALSE){
+                   accum_backwards = FALSE,
+                   continue_on_error = FALSE){
 
 
 
@@ -173,8 +175,9 @@ run_sim <- function(arm_list=c("int","noint"),
   
   output_sim <- list()
   
+  final_log <- list()
   log_list <- list()
-  
+  n_errors <- 0
 
   start_time <-  proc.time()
   
@@ -186,7 +189,10 @@ run_sim <- function(arm_list=c("int","noint"),
   } else{
     length_sensitivities <- n_sensitivity * length(sensitivity_names)
   }
-  
+    
+    progressr::handlers(progressr::handler_txtprogressbar(width=100))
+    
+    progressr::with_progress({
   #Need to figure out how to distinguish DSA (as many sensitivities as parameters) and Scenarios (as many sensivities as scenarios)
   for (sens in 1:length_sensitivities) {
     print(paste0("Analysis number: ",sens))
@@ -261,6 +267,7 @@ run_sim <- function(arm_list=c("int","noint"),
                        timed_freq = timed_freq,
                        debug = debug,
                        accum_backwards = accum_backwards,
+                       continue_on_error = continue_on_error,
                        log_list = list()
                       )
     
@@ -294,7 +301,7 @@ run_sim <- function(arm_list=c("int","noint"),
           )
         )
         
-        names(dump_info) <- paste0("Analysis: ", input_list_sens$sens,
+        names(dump_info) <- paste0("Analysis: ", input_list_sens$sens," ", input_list_sens$sens_name_used,
                                    "; Structural"
         )
         
@@ -309,9 +316,7 @@ run_sim <- function(arm_list=c("int","noint"),
     input_list_sens <- input_list_sens[!duplic]
 
 # Simulation loop ---------------------------------------------------------
-    progressr::handlers(progressr::handler_txtprogressbar(width=100))
-    
-    progressr::with_progress({
+
       
     for (simulation in 1:n_sim) {
       print(paste0("Simulation number: ",simulation))
@@ -348,7 +353,7 @@ run_sim <- function(arm_list=c("int","noint"),
             )
           )
           
-          names(dump_info) <- paste0("Analysis: ", input_list$sens,
+          names(dump_info) <- paste0("Analysis: ", input_list$sens," ", input_list$sens_name_used,
                                      "; Sim: ", input_list$sim,
                                      "; Statics"
           )
@@ -356,7 +361,7 @@ run_sim <- function(arm_list=c("int","noint"),
           log_list <- c(log_list,dump_info)
         }
       }
-  
+      
       #Make sure there are no duplicated inputs in the model, if so, take the last one
       duplic <- duplicated(names(input_list),fromLast = T)
       if (sum(duplic)>0 & simulation==1 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added.\n")  }
@@ -373,7 +378,12 @@ run_sim <- function(arm_list=c("int","noint"),
                                         input_list = input_list)                    # run simulation
       
       if(!is.null(final_output$error_m)){
+        if((n_sim > 1 | n_sensitivity > 1) & continue_on_error){
+          n_errors <- n_errors + 1
+          next
+        } else{
         stop(final_output$error_m)
+        }
       }
       
       if (input_list$ipd>0) {
@@ -384,28 +394,35 @@ run_sim <- function(arm_list=c("int","noint"),
       final_output <- c(list(sensitivity_name = sens_name_used), final_output)
       
       if(input_list$debug){
-        final_output$log_list <- c(log_list,final_output$log_list)
+        log_list <- lapply(log_list,transform_debug)
         
-        export_log(final_output$log_list,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+        final_output$log_list <- c(log_list,final_output$log_list)
       }
       
       output_sim[[sens]][[simulation]] <- final_output
   
       print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
     }
-  }, enable=TRUE)
 
     print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
-  }
+    }
+  }, enable=TRUE)
+    
   print(paste0("Total time to run: ",  round(proc.time()[3]- start_time[3] , 2), "s"))
 
 
   # Export results ----------------------------------------------------------
-
+  if(input_list$debug){
+    final_log <- unlist(
+                  unlist(
+                    lapply(output_sim, function(y) lapply(y, function(x) x$log_list )),
+                                           recursive = FALSE),
+                                    recursive = FALSE)
+    
+    export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+  }
   
-  
-
   results <- output_sim
   
   #Retore original rng kind
@@ -415,13 +432,23 @@ run_sim <- function(arm_list=c("int","noint"),
   
 }, error = function(e) {
   if(debug){
+    
     if(is.null(final_output)){
-      export_log(log_list,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+      export_log(lapply(log_list,transform_debug),paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
       stop(e$message)
     }else{
+      log_list <- lapply(log_list,transform_debug)
+      
       final_output$log_list <- c(log_list,final_output$log_list)
       
-      export_log(final_output$log_list,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+      output_sim[[sens]][[simulation]] <- final_output
+      final_log <- unlist(
+        unlist(
+          lapply(output_sim, function(y) lapply(y, function(x) x$log_list )),
+          recursive = FALSE),
+        recursive = FALSE)
+      
+      export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
     }
     stop(e$message)
   }else{

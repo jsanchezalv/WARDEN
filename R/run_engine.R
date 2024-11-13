@@ -74,7 +74,7 @@ run_engine <- function(arm_list,
           )
         )
         
-        names(dump_info) <- paste0("Analysis: ", input_list_pt$sens,
+        names(dump_info) <- paste0("Analysis: ", input_list_pt$sens," ", input_list_pt$sens_name_used,
                                    "; Sim: ", input_list_pt$sim,
                                    "; Patient: ", input_list_pt$i,
                                    "; Initial Patient Conditions"
@@ -128,7 +128,7 @@ run_engine <- function(arm_list,
             )
           )
 
-          names(dump_info) <- paste0("Analysis: ", input_list_arm$sens,
+          names(dump_info) <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                                      "; Sim: ", input_list_arm$sim,
                                      "; Patient: ", input_list_arm$i,
                                      "; Initial Patient-Arm Conditions"
@@ -163,7 +163,7 @@ run_engine <- function(arm_list,
         )
       )
       
-      names(dump_info) <- paste0("Analysis: ", input_list_arm$sens,
+      names(dump_info) <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                                  "; Sim: ", input_list_arm$sim,
                                  "; Patient: ", input_list_arm$i,
                                  "; Initialize Time to Events for Patient-Arm"
@@ -259,7 +259,8 @@ run_engine <- function(arm_list,
       if(!is.null(temp_log)){
         temp_log_pt <- c(temp_log_pt,temp_log)
       }
-        
+      
+      final_output <- list()  
       final_output$log_list <- lapply(temp_log_pt,transform_debug)
       final_output$error_m <- e$message
       return(final_output)
