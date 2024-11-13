@@ -179,7 +179,8 @@ run_sim <- function(arm_list=c("int","noint"),
   start_time <-  proc.time()
   
 # Analysis loop ---------------------------------------------------------
-  
+  tryCatch({
+    
   if (is.null(sensitivity_names)) {
     length_sensitivities <- n_sensitivity
   } else{
@@ -370,6 +371,11 @@ run_sim <- function(arm_list=c("int","noint"),
                                         common_pt_inputs=common_pt_inputs,
                                         unique_pt_inputs=unique_pt_inputs,
                                         input_list = input_list)                    # run simulation
+      
+      if(!is.null(final_output$error_m)){
+        stop(final_output$error_m)
+      }
+      
       if (input_list$ipd>0) {
         final_output$merged_df$simulation <- simulation
         final_output$merged_df$sensitivity <- sens
@@ -406,5 +412,21 @@ run_sim <- function(arm_list=c("int","noint"),
   RNGkind(rng_kind_store)
   
   return(results)
+  
+}, error = function(e) {
+  if(debug){
+    if(is.null(final_output)){
+      export_log(log_list,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+      stop(e$message)
+    }else{
+      final_output$log_list <- c(log_list,final_output$log_list)
+      
+      export_log(final_output$log_list,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+    }
+    stop(e$message)
+  }else{
+    stop(e$message)
+  }
+} )
 
 }

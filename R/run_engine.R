@@ -36,6 +36,7 @@ run_engine <- function(arm_list,
 
     
   pb <- progressr::progressor(50) 
+  tryCatch({
   
   for (i in 1:npats) {
     set.seed(sens*100000037 + simulation*10007 + i*53)
@@ -150,8 +151,31 @@ run_engine <- function(arm_list,
         evt_list <- do.call("initiate_evt",list(arm,input_list_arm))
       }
 
+    if(input_list_pt$debug){ 
+      names_input <- names(evt_list$time_data)
+      prev_value <- setNames(vector("list", length(names_input)), names_input)
+      prev_value[names_input] <- evt_list$time_data[names_input]
+      prev_value["cur_evtlist"] <- list(setNames(rep(Inf,length(input_list_arm$init_event_list[[1]]$evts)), input_list_arm$init_event_list[[1]]$evts))
+      dump_info <- list(
+        list(
+          prev_value = prev_value,
+          cur_value  = c(evt_list[["time_data"]],evt_list["cur_evtlist"])
+        )
+      )
+      
+      names(dump_info) <- paste0("Analysis: ", input_list_arm$sens,
+                                 "; Sim: ", input_list_arm$sim,
+                                 "; Patient: ", input_list_arm$i,
+                                 "; Initialize Time to Events for Patient-Arm"
+      )
+      
+      temp_log <- c(temp_log,dump_info)
+    }
+  
 
       input_list_arm <- c(input_list_arm,evt_list$time_data,evt_list["cur_evtlist"])
+      
+      
 
       # 3 Loop per event --------------------------------------------------------
       #Main environment of reference is this one
@@ -224,6 +248,24 @@ run_engine <- function(arm_list,
     final_output$log_list <- input_list$log_list
   }
     return(final_output)
-
+  
+  }, error = function(e) {
+    if(input_list$debug){
+      
+      if(!is.null(input_list_arm$log_list)){
+        temp_log <- c(temp_log,input_list_arm$log_list)
+      }
+      
+      if(!is.null(temp_log)){
+        temp_log_pt <- c(temp_log_pt,temp_log)
+      }
+        
+      final_output$log_list <- lapply(temp_log_pt,transform_debug)
+      final_output$error_m <- e$message
+      return(final_output)
+    }else{
+      stop(e$message)
+    }
+  } )
 
 }
