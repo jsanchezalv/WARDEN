@@ -407,7 +407,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       
       if(!is.null(final_output$error_m)){
         if((n_sim > 1 | n_sensitivity > 1) & continue_on_error){
-          next
+          return(list(NULL))
         } else{
           stop(final_output$error_m)
         }

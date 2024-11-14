@@ -252,6 +252,7 @@ run_engine <- function(arm_list,
     return(final_output)
   
   }, error = function(e) {
+    
     if(input_list$debug){
       
       if(!is.null(input_list_arm$log_list)){
@@ -264,10 +265,36 @@ run_engine <- function(arm_list,
       
       final_output <- list()  
       final_output$log_list <- lapply(temp_log_pt,transform_debug)
-      final_output$error_m <- e$message
+      final_output$error_m <- messge(e$message,
+                                     message("Error in analysis: ", sens,
+                                             "; simulation: ", simulation,
+                                             "; patient: ", if(exists("i")){i},
+                                             "; arm: ", if(exists("arm")){arm},
+                                             "; event: ", if(exists("Evt")){Evt$evt},
+                                             "; time: ", if(exists("Evt")){Evt$evttime})
+                                     )
       return(final_output)
-    }else{
-      stop(e$message)
+    }else if(input_list$continue_on_error){
+      final_output <- list()  
+      final_output$error_m <- message(e$message,
+                                     message("Error in analysis: ", sens,
+                                             "; simulation: ", simulation,
+                                             "; patient: ", if(exists("i")){i},
+                                             "; arm: ", if(exists("arm")){arm},
+                                             "; event: ", if(exists("Evt")){Evt$evt},
+                                             "; time: ", if(exists("Evt")){Evt$evttime})
+      )
+      return(final_output)
+      
+    } else{
+      stop(message(e$message,
+                   message("Error in analysis: ", sens,
+                           "; simulation: ", simulation,
+                           "; patient: ", if(exists("i")){i},
+                           "; arm: ", if(exists("arm")){arm},
+                           "; event: ", if(exists("Evt")){Evt$evt},
+                           "; time: ", if(exists("Evt")){Evt$evttime})
+      ))
     }
   } )
 
