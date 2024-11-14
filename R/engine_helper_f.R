@@ -18,7 +18,9 @@ if(getRversion() >= "2.15.1") {
         'out',
         'number_events',
         'evt_arm',
-        'input_list_arm')
+        'input_list_arm',
+        'nexttime',
+        'nevt_id')
     )) 
 }
 

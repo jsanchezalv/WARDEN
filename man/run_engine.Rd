@@ -8,7 +8,8 @@ run_engine(
   arm_list,
   common_pt_inputs = NULL,
   unique_pt_inputs = NULL,
-  input_list = NULL
+  input_list = NULL,
+  pb = pb
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ run_engine(
 \item{input_list}{A list of all other inputs: drc, drq, psa_bool, init_event_list, evt_react_list,
 uc_lists = list(util_ongoing_list,util_instant_list,util_cycle_list,cost_ongoing_list,cost_instant_list,cost_cycle_list),
 input_out,ipd,arm_list,simulation,npats,n_sim}
+
+\item{pb}{progress bar}
 }
 \value{
 A data frame with the simulation results

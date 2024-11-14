@@ -6,12 +6,12 @@
 #' @param input_list A list of all other inputs: drc, drq, psa_bool, init_event_list, evt_react_list,
 #' uc_lists = list(util_ongoing_list,util_instant_list,util_cycle_list,cost_ongoing_list,cost_instant_list,cost_cycle_list),
 #' input_out,ipd,arm_list,simulation,npats,n_sim
+#' @param pb progress bar
 #'
 #' @return A data frame with the simulation results
 #' @importFrom purrr map
 #' @importFrom purrr map_dbl
 #' @importFrom data.table rbindlist
-#' @importFrom progressr progressor
 #'
 #' @keywords internal
 
@@ -19,11 +19,13 @@
 run_engine <- function(arm_list,
                             common_pt_inputs=NULL,
                             unique_pt_inputs=NULL,
-                            input_list = NULL){
+                            input_list = NULL,
+                       pb = pb){
   # Initial set-up --------------------------
   arm_list <- arm_list
   simulation <- input_list$simulation
   sens <- input_list$sens
+  n_sensitivity <- input_list$n_sensitivity
   n_sim <- input_list$n_sim
   npats <- input_list$npats
   psa_bool <- input_list$psa_bool
@@ -35,12 +37,11 @@ run_engine <- function(arm_list,
   temp_log_pt <- list()
 
     
-  pb <- progressr::progressor(50) 
   tryCatch({
   
   for (i in 1:npats) {
-    set.seed(sens*100000037 + simulation*10007 + i*53)
-    if(i %% ceiling(npats / 50) == 0 | i == npats){
+    set.seed(sens*100037 + simulation*1007 + i*53)
+    if((((sens - 1) * n_sim * npats) + ((simulation - 1) * npats) + i) %% ceiling(npats*n_sim*n_sensitivity / 50) == 0){
       pb(sprintf("Simulation %g", simulation))
       }
     
@@ -94,7 +95,8 @@ run_engine <- function(arm_list,
     temp_log <- list()
     
     for (arm in arm_list) {
-      set.seed(sens*100000037 + simulation*10007 + i*53 + which(arm==arm_list))
+      
+      set.seed(sens*1037 + simulation*1007 + i*53 + which(arm==arm_list))
       # Initialize values to prevent errors
       output_list <- list(curtime = 0)
       

@@ -37,6 +37,7 @@ if(getRversion() >= "2.15.1") {
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
 #' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
+#' @param continue_on_error If TRUE, on error will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1, not at the patient level)
 #'
 #' @return A list of lists with the analysis results
 #' @importFrom doFuture `%dofuture%`
@@ -45,6 +46,7 @@ if(getRversion() >= "2.15.1") {
 #' @importFrom foreach foreach
 #' @importFrom progressr with_progress
 #' @importFrom progressr handlers
+#' @importFrom progressr progressor
 #' @importFrom progressr handler_txtprogressbar
 #'
 #' @export
@@ -124,7 +126,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                              ipd = 1,
                              timed_freq = NULL,
                              debug = FALSE,
-                             accum_backwards = FALSE){
+                             accum_backwards = FALSE,
+                             continue_on_error = FALSE){
   
   
   # Set-up basics -----------------------------------------------------------
@@ -190,18 +193,25 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   
   output_sim <- list()
   
+  final_log <- list()
   log_list <- list()
   
   start_time <-  proc.time()
   
   # Analysis loop ---------------------------------------------------------
-  
+  tryCatch({
+    
   if (is.null(sensitivity_names)) {
     length_sensitivities <- n_sensitivity
   } else{
     length_sensitivities <- n_sensitivity * length(sensitivity_names)
   }
   
+  progressr::handlers(progressr::handler_txtprogressbar(width=100))
+  
+  progressr::with_progress({
+    pb <- progressr::progressor(50) 
+    
   for (sens in 1:length_sensitivities) {
     print(paste0("Analysis number: ",sens))
     start_time_analysis <-  proc.time()
@@ -275,10 +285,11 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        timed_freq = timed_freq,
                        debug = debug,
                        accum_backwards = accum_backwards,
+                       continue_on_error = continue_on_error,
                        log_list = list()
                       )
     
-    set.seed(sens*100000037)
+    set.seed(sens*100037)
     
     # Draw Common parameters  -------------------------------
     if(!is.null(sensitivity_inputs)){
@@ -305,7 +316,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
           )
         )
         
-        names(dump_info) <- paste0("Analysis: ", input_list_sens$sens,
+        names(dump_info) <- paste0("Analysis: ", input_list_sens$sens," ", input_list_sens$sens_name_used,
                                    "; Structural"
         )
         
@@ -325,9 +336,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     exported_items <- unique(c("input_list_sens",ls(.GlobalEnv),ls(parent.env(environment())),ls(environment())))
     options(future.rng.onMisuse = "ignore")
     
-    progressr::handlers(progressr::handler_txtprogressbar(width=100))
-
-    progressr::with_progress({  
     output_sim[[sens]] <- foreach(simulation = 1:n_sim,
                          # .options.future = list(seed = TRUE),
                          .options.future = list(packages = .packages()),
@@ -344,7 +352,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       input_list <- c(input_list_sens,
                       simulation = simulation)
       
-      set.seed(sens*100000037 + simulation*10007)
+      set.seed(sens*100037 + simulation*1007)
       
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
@@ -372,7 +380,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
             )
           )
           
-          names(dump_info) <- paste0("Analysis: ", input_list$sens,
+          names(dump_info) <- paste0("Analysis: ", input_list$sens," ", input_list$sens_name_used,
                                      "; Sim: ", input_list$sim,
                                      "; Statics"
           )
@@ -394,8 +402,16 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
         final_output <- RDICE:::run_engine(arm_list=arm_list,
                                         common_pt_inputs=common_pt_inputs,
                                         unique_pt_inputs=unique_pt_inputs,
-                                        input_list = input_list)                    # run simulation
+                                        input_list = input_list,
+                                        pb = pb)                    # run simulation
       
+      if(!is.null(final_output$error_m)){
+        if((n_sim > 1 | n_sensitivity > 1) & continue_on_error){
+          next
+        } else{
+          stop(final_output$error_m)
+        }
+      }
   
       if (input_list$ipd>0) {
   
@@ -405,32 +421,68 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       
       final_output <- c(list(sensitivity_name = sens_name_used), final_output)
       
-      if(input_list$debug){
-        final_output$log_list <- c(log_list,final_output$log_list)
+      if(debug){
+        log_list <- lapply(log_list,transform_debug)
         
-        export_log(final_output$log_list,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+        final_output$log_list <- c(log_list,final_output$log_list)
       }
       
       return(list(final_output))
       
       print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
      }
-    }, enable=TRUE) 
+    
     
 
     print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
   }
+  }, enable=TRUE) 
   print(paste0("Total time to run: ",  round(proc.time()[3]- start_time[3] , 2), "s"))
   
 
   # Export results ----------------------------------------------------------
-
+  if(debug){
+    final_log <- unlist(
+      unlist(
+        lapply(output_sim, function(y) lapply(y, function(x) x$log_list )),
+        recursive = FALSE),
+      recursive = FALSE)
+    
+    export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+  }
+  
 
   results <- output_sim
   
   RNGkind(rng_kind_store)
   
   return(results)
+
+}, error = function(e) {
+  if(debug){
+    
+    if(is.null(final_output)){
+      export_log(lapply(log_list,transform_debug),paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+      stop(e$message)
+    }else{
+      log_list <- lapply(log_list,transform_debug)
+      
+      final_output$log_list <- c(log_list,final_output$log_list)
+      
+      output_sim[[sens]][[simulation]] <- final_output
+      final_log <- unlist(
+        unlist(
+          lapply(output_sim, function(y) lapply(y, function(x) x$log_list )),
+          recursive = FALSE),
+        recursive = FALSE)
+      
+      export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+    }
+    stop(e$message)
+  }else{
+    stop(e$message)
+  }
+} )
 
 }
