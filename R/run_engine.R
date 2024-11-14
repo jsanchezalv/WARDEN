@@ -276,6 +276,7 @@ run_engine <- function(arm_list,
       return(final_output)
     }else if(input_list$continue_on_error){
       final_output <- list()  
+      
       final_output$error_m <- message(e$message,
                                      message("Error in analysis: ", sens,
                                              "; simulation: ", simulation,

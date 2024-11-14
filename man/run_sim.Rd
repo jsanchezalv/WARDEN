@@ -87,7 +87,7 @@ run_sim(
 
 \item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.}
 
-\item{continue_on_error}{If TRUE, on error will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1, not at the patient level)}
+\item{continue_on_error}{If TRUE, on error at patient stage will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1, not at the patient level)}
 }
 \value{
 A list of data frames with the simulation results
@@ -129,6 +129,12 @@ If the \code{cycle} lists are used, then it is expected the user will declare as
 pasted with \code{cycle_l} and \code{cycle_starttime} (e.g., c_default_cycle_l and c_default_cycle_starttime) to
 ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime
 being the starting time in which the variable started counting.
+
+`debug = TRUE`` will export a log file with the timestamp up the error
+
+\code{continue_on_error} only works for inputs loaded at the patient level (patient or arm-patient)
+and not for inputs loaded at the simulation or sensitivity level, as it's considered that an error
+at those stages is more likely to be due to more severe issues than patient sampling issues
 }
 \examples{
 \dontrun{

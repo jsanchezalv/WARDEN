@@ -26,7 +26,7 @@
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
 #' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
-#' @param continue_on_error If TRUE, on error will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1, not at the patient level)
+#' @param continue_on_error If TRUE, on error at patient stage will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1, not at the patient level)
 #'
 #' @return A list of data frames with the simulation results
 #' @importFrom progressr with_progress
@@ -68,6 +68,12 @@
 #'   pasted with `cycle_l` and `cycle_starttime` (e.g., c_default_cycle_l and c_default_cycle_starttime) to 
 #'   ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime 
 #'   being the starting time in which the variable started counting.
+#'   
+#'  `debug = TRUE`` will export a log file with the timestamp up the error
+#'  
+#'  `continue_on_error` only works for inputs loaded at the patient level (patient or arm-patient)
+#'   and not for inputs loaded at the simulation or sensitivity level, as it's considered that an error
+#'   at those stages is more likely to be due to more severe issues than patient sampling issues
 #'
 #' @examples
 #' \dontrun{
@@ -387,14 +393,15 @@ run_sim <- function(arm_list=c("int","noint"),
         } else{
         stop(final_output$error_m)
         }
-      }
-      
+      } 
       if (input_list$ipd>0) {
         final_output$merged_df$simulation <- simulation
         final_output$merged_df$sensitivity <- sens
       }
       
       final_output <- c(list(sensitivity_name = sens_name_used), final_output)
+      
+      
       
       if(debug){
         log_list <- lapply(log_list,transform_debug)

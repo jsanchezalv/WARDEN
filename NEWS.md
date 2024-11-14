@@ -1,3 +1,9 @@
+# RDICE 0.95
+* Seeds used by default have been changed to guarantee uniqueness
+* Added possibility of continuing to the next simulation on error (if it occurs at the patient/arm level, not at the statics/structural loading level)
+* Debug mode now exports log even if the simulation stops due to error. If combined with continue on error, it will continue
+to export log with the timestamp
+
 # RDICE 0.94
 * Added possibility of accumulating outputs continuously backward or forward using the accum_backward option in run_sim and run_sim_parallel
 
