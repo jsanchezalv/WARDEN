@@ -290,7 +290,7 @@ pick_val_v <- function(base,
         
       } else { 
         #If distribution is dirichlet, recalculate remaining values using conditional
-        output[[i]] <- conditional_dirichlet(temp_data[[i]], which(ind), sens[[i]][ind], full_output = TRUE)[[1]]
+        output[[i]] <- conditional_dirichlet(temp_data[[i]], which(ind), sens[[i]][ind], full_output = TRUE)
       }
     }
     
