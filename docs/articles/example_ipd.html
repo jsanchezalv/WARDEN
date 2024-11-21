@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">RDICE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.95</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.96</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,7 @@
                         <h4 data-toc-skip class="author">Valerie Aponte
 Ribero and Javier Sanchez Alvarez</h4>
             
-            <h4 data-toc-skip class="date">November 14, 2024</h4>
+            <h4 data-toc-skip class="date">November 21, 2024</h4>
       
       
       <div class="d-none name"><code>example_ipd.Rmd</code></div>
@@ -130,8 +130,8 @@ progression-free state and may move to the progressed state. At any
 point in time they can die, depending on the risk of each disease stage.
 Patients may also experience a disease event which accelerates
 progression.</p>
-<div id="htmlwidget-2c2ed8ab53f48d5ec3a0" style="width:700px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-2c2ed8ab53f48d5ec3a0">{"x":{"diagram":"\n  digraph graph1 {\n  \n  graph [layout = dot, rankdir = LR, nodesep=\"1\", fontsize = 12]\n  \n  # node definitions with substituted label text\n  \n  node [shape = oval]\n  a [label = \"Progression-free\"]\n  b [label = \"Progressed\"]\n  d [label = \"Death\"]\n  \n  node [shape = box]\n  c [label = \"Progression-accelerating event\", style = dashed]\n  \n  a -> d\n  a -> b\n  b -> d\n  c -> b [style = dashed]\n  \n  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-9df1506249b0894f2c16" style="width:700px;height:300px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9df1506249b0894f2c16">{"x":{"diagram":"\n  digraph graph1 {\n  \n  graph [layout = dot, rankdir = LR, nodesep=\"1\", fontsize = 12]\n  \n  # node definitions with substituted label text\n  \n  node [shape = oval]\n  a [label = \"Progression-free\"]\n  b [label = \"Progressed\"]\n  d [label = \"Death\"]\n  \n  node [shape = box]\n  c [label = \"Progression-accelerating event\", style = dashed]\n  \n  a -> d\n  a -> b\n  b -> d\n  c -> b [style = dashed]\n  \n  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
 <h2 id="generate-dummy-ipd-trial-data-and-fit-survival-models">Generate dummy IPD trial data and fit survival models<a class="anchor" aria-label="anchor" href="#generate-dummy-ipd-trial-data-and-fit-survival-models"></a>
@@ -267,8 +267,8 @@ one could use the items generated in <code>common_all_inputs</code> in
 <span>  Sex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">IPD</span><span class="op">[</span><span class="va">i</span>,<span class="st">"SEX"</span><span class="op">]</span><span class="op">)</span>, <span class="co">#Record sex of individual patient. 0 = Female; 1 =Male</span></span>
 <span>  BLAge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">IPD</span><span class="op">[</span><span class="va">i</span>,<span class="st">"AGE"</span><span class="op">]</span><span class="op">)</span>, <span class="co">#Record patient age at baseline</span></span>
 <span>  </span>
-<span>  <span class="co">#Draw time to non-disease related death from a restricted Gompertz distribution</span></span>
-<span>  nat.death <span class="op">=</span> <span class="fu"><a href="../reference/rresgompertz.html">rresgompertz</a></span><span class="op">(</span><span class="fl">1</span>,shape<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">Sex</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span><span class="op">{</span><span class="fl">0.102</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.115</span><span class="op">}</span>,</span>
+<span>  <span class="co">#Draw time to non-disease related death from a conditional Gompertz distribution</span></span>
+<span>  nat.death <span class="op">=</span> <span class="fu"><a href="../reference/rcond_gompertz.html">rcond_gompertz</a></span><span class="op">(</span><span class="fl">1</span>,shape<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">Sex</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span><span class="op">{</span><span class="fl">0.102</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.115</span><span class="op">}</span>,</span>
 <span>                               rate<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">Sex</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span><span class="op">{</span><span class="fl">0.000016</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.0000041</span><span class="op">}</span>,</span>
 <span>                               lower_bound <span class="op">=</span> <span class="va">BLAge</span><span class="op">)</span> <span class="co"># Baseline Age in years</span></span>
 <span>  <span class="op">)</span></span>
@@ -425,9 +425,9 @@ defined for each patient in the simulated data set.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.69s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.69s"</span></span>
-<span><span class="co">#&gt; [1] "Total time to run: 0.71s"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.84s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.84s"</span></span>
+<span><span class="co">#&gt; [1] "Total time to run: 0.84s"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

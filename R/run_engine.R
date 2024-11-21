@@ -13,7 +13,8 @@
 #' @importFrom purrr map_dbl
 #' @importFrom data.table rbindlist
 #'
-#' @keywords internal
+#' @noRd
+
 
 
 run_engine <- function(arm_list,
@@ -265,7 +266,7 @@ run_engine <- function(arm_list,
       
       final_output <- list()  
       final_output$log_list <- lapply(temp_log_pt,transform_debug)
-      final_output$error_m <- messge(e$message,
+      final_output$error_m <- message(e$message,
                                      message("Error in analysis: ", sens,
                                              "; simulation: ", simulation,
                                              "; patient: ", if(exists("i")){i},

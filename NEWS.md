@@ -1,3 +1,7 @@
+# RDICE 0.96
+* Update based on validation comments from Gabriel. 
+* Renamed conditional quantile functions for consistency.
+
 # RDICE 0.95
 * Seeds used by default have been changed to guarantee uniqueness
 * Added possibility of continuing to the next simulation on error (if it occurs at the patient/arm level, not at the statics/structural loading level)

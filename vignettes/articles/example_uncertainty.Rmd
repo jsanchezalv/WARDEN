@@ -106,7 +106,7 @@ common_all_inputs <- add_item() %>%
 
 #Put objects here that do not change as we loop through interventions for a patient
 common_pt_inputs <- add_item(sex_pt = ifelse(rbinom(1,1,p=0.01),"male","female"),
-                             nat.os.s = rresgompertz(1,
+                             nat.os.s = rcond_gompertz(1,
                                                      shape=if(sex_pt=="male"){0.102}else{0.115},
                                                      rate=if(sex_pt=="male"){0.000016}else{0.0000041},
                                                      lower_bound = 50) ) #in years, for a patient who is 50yo
@@ -452,7 +452,7 @@ sample_sizes <- c(50,100,500,1000)
 sim_size_df <- NULL
 for (sample_size in sample_sizes) {
   results <- suppressWarnings( #run without warnings
-      run_sim_parallel(  
+      run_sim(  
     npats=sample_size,                        # number of patients to be simulated
     n_sim=6,                                # number of simulations to run
     psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
@@ -465,7 +465,6 @@ for (sample_size in sample_sizes) {
     util_ongoing_list = util_ongoing,
     cost_ongoing_list = cost_ongoing,
     cost_instant_list = cost_instant,
-    ncores = 6, # number of cores to use, recommended not to use all
     ipd=FALSE                                 # Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower
   )) 
 
@@ -544,7 +543,7 @@ sample_sizes <- 1000
 sim_size_psa_df <- NULL
 for (sample_size in sample_sizes) {
   results <- suppressWarnings( #run without warnings
-      run_sim_parallel(  
+      run_sim(  
     npats=sample_size,                        # number of patients to be simulated
     n_sim=6,                                # number of simulations to run
     psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
@@ -557,7 +556,6 @@ for (sample_size in sample_sizes) {
     util_ongoing_list = util_ongoing,
     cost_ongoing_list = cost_ongoing,
     cost_instant_list = cost_instant,
-    ncores = 6, # number of cores to use, recommended not to use all
     ipd=FALSE                                 # Return IPD data through merged_df? Set to FALSE as it's not of interest here and it makes code slower
   )) 
 

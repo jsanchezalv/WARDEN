@@ -8,8 +8,7 @@ if(getRversion() >= "2.15.1") {
         "tte",
         "evt_num",
         ".id",
-        "evt_count"),
-      c("stop2") #rdirichlet
+        "evt_count")
     )) 
 }
 
@@ -102,10 +101,10 @@ rdirichlet <- function(n=1,alpha,seed=NULL) {
       alpha <- matrix(alpha, nrow = 1)
     }
     if (prod(dim(alpha)) == 0) {
-      stop2("alpha should be non-empty.")
+      stop("alpha should be non-empty.")
     }
     if (isTRUE(any(alpha < 0))) {
-      stop2("alpha must be positive.")
+      stop("alpha must be positive.")
     }
     if (n == 1) {
       out <- matrix(rgamma(ncol(alpha) * nrow(alpha), alpha), ncol = ncol(alpha))
@@ -265,25 +264,25 @@ rgamma_mse <- function(n=1,mean_v,se,seed=NULL) {
 }
 
 
-#' Draw from a restricted Gompertz distribution (lower and upper bound)
+#' Draw from a Conditional Gompertz distribution (lower and upper bound)
 #'
 #' @param n The number of observations to be drawn
 #' @param shape The shape parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
 #' @param rate The rate parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
-#' @param lower_bound The lower bound of the restricted distribution
-#' @param upper_bound The upper bound of the restricted distribution
+#' @param lower_bound The lower bound of the conditional distribution
+#' @param upper_bound The upper bound of the conditional distribution
 #' @param seed An integer which will be used to set the seed for this draw.
 #'
-#' @return Estimate(s) from the restricted Gompertz distribution based on given parameters
+#' @return Estimate(s) from the Conditional Gompertz distribution based on given parameters
 #'
 #' @importFrom stats runif
 #'
 #' @export
 #'
 #' @examples
-#' rresgompertz_lu(1,shape=0.05,rate=0.01,lower_bound = 50)
+#' rcond_gompertz_lu(1,shape=0.05,rate=0.01,lower_bound = 50)
 
-rresgompertz_lu <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf, seed=NULL){
+rcond_gompertz_lu <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf, seed=NULL){
 
   if(!is.null(seed)){
     set.seed(seed)
@@ -294,24 +293,24 @@ rresgompertz_lu <- function(n, shape, rate , lower_bound = 0, upper_bound = Inf,
   flexsurv::qgompertz(uniform_random_numbers, shape, rate ) - lower_bound
 }
 
-#' Draw from a restricted Gompertz distribution (lower bound only)
+#' Draw from a conditional Gompertz distribution (lower bound only)
 #'
 #' @param n The number of observations to be drawn
 #' @param shape The shape parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
 #' @param rate The rate parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
-#' @param lower_bound The lower bound of the restricted distribution
+#' @param lower_bound The lower bound of the conditional distribution
 #' @param seed An integer which will be used to set the seed for this draw.
 #'
-#' @return Estimate(s) from the restricted Gompertz distribution based on given parameters
+#' @return Estimate(s) from the conditional Gompertz distribution based on given parameters
 #'
 #' @importFrom stats runif
 #'
 #' @export
 #'
 #' @examples
-#' rresgompertz(1,shape=0.05,rate=0.01,lower_bound = 50)
+#' rcond_gompertz(1,shape=0.05,rate=0.01,lower_bound = 50)
 
-rresgompertz <- function(n=1,shape,rate,lower_bound,seed=NULL){
+rcond_gompertz <- function(n=1,shape,rate,lower_bound,seed=NULL){
   if(!is.null(seed)){
     set.seed(seed)
   }
@@ -321,43 +320,46 @@ rresgompertz <- function(n=1,shape,rate,lower_bound,seed=NULL){
 }
 
 
-#' Quantile function for restricted Gompertz distribution (lower bound only)
+#' Quantile function for conditional Gompertz distribution (lower bound only)
 #'
 #' @param rnd Vector of quantiles
 #' @param shape The shape parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
 #' @param rate The rate parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
-#' @param lower_bound The lower bound of the restricted distribution
+#' @param lower_bound The lower bound of the conditional distribution
 #'
-#' @return Estimate(s) from the restricted Gompertz distribution based on given parameters
+#' @return Estimate(s) from the conditional Gompertz distribution based on given parameters
 #'
 #' @export
 #'
 #' @examples
-#' qresgompertz(rnd=0.5,shape=0.05,rate=0.01,lower_bound = 50)
+#' qcond_gompertz(rnd=0.5,shape=0.05,rate=0.01,lower_bound = 50)
 
-qresgompertz <- function(rnd=0.5,shape,rate,lower_bound){
+qcond_gompertz <- function(rnd=0.5,shape,rate,lower_bound){
+  if(rnd <0 | rnd > 1){
+    stop("rnd is <0 or >1")
+  }
   
   out <- (1/shape)*log(1- ((shape/rate)*log(1-rnd)/exp(shape*lower_bound)))
   
   return(out)
 }
 
-#' Survival Probaility function for restricted Gompertz distribution (lower bound only)
+#' Survival Probaility function for conditional Gompertz distribution (lower bound only)
 #'
 #' @param time Vector of times
 #' @param shape The shape parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
 #' @param rate The rate parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object
-#' @param lower_bound The lower bound of the restricted distribution
+#' @param lower_bound The lower bound of the conditional distribution
 #'
-#' @return Estimate(s) from the restricted Gompertz distribution based on given parameters
+#' @return Estimate(s) from the conditional Gompertz distribution based on given parameters
 #'
 #'
 #' @export
 #'
 #' @examples
-#' presgompertz(time=1,shape=0.05,rate=0.01,lower_bound = 50)
+#' pcond_gompertz(time=1,shape=0.05,rate=0.01,lower_bound = 50)
 
-presgompertz <- function(time=1,shape,rate,lower_bound){
+pcond_gompertz <- function(time=1,shape,rate,lower_bound){
   
   out <- 1- exp(-(rate/shape) * exp(shape*lower_bound)*(exp(shape * time)-1))
     
@@ -506,9 +508,9 @@ rpoisgamma <- function(n, rate, theta=NULL, obs_time=1, t_reps, seed=NULL,return
 #' i <- 1:2  # Index of the known parameter
 #' xi <- c(1.2,2.3)  # Known value of the first parameter
 #'
-#'conditional_mvn(mu, Sigma, i, xi,full_output = TRUE)
+#'cond_mvn(mu, Sigma, i, xi,full_output = TRUE)
 
-conditional_mvn <- function(mu, Sigma, i, xi, full_output = FALSE) {
+cond_mvn <- function(mu, Sigma, i, xi, full_output = FALSE) {
   
   if(length(mu)==length(i)){stop("Trying to condition on all parameters")}
   
@@ -572,9 +574,9 @@ conditional_mvn <- function(mu, Sigma, i, xi, full_output = FALSE) {
 #' xi <- 0.5  # Known value of the second parameter
 #' 
 #' # Compute the conditional alpha parameters with full output
-#' conditional_dirichlet(alpha, i, xi, full_output = TRUE)
+#' cond_dirichlet(alpha, i, xi, full_output = TRUE)
 
-conditional_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
+cond_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
   
   if(length(alpha)==length(i)){stop("Trying to condition on all parameters")}
   if(sum(xi) > 1){stop("Sum of xi should be <= 1")}
@@ -616,9 +618,13 @@ conditional_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
 #' @export
 #'
 #' @examples
-#' conditional_qexp(rnd = 0.5,rate = 3)
+#' qcond_exp(rnd = 0.5,rate = 3)
 
-conditional_qexp <- function(rnd = 0.5, rate) {
+qcond_exp <- function(rnd = 0.5, rate) {
+  if(rnd <0 | rnd > 1){
+    stop("rnd is <0 or >1")
+  }
+  
   -log(1-rnd)/rate
 }
 
@@ -635,9 +641,13 @@ conditional_qexp <- function(rnd = 0.5, rate) {
 #' @export
 #'
 #' @examples
-#' conditional_qweibull(rnd = 0.5,shape = 3,scale = 66.66,lower_bound = 50)
+#' qcond_weibull(rnd = 0.5,shape = 3,scale = 66.66,lower_bound = 50)
 
-conditional_qweibull <- function(rnd = 0.5, shape, scale, lower_bound) {
+qcond_weibull <- function(rnd = 0.5, shape, scale, lower_bound) {
+  if(rnd <0 | rnd > 1){
+    stop("rnd is <0 or >1")
+  }
+  
   (lower_bound^shape - log(1-rnd)*scale^shape)^(1/shape) - lower_bound
 }
 
@@ -653,9 +663,13 @@ conditional_qweibull <- function(rnd = 0.5, shape, scale, lower_bound) {
 #' @export
 #'
 #' @examples
-#' conditional_qllogis(rnd = 0.5,shape = 1,scale = 1,lower_bound = 1)
+#' qcond_llogis(rnd = 0.5,shape = 1,scale = 1,lower_bound = 1)
 
-conditional_qllogis <- function(rnd = 0.5, shape, scale, lower_bound) {
+qcond_llogis <- function(rnd = 0.5, shape, scale, lower_bound) {
+  if(rnd <0 | rnd > 1){
+    stop("rnd is <0 or >1")
+  }
+  
   ((scale^shape + lower_bound^shape)/(1-rnd) - scale^shape )^(1/shape)- lower_bound
 }
 
@@ -675,9 +689,12 @@ conditional_qllogis <- function(rnd = 0.5, shape, scale, lower_bound) {
 #' @export
 #'
 #' @examples
-#' conditional_qlnorm(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1, s_obs=0.8)
+#' qcond_lnorm(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1, s_obs=0.8)
 
-conditional_qlnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound, s_obs) {
+qcond_lnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound, s_obs) {
+  if(rnd <0 | rnd > 1){
+    stop("rnd is <0 or >1")
+  }
   
   exp(meanlog + sdlog * qnorm(1 - s_obs * (1-rnd))) - lower_bound
 }
@@ -699,9 +716,12 @@ conditional_qlnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound, s_obs) {
 #' @export
 #'
 #' @examples
-#' conditional_qnorm(rnd = 0.5, mean = 1,sd = 1,lower_bound = 1, s_obs=0.8)
+#' qcond_norm(rnd = 0.5, mean = 1,sd = 1,lower_bound = 1, s_obs=0.8)
 
-conditional_qnorm <- function(rnd = 0.5, mean,sd, lower_bound, s_obs) {
+qcond_norm <- function(rnd = 0.5, mean,sd, lower_bound, s_obs) {
+  if(rnd <0 | rnd > 1){
+    stop("rnd is <0 or >1")
+  }
 
   qnorm(1 - s_obs*(1-rnd),mean,sd) - lower_bound
 }
@@ -723,9 +743,12 @@ conditional_qnorm <- function(rnd = 0.5, mean,sd, lower_bound, s_obs) {
 #' @export
 #'
 #' @examples
-#' conditional_qgamma(rnd = 0.5, rate = 1.06178, shape = 0.01108,lower_bound = 1, s_obs=0.8)
+#' qcond_gamma(rnd = 0.5, rate = 1.06178, shape = 0.01108,lower_bound = 1, s_obs=0.8)
 
-conditional_qgamma <- function(rnd = 0.5, rate,shape, lower_bound, s_obs) {
+qcond_gamma <- function(rnd = 0.5, rate,shape, lower_bound, s_obs) {
+  if(rnd <0 | rnd > 1){
+    stop("rnd is <0 or >1")
+  }
   
   qgamma(1 - s_obs*(1-rnd),rate,shape) - lower_bound
 }

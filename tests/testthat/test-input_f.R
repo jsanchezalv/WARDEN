@@ -190,6 +190,28 @@ test_that("Create indicators works correctly",{
 
 test_that("Pick values vectorized work correctly",{
   expect_equal(
+    pick_val_v(base = list(2,3,c(2, 3, 4)),
+               psa =sapply(1:3,
+                           function(x) eval(call(
+                             c("rnorm","rnorm","rdirichlet")[[x]],
+                             1,
+                             c(2,3,list(c(2, 3, 4)))[[x]],
+                             c(0.1,0.1,NULL)[[x]]
+                             ))),
+               sens = list(4,5,c(0.4,0.8,0.1)),
+               psa_ind = FALSE,
+               sens_ind = TRUE,
+               indicator=list(1,2,c(3,4,5)),
+               names_out=c("util","util2","dirichlet_vector") ,
+               indicator_sens_binary = FALSE,
+               sens_iterator = 5,
+               distributions = list("rnorm","rnorm","rdirichlet"),
+               covariances = list(0.1,0.1,NULL) ),
+    list(util = 2, util2 = 3, dirichlet_vector = c(0.36, 0.54, 0.1))
+    
+  )
+  
+  expect_equal(
     pick_val_v(
       base = c(0,0),
       psa =c(rnorm(1,0,0.1),rnorm(1,0,0.1)),
@@ -307,5 +329,56 @@ test_that("Pick values vectorized work correctly",{
   )
   
 
+})
+
+
+test_that("Conditional Multivariate normal works as expected",{
+  expect_equal(
+    cond_mvn(mu = c(1, 2, 3),
+                    Sigma = matrix(c(0.2, 0.05, 0.1, 
+                                     0.05, 0.3, 0.05, 
+                                     0.1, 0.05, 0.4), nrow = 3),
+                    i = 1:2,
+                    xi = c(1.2,2.3),
+                    full_output = TRUE
+                    )$mean,
+    c(1.2, 2.3, 3.1217391)
+  )
+  
+  expect_equal(
+    cond_mvn(mu = c(1, 2, 3),
+                    Sigma = matrix(c(0.2, 0.05, 0.1, 
+                                     0.05, 0.3, 0.05, 
+                                     0.1, 0.05, 0.4), nrow = 3),
+                    i = 1:2,
+                    xi = c(1.2,2.3),
+                    full_output = TRUE
+    )$covariance,
+    structure(c(0, 0, 0, 0, 0, 0, 0, 0, 0.347826086956522), dim = c(3L, 
+                                                                    3L))
+  )
+  
+  expect_error(
+    cond_mvn(mu = c(1, 2, 3),
+                    Sigma = matrix(c(0, 0, 0, 
+                                     0, 0, 0, 
+                                     0, 0, 0), nrow = 3),
+                    i = 1:2,
+                    xi = c(1.2,2.3),
+                    full_output = TRUE
+    )
+  )
+  
+  expect_error(
+    cond_mvn(mu = c(1, 2, 3),
+                    Sigma = matrix(c(0, 0, 0, 
+                                     0, 0, 0, 
+                                     0, 0, 0), nrow = 3),
+                    i = 5,
+                    xi = c(1.2,2.3),
+                    full_output = TRUE
+    )
+  )
+  
 })
 

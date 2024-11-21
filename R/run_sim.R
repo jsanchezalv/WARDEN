@@ -144,8 +144,10 @@ run_sim <- function(arm_list=c("int","noint"),
   )
   
   if(  length(matched_list_forbidden)>0){
-    stop(paste0("Name(s) or object `", list_forbidden_names[matched_list_forbidden],"` defined belong to the list of forbidden names, which can cause issues in the model.
-         Please remove or rename those names. See run_sim or run_sim_parallel for a full list of these names.\n"))
+    stop(paste0("Name(s) or object: `", list_forbidden_names[matched_list_forbidden],"` defined belong to the list of forbidden names, which can cause issues in the model.
+    This is likely caused by an object being declared in the parent/global environment (e.g., `i`) or in the inputs. 
+    You can use functions like find('i') to help you locate them. 
+    Please remove or rename those objects. See run_sim or run_sim_parallel for a full list of these names.\n"))
   }
   
   if(length(names(evt_react_list)) != length(init_event_list[[1]][["evts"]])){
@@ -293,7 +295,7 @@ run_sim <- function(arm_list=c("int","noint"),
           input_list_sens <- c(input_list_sens, list.sensitivity_inputs[[1]])
         } else{
         if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
-          warning("Item ", names(list.sensitivity_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
+          warning("Item ", names(list.sensitivity_inputs), " is named. It is advised to assign unnamed objects or use lists if they are going to be processed in the model, as they could generate errors.\n")
         }
         input_list_sens <- c(input_list_sens,list.sensitivity_inputs)
         }
@@ -417,7 +419,6 @@ run_sim <- function(arm_list=c("int","noint"),
     print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
     }
-  }, enable=TRUE)
     
   print(paste0("Total time to run: ",  round(proc.time()[3]- start_time[3] , 2), "s"))
 
@@ -437,6 +438,9 @@ run_sim <- function(arm_list=c("int","noint"),
   
   #Retore original rng kind
   RNGkind(rng_kind_store)
+  
+   }, enable=TRUE)
+    
   
   return(results)
   

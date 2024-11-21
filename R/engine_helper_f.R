@@ -20,7 +20,7 @@ if(getRversion() >= "2.15.1") {
         'evt_arm',
         'input_list_arm',
         'nexttime',
-        'nevt_id')
+        'evt_id')
     )) 
 }
 
@@ -88,7 +88,7 @@ get_next_evt <- function(evt_list){                  # This function identifies 
     # min_evt <- which.min(evt_list) #old method
 
     #select the position in the vector that has the minimum time, adding the priority times to make sure to select the right one,
-    # 4x slower than old method
+    # 4x slower than old method, but this is required to solve ties
     
     min_evt <- which.min(evt_list + parent.frame()$input_list_arm$precision_times[names(evt_list)]) 
     cur_evtlist <- list(out = list(evt = names(evt_list[min_evt]), evttime = evt_list[[min_evt]]), evt_list = evt_list[-min_evt])
@@ -314,61 +314,13 @@ transform_debug <- function(debug_data) {
   return(new_event)
 }
 
-#Expand events for time frequency approach
-
-#' Helper function to export debug log to a txt file
-#' 
-#' @param row row to apply function to
-#' @param time_points time points to use
-#' @param reset_columns Columns that need reset (instantaneous)
-#' 
-#' @return Expanded datatable
-#' 
-#' @keywords internal
-#' @noRd
-
-expand_event <- function(row, time_points, reset_columns) {
-  
-  evttime <- row$evttime
-  nexttime <- row$nexttime
-  
-  # Get time_points that fall between evttime and nexttime
-  relevant_timepoints <- time_points[time_points > evttime & time_points < nexttime]
-  
-  # Combine the start (evttime), end (nexttime), and time_points in between
-  start_times <- c(evttime, relevant_timepoints)
-  end_times <- c(relevant_timepoints, nexttime)
-
-  # Create expanded rows
-  expanded <- rbindlist(lapply(seq_along(start_times), function(i) {
-    # Copy the row and modify the evttime/nexttime
-    new_row <- copy(row)
-    new_row$evttime <- start_times[i]
-    new_row$nexttime <- end_times[i]
-    new_row$time_points <- time_points[i]
-    
-    # If not the first occurrence, reset specified columns to 0
-    if (i > 1) {
-      for (col in reset_columns) {
-        new_row[[col]] <- 0
-        new_row[[paste0(col,"_","undisc")]] <- 0
-      }
-    }
-    
-    return(new_row)
-  }))
-  
-  return(expanded)
-}
-
-
 # Helper function to export debug log to a txt file
 
 #' Helper function to export debug log to a txt file
 #' 
 #' @param log_list name of the debug list object to be exported
 #' @param log_name name of the file to be exported to (e.g., "log_list.txt")
-#' @param main_byline description
+#' @param main_byline TRUE if the main line (analysis, simulation, patient...) should be split in different lines or FALSE if pasted as a single line
 #' 
 #' @return None, writes txt called log_name
 #' 

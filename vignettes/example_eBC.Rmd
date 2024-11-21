@@ -103,7 +103,7 @@ common_all_inputs <- add_item() %>%
 )
 #Put objects here that do not change as we loop through interventions for a patient
 common_pt_inputs <- add_item(sex_pt = ifelse(rbinom(1,1,p=0.01),"male","female"),
-                             nat.os.s = rresgompertz(1,
+                             nat.os.s = rcond_gompertz(1,
                                                      shape=if(sex_pt=="male"){0.102}else{0.115},
                                                      rate=if(sex_pt=="male"){0.000016}else{0.0000041},
                                                      lower_bound = 50) ) #in years, for a patient who is 50yo

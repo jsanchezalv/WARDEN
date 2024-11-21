@@ -25,7 +25,7 @@ Perform luck adjustment
 This function performs the luck adjustment automatically for the user, returning the adjusted luck number.
 Luck is interpreted in the same fashion as is standard in R (higher luck, higher time to event).
 
-Note that if TTE is predicted using a conditional quantile function (e.g., restricted gompertz, conditional quantile weibull...) \code{prevsurv} and \code{cursurv}
+Note that if TTE is predicted using a conditional quantile function (e.g., conditional gompertz, conditional quantile weibull...) \code{prevsurv} and \code{cursurv}
 are the unconditional survival using the "previous" parametrization but at the previous time for \code{presurv} and at the current time for \code{cursurv}.
 For other distributions, \code{presurv} is the survival up to current time using the previous parametrization, and \code{cursurv}
 is the survival up to current time using the current parametrization.
@@ -76,7 +76,7 @@ new_luck <- luck_adj(prevsurv = 1-pweibull(q=10,3,1/0.025),
                       luck = new_luck,
                       condq = TRUE) #time 25 change
 
-conditional_qweibull(rnd = new_luck,
+qcond_weibull(rnd = new_luck,
                      shape = 3,
                      scale = 1/0.015,
                      lower_bound = 25) + 25 #final TTE

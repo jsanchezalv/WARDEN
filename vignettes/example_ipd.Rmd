@@ -168,8 +168,8 @@ common_pt_inputs <- add_item(
   Sex = as.numeric(IPD[i,"SEX"]), #Record sex of individual patient. 0 = Female; 1 =Male
   BLAge = as.numeric(IPD[i,"AGE"]), #Record patient age at baseline
   
-  #Draw time to non-disease related death from a restricted Gompertz distribution
-  nat.death = rresgompertz(1,shape=if(Sex==1){0.102}else{0.115},
+  #Draw time to non-disease related death from a conditional Gompertz distribution
+  nat.death = rcond_gompertz(1,shape=if(Sex==1){0.102}else{0.115},
                                rate=if(Sex==1){0.000016}else{0.0000041},
                                lower_bound = BLAge) # Baseline Age in years
   )

@@ -286,11 +286,11 @@ pick_val_v <- function(base,
         
       } else if(distributions[[i]]=="mvrnorm"){
         #If distribution is mvrnorm, recalculate remaining values using conditional
-        output[[i]] <- conditional_mvn(temp_data[[i]], covariances[[i]], which(ind), sens[[i]][ind], full_output = TRUE)[[1]]
+        output[[i]] <- cond_mvn(temp_data[[i]], covariances[[i]], which(ind), sens[[i]][ind], full_output = TRUE)[[1]]
         
       } else { 
         #If distribution is dirichlet, recalculate remaining values using conditional
-        output[[i]] <- conditional_dirichlet(temp_data[[i]], which(ind), sens[[i]][ind], full_output = TRUE)
+        output[[i]] <- cond_dirichlet(temp_data[[i]], which(ind), sens[[i]][ind], full_output = TRUE)
       }
     }
     
@@ -815,7 +815,7 @@ add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
 #' This function performs the luck adjustment automatically for the user, returning the adjusted luck number.
 #' Luck is interpreted in the same fashion as is standard in R (higher luck, higher time to event).
 #' 
-#' Note that if TTE is predicted using a conditional quantile function (e.g., restricted gompertz, conditional quantile weibull...) `prevsurv` and `cursurv`
+#' Note that if TTE is predicted using a conditional quantile function (e.g., conditional gompertz, conditional quantile weibull...) `prevsurv` and `cursurv`
 #' are the unconditional survival using the "previous" parametrization but at the previous time for `presurv` and at the current time for `cursurv`.
 #' For other distributions, `presurv` is the survival up to current time using the previous parametrization, and `cursurv` 
 #' is the survival up to current time using the current parametrization.
@@ -866,7 +866,7 @@ add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
 #'                       luck = new_luck,
 #'                       condq = TRUE) #time 25 change
 #' 
-#' conditional_qweibull(rnd = new_luck,
+#' qcond_weibull(rnd = new_luck,
 #'                      shape = 3,
 #'                      scale = 1/0.015,
 #'                      lower_bound = 25) + 25 #final TTE

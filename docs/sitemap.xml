@@ -82,6 +82,12 @@
     <loc>/reference/conditional_qweibull.html</loc>
   </url>
   <url>
+    <loc>/reference/cond_dirichlet.html</loc>
+  </url>
+  <url>
+    <loc>/reference/cond_mvn.html</loc>
+  </url>
+  <url>
     <loc>/reference/create_indicators.html</loc>
   </url>
   <url>
@@ -145,6 +151,9 @@
     <loc>/reference/new_event.html</loc>
   </url>
   <url>
+    <loc>/reference/pcond_gompertz.html</loc>
+  </url>
+  <url>
     <loc>/reference/pick_psa.html</loc>
   </url>
   <url>
@@ -160,10 +169,37 @@
     <loc>/reference/qbeta_mse.html</loc>
   </url>
   <url>
+    <loc>/reference/qcond_exp.html</loc>
+  </url>
+  <url>
+    <loc>/reference/qcond_gamma.html</loc>
+  </url>
+  <url>
+    <loc>/reference/qcond_gompertz.html</loc>
+  </url>
+  <url>
+    <loc>/reference/qcond_llogis.html</loc>
+  </url>
+  <url>
+    <loc>/reference/qcond_lnorm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/qcond_norm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/qcond_weibull.html</loc>
+  </url>
+  <url>
     <loc>/reference/qresgompertz.html</loc>
   </url>
   <url>
     <loc>/reference/rbeta_mse.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rcond_gompertz.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rcond_gompertz_lu.html</loc>
   </url>
   <url>
     <loc>/reference/rdirichlet.html</loc>
