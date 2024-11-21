@@ -38,3 +38,7 @@ devtools::install_github("javiersanchezalvarezevidera/RDICE", ref="main")
 ## Citation
 
 If you use `RDICE`, please contact the authors for the most up to date appropiate citation.
+
+<!-- badges: start -->
+  [![R-CMD-check](https://github.com/javiersanchezalvarezevidera/RDICE/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/javiersanchezalvarezevidera/RDICE/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
