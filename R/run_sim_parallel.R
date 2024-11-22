@@ -218,7 +218,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   progressr::handlers(progressr::handler_txtprogressbar(width=100))
   
   progressr::with_progress({
-    pb <- progressr::progressor(50) 
+    pb <- progressr::progressor(min(npats*length_sensitivities*n_sim,50)) 
     
   for (sens in 1:length_sensitivities) {
     print(paste0("Analysis number: ",sens))
@@ -287,6 +287,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        n_sim = n_sim,
                        sensitivity_bool = sensitivity_bool,
                        n_sensitivity = n_sensitivity,
+                       length_sensitivities = length_sensitivities,
                        sens = sens,
                        sensitivity_names = sensitivity_names,
                        sens_name_used = sens_name_used,

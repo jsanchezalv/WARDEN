@@ -27,6 +27,7 @@ run_engine <- function(arm_list,
   simulation <- input_list$simulation
   sens <- input_list$sens
   n_sensitivity <- input_list$n_sensitivity
+  length_sensitivities <- input_list$length_sensitivities
   n_sim <- input_list$n_sim
   npats <- input_list$npats
   psa_bool <- input_list$psa_bool
@@ -42,7 +43,7 @@ run_engine <- function(arm_list,
   
   for (i in 1:npats) {
     set.seed(simulation*1007 + i*53)
-    if((((sens - 1) * n_sim * npats) + ((simulation - 1) * npats) + i) %% ceiling(npats*n_sim*n_sensitivity / 50) == 0){
+    if((((sens - 1) * n_sim * npats) + ((simulation - 1) * npats) + i) %% ceiling(npats*n_sim*length_sensitivities / min(npats*length_sensitivities*n_sim,50)) == 0){
       pb(sprintf("Simulation %g", simulation))
       }
     

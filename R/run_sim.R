@@ -202,7 +202,7 @@ run_sim <- function(arm_list=c("int","noint"),
     progressr::handlers(progressr::handler_txtprogressbar(width=100))
     
     progressr::with_progress({
-     pb <- progressr::progressor(50) 
+     pb <- progressr::progressor(min(npats*length_sensitivities*n_sim,50)) 
       
   #Need to figure out how to distinguish DSA (as many sensitivities as parameters) and Scenarios (as many sensivities as scenarios)
   for (sens in 1:length_sensitivities) {
@@ -272,6 +272,7 @@ run_sim <- function(arm_list=c("int","noint"),
                        n_sim = n_sim,
                        sensitivity_bool = sensitivity_bool,
                        n_sensitivity = n_sensitivity,
+                       length_sensitivities = length_sensitivities,
                        sens = sens,
                        sensitivity_names = sensitivity_names,
                        sens_name_used = sens_name_used,
