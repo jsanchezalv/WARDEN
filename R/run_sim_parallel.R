@@ -297,20 +297,21 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        log_list = list()
                       )
     
-    set.seed(sens*100037)
+    set.seed(100037)
     
     # Draw Common parameters  -------------------------------
     if(!is.null(sensitivity_inputs)){
       for (inp in 1:length(sensitivity_inputs)) {
         list.sensitivity_inputs <- lapply(sensitivity_inputs[inp],function(x) eval(x, input_list_sens))
+        
         #If using pick_eval_v or other expressions, the lists are not deployed, so this is necessary to do so
         if(any(is.null(names(list.sensitivity_inputs)), names(list.sensitivity_inputs)=="") & length(list.sensitivity_inputs)==1) {
-          input_list_sens <- c(input_list_sens, list.sensitivity_inputs[[1]])
+          input_list_sens[names(list.sensitivity_inputs[[1]])] <- list.sensitivity_inputs[[1]]
         } else{
-        if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
-          warning("Item ", names(list.sensitivity_inputs), " is named. It is advised to assign unnamed objects or use lists if they are going to be processed in the model, as they could generate errors.\n")
-        }
-        input_list_sens <- c(input_list_sens,list.sensitivity_inputs)
+          if ((!is.null(names(list.sensitivity_inputs[[1]]))) & sens==1) {
+            warning("Item ", names(list.sensitivity_inputs), " is named. It is advised to assign unnamed objects or use lists if they are going to be processed in the model, as they could generate errors.\n")
+          }
+          input_list_sens[names(list.sensitivity_inputs)] <- list.sensitivity_inputs  
         }
       }
       
@@ -360,7 +361,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       input_list <- c(input_list_sens,
                       simulation = simulation)
       
-      set.seed(sens*100037 + simulation*1007)
+      set.seed(simulation*1007)
       
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
@@ -368,12 +369,12 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
           list.common_all_inputs <- lapply(common_all_inputs[inp],function(x) eval(x, input_list))
           #If using pick_eval_v or other expressions, the lists are not deployed, so this is necessary to do so
           if(any(is.null(names(list.common_all_inputs)), names(list.common_all_inputs)=="") & length(list.common_all_inputs)==1) {
-            input_list <- c(input_list, list.common_all_inputs[[1]])
+            input_list[names(list.common_all_inputs[[1]])] <- list.common_all_inputs[[1]]
           } else{
-          if ((!is.null(names(list.common_all_inputs[[1]]))) & simulation==1 & sens==1) {
-            warning("Item ", names(list.common_all_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
-          }
-          input_list <- c(input_list,list.common_all_inputs)
+            if ((!is.null(names(list.common_all_inputs[[1]]))) & simulation==1 & sens==1) {
+              warning("Item ", names(list.common_all_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they could generate errors.\n")
+            }
+            input_list[names(list.common_all_inputs)] <- list.common_all_inputs
           }
         }
         

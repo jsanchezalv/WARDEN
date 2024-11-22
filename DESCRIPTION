@@ -29,8 +29,7 @@ Suggests:
     DiagrammeR,
     testthat (>= 3.0.0),
     survminer,
-    survival,
-    flexsurvPlus
+    survival
 Imports: 
     purrr,
     data.table,
@@ -47,3 +46,5 @@ Imports:
     tidyr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10)

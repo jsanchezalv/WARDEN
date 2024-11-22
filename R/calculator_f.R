@@ -648,7 +648,7 @@ qcond_weibull <- function(rnd = 0.5, shape, scale, lower_bound) {
     stop("rnd is <0 or >1")
   }
   
-  (lower_bound^shape - log(1-rnd)*scale^shape)^(1/shape) - lower_bound
+  ((lower_bound/scale)^shape - log(1-rnd))^(1/shape)*scale - lower_bound
 }
 
 #' Conditional quantile function for loglogistic distribution 

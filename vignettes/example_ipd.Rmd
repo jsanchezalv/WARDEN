@@ -33,7 +33,6 @@ library(RDICE)
 library(dplyr)
 library(survival)
 library(survminer)
-library(flexsurvPlus)
 library(kableExtra)
 library(tidyr)
 library(purrr)
@@ -76,12 +75,12 @@ DiagrammeR::grViz("
 ```
 
 # Generate dummy IPD trial data and fit survival models
-The dummy IPD trial data is generated below using the sim_adtte() function from the flexsurvPlus package.
+The dummy IPD trial data was generated below from using the `sim_adtte()` function from the `flexsurvPlus` package.
 Parametric survival models are fit to the dummy OS and TTP IPD. We are using the flexsurv package to fit the parametric survival models.
 
 ```{r load_data, message=FALSE}
 #Generate dummy IPD
-tte.df <- sim_adtte(seed = 821, rho = 0, beta_1a = log(0.6), beta_1b = log(0.6), beta_pd = log(0.2))
+tte.df <- RDICE::tte.df
 
 #Change data frame to wide format
 tte.df <- tte.df %>% select(-PARAM) %>% pivot_wider(names_from = PARAMCD, values_from = c(AVAL,CNSR)) 
