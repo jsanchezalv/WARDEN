@@ -776,7 +776,7 @@ add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
     }
 
     
-    if (length(evts)>1 | !is.character(evts) | any(nchar(evts)<2)) {
+    if (length(evts)<2 | !is.character(evts) | any(nchar(evts)<2)) {
       stop("evts argument in add_tte should be a string vector with at least 2 characters each. At least two events should be defined (e.g., start and end).")
     }
 
