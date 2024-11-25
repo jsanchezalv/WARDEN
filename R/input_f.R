@@ -715,7 +715,10 @@ modify_item_seq <- function(...){
 
 add_reactevt <- function(.data=NULL,name_evt,input){
 
-
+  if (length(name_evt)>1 | !is.character(name_evt) | any(nchar(name_evt)<2)) {
+    stop("name_evt argument in add_reactevt should be a single string with at least 2 characters")
+  }
+  
   data_list <- .data
 
   evt_r <- list(list(react=substitute(input)))
@@ -772,10 +775,10 @@ add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
       stop("other_inp argument is required to be a character vector or be set to NULL")
     }
 
-    if (!is.character(evts) | length(evts)<2) {
-      stop("evts argument in add_tte for the intervention ", arm_i, " is required to be a character vector with length >1")
+    
+    if (length(evts)>1 | !is.character(evts) | any(nchar(evts)<2)) {
+      stop("evts argument in add_tte should be a string vector with at least 2 characters each. At least two events should be defined (e.g., start and end).")
     }
-
 
     evt_l <- list(list(expr=substitute(input),
                        evts = evts,

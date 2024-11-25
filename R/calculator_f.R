@@ -310,7 +310,7 @@ rcond_gompertz_lu <- function(n, shape, rate , lower_bound = 0, upper_bound = In
 #' @examples
 #' rcond_gompertz(1,shape=0.05,rate=0.01,lower_bound = 50)
 
-rcond_gompertz <- function(n=1,shape,rate,lower_bound,seed=NULL){
+rcond_gompertz <- function(n=1,shape,rate,lower_bound=0,seed=NULL){
   if(!is.null(seed)){
     set.seed(seed)
   }
@@ -334,7 +334,7 @@ rcond_gompertz <- function(n=1,shape,rate,lower_bound,seed=NULL){
 #' @examples
 #' qcond_gompertz(rnd=0.5,shape=0.05,rate=0.01,lower_bound = 50)
 
-qcond_gompertz <- function(rnd=0.5,shape,rate,lower_bound){
+qcond_gompertz <- function(rnd=0.5,shape,rate,lower_bound=0){
   if(rnd <0 | rnd > 1){
     stop("rnd is <0 or >1")
   }
@@ -359,7 +359,7 @@ qcond_gompertz <- function(rnd=0.5,shape,rate,lower_bound){
 #' @examples
 #' pcond_gompertz(time=1,shape=0.05,rate=0.01,lower_bound = 50)
 
-pcond_gompertz <- function(time=1,shape,rate,lower_bound){
+pcond_gompertz <- function(time=1,shape,rate,lower_bound=0){
   
   out <- 1- exp(-(rate/shape) * exp(shape*lower_bound)*(exp(shape * time)-1))
     
@@ -643,7 +643,7 @@ qcond_exp <- function(rnd = 0.5, rate) {
 #' @examples
 #' qcond_weibull(rnd = 0.5,shape = 3,scale = 66.66,lower_bound = 50)
 
-qcond_weibull <- function(rnd = 0.5, shape, scale, lower_bound) {
+qcond_weibull <- function(rnd = 0.5, shape, scale, lower_bound=0) {
   if(rnd <0 | rnd > 1){
     stop("rnd is <0 or >1")
   }
@@ -665,12 +665,12 @@ qcond_weibull <- function(rnd = 0.5, shape, scale, lower_bound) {
 #' @examples
 #' qcond_llogis(rnd = 0.5,shape = 1,scale = 1,lower_bound = 1)
 
-qcond_llogis <- function(rnd = 0.5, shape, scale, lower_bound) {
+qcond_llogis <- function(rnd = 0.5, shape, scale, lower_bound=0) {
   if(rnd <0 | rnd > 1){
     stop("rnd is <0 or >1")
   }
   
-  ((scale^shape + lower_bound^shape)/(1-rnd) - scale^shape )^(1/shape)- lower_bound
+  scale * ((1/(1-rnd))*(rnd + (lower_bound/scale)^shape))^(1/shape) - lower_bound
 }
 
 #' Conditional quantile function for lognormal distribution 
@@ -691,7 +691,7 @@ qcond_llogis <- function(rnd = 0.5, shape, scale, lower_bound) {
 #' @examples
 #' qcond_lnorm(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1, s_obs=0.8)
 
-qcond_lnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound, s_obs) {
+qcond_lnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound=0, s_obs) {
   if(rnd <0 | rnd > 1){
     stop("rnd is <0 or >1")
   }
@@ -718,7 +718,7 @@ qcond_lnorm <- function(rnd = 0.5, meanlog, sdlog, lower_bound, s_obs) {
 #' @examples
 #' qcond_norm(rnd = 0.5, mean = 1,sd = 1,lower_bound = 1, s_obs=0.8)
 
-qcond_norm <- function(rnd = 0.5, mean,sd, lower_bound, s_obs) {
+qcond_norm <- function(rnd = 0.5, mean,sd, lower_bound=0, s_obs) {
   if(rnd <0 | rnd > 1){
     stop("rnd is <0 or >1")
   }
@@ -745,7 +745,7 @@ qcond_norm <- function(rnd = 0.5, mean,sd, lower_bound, s_obs) {
 #' @examples
 #' qcond_gamma(rnd = 0.5, rate = 1.06178, shape = 0.01108,lower_bound = 1, s_obs=0.8)
 
-qcond_gamma <- function(rnd = 0.5, rate,shape, lower_bound, s_obs) {
+qcond_gamma <- function(rnd = 0.5, rate,shape, lower_bound=0, s_obs) {
   if(rnd <0 | rnd > 1){
     stop("rnd is <0 or >1")
   }

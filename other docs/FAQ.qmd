@@ -1,8 +1,8 @@
 ---
 title: "RDICE FAQ"
-subtitle: 'Version 1.0. Made for RDICE v0.94'
+subtitle: 'Version 1.0. Made for RDICE v0.97'
 author: "Javier Sanchez Alvarez"
-date: '`r format(Sys.Date(), "%B %d, %Y")`'
+date: 'today'
 nocite: '@*'
 format: 
     html:
@@ -75,4 +75,4 @@ This option can be modified in the `run_sim` and `run_sim_parallel` functions.
 
 ### Debugging
 
-Log files are created both in RDICE and DICE, but the details included are different, and log files are not created on error in RDICE, as R has a debug method which would allow the user to navigate live through the code at the moment of error. A log file will be created if debug option is activated.
+Log files are created both in RDICE and DICE, but the details included are different. Furthermore, R has a debug method which would allow the user to navigate live through the code at the moment of error. A log file will be created if debug option is activated.

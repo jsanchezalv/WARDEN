@@ -24,6 +24,40 @@ if(getRversion() >= "2.15.1") {
     )) 
 }
 
+# Load Inputs --------------------------------------------------------------------------------------------------------------------------------------
+
+#' Function to load input expressions in a loop
+#'
+#' @param inputs List of existing inputs
+#' @param list_uneval_inputs List of unevaluated inputs (substituted expressions)
+#'
+#' @return Updated list of evaluated inputs
+#'
+#' @examples
+#' load_inputs(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
+#'
+#' @keywords internal
+#' @noRd
+
+load_inputs <- function(inputs,list_uneval_inputs){
+  for (inp in 1:length(list_uneval_inputs)) {
+    list.eval_inputs <- lapply(list_uneval_inputs[inp],function(x) eval(x, inputs))
+    #If using pick_eval_v or other expressions, the lists are not deployed, so this is necessary to do so
+    if(any(is.null(names(list.eval_inputs)), names(list.eval_inputs)=="") & length(list.eval_inputs)==1) {
+      inputs[names(list.eval_inputs[[1]])] <- list.eval_inputs[[1]]
+    } else{
+      if (!is.null(names(list.eval_inputs[[1]]))) {
+        warning("Item ", names(list.eval_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
+      }
+      inputs[names(list.eval_inputs)] <- list.eval_inputs
+      
+    }
+  }
+  
+  return(inputs)
+}
+
+
 # Initial event list --------------------------------------------------------------------------------------------------------------------------------------
 
 #' Execute the initial time to events and separate the events from other inputs that are stored
@@ -421,9 +455,6 @@ expand_evts_bwd <- function(data, time_points, reset_columns = NULL) {
     columns_to_reset <- c(reset_columns, reset_columns_undisc)
     
     # Create a vector indicating which rows are the last in their expanded series
-    is_last_expansion <- rep(FALSE,nrow(expanded_data))
-    is_last_expansion[cumsum(num_expanded_rows)] <- TRUE
-    
     is_last_expansion <- sequence(num_expanded_rows) == num_expanded_rows
     
     # Reset the specified columns for all non-last expanded rows

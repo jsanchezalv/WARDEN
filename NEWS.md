@@ -1,3 +1,9 @@
+# RDICE 0.97
+* Update based on validation comments from Gabriel
+** Modified conditional quantile functions weibull and llogistic to better match default R stats behavior
+* Set License to be GPL >=3
+
+
 # RDICE 0.96
 * Update based on validation comments from Gabriel. 
 * Renamed conditional quantile functions for consistency.

@@ -1,6 +1,6 @@
 Package: RDICE
 Title: Discrete Event Simulation for Cost-Effectiveness Modelling
-Version: 0.96
+Version: 0.97
 Authors@R: 
     c(person(given = "Javier",
            family = "Sanchez Alvarez",
@@ -15,7 +15,7 @@ Authors@R:
       role = "ctb",
       email = ""))     
 Description: A package designed to perform discrete event simulation for cost-effectiveness modelling.
-License: Apache License (>= 2)
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
