@@ -55,7 +55,7 @@ pick_psa(params[["dist"]],params[["n"]],params[["a"]],params[["b"]],params[["c"]
 
 #Can be combined with multiple type of functions and distributions if parameters are well located
 
-#'params <- list(
+params <- list(
 param=list("a","b","c","d"),
 dist=list("rlnorm","rnorm","rgengamma","draw_tte"),
 n=list(4,1,1,1),

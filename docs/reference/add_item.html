@@ -26,7 +26,7 @@
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
     <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
   </ul></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/javiersanchezalvarezevidera/RDICE"><span class="fa fa-github"></span></a></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/javiersanchezalvarezevidera/RDICE" aria-label="View on Github"><span class="fa fa-github"></span></a></li>
       </ul></div>
 
 
@@ -78,7 +78,7 @@ it should be implemented after a first <code>add_item()</code> (empty or with co
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="fu">add_item</span><span class="op">(</span>fl.idfs <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">add_item</span><span class="op">(</span>util_idfs <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">psa_bool</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.8</span>,<span class="fl">0.2</span><span class="op">)</span><span class="op">}</span> <span class="kw">else</span><span class="op">{</span><span class="fl">0.8</span><span class="op">}</span>, util.mbc <span class="op">=</span> <span class="fl">0.6</span>, cost_idfs <span class="op">=</span> <span class="fl">2500</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">common_inputs</span> <span class="op">&lt;-</span> <span class="fu">add_item</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span></span>
+<span class="r-in"><span><span class="va">common_inputs</span> <span class="op">&lt;-</span> <span class="fu">add_item</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span><span class="fu">add_item</span><span class="op">(</span><span class="fu"><a href="pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  base      <span class="op">=</span> <span class="va">l_statics</span><span class="op">[[</span><span class="st">"base"</span><span class="op">]</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>  psa       <span class="op">=</span> <span class="fu"><a href="pick_psa.html">pick_psa</a></span><span class="op">(</span></span></span>

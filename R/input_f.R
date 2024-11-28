@@ -155,7 +155,7 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 # dsa_max=list(c(1,2,3,4),3,3,2)
 # )
 #'
-#'#'params <- list(
+#' params <- list(
 #' param=list("a","b","c","d"),
 #' dist=list("rlnorm","rnorm","rgengamma","draw_tte"),
 #' n=list(4,1,1,1),
