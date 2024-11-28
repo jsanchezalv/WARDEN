@@ -15,19 +15,18 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example with IPD trial data</a></li>
-    <li><a class="dropdown-item" href="../articles/example_markov.html">Example for a Markov Model</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example for a Sick-Sicker-Dead model - Random Number Substreams &amp; Luck Adjustment</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example for a Sick-Sicker-Dead model</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Substreams</a></li>
+    <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
   </ul></li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
- <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/javiersanchezalvarezevidera/RDICE" aria-label="View on Github"><span class="fa fa-github"></span></a></li>
       </ul></div>
 
 
@@ -40,8 +39,14 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="main-modelling-functions">Main Modelling Functions<a class="anchor" aria-label="anchor" href="#main-modelling-functions"></a></h2>
 
+
+
+
+    </div><div class="section level2">
+
+      <h3 id="modelling-core-functions">Modelling Core Functions<a class="anchor" aria-label="anchor" href="#modelling-core-functions"></a></h3>
 
 
 
@@ -70,102 +75,6 @@
         <dd>Define events and the initial event time</dd>
       </dl><dl><dt>
 
-          <code><a href="ceac_des.html">ceac_des()</a></code>
-
-        </dt>
-        <dd>Calculate the cost-effectiveness acceptability curve (CEAC) for a DES model with a PSA result</dd>
-      </dl><dl><dt>
-
-          <code><a href="cond_dirichlet.html">cond_dirichlet()</a></code>
-
-        </dt>
-        <dd>Calculate conditional dirichlet values</dd>
-      </dl><dl><dt>
-
-          <code><a href="cond_mvn.html">cond_mvn()</a></code>
-
-        </dt>
-        <dd>Calculate conditional multivariate normal values</dd>
-      </dl><dl><dt>
-
-          <code><a href="create_indicators.html">create_indicators()</a></code>
-
-        </dt>
-        <dd>Creates a vector of indicators (0 and 1) for sensitivity/DSA analysis</dd>
-      </dl><dl><dt>
-
-          <code><a href="disc_cycle.html">disc_cycle()</a></code>
-
-        </dt>
-        <dd>Cycle discounting</dd>
-      </dl><dl><dt>
-
-          <code><a href="disc_cycle_v.html">disc_cycle_v()</a></code>
-
-        </dt>
-        <dd>Cycle discounting for vectors</dd>
-      </dl><dl><dt>
-
-          <code><a href="disc_instant.html">disc_instant()</a></code>
-
-        </dt>
-        <dd>Calculate instantaneous discounted costs or qalys</dd>
-      </dl><dl><dt>
-
-          <code><a href="disc_instant_v.html">disc_instant_v()</a></code>
-
-        </dt>
-        <dd>Calculate instantaneous discounted costs or qalys for vectors</dd>
-      </dl><dl><dt>
-
-          <code><a href="disc_ongoing.html">disc_ongoing()</a></code>
-
-        </dt>
-        <dd>Calculate discounted costs and qalys between events</dd>
-      </dl><dl><dt>
-
-          <code><a href="disc_ongoing_v.html">disc_ongoing_v()</a></code>
-
-        </dt>
-        <dd>Calculate discounted costs and qalys between events for vectors</dd>
-      </dl><dl><dt>
-
-          <code><a href="draw_tte.html">draw_tte()</a></code>
-
-        </dt>
-        <dd>Draw a time to event from a list of parametric survival functions</dd>
-      </dl><dl><dt>
-
-          <code><a href="evpi_des.html">evpi_des()</a></code>
-
-        </dt>
-        <dd>Calculate the Expected Value of Perfect Information (EVPI) for a DES model with a PSA result</dd>
-      </dl><dl><dt>
-
-          <code><a href="extract_elements_from_list.html">extract_elements_from_list()</a></code>
-
-        </dt>
-        <dd>Extracts items and events by looking into modify_item, modify_item_seq, modify_event and new_event</dd>
-      </dl><dl><dt>
-
-          <code><a href="extract_from_reactions.html">extract_from_reactions()</a></code>
-
-        </dt>
-        <dd>Extract all items and events and their interactions from the event reactions list</dd>
-      </dl><dl><dt>
-
-          <code><a href="extract_psa_result.html">extract_psa_result()</a></code>
-
-        </dt>
-        <dd>Extract PSA results from a treatment</dd>
-      </dl><dl><dt>
-
-          <code><a href="luck_adj.html">luck_adj()</a></code>
-
-        </dt>
-        <dd>Perform luck adjustment</dd>
-      </dl><dl><dt>
-
           <code><a href="modify_event.html">modify_event()</a></code>
 
         </dt>
@@ -190,10 +99,33 @@
         <dd>Generate new events to be added to existing vector of events</dd>
       </dl><dl><dt>
 
-          <code><a href="pcond_gompertz.html">pcond_gompertz()</a></code>
+          <code><a href="run_sim.html">run_sim()</a></code>
 
         </dt>
-        <dd>Survival Probaility function for conditional Gompertz distribution (lower bound only)</dd>
+        <dd>Run the simulation</dd>
+      </dl><dl><dt>
+
+          <code><a href="run_sim_parallel.html">run_sim_parallel()</a></code>
+
+        </dt>
+        <dd>Run simulations in parallel mode (at the simulation level)</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="modelling-auxiliary-functions">Modelling Auxiliary Functions<a class="anchor" aria-label="anchor" href="#modelling-auxiliary-functions"></a></h3>
+
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="create_indicators.html">create_indicators()</a></code>
+
+        </dt>
+        <dd>Creates a vector of indicators (0 and 1) for sensitivity/DSA analysis</dd>
       </dl><dl><dt>
 
           <code><a href="pick_psa.html">pick_psa()</a></code>
@@ -206,6 +138,123 @@
 
         </dt>
         <dd>Select which values should be applied in the corresponding loop for several values (vector or list).</dd>
+      </dl><dl><dt>
+
+          <code><a href="replicate_profiles.html">replicate_profiles()</a></code>
+
+        </dt>
+        <dd>Replicate profiles data.frame</dd>
+      </dl><dl><dt>
+
+          <code><a href="runif_stream.html">runif_stream()</a></code>
+
+        </dt>
+        <dd>Creates a random uniform 0-1 for a given random seed substream and updates the value</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="modelling-summary-functions">Modelling Summary Functions<a class="anchor" aria-label="anchor" href="#modelling-summary-functions"></a></h3>
+
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="ceac_des.html">ceac_des()</a></code>
+
+        </dt>
+        <dd>Calculate the cost-effectiveness acceptability curve (CEAC) for a DES model with a PSA result</dd>
+      </dl><dl><dt>
+
+          <code><a href="evpi_des.html">evpi_des()</a></code>
+
+        </dt>
+        <dd>Calculate the Expected Value of Perfect Information (EVPI) for a DES model with a PSA result</dd>
+      </dl><dl><dt>
+
+          <code><a href="summary_results_det.html">summary_results_det()</a></code>
+
+        </dt>
+        <dd>Deterministic results for a specific treatment</dd>
+      </dl><dl><dt>
+
+          <code><a href="summary_results_sens.html">summary_results_sens()</a></code>
+
+        </dt>
+        <dd>Summary of sensitivity outputs for a treatment</dd>
+      </dl><dl><dt>
+
+          <code><a href="summary_results_sim.html">summary_results_sim()</a></code>
+
+        </dt>
+        <dd>Summary of PSA outputs for a treatment</dd>
+      </dl></div><div class="section level2">
+      <h2 id="statistics-functions">Statistics Functions<a class="anchor" aria-label="anchor" href="#statistics-functions"></a></h2>
+
+
+
+
+    </div><div class="section level2">
+
+      <h3 id="statistics-auxiliary-functions">Statistics Auxiliary Functions<a class="anchor" aria-label="anchor" href="#statistics-auxiliary-functions"></a></h3>
+
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="draw_tte.html">draw_tte()</a></code>
+
+        </dt>
+        <dd>Draw a time to event from a list of parametric survival functions</dd>
+      </dl><dl><dt>
+
+          <code><a href="luck_adj.html">luck_adj()</a></code>
+
+        </dt>
+        <dd>Perform luck adjustment</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="statistics-distributions-functions">Statistics Distributions Functions<a class="anchor" aria-label="anchor" href="#statistics-distributions-functions"></a></h3>
+
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="cond_dirichlet.html">cond_dirichlet()</a></code>
+
+        </dt>
+        <dd>Calculate conditional dirichlet values</dd>
+      </dl><dl><dt>
+
+          <code><a href="cond_mvn.html">cond_mvn()</a></code>
+
+        </dt>
+        <dd>Calculate conditional multivariate normal values</dd>
+      </dl><dl><dt>
+
+          <code><a href="rgamma_mse.html">rgamma_mse()</a></code>
+
+        </dt>
+        <dd>Draw from a gamma distribution based on mean and se</dd>
+      </dl><dl><dt>
+
+          <code><a href="rpoisgamma.html">rpoisgamma()</a></code>
+
+        </dt>
+        <dd>Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process</dd>
       </dl><dl><dt>
 
           <code><a href="qbeta_mse.html">qbeta_mse()</a></code>
@@ -286,58 +335,75 @@
         <dd>Draw from a dirichlet distribution based on mean transition probabilities and standard errors</dd>
       </dl><dl><dt>
 
-          <code><a href="replicate_profiles.html">replicate_profiles()</a></code>
+          <code><a href="pcond_gompertz.html">pcond_gompertz()</a></code>
 
         </dt>
-        <dd>Replicate profiles data.frame</dd>
+        <dd>Survival Probaility function for conditional Gompertz distribution (lower bound only)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="other-functions-and-utilities">Other Functions and Utilities<a class="anchor" aria-label="anchor" href="#other-functions-and-utilities"></a></h2>
+
+
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="disc_cycle.html">disc_cycle()</a></code>
+
+        </dt>
+        <dd>Cycle discounting</dd>
       </dl><dl><dt>
 
-          <code><a href="rgamma_mse.html">rgamma_mse()</a></code>
+          <code><a href="disc_cycle_v.html">disc_cycle_v()</a></code>
 
         </dt>
-        <dd>Draw from a gamma distribution based on mean and se</dd>
+        <dd>Cycle discounting for vectors</dd>
       </dl><dl><dt>
 
-          <code><a href="rpoisgamma.html">rpoisgamma()</a></code>
+          <code><a href="disc_instant.html">disc_instant()</a></code>
 
         </dt>
-        <dd>Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process</dd>
+        <dd>Calculate instantaneous discounted costs or qalys</dd>
       </dl><dl><dt>
 
-          <code><a href="run_sim.html">run_sim()</a></code>
+          <code><a href="disc_instant_v.html">disc_instant_v()</a></code>
 
         </dt>
-        <dd>Run the simulation</dd>
+        <dd>Calculate instantaneous discounted costs or qalys for vectors</dd>
       </dl><dl><dt>
 
-          <code><a href="run_sim_parallel.html">run_sim_parallel()</a></code>
+          <code><a href="disc_ongoing.html">disc_ongoing()</a></code>
 
         </dt>
-        <dd>Run simulations in parallel mode (at the simulation level)</dd>
+        <dd>Calculate discounted costs and qalys between events</dd>
       </dl><dl><dt>
 
-          <code><a href="runif_stream.html">runif_stream()</a></code>
+          <code><a href="disc_ongoing_v.html">disc_ongoing_v()</a></code>
 
         </dt>
-        <dd>Creates a random uniform 0-1 for a given random seed substream and updates the value</dd>
+        <dd>Calculate discounted costs and qalys between events for vectors</dd>
       </dl><dl><dt>
 
-          <code><a href="summary_results_det.html">summary_results_det()</a></code>
+          <code><a href="extract_elements_from_list.html">extract_elements_from_list()</a></code>
 
         </dt>
-        <dd>Deterministic results for a specific treatment</dd>
+        <dd>Extracts items and events by looking into modify_item, modify_item_seq, modify_event and new_event</dd>
       </dl><dl><dt>
 
-          <code><a href="summary_results_sens.html">summary_results_sens()</a></code>
+          <code><a href="extract_from_reactions.html">extract_from_reactions()</a></code>
 
         </dt>
-        <dd>Summary of sensitivity outputs for a treatment</dd>
+        <dd>Extract all items and events and their interactions from the event reactions list</dd>
       </dl><dl><dt>
 
-          <code><a href="summary_results_sim.html">summary_results_sim()</a></code>
+          <code><a href="extract_psa_result.html">extract_psa_result()</a></code>
 
         </dt>
-        <dd>Summary of PSA outputs for a treatment</dd>
+        <dd>Extract PSA results from a treatment</dd>
       </dl><dl><dt>
 
           <code><a href="tte.df.html">tte.df</a></code>
@@ -345,7 +411,8 @@
         </dt>
         <dd>Example TTE IPD data</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
