@@ -158,7 +158,8 @@ evt_react_list <-
 
 ```
 
-We can also now use the `extract_from_reactions` function to obtain a data.frame with all the relationships defined in the reactions in the model. This functions looks at all `modify_item`, `modify_item_seq`, `modify_event` and `new_event` and checks which elements are being defined there, their definition, and whether they are triggered conditionally (e.g., `"if(a==1){modify_item(list(b=2))}"`). Note it would be straightforward to build a network graph showcasing all the interactions between events in terms of events affecting other events, or to show which (and how) events affect specific items.
+### Extract Interactions Between Events
+As an additional optional step, to easily see the interactions between the reactions of the events, we can also now use the `extract_from_reactions` function to obtain a data.frame with all the relationships defined in the reactions in the model. This functions looks at all `modify_item`, `modify_item_seq`, `modify_event` and `new_event` and checks which elements are being defined there, their definition, and whether they are triggered conditionally (e.g., `"if(a==1){modify_item(list(b=2))}"`). Note it would be straightforward to build a network graph showcasing all the interactions between events in terms of events affecting other events, or to show which (and how) events affect specific items.
 
 ```{r model_relatioships}
 
