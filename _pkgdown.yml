@@ -6,100 +6,95 @@ destination: docs
 
 navbar:
   title: "RDICE"
-left:
-  - icon: fa-home
-href: index.html
-- text: "Reference"
-href: reference/index.html
-- text: "Articles"
-menu:
-  - text: "Example in a Sick-Sicker-Dead Model"
-href: articles/example_ssd.html
-- text: "Example in a Sick-Sicker-Dead Model - Substreams"
-href: articles/example_ssd_stream.html
-- text: "Example in Early Breast Cancer"
-href: articles/example_eBC.html
-- text: "Example in a Markov Model"
-href: articles/example_markov.html
-- text: "Structural and Parametric Uncertainty"
-href: articles/example_uncertainty.html
-- text: "Example for Individual Patient Data"
-href: articles/example_ipd.html
-
-right:
-  - icon: fa-github
-href: https://github.com/javiersanchezalvarezevidera/RDICE
-aria-label: View on Github
-
-
+  left:
+    - icon: fa-home
+      href: index.html
+    - text: "Reference"
+      href: reference/index.html
+    - text: "Articles"
+      menu:
+        - text: "Example in a Sick-Sicker-Dead Model"
+          href: articles/example_ssd.html
+        - text: "Example in a Sick-Sicker-Dead Model - Substreams"
+          href: articles/example_ssd_stream.html
+        - text: "Example in Early Breast Cancer"
+          href: articles/example_eBC.html
+        - text: "Example in a Markov Model"
+          href: articles/example_markov.html
+        - text: "Structural and Parametric Uncertainty"
+          href: articles/example_uncertainty.html
+        - text: "Example for Individual Patient Data"
+          href: articles/example_ipd.html
+  right:
+    - icon: fa-github
+      href: https://github.com/javiersanchezalvarezevidera/RDICE
+      aria-label: View on Github
 
 reference:
   - title: Main Modelling Functions
-- subtitle: Modelling Core Functions
-contents:
-  - add_item
-- add_reactevt
-- add_tte
-- modify_event
-- modify_item
-- modify_item_seq
-- new_event
-- run_sim
-- run_sim_parallel
+  - subtitle: Modelling Core Functions
+    contents:
+      - add_item
+      - add_reactevt
+      - add_tte
+      - modify_event
+      - modify_item
+      - modify_item_seq
+      - new_event
+      - run_sim
+      - run_sim_parallel
 
+  - subtitle: Modelling Auxiliary Functions
+    contents:
+      - create_indicators
+      - pick_psa
+      - pick_val_v
+      - replicate_profiles
+      - runif_stream
 
-- subtitle: Modelling Auxiliary Functions
-contents:
-  - create_indicators
-- pick_psa
-- pick_val_v
-- replicate_profiles
-- runif_stream
+  - subtitle: Modelling Summary Functions
+    contents:
+      - ceac_des
+      - evpi_des
+      - summary_results_det
+      - summary_results_sens
+      - summary_results_sim
 
-- subtitle: Modelling Summary Functions
-contents:
-  - ceac_des
-- evpi_des
-- summary_results_det
-- summary_results_sens
-- summary_results_sim
+  - title: Statistics Functions
+  - subtitle: Statistics Auxiliary Functions
+    contents:
+      - draw_tte
+      - luck_adj
+  - subtitle: Statistics Distributions Functions
+    contents:
+      - cond_dirichlet
+      - cond_mvn
+      - rgamma_mse
+      - rpoisgamma
+      - qbeta_mse
+      - qcond_exp
+      - qcond_gamma
+      - qcond_gompertz
+      - qcond_llogis
+      - qcond_lnorm
+      - qcond_norm
+      - qcond_weibull
+      - rbeta_mse
+      - rcond_gompertz
+      - rcond_gompertz_lu
+      - rdirichlet
+      - rdirichlet_prob
+      - pcond_gompertz
 
-- title: Statistics Functions
-- subtitle: Statistics Auxiliary Functions
-contents:
-  - draw_tte
-- luck_adj
-
-- subtitle: Statistics Distributions Functions
-contents:
-  - cond_dirichlet
-- cond_mvn  
-- rgamma_mse
-- rpoisgamma
-- qbeta_mse
-- qcond_exp
-- qcond_gamma
-- qcond_gompertz
-- qcond_llogis
-- qcond_lnorm
-- qcond_norm
-- qcond_weibull
-- rbeta_mse
-- rcond_gompertz
-- rcond_gompertz_lu
-- rdirichlet
-- rdirichlet_prob  
-- pcond_gompertz
-
-- title: Other Functions and Utilities
-contents:
-  - disc_cycle
-- disc_cycle_v
-- disc_instant
-- disc_instant_v
-- disc_ongoing
-- disc_ongoing_v
-- extract_elements_from_list
-- extract_from_reactions
-- extract_psa_result  
-- tte.df
+  - title: Other Functions and Utilities
+    contents:
+      - disc_cycle
+      - disc_cycle_v
+      - disc_instant
+      - disc_instant_v
+      - disc_ongoing
+      - disc_ongoing_v
+      - extract_elements_from_list
+      - extract_from_reactions
+      - extract_psa_result
+      - tte.df
