@@ -29,22 +29,24 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Substreams</a></li>
-    <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
+<li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example with IPD trial data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_markov.html">Example for a Markov Model</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example for a Sick-Sicker-Dead model - Random Number Substreams &amp; Luck Adjustment</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example for a Sick-Sicker-Dead model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/javiersanchezalvarezevidera/RDICE" aria-label="View on Github"><span class="fa fa-github"></span></a></li>
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
       </ul>
 </div>
 
@@ -473,9 +475,9 @@ the <code>run_sim</code> function.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.97s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.97s"</span></span>
-<span><span class="co">#&gt; [1] "Total time to run: 0.98s"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.93s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 1: 0.93s"</span></span>
+<span><span class="co">#&gt; [1] "Total time to run: 0.94s"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -1670,27 +1672,27 @@ variables altered in the scenario, and 0 otherwise.</p>
 <span><span class="co">#&gt; [1] "Analysis number: 3"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.17s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 3: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 3: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 4"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Time to run analysis 4: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 5"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 5: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.17s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 5: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 6"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 6: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.17s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 6: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 7"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 7: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 7: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 8"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 8: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.17s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 8: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 9"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.19s"</span></span>
@@ -1701,21 +1703,21 @@ variables altered in the scenario, and 0 otherwise.</p>
 <span><span class="co">#&gt; [1] "Time to run analysis 10: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 11"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 11: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.17s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 11: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 12"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Time to run analysis 12: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 13"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 13: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 13: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 14"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 14: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Total time to run: 2.54s"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.17s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 14: 0.17s"</span></span>
+<span><span class="co">#&gt; [1] "Total time to run: 2.49s"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="check-results">Check results<a class="anchor" aria-label="anchor" href="#check-results"></a>
@@ -1775,21 +1777,21 @@ option</p>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.4s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.36s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 4: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 6: 0.17s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 1: 1.28s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 1: 1.23s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 2"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 3: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
@@ -1798,8 +1800,22 @@ option</p>
 <span><span class="co">#&gt; [1] "Time to run simulation 5: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 6: 0.17s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 2: 1.07s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 2: 1.04s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 3"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.17s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.17s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 3: 1.07s"</span></span>
+<span><span class="co">#&gt; [1] "Analysis number: 4"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
@@ -1809,94 +1825,80 @@ option</p>
 <span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 4: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.17s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 3: 1.06s"</span></span>
-<span><span class="co">#&gt; [1] "Analysis number: 4"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.17s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 6: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 4: 1.1s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 4: 1.08s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 5"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 3: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 5: 1.11s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 5: 1.08s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 6"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 2: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 4: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 5: 0.17s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.23s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 6: 1.14s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.22s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 6: 1.12s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 7"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.22s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 7: 1.15s"</span></span>
-<span><span class="co">#&gt; [1] "Analysis number: 8"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.2s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.22s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.2s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 8: 1.15s"</span></span>
-<span><span class="co">#&gt; [1] "Analysis number: 9"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.2s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 2: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 3: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.2s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.17s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 7: 1.08s"</span></span>
+<span><span class="co">#&gt; [1] "Analysis number: 8"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 8: 1.09s"</span></span>
+<span><span class="co">#&gt; [1] "Analysis number: 9"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 5: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.2s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 9: 1.16s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 9: 1.11s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 10"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.19s"</span></span>
@@ -1907,15 +1909,15 @@ option</p>
 <span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 4: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.2s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 6: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 10: 1.14s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 10: 1.12s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 11"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.2s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 3: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
@@ -1924,18 +1926,18 @@ option</p>
 <span><span class="co">#&gt; [1] "Time to run simulation 5: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 6: 0.18s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 11: 1.13s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 11: 1.1s"</span></span>
 <span><span class="co">#&gt; [1] "Analysis number: 12"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.23s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.22s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 3: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.21s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.2s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.19s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 6: 0.2s"</span></span>
 <span><span class="co">#&gt; [1] "Time to run analysis 12: 1.18s"</span></span>
@@ -1943,31 +1945,31 @@ option</p>
 <span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 1: 0.2s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.22s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.2s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.19s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.2s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 13: 1.2s"</span></span>
-<span><span class="co">#&gt; [1] "Analysis number: 14"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.2s"</span></span>
-<span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 3: 0.2s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.2s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
-<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.2s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.18s"</span></span>
 <span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
 <span><span class="co">#&gt; [1] "Time to run simulation 6: 0.2s"</span></span>
-<span><span class="co">#&gt; [1] "Time to run analysis 14: 1.17s"</span></span>
-<span><span class="co">#&gt; [1] "Total time to run: 16.04s"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Time to run analysis 13: 1.16s"</span></span>
+<span><span class="co">#&gt; [1] "Analysis number: 14"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 1"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 1: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 2"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 2: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 3"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 3: 0.2s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 4"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 4: 0.18s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 5"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 5: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Simulation number: 6"</span></span>
+<span><span class="co">#&gt; [1] "Time to run simulation 6: 0.19s"</span></span>
+<span><span class="co">#&gt; [1] "Time to run analysis 14: 1.14s"</span></span>
+<span><span class="co">#&gt; [1] "Total time to run: 15.6s"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="check-results-1">Check results<a class="anchor" aria-label="anchor" href="#check-results-1"></a>
