@@ -4,7 +4,7 @@
 \alias{qcond_gompertz}
 \title{Quantile function for conditional Gompertz distribution (lower bound only)}
 \usage{
-qcond_gompertz(rnd = 0.5, shape, rate, lower_bound)
+qcond_gompertz(rnd = 0.5, shape, rate, lower_bound = 0)
 }
 \arguments{
 \item{rnd}{Vector of quantiles}

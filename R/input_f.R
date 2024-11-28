@@ -693,7 +693,8 @@ modify_item_seq <- function(...){
 #' There are a series of objects that can be used in this context to help define the event reactions.
 #'
 #' The following functions may be used to define event reactions within this `add_reactevt()` function:
-#' `modify_item()` | Adds & Modifies items/flags/variables for future events
+#' `modify_item()` | Adds & Modifies items/flags/variables for future events (does not consider sequential)
+#' `modify_item_seq()` | Adds & Modifies items/flags/variables for future events in a sequential manner
 #' `new_event()` | Adds events to the vector of events for that patient
 #' `modify_event()` | Modifies existing events by changing their time
 #'
@@ -706,6 +707,8 @@ modify_item_seq <- function(...){
 #' `simulation` | Simulation being iterated (numeric)
 #'
 #' The model will run until `curtime` is set to `Inf`, so the event that terminates the model should modify `curtime` and set it to `Inf`.
+#'
+#' The user can use `extract_from_reactions` function on the output to obtain a data.frame with all the relationships defined in the reactions in the model.
 #'
 #' @examples
 #' \dontrun{
@@ -1158,26 +1161,6 @@ disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclv
 }
 
 
-#' Reverts list
-#'
-#' @param ls List
-#'
-#' @return Reverted list
-#'
-#' @examples \dontrun{
-#' revert_list(ls=list(a=list(ab=1,ac=2),b=list(ab=2,ac=3)))
-#' }
-#'
-#' @export
-
-revert_list <- function(ls) {
-  if(!is.list(ls)){stop("Object passed is not a list")}
-  
-  x <- lapply(ls,`[`, names(ls[[1]]))
-  apply(do.call(rbind, x), 2, as.list)
-}
-
-
 #' Creates a random uniform 0-1 for a given random seed substream and updates the value
 #'
 #' @param n Number of elements
@@ -1228,3 +1211,239 @@ runif_stream <- function(n=1,random_seed,gen="event_seq"){
 
   out
 } 
+
+
+# Model Events Interactions -------------------------------------------------------
+
+#' Extract all items and events and their interactions from the event reactions list
+#'
+#' @param reactions list generated through `add_reactevt`
+#'
+#' @return A data.frame with the relevant item/event, the event where it's assigned,
+#'  and whether it's contained within a conditional statement
+#'
+#' @examples 
+#' a <- add_reactevt(name_evt="example",
+#'    input={
+#'       modify_item(list(w=5))
+#'    })
+#'    
+#'  extract_from_reactions(a)
+#' 
+#'
+#' @export
+#' 
+extract_from_reactions <- function(reactions){
+  data.table::rbindlist(lapply(purrr::map(reactions,"react"), function(x){
+    out <- ast_as_list(x)
+    extract_elements_from_list(out)
+  }),
+  idcol="event")
+}
+
+
+#' Transform a substituted expression to its Abstract Syntax Tree (AST) as a list
+#'
+#' @param ee Substituted expression
+#'
+#' @return Nested list with the Abstract Syntax Tree (AST)
+#'
+#' @noRd
+#' 
+ast_as_list <- function(ee) {
+  purrr::map_if(as.list(ee), is.call, ast_as_list)
+  }
+
+
+#' Extracts items and events by looking into modify_item, modify_item_seq, modify_event and new_event
+#'
+#' @param node Relevant node within the nested AST list
+#' @param conditional_flag Boolean whether the statement is contained within a conditional statement
+#'
+#' @return A data.frame with the relevant item/event, the event where it's assigned,
+#'  and whether it's contained within a conditional statement
+#'
+#' expr <- substitute({
+#' 
+#' a <- sum(5+7)
+#' 
+#' modify_item(list(afsa=ifelse(TRUE,"asda",NULL)))
+#' 
+#' modify_item_seq(list(
+#'   
+#'   o_other_q_gold1 = if(gold == 1) { utility } else { 0 },
+#'   
+#'   o_other_q_gold2 = if(gold == 2) { utility } else { 0 },
+#'   
+#'   o_other_q_gold3 = if(gold == 3) { utility } else { 0 },
+#'   
+#'   o_other_q_gold4 = if(gold == 4) { utility } else { 0 },
+#'   
+#'   o_other_q_on_dup = if(on_dup) { utility } else { 0 }
+#'  
+#' ))
+#' 
+#' if(a==1){
+#'   modify_item(list(a=list(6+b)))
+#'   
+#'   modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
+#' } else{
+#'   modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
+#'   if(a>6){
+#'     modify_item(list(a=8))
+#'   }
+#'   
+#' }
+#' 
+#' 
+#' if (sel_resp_incl == 1 & on_dup == 1) {
+#'   
+#'   modify_event(list(e_response = curtime, z = 6))
+#'   
+#' }
+#' 
+#' })
+#' 
+#' 
+#' out <- ast_as_list(expr)
+#' 
+#' results <- extract_elements_from_list(out)
+#' 
+#' @export
+#' 
+extract_elements_from_list <- function(node, conditional_flag = FALSE) {
+  results <- data.frame(
+    name = character(),
+    type = character(),
+    conditional_flag = logical(),
+    definition = character(),
+    stringsAsFactors = FALSE
+  )
+  
+  # Base case: check if the node is a relevant function
+  if (is.list(node)) {
+    # Safely extract and convert node[[1]] to character
+    func_name <- if (!is.null(node[[1]])) as.character(node[[1]]) else NULL
+    
+    if (!is.null(func_name) && func_name %in% c("modify_item_seq", "modify_item", "modify_event", "new_event")) {
+      # Determine type
+      type <- if (func_name %in% c("modify_item_seq", "modify_item")) "item" else "event"
+      
+      # Extract list elements
+      list_expr <- node[[2]]
+      if (is.list(list_expr)) {
+        definition <- unlist(extract_defs(node),recursive=TRUE)
+        definition <- definition[!names(definition)==""]
+        
+        results_temp <- data.frame(
+          name = names(definition),
+          type = type,
+          conditional_flag = conditional_flag,
+          definition = definition,
+          stringsAsFactors = FALSE
+        )
+        
+        results <- rbind(results,results_temp)
+      }
+    }
+    
+    # Check if the node is an `if` block
+    if (!is.null(func_name) && func_name == "if") {
+      # Process the condition
+      conditional_flag <- TRUE
+    }
+  }
+  
+  # Recursive case: iterate through list elements
+  if (is.list(node)) {
+    for (child in node) {
+      results <- rbind(results, extract_elements_from_list(child, conditional_flag))
+    }
+  }
+  
+  results <- results[!(is.na(results$name) | results$name == "" | is.na(results$definition)), ]
+  
+  
+  return(results)
+}
+
+#' Loop to extract an expression from a list
+#'
+#' @param lst sublist from the AST as list
+#'
+#' @return Reconstructed expression as a character
+#'
+#' @noRd
+#' 
+expr_from_list <- function(lst) {
+  if(is.null(lst)){
+    return(lst)
+  } else if (is.atomic(lst)) {
+    return(lst)
+  } else if (is.symbol(lst)) {
+    return(as.name(lst))
+  } else if (is.list(lst) && length(lst) == 1) {
+    return(expr_from_list(lst[[1]]))
+  } else {
+    func_name <- as.character(expr_from_list(lst[[1]]))
+    
+    # Ensure func_name is a character string
+    if (!is.character(func_name)) {
+      stop("Function name must be a character string: ", func_name)
+    }
+    
+    args <- lapply(lst[-1], expr_from_list)
+    
+    # Handle special cases (e.g., operators)
+    return(do.call(call, c(func_name, args),quote = TRUE))
+  }
+}
+
+
+#' Clean output from generated expression
+#'
+#' @param called Generated expression from `expr_from_list`
+#'
+#' @return Cleaned character expression 
+#'
+#' @noRd
+#' 
+clean_output <- function(called){
+  gsub("    ","",
+       gsub("\"","'",
+            paste0(
+              deparse(called
+              ),collapse="")
+       )
+  )
+}
+
+#' Extract relevant definitions from sublist
+#'
+#' @param lst sublist of the AST where to obtain definitions from
+#'
+#' @return Vector of cleaned character expressions definitions found in the sublist 
+#'
+#' @noRd
+#' 
+extract_defs <- function(lst){
+  if(purrr::pluck_depth(lst)<=2 & is.null(names(lst))){
+    NULL
+  }else{
+    if(length(lst[!is.null(names(lst))&names(lst)!=""])==0){
+      lapply(lst, extract_defs)
+    } else{
+      lapply(lst[!is.null(names(lst)) &names(lst)!=""], function(x){
+        if(is.null(x)){"NULL"}else{
+          clean_output(expr_from_list(x))              
+          
+        }
+      }
+      )
+    }
+  }
+}
+
+
+
+

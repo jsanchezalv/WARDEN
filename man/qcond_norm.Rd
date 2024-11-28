@@ -4,7 +4,7 @@
 \alias{qcond_norm}
 \title{Conditional quantile function for normal distribution}
 \usage{
-qcond_norm(rnd = 0.5, mean, sd, lower_bound, s_obs)
+qcond_norm(rnd = 0.5, mean, sd, lower_bound = 0, s_obs)
 }
 \arguments{
 \item{rnd}{Vector of quantiles}

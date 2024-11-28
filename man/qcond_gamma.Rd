@@ -4,7 +4,7 @@
 \alias{qcond_gamma}
 \title{Conditional quantile function for gamma distribution}
 \usage{
-qcond_gamma(rnd = 0.5, rate, shape, lower_bound, s_obs)
+qcond_gamma(rnd = 0.5, rate, shape, lower_bound = 0, s_obs)
 }
 \arguments{
 \item{rnd}{Vector of quantiles}

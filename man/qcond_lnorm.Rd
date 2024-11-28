@@ -4,7 +4,7 @@
 \alias{qcond_lnorm}
 \title{Conditional quantile function for lognormal distribution}
 \usage{
-qcond_lnorm(rnd = 0.5, meanlog, sdlog, lower_bound, s_obs)
+qcond_lnorm(rnd = 0.5, meanlog, sdlog, lower_bound = 0, s_obs)
 }
 \arguments{
 \item{rnd}{Vector of quantiles}

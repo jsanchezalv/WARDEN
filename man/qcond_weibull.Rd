@@ -4,7 +4,7 @@
 \alias{qcond_weibull}
 \title{Conditional quantile function for weibull distribution}
 \usage{
-qcond_weibull(rnd = 0.5, shape, scale, lower_bound)
+qcond_weibull(rnd = 0.5, shape, scale, lower_bound = 0)
 }
 \arguments{
 \item{rnd}{Vector of quantiles}

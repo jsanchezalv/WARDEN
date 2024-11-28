@@ -4,7 +4,7 @@
 \alias{pcond_gompertz}
 \title{Survival Probaility function for conditional Gompertz distribution (lower bound only)}
 \usage{
-pcond_gompertz(time = 1, shape, rate, lower_bound)
+pcond_gompertz(time = 1, shape, rate, lower_bound = 0)
 }
 \arguments{
 \item{time}{Vector of times}

@@ -4,7 +4,7 @@
 \alias{rcond_gompertz}
 \title{Draw from a conditional Gompertz distribution (lower bound only)}
 \usage{
-rcond_gompertz(n = 1, shape, rate, lower_bound, seed = NULL)
+rcond_gompertz(n = 1, shape, rate, lower_bound = 0, seed = NULL)
 }
 \arguments{
 \item{n}{The number of observations to be drawn}

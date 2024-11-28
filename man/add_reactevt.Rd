@@ -20,7 +20,8 @@ Define the modifications to other events, costs, utilities, or other items affec
 There are a series of objects that can be used in this context to help define the event reactions.
 
 The following functions may be used to define event reactions within this \code{add_reactevt()} function:
-\code{modify_item()} | Adds & Modifies items/flags/variables for future events
+\code{modify_item()} | Adds & Modifies items/flags/variables for future events (does not consider sequential)
+\code{modify_item_seq()} | Adds & Modifies items/flags/variables for future events in a sequential manner
 \code{new_event()} | Adds events to the vector of events for that patient
 \code{modify_event()} | Modifies existing events by changing their time
 
@@ -33,6 +34,8 @@ Apart from the items defined with add_item(), we can also use standard variables
 \code{simulation} | Simulation being iterated (numeric)
 
 The model will run until \code{curtime} is set to \code{Inf}, so the event that terminates the model should modify \code{curtime} and set it to \code{Inf}.
+
+The user can use \code{extract_from_reactions} function on the output to obtain a data.frame with all the relationships defined in the reactions in the model.
 }
 \examples{
 \dontrun{
