@@ -527,7 +527,6 @@ ggplot(
         summarise(mean=mean(value),sd=sd(value), `CV (%)` = 100*sd(value)/abs(mean(value)))) +
     geom_point(aes(x=sample_size,y=`CV (%)`,fill= element),shape=21,size = 2, alpha=0.7) +
     geom_line(aes(x=sample_size,y=`CV (%)`,col= element, group=element)) +
-    ggforce::facet_zoom(ylim = c(0, 10)) +
     scale_y_continuous(n.breaks=10,expand=c(0.01,0.01)) +
     theme_bw()
 ```

@@ -164,7 +164,7 @@ We can also now use the `extract_from_reactions` function to obtain a data.frame
 
 df_interactions <- extract_from_reactions(evt_react_list)
 
-df_interactions
+kable(df_interactions)
 
 ```
 
