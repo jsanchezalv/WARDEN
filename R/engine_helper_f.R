@@ -241,7 +241,7 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
 
 #' Evaluates the cost/utility/cycle unevaluated expressions to be processed by the simulation engine
 #'
-#' @param x The specific cost/utility and its type (ongoing, instant...) to be used, created through add_cost/add_util
+#' @param x The specific cost/utility and its type (ongoing, instant...) to be used
 #' @param ifnull Value to be used if the input has not been defined
 #' @param type Identifies what type of input is being used. Can be "cost", "util", "cycle_l" (cycle length) and "cycle_starttime" (starting time of the cycle)
 #' @param evt_arm_i The event-intervention identifier to understand which specific input to use, separated by an underscore

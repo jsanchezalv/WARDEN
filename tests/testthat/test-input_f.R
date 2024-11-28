@@ -521,3 +521,157 @@ test_that("Model Reactions Interactivity summary can be created",{
   
   
 })
+
+
+test_that("add_tte works as expected", {
+  initial_data <- list()
+  arm <- "control"
+  evts <- c("start", "end")
+  
+  result <- add_tte(.data = initial_data, arm = arm, evts = evts, input = {
+    start <- 0
+    end <- 100
+  })
+  
+  expect_true("control" %in% names(result))
+  expect_equal(result$control$evts, evts)
+})
+
+test_that("modify_item modifies input items correctly", {
+  input_list_arm <- list(
+    qaly_default_instant = 100, 
+    accum_backwards = TRUE,
+    debug = FALSE,
+    accum_backwards = FALSE
+    
+  )
+  assign("input_list_arm", input_list_arm, envir = parent.frame())
+  
+  modify_item(list("qaly_default_instant" = 200))
+  expect_equal(input_list_arm$qaly_default_instant, 200)
+  
+  modify_item(list(new_cost = 300))
+  expect_equal(input_list_arm$new_cost, 300)
+})
+
+test_that("modify_event modifies events correctly", {
+  input_list_arm <- list(
+    cur_evtlist = c(ae = 5, nat.death = 100), 
+    debug = FALSE,
+    accum_backwards = FALSE
+  )
+  assign("input_list_arm", input_list_arm, envir = parent.frame())
+  
+  # Modify an existing event
+  modify_event(list(ae = 10))
+  expect_equal(input_list_arm$cur_evtlist[["ae"]], 10)
+  
+  # Create new event if not exists
+  modify_event(list(new_event = 50), create_if_null = TRUE)
+  expect_equal(input_list_arm$cur_evtlist[["new_event"]], 50)
+  
+  # Ignore non-existent event
+  expect_warning(modify_event(list(nonexistent = 20), create_if_null = FALSE))
+  expect_error(input_list_arm$cur_evtlist[["nonexistent"]])
+})
+
+test_that("new_event adds new events correctly", {
+  input_list_arm <- list(cur_evtlist = c(), 
+                         debug = FALSE,
+                         accum_backwards = FALSE)
+  assign("input_list_arm", input_list_arm, envir = parent.frame())
+  
+  new_event(list("ae" = 5))
+  expect_equal(input_list_arm$cur_evtlist[["ae"]], 5)
+  
+  expect_error(new_event(list("not_numeric" = "five")), 
+               "New event times are not all numeric, please review")
+})
+
+
+test_that("replicate_profiles works correctly", {
+  profiles <- data.frame(id = 1:10, age = rnorm(10, 60, 5))
+  
+  # Test replication with replacement
+  set.seed(42)
+  result <- replicate_profiles(profiles, replications = 20, replacement = TRUE)
+  expect_equal(nrow(result), 20)
+  expect_true(all(result$id %in% profiles$id))
+  
+  # Test replication without replacement
+  set.seed(42)
+  result_no_replacement <- replicate_profiles(profiles, replications = 10, replacement = FALSE)
+  expect_equal(nrow(result_no_replacement), 10)
+  expect_equal(sort(result_no_replacement$id), sort(profiles$id))
+  
+})
+
+
+test_that("modify_item_seq works sequentially", {
+  input_list_arm <- list(a = 1, b = 2, curtime = 1, accum_backwards = FALSE, debug = FALSE)
+  assign("input_list_arm", input_list_arm, envir = parent.frame())
+  
+  # Test sequential modification
+  modify_item_seq(list(a = 3, b = a + 2))
+  expect_equal(input_list_arm$a, 3)
+  expect_equal(input_list_arm$b, 5)
+  
+  # Test debug mode
+  input_list_arm$debug <- TRUE
+  input_list_arm$log_list <- list()
+  modify_item_seq(list(a = 4, c = b * 2))
+  expect_equal(input_list_arm$a, 4)
+  expect_equal(input_list_arm$c, 10)
+  expect_true(length(input_list_arm$log_list) > 0)
+})
+
+
+test_that("add_reactevt adds reactions correctly", {
+  # Create an empty data list
+  data_list <- list()
+  
+  # Add a reaction
+  result <- add_reactevt(.data = data_list, name_evt = "start", input = { curtime <- Inf })
+  expect_true("start" %in% names(result))
+
+  # Test error handling for invalid event name
+  expect_error(add_reactevt(name_evt = c("evt1", "evt2"), input = {}), 
+               "name_evt argument in add_reactevt should be a single string with at least 2 characters")
+})
+
+
+test_that("luck_adj adjusts luck correctly", {
+  # Test single values
+  adj <- luck_adj(prevsurv = 0.8, cursurv = 0.6, luck = 0.9, condq = TRUE)
+  expect_true(adj > 0 & adj < 1)
+  
+  # Test vectorized adjustment
+  adj_vec <- luck_adj(prevsurv = c(0.8, 0), cursurv = c(0.6, 0.5), luck = c(0.9, 0.8), condq = TRUE)
+  expect_equal(length(adj_vec), 2)
+  expect_equal(adj_vec[2], 0.8)
+  
+  # Test conditional adjustment
+  adj_cond <- luck_adj(prevsurv = 0.8, cursurv = 0.6, luck = 0.9, condq = FALSE)
+  expect_true(adj_cond > 0 & adj_cond < 1)
+})
+
+
+test_that("runif_stream generates random values consistently", {
+  # Simulate a global random seed
+  RNGkind("L'Ecuyer-CMRG")
+  set.seed(123)
+  random_seed <- .Random.seed
+  input_list_arm <- list()
+  assign("input_list_arm", input_list_arm, envir = parent.frame())
+  
+  # Generate uniform values
+  result <- runif_stream(n = 5, random_seed = .Random.seed, gen = "event_seq")
+  expect_equal(length(result), 5)
+  expect_true(all(result >= 0 & result <= 1))
+  
+  # Ensure seed consistency
+  set.seed(123)
+  expect_equal(.Random.seed, random_seed)
+})
+
+
