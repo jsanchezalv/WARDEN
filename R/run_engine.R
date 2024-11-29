@@ -80,7 +80,7 @@ run_engine <- function(arm_list,
     }
 
     #Make sure there are no duplicated inputs in the model, if so, take the last one
-    duplic <- duplicated(names(input_list_pt),fromLast = T)
+    duplic <- duplicated(names(input_list_pt),fromLast = TRUE)
     if (sum(duplic)>0 & i==1 & simulation==1 & sens==1) { warning("Duplicated items detected in the Patient, using the last one added.\n")  }
     input_list_pt <- input_list_pt[!duplic]
 
@@ -124,7 +124,7 @@ run_engine <- function(arm_list,
       }
 
       #Make sure there are no duplicated inputs in the model, if so, take the last one
-      duplic <- duplicated(names(input_list_arm),fromLast = T)
+      duplic <- duplicated(names(input_list_arm),fromLast = TRUE)
       if (sum(duplic)>0 & i==1 & simulation==1 & sens==1) { warning("Duplicated items detected in the Arm, using the last one added.\n")  }
       input_list_arm <- input_list_arm[!duplic]
 

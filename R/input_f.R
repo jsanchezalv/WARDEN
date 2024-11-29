@@ -1325,9 +1325,9 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
     # Safely extract and convert node[[1]] to character
     func_name <- if (!is.null(node[[1]])) as.character(node[[1]]) else NULL
     
-    if (!is.null(func_name) && func_name %in% c("modify_item_seq", "modify_item", "modify_event", "new_event")) {
+    if (!is.null(func_name) && any(func_name %in% c("modify_item_seq", "modify_item", "modify_event", "new_event"))) {
       # Determine type
-      type <- if (func_name %in% c("modify_item_seq", "modify_item")) "item" else "event"
+      type <- if (any(func_name %in% c("modify_item_seq", "modify_item"))) "item" else "event"
       
       # Extract list elements
       list_expr <- node[[2]]
@@ -1348,7 +1348,7 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
     }
     
     # Check if the node is an `if` block
-    if (!is.null(func_name) && func_name == "if") {
+    if (!is.null(func_name) && any(func_name == "if")) {
       # Process the condition
       conditional_flag <- TRUE
     }
@@ -1385,13 +1385,7 @@ expr_from_list <- function(lst) {
   } else if (is.list(lst) && length(lst) == 1) {
     return(expr_from_list(lst[[1]]))
   } else {
-    func_name <- as.character(expr_from_list(lst[[1]]))
-    
-    # Ensure func_name is a character string
-    if (!is.character(func_name)) {
-      stop("Function name must be a character string: ", func_name)
-    }
-    
+    func_name <- deparse(expr_from_list(lst[[1]]))
     args <- lapply(lst[-1], expr_from_list)
     
     # Handle special cases (e.g., operators)
@@ -1409,12 +1403,14 @@ expr_from_list <- function(lst) {
 #' @noRd
 #' 
 clean_output <- function(called){
-  gsub("    ","",
-       gsub("\"","'",
+  gsub("\`","",
+       gsub("    ","",
+            gsub("\"","'",
             paste0(
               deparse(called
               ),collapse="")
-       )
+            )
+      )
   )
 }
 
@@ -1427,7 +1423,7 @@ clean_output <- function(called){
 #' @noRd
 #' 
 extract_defs <- function(lst){
-  if(purrr::pluck_depth(lst)<=2 & is.null(names(lst))){
+  if(purrr::pluck_depth(lst)<=1 & is.null(names(lst))){
     NULL
   }else{
     if(length(lst[!is.null(names(lst))&names(lst)!=""])==0){
