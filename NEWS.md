@@ -1,6 +1,11 @@
+#RDICE 0.98
+* Repository is now public, Github Website has been set up
+  ** Website references are now split by topic
+* Added auxiliary functions to extract items and events from reactions to easily see interconections in models
+
 # RDICE 0.97
 * Update based on validation comments from Gabriel
-** Modified conditional quantile functions weibull and llogistic to better match default R stats behavior
+  ** Modified conditional quantile functions weibull and llogistic to better match default R stats behavior
 * Set License to be GPL >=3
 
 
