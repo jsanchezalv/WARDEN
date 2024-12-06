@@ -1,5 +1,5 @@
 Package: WARDEN
-Title: Workflows for health technology Assessments in R using Discrete EveNts
+Title: Workflows for Health Technology Assessments in R using Discrete EveNts
 Version: 0.99
 Authors@R: 
     c(person(given = "Javier",
@@ -14,7 +14,7 @@ Authors@R:
       family = "Aponte Ribero",
       role = "ctb",
       email = ""))     
-Description: A package designed to perform discrete event simulation for cost-effectiveness modelling.
+Description: Perform discrete event simulation for cost-effectiveness modelling.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
