@@ -6,8 +6,7 @@
 `WARDEN` is a user-friendly package that facilitates the use of discrete
 event simulations without resource constraints for cost-effectiveness
 analysis. The package supports a flexible, practical approach to
-discrete event simulation while keeping an acceptable performance
-through the use of parallel computing.
+discrete event simulation while keeping an acceptable performance.
 
 The current version supports:
 
@@ -17,8 +16,7 @@ The current version supports:
 - Delayed execution of the main inputs to facilitate readability of the
   model
 - Implementation of structural and parameter uncertainty
-- Helper functions to facilitate drawing of time to events and the use
-  of hazard ratios
+- Helper functions to facilitate drawing of time to events and the use of hazard ratios, as well as other functions to facilitate transparency
 - Performing cost-effectiveness and uncertainty analysis
 
 It is recommended that the user checks the vignettes, first the simple
@@ -52,7 +50,7 @@ repository](https://github.com/jsanchezalv/WARDEN).
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jjsanchezalv/WARDEN", ref="main")
+devtools::install_github("jsanchezalv/WARDEN", ref="main")
 ```
 
 ## Citation
@@ -62,7 +60,7 @@ appropiate citation.
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/javiersanchezalvarezevidera/WARDEN/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/javiersanchezalvarezevidera/WARDEN/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/jsanchezalv/WARDEN/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jsanchezalv/WARDEN/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 # WARDEN <a href="https://jsanchezalv.github.io/WARDEN/"><img src="man/figures/logo.png" align="right" height="137" alt="WARDEN website" /></a>

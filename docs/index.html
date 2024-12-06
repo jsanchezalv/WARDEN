@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Workflows for health technology Assessments in R using Discrete EveNts • WARDEN</title>
+<title>Workflows for Health Technology Assessments in R using Discrete EveNts • WARDEN</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
@@ -16,9 +16,9 @@
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Workflows for health technology Assessments in R using Discrete EveNts">
-<meta name="description" content="A package designed to perform discrete event simulation for cost-effectiveness modelling.">
-<meta property="og:description" content="A package designed to perform discrete event simulation for cost-effectiveness modelling.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Workflows for Health Technology Assessments in R using Discrete EveNts">
+<meta name="description" content="Perform discrete event simulation for cost-effectiveness modelling.">
+<meta property="og:description" content="Perform discrete event simulation for cost-effectiveness modelling.">
 <meta property="og:image" content="https://jsanchezalv.github.io/WARDEN/logo.png">
 </head>
 <body>
@@ -53,7 +53,7 @@
 </li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/javiersanchezalvarezevidera/WARDEN" aria-label="View on Github"><span class="fa fa-github"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/jsanchezalv/WARDEN" aria-label="View on Github"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
 
@@ -69,14 +69,14 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><code>WARDEN</code> is a user-friendly package that facilitates the use of discrete event simulations without resource constraints for cost-effectiveness analysis. The package supports a flexible, practical approach to discrete event simulation while keeping an acceptable performance through the use of parallel computing.</p>
+<p><code>WARDEN</code> is a user-friendly package that facilitates the use of discrete event simulations without resource constraints for cost-effectiveness analysis. The package supports a flexible, practical approach to discrete event simulation while keeping an acceptable performance.</p>
 <p>The current version supports:</p>
 <ul>
 <li>Discrete event simulation models, Markov/semi-Markov models and hybrid models using parallel and non-parallel engines</li>
 <li>Seamlessly integrating data.frames and other objects into the model</li>
 <li>Delayed execution of the main inputs to facilitate readability of the model</li>
 <li>Implementation of structural and parameter uncertainty</li>
-<li>Helper functions to facilitate drawing of time to events and the use of hazard ratios</li>
+<li>Helper functions to facilitate drawing of time to events and the use of hazard ratios, as well as other functions to facilitate transparency</li>
 <li>Performing cost-effectiveness and uncertainty analysis</li>
 </ul>
 <p>It is recommended that the user checks the vignettes, first the simple <a href="https://jsanchezalv.github.io/WARDEN/articles/example_ssd.html">Sick-Sicker-Dead model</a> and then the more complex model for <a href="https://jsanchezalv.github.io/WARDEN/articles/example_eBC.html">early breast cancer</a>. The <a href="https://jsanchezalv.github.io/WARDEN/articles/example_markov.html">markov</a> example shows how to run a cohort Markov model while using the same modeling framework. Similarly, a simulation based Markov model could be run. Structural and parametric uncertainty are explored in the <a href="https://jsanchezalv.github.io/WARDEN/articles/example_uncertainty.html">corresponding vignette</a>. The <a href="https://jsanchezalv.github.io/WARDEN/articles/example_ipd.html">IPD vignette</a> shows how WARDEN can be used when individual patient data is available.</p>
@@ -93,7 +93,7 @@
 <p><code>WARDEN</code> can the be installed directly from this repo via</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"jjsanchezalv/WARDEN"</span>, ref<span class="op">=</span><span class="st">"main"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"jsanchezalv/WARDEN"</span>, ref<span class="op">=</span><span class="st">"main"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
@@ -136,7 +136,7 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/javiersanchezalvarezevidera/WARDEN/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/javiersanchezalvarezevidera/WARDEN/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/jsanchezalv/WARDEN/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/jsanchezalv/WARDEN/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
 

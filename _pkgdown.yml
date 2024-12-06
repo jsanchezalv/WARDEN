@@ -28,7 +28,7 @@ navbar:
           href: articles/example_ipd.html
   right:
     - icon: fa-github
-      href: https://github.com/javiersanchezalvarezevidera/WARDEN
+      href: https://github.com/jsanchezalv/WARDEN
       aria-label: View on Github
 
 reference:
