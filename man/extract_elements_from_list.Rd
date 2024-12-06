@@ -14,7 +14,12 @@ extract_elements_from_list(node, conditional_flag = FALSE)
 \value{
 A data.frame with the relevant item/event, the event where it's assigned,
 and whether it's contained within a conditional statement
-
+}
+\description{
+Extracts items and events by looking into modify_item, modify_item_seq, modify_event and new_event
+}
+\examples{
+\dontrun{
 expr <- substitute({
 
 a <- sum(5+7)
@@ -22,43 +27,44 @@ a <- sum(5+7)
 modify_item(list(afsa=ifelse(TRUE,"asda",NULL)))
 
 modify_item_seq(list(
-
-o_other_q_gold1 = if(gold == 1) { utility } else { 0 },
-
-o_other_q_gold2 = if(gold == 2) { utility } else { 0 },
-
-o_other_q_gold3 = if(gold == 3) { utility } else { 0 },
-
-o_other_q_gold4 = if(gold == 4) { utility } else { 0 },
-
-o_other_q_on_dup = if(on_dup) { utility } else { 0 }
-
+  
+  o_other_q_gold1 = if(gold == 1) { utility } else { 0 },
+  
+  o_other_q_gold2 = if(gold == 2) { utility } else { 0 },
+  
+  o_other_q_gold3 = if(gold == 3) { utility } else { 0 },
+  
+  o_other_q_gold4 = if(gold == 4) { utility } else { 0 },
+  
+  o_other_q_on_dup = if(on_dup) { utility } else { 0 }
+ 
 ))
 
 if(a==1){
-modify_item(list(a=list(6+b)))
-
-modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
+  modify_item(list(a=list(6+b)))
+  
+  modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
 } else{
-modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
-if(a>6){
-modify_item(list(a=8))
+  modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
+  if(a>6){
+    modify_item(list(a=8))
+  }
+  
 }
 
-}
 
 if (sel_resp_incl == 1 & on_dup == 1) {
-
-modify_event(list(e_response = curtime, z = 6))
-
+  
+  modify_event(list(e_response = curtime, z = 6))
+  
 }
 
 })
+
 
 out <- ast_as_list(expr)
 
 results <- extract_elements_from_list(out)
 }
-\description{
-Extracts items and events by looking into modify_item, modify_item_seq, modify_event and new_event
+
 }

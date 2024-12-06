@@ -31,7 +31,7 @@ When running a DES, it's important to consider speed. Simulation based models ca
 ## Main options
 
 ```{r setup}
-library(RDICE)
+library(WARDEN)
 
 library(dplyr)
 library(ggplot2)

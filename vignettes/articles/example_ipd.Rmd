@@ -29,7 +29,7 @@ This document runs a discrete event simulation model using simulated individual 
 # Packages and main options
 
 ```{r setup,message=FALSE}
-library(RDICE)
+library(WARDEN)
 library(dplyr)
 library(survival)
 library(survminer)
@@ -81,7 +81,7 @@ Parametric survival models are fit to the dummy OS and TTP IPD. We are using the
 
 ```{r load_data, message=FALSE}
 #Generate dummy IPD
-tte.df <- RDICE::tte.df
+tte.df <- WARDEN::tte.df
 
 #Change data frame to wide format
 tte.df <- tte.df %>% select(-PARAM) %>% pivot_wider(names_from = PARAMCD, values_from = c(AVAL,CNSR)) 

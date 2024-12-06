@@ -31,7 +31,7 @@ When running a DES, it's important to consider speed. Simulation based models ca
 ## Main options
 
 ```{r setup}
-library(RDICE)
+library(WARDEN)
 
 library(dplyr)
 library(ggplot2)
@@ -68,7 +68,8 @@ common_all_inputs <-add_item(
                       HR_int = 0.8,
                       drc = 0.035, #different values than what's assumed by default
                       drq = 0.035,
-                      random_seed_sicker_i = sample.int(100000,1000,replace = FALSE))  #to be used as seeds to draw the time to event for sicker, to ensure same luck for the same patient independently of the arm
+                      random_seed_sicker_i = sample.int(100000,1000,replace = FALSE)
+)  #to be used as seeds to draw the time to event for sicker, to ensure same luck for the same patient independently of the arm
 
 
 #Put objects here that do not change as we loop through treatments for a patient

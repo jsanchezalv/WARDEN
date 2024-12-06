@@ -1,32 +1,35 @@
-#RDICE 0.98
+# WARDEN 0.99
+* Now debug and continue_on_error will work on all stages, not only for simulations
+* CRAN preparation changes
+
+# WARDEN 0.98
 * Repository is now public, Github Website has been set up
   ** Website references are now split by topic
 * Added auxiliary functions to extract items and events from reactions to easily see interconections in models
 
-# RDICE 0.97
+# WARDEN 0.97
 * Update based on validation comments from Gabriel
   ** Modified conditional quantile functions weibull and llogistic to better match default R stats behavior
 * Set License to be GPL >=3
 
-
-# RDICE 0.96
+# WARDEN 0.96
 * Update based on validation comments from Gabriel. 
 * Renamed conditional quantile functions for consistency.
 
-# RDICE 0.95
+# WARDEN 0.95
 * Seeds used by default have been changed to guarantee uniqueness
 * Added possibility of continuing to the next simulation on error (if it occurs at the patient/arm level, not at the statics/structural loading level)
 * Debug mode now exports log even if the simulation stops due to error. If combined with continue on error, it will continue
 to export log with the timestamp
 
-# RDICE 0.94
+# WARDEN 0.94
 * Added possibility of accumulating outputs continuously backward or forward using the accum_backward option in run_sim and run_sim_parallel
 
-# RDICE 0.93
+# WARDEN 0.93
 * Conditional quantile functions added and adjusted
 * Luck adjustment function added with instructions for user
 
-# RDICE 0.92
+# WARDEN 0.92
 * Progress bar added for both parallel and standard computing model
 * To use progress bar while in batch mode for a quarto document, make sure to add in the knitr options 
 knitr:
@@ -34,14 +37,14 @@ knitr:
     R.options:
       progressr.enable: true
 
-# RDICE 0.91
+# WARDEN 0.91
 * Debug mode exports a txt file
 
-# RDICE 0.9
+# WARDEN 0.9
 * Warning, this commit will change previous results. 
 * Sensitivity-level and simulaton-level seeds have been moved outside the input loading loop as this caused correlation between inputs loaded at those stages. 
 
-# RDICE 0.5
+# WARDEN 0.5
 
 * Initial set-up of news file
 * Summary of inputs has been overhauled to provide INMB through a WTP argument

@@ -1262,7 +1262,9 @@ ast_as_list <- function(ee) {
 #'
 #' @return A data.frame with the relevant item/event, the event where it's assigned,
 #'  and whether it's contained within a conditional statement
-#'
+#'  
+#' @examples
+#' \dontrun{
 #' expr <- substitute({
 #' 
 #' a <- sum(5+7)
@@ -1308,6 +1310,7 @@ ast_as_list <- function(ee) {
 #' out <- ast_as_list(expr)
 #' 
 #' results <- extract_elements_from_list(out)
+#' }
 #' 
 #' @export
 #' 

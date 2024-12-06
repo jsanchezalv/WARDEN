@@ -1,6 +1,6 @@
-Package: RDICE
-Title: Discrete Event Simulation for Cost-Effectiveness Modelling
-Version: 0.98
+Package: WARDEN
+Title: Workflows for health technology Assessments in R using Discrete EveNts
+Version: 0.99
 Authors@R: 
     c(person(given = "Javier",
            family = "Sanchez Alvarez",
@@ -48,4 +48,4 @@ VignetteBuilder: knitr
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
-URL: https://jsanchezalv.github.io/RDICE/
+URL: https://jsanchezalv.github.io/WARDEN/

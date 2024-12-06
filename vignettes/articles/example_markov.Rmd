@@ -28,7 +28,7 @@ This document runs a discrete event simulation model in the context of a simple 
 ## Main options
 
 ```{r setup}
-library(RDICE)
+library(WARDEN)
 
 library(dplyr)
 library(ggplot2)

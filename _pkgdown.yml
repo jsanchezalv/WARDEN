@@ -1,14 +1,15 @@
-url: https://jsanchezalv.github.io/RDICE/
+url: https://jsanchezalv.github.io/WARDEN/
 template:
   bootstrap: 5
 
 destination: docs
 
 navbar:
-  title: "RDICE"
+  title: "WARDEN"
   left:
     - icon: fa-home
       href: index.html
+      aria-label: View Index
     - text: "Reference"
       href: reference/index.html
     - text: "Articles"
@@ -27,7 +28,7 @@ navbar:
           href: articles/example_ipd.html
   right:
     - icon: fa-github
-      href: https://github.com/javiersanchezalvarezevidera/RDICE
+      href: https://github.com/javiersanchezalvarezevidera/WARDEN
       aria-label: View on Github
 
 reference:
