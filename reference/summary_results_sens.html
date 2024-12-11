@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,9 +71,131 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="fu">summary_results_sens</span><span class="op">(</span><span class="va">results</span>, arm<span class="op">=</span><span class="st">"int"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sensitivity_name <span class="op">=</span> <span class="st">""</span>, arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_lys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">9.04687362556945</span>, noint <span class="op">=</span> <span class="fl">9.04687362556945</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_qalys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">6.20743830697466</span>, noint <span class="op">=</span> <span class="fl">6.18115138126336</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_costs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">49921.6357486899</span>, noint <span class="op">=</span> <span class="fl">41225.2544659378</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_lys_undisc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">10.8986618377039</span>, noint <span class="op">=</span> <span class="fl">10.8986618377039</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_qalys_undisc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">7.50117621700097</span>, noint <span class="op">=</span> <span class="fl">7.47414569286751</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_costs_undisc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">59831.3573929783</span>, noint <span class="op">=</span> <span class="fl">49293.1025437205</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, c_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">49921.6357486899</span>, noint <span class="op">=</span> <span class="fl">41225.2544659378</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, c_default_undisc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">59831.3573929783</span>, noint <span class="op">=</span> <span class="fl">49293.1025437205</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, q_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">6.20743830697466</span>, noint <span class="op">=</span> <span class="fl">6.18115138126336</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, q_default_undisc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">7.50117621700097</span>, noint <span class="op">=</span> <span class="fl">7.47414569286751</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, merged_df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>simulation <span class="op">=</span> <span class="fl">1L</span>, sensitivity <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">summary_results_sens</span><span class="op">(</span><span class="va">res</span>,arm<span class="op">=</span><span class="st">"int"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        arm analysis analysis_name          variable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;char&gt;    &lt;int&gt;        &lt;char&gt;            &lt;fctr&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:    int        1                           costs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:  noint        1                           costs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:    int        1                          dcosts</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:  noint        1                          dcosts</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:    int        1                             lys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:  noint        1                             lys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:    int        1                            dlys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:  noint        1                            dlys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:    int        1                           qalys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:  noint        1                           qalys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11:    int        1                          dqalys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12:  noint        1                          dqalys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13:    int        1                            ICER</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14:  noint        1                            ICER</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15:    int        1                            ICUR</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16:  noint        1                            ICUR</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17:    int        1                            INMB</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18:  noint        1                            INMB</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19:    int        1                    costs_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20:  noint        1                    costs_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21:    int        1                   dcosts_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22:  noint        1                   dcosts_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23:    int        1                      lys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24:  noint        1                      lys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25:    int        1                     dlys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26:  noint        1                     dlys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27:    int        1                    qalys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28:  noint        1                    qalys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29:    int        1                   dqalys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30:  noint        1                   dqalys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31:    int        1                     ICER_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32:  noint        1                     ICER_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 33:    int        1                     ICUR_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34:  noint        1                     ICUR_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35:    int        1                     INMB_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36:  noint        1                     INMB_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37:    int        1                       c_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38:  noint        1                       c_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 39:    int        1                      dc_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 40:  noint        1                      dc_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 41:    int        1                c_default_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 42:  noint        1                c_default_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 43:    int        1               dc_default_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 44:  noint        1               dc_default_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 45:    int        1                       q_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 46:  noint        1                       q_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 47:    int        1                      dq_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 48:  noint        1                      dq_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49:    int        1                q_default_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50:  noint        1                q_default_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51:    int        1               dq_default_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52:  noint        1               dq_default_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        arm analysis analysis_name          variable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                               &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:          49,922 (49,922; 49,922)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:          41,225 (41,225; 41,225)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:             8,696 (8,696; 8,696)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                9.05 (9.05; 9.05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                9.05 (9.05; 9.05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                6.21 (6.21; 6.21)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                6.18 (6.18; 6.18)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12:             0.026 (0.026; 0.026)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                     NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14:                   Inf (Inf; Inf)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15:                     NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16:       330,825 (330,825; 330,825)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17:                     NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18:          -7,382 (-7,382; -7,382)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19:          59,831 (59,831; 59,831)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20:          49,293 (49,293; 49,293)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22:          10,538 (10,538; 10,538)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23:                10.9 (10.9; 10.9)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24:                10.9 (10.9; 10.9)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27:                   7.5 (7.5; 7.5)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28:                7.47 (7.47; 7.47)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30:             0.027 (0.027; 0.027)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31:                     NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32:                   Inf (Inf; Inf)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 33:                     NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34:       389,865 (389,865; 389,865)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35:                     NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36:          -9,187 (-9,187; -9,187)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37: 49,921.64 (49,921.64; 49,921.64)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38: 41,225.25 (41,225.25; 41,225.25)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 39:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 40: 8,696.381 (8,696.381; 8,696.381)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 41: 59,831.36 (59,831.36; 59,831.36)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 42:    49,293.1 (49,293.1; 49,293.1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 43:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 44: 10,538.25 (10,538.25; 10,538.25)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 45:                6.21 (6.21; 6.21)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 46:                6.18 (6.18; 6.18)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 47:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 48:             0.026 (0.026; 0.026)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49:                   7.5 (7.5; 7.5)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50:                7.47 (7.47; 7.47)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51:                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52:             0.027 (0.027; 0.027)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                value</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
