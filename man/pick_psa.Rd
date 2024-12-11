@@ -27,7 +27,6 @@ This feature is convenient when mixing distributions with different number of ar
 While it's slightly lower than individually calling each function, it makes the code easier to read and more transparent
 }
 \examples{
-\dontrun{
 params <- list(
 param=list("a","b"),
 dist=list("rlnorm","rnorm"),
@@ -66,9 +65,4 @@ c=list(NA,NA,NA,NA), #NA arguments will be ignored
 dsa_min=list(c(1,2,3,4),2,1,0),
 dsa_max=list(c(1,2,3,4),3,3,2)
 )
-
-
-
-}
-
 }

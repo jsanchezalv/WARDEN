@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,9 +67,23 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="fu">extract_psa_result</span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_costs"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sensitivity_name <span class="op">=</span> <span class="st">""</span>, arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_lys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">9.04687362556945</span>, noint <span class="op">=</span> <span class="fl">9.04687362556945</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_qalys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">6.20743830697466</span>, noint <span class="op">=</span> <span class="fl">6.18115138126336</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_costs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">49921.6357486899</span>, noint <span class="op">=</span> <span class="fl">41225.2544659378</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_lys_undisc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">10.8986618377039</span>, noint <span class="op">=</span> <span class="fl">10.8986618377039</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_qalys_undisc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">7.50117621700097</span>, noint <span class="op">=</span> <span class="fl">7.47414569286751</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, total_costs_undisc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">59831.3573929783</span>, noint <span class="op">=</span> <span class="fl">49293.1025437205</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, c_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">49921.6357486899</span>, noint <span class="op">=</span> <span class="fl">41225.2544659378</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, c_default_undisc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">59831.3573929783</span>, noint <span class="op">=</span> <span class="fl">49293.1025437205</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, q_default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">6.20743830697466</span>, noint <span class="op">=</span> <span class="fl">6.18115138126336</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, q_default_undisc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>int <span class="op">=</span> <span class="fl">7.50117621700097</span>, noint <span class="op">=</span> <span class="fl">7.47414569286751</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, merged_df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>simulation <span class="op">=</span> <span class="fl">1L</span>, sensitivity <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">extract_psa_result</span><span class="op">(</span><span class="va">res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,<span class="st">"total_costs"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        int    noint simulation     element</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 49921.64 41225.25          1 total_costs</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

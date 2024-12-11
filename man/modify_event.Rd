@@ -11,7 +11,9 @@ modify_event(evt, create_if_null = TRUE)
 
 \item{create_if_null}{A boolean.
 If TRUE, it will create non-existing events with the chosen time to event.
-If FALSE, it will ignore those.}
+If FALSE, it will ignore those.
+
+@return No return value, modifies/adds event to \code{cur_evtlist} and integrates it with the main list for storage}
 }
 \description{
 Modify the time of existing events
@@ -21,9 +23,9 @@ The functions to add/modify events/inputs use lists. Whenever several inputs/eve
 So rather than use two \code{modify_event} with a list of one element, it's better to group them into a single \code{modify_event} with a list of two elements.
 
 This function does not evaluate sequentially.
+
+This function is intended to be used only within the \code{add_reactevt} function in its \code{input} parameter and should not be run elsewhere or it will return an error.
 }
 \examples{
-\dontrun{
-modify_event(list("os"=40, "ttot"=curtime+0.0001))
-}
+add_reactevt(name_evt = "idfs",input = {modify_event(list("os"=5))})
 }

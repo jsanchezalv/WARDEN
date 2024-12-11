@@ -9,6 +9,9 @@ modify_item(list_item)
 \arguments{
 \item{list_item}{A list of items and their values or expressions}
 }
+\value{
+No return value, modifies/adds item to the environment and integrates it with the main list for storage
+}
 \description{
 Modify the value of existing items
 }
@@ -19,9 +22,9 @@ So rather than use two \code{modify_item} with a list of one element, it's bette
 Costs and utilities can be modified by using the construction \code{type_name_category}, where type is either "qaly" or "cost",
 name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass \code{cost_default_instant} and modify the cost.
 This will overwrite the value defined in the corresponding cost/utility section.
+
+This function is intended to be used only within the \code{add_reactevt} function in its \code{input} parameter and should not be run elsewhere or it will return an error.
 }
 \examples{
-\dontrun{
-modify_item(list(cost.idfs = 500, cost.tx = cost.tx + 4000))
-}
+add_reactevt(name_evt = "idfs",input = {modify_item(list("cost.it"=5))})
 }

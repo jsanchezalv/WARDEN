@@ -33,8 +33,7 @@ Double based on cycle discounting
 Cycle discounting
 }
 \examples{
-\dontrun{
 disc_cycle(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
-}
+
 
 }

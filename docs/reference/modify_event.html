@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,8 @@
 <dt id="arg-create-if-null">create_if_null<a class="anchor" aria-label="anchor" href="#arg-create-if-null"></a></dt>
 <dd><p>A boolean.
 If TRUE, it will create non-existing events with the chosen time to event.
-If FALSE, it will ignore those.</p></dd>
+If FALSE, it will ignore those.</p>
+<p>@return No return value, modifies/adds event to <code>cur_evtlist</code> and integrates it with the main list for storage</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -67,13 +68,19 @@ If FALSE, it will ignore those.</p></dd>
     <p>The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two <code>modify_event</code> with a list of one element, it's better to group them into a single <code>modify_event</code> with a list of two elements.</p>
 <p>This function does not evaluate sequentially.</p>
+<p>This function is intended to be used only within the <code>add_reactevt</code> function in its <code>input</code> parameter and should not be run elsewhere or it will return an error.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="fu">modify_event</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"os"</span><span class="op">=</span><span class="fl">40</span>, <span class="st">"ttot"</span><span class="op">=</span><span class="va">curtime</span><span class="op">+</span><span class="fl">0.0001</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"idfs"</span>,input <span class="op">=</span> <span class="op">{</span><span class="fu">modify_event</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"os"</span><span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $idfs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $idfs$react</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     modify_event(list(os = 5))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -29,7 +29,6 @@ Events need to be separately defined for each intervention.
 For each event that is defined in this list, the user needs to add a reaction to the event using the \code{add_reactevt()} function which will determine what calculations will happen at an event.
 }
 \examples{
-\dontrun{
 add_tte(arm="int",evts = c("start","ttot","idfs","os"),
 input={
 start <- 0
@@ -37,6 +36,5 @@ idfs <- draw_tte(1,'lnorm',coef1=2, coef2=0.5)
 ttot <- min(draw_tte(1,'lnorm',coef1=1, coef2=4),idfs)
 os <- draw_tte(1,'lnorm',coef1=0.8, coef2=0.2)
 })
-}
 
 }

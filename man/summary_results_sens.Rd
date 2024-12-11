@@ -20,7 +20,19 @@ A data frame with each sensitivity output per arm
 Summary of sensitivity outputs for a treatment
 }
 \examples{
-\dontrun{
-summary_results_sens(results, arm="int")
-}
+res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
+), total_lys = c(int = 9.04687362556945, noint = 9.04687362556945
+), total_qalys = c(int = 6.20743830697466, noint = 6.18115138126336
+), total_costs = c(int = 49921.6357486899, noint = 41225.2544659378
+), total_lys_undisc = c(int = 10.8986618377039, noint = 10.8986618377039
+), total_qalys_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+), total_costs_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+), c_default = c(int = 49921.6357486899, noint = 41225.2544659378
+), c_default_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+), q_default = c(int = 6.20743830697466, noint = 6.18115138126336
+), q_default_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+), merged_df = list(simulation = 1L, sensitivity = 1L))))
+
+
+summary_results_sens(res,arm="int")
 }

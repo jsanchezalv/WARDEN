@@ -412,7 +412,7 @@ test_that("Model Reactions Interactivity summary can be created",{
       
       b = if(a){"CZ"}else{"AW"},
       
-      rnd_prob_exn_sev = runif_stream(1, substream_prob_exn_sev),
+      rnd_prob_exn_sev = runif(1),
       
       exn_sev = rnd_prob_exn_sev <= p_sev,
       
@@ -466,7 +466,7 @@ test_that("Model Reactions Interactivity summary can be created",{
       
       o_rec_utility = utility,
       
-      rnd_exn = runif_stream(1, substream_exn)
+      rnd_exn = runif(1)
       
     ))
     
@@ -656,22 +656,5 @@ test_that("luck_adj adjusts luck correctly", {
 })
 
 
-test_that("runif_stream generates random values consistently", {
-  # Simulate a global random seed
-  RNGkind("L'Ecuyer-CMRG")
-  set.seed(123)
-  random_seed <- .Random.seed
-  input_list_arm <- list()
-  assign("input_list_arm", input_list_arm, envir = parent.frame())
-  
-  # Generate uniform values
-  result <- runif_stream(n = 5, random_seed = .Random.seed, gen = "event_seq")
-  expect_equal(length(result), 5)
-  expect_true(all(result >= 0 & result <= 1))
-  
-  # Ensure seed consistency
-  set.seed(123)
-  expect_equal(.Random.seed, random_seed)
-})
 
 

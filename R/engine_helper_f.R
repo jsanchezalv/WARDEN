@@ -110,7 +110,9 @@ initiate_evt <- function(arm_name,input_list_arm){
 #' @return Two lists: one containing the name and time of the next event, the other with the remaining events to be processed
 #'
 #' @examples
+#' \donttest{
 #' get_next_evt(evt_list = input_list_arm$cur_evtlist)
+#'}
 #'
 #' @keywords internal
 #' @noRd
@@ -147,7 +149,9 @@ get_next_evt <- function(evt_list){                  # This function identifies 
 #' @return The updated input list with after the reaction to the event is evaluated
 #'
 #' @examples
+#' \donttest{
 #' react_evt(thisevt="evt1",arm="int",input_list_arm=input_list_arm)
+#' }
 #'
 #' @keywords internal
 #' @noRd
@@ -204,7 +208,9 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
 #' @return The modified input list with the updates after executing the corresponding reactions
 #'
 #' @examples
+#' \donttest{
 #' eval_reactevt(react_list = input_list_arm$evt_react_list,evt_name ="evt1",input_list_arm=input_list_arm)
+#'}
 #'
 #' @keywords internal
 #' @noRd
@@ -250,7 +256,9 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
 #' @return A numeric vector of evaluated costs/utilities/cycle lengths/starting times for the specific event and intervention defined
 #'
 #' @examples
+#' \donttest{
 #' get_input(x = input_list_arm$uc_lists$cost_ongoing_list,ifnull=0,type="cost",evt_arm_i="evt1_int",input_list_arm_i=input_list_arm)
+#'}
 #'
 #' @keywords internal
 #' @noRd
@@ -303,7 +311,9 @@ get_input <-  function(x,ifnull=0,type,evt_arm_i =evt_arm, input_list_arm_i=inpu
 #' @importFrom stats quantile
 #'
 #' @examples
+#' \donttest{
 #' interval_out(output_sim=results$output_sim[[1]],element="costs.",round_digit=3)
+#'}
 #'
 #' @keywords internal
 #' @noRd
@@ -550,8 +560,10 @@ expand_evts_fwd <- function(data, time_points, reset_columns = NULL) {
 #' It computes the discounted and undiscounted lys/costs/qalys at specific timepoints in an aggregated format.
 #' 
 #' @examples
+#' \donttest{
 #' compute_outputs_timseq(patdata_dt=patdata_dt,input_list=input_list, freq = 1)
-#'
+#' }
+#' 
 #' @keywords internal
 #' @noRd
 
@@ -795,7 +807,9 @@ compute_outputs_timseq <- function(freq,
 #' If using ipd = 3, it will return the average across patients of the last observation per patient (if numeric. If not numeric, it will be discarded).
 #'
 #' @examples
+#' \donttest{
 #' compute_outputs(patdata=patdata,input_list=input_list)
+#'}
 #'
 #' @keywords internal
 #' @noRd

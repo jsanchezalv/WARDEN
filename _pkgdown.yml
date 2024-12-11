@@ -51,7 +51,6 @@ reference:
       - pick_psa
       - pick_val_v
       - replicate_profiles
-      - runif_stream
 
   - subtitle: Modelling Summary Functions
     contents:
@@ -95,6 +94,7 @@ reference:
       - disc_instant_v
       - disc_ongoing
       - disc_ongoing_v
+      - ast_as_list
       - extract_elements_from_list
       - extract_from_reactions
       - extract_psa_result

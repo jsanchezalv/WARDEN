@@ -30,8 +30,6 @@ Resampled data.frame of profiles
 Replicate profiles data.frame
 }
 \examples{
-\dontrun{
 replicate_profiles(profiles=data.frame(id=1:100,age=rnorm(100,60,5)),
 replications=200,probabilities=rep(1,100))
-}
 }

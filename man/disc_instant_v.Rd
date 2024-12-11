@@ -20,8 +20,7 @@ Double based on discrete time discounting
 Calculate instantaneous discounted costs or qalys for vectors
 }
 \examples{
-\dontrun{
 disc_instant_v(lcldr=0.035, lclcurtime=3, lclval=2500)
-}
+
 
 }

@@ -57,7 +57,6 @@ Lists should be used when correlated variables are introduced to make sure the s
 This function allows to choose between using an approach where only the full parameters are varied, and an approach where subelements of the parameters can be changed
 }
 \examples{
-\dontrun{
 pick_val_v(base = list(0,0),
              psa =list(rnorm(1,0,0.1),rnorm(1,0,0.1)),
              sens = list(2,3),
@@ -88,5 +87,4 @@ pick_val_v(base = list(2,3,c(1,2)),
              covariances = list(0.1,0.1,matrix(c(1,0.1,0.1,1),2,2))
 )
  
-} 
 }

@@ -22,8 +22,7 @@ Double based on continuous time discounting
 Calculate discounted costs and qalys between events for vectors
 }
 \examples{
-\dontrun{
 disc_ongoing_v(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
-}
+
 
 }

@@ -9,6 +9,9 @@ modify_item_seq(...)
 \arguments{
 \item{...}{A list of items and their values or expressions. Will be evaluated sequentially (so one could have list(a= 1, b = a +2 ))}
 }
+\value{
+No return value, modifies/adds items sequentially and deploys to the environment and with the main list for storage
+}
 \description{
 Modify the value of existing items
 }
@@ -22,10 +25,11 @@ This will overwrite the value defined in the corresponding cost/utility section.
 
 The function is different from modify_item in that this function evaluates sequentially the arguments within the list passed.
 This implies a slower performance relative to modify_item, but it can be more cleaner and convenient in certain instances.
+
+This function is intended to be used only within the \code{add_reactevt} function in its \code{input} parameter and should not be run elsewhere or it will return an error.
 }
 \examples{
-\dontrun{
-modify_item_seq(list(cost.idfs = 500, cost.tx = cost.idfs + 4000))
-}
-
+add_reactevt(name_evt = "idfs",input = {
+  modify_item_seq(list(cost.idfs = 500, cost.tx = cost.idfs + 4000))
+  })
 }

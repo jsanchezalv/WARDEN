@@ -32,7 +32,8 @@ run_sim_parallel(
   timed_freq = NULL,
   debug = FALSE,
   accum_backwards = FALSE,
-  continue_on_error = FALSE
+  continue_on_error = FALSE,
+  seed = NULL
 )
 }
 \arguments{
@@ -91,6 +92,8 @@ run_sim_parallel(
 \item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.}
 
 \item{continue_on_error}{If TRUE, on error  at patient stage will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1, not at the patient level)}
+
+\item{seed}{Starting seed to be used for the whole analysis. If null, it's set to 1 by default.}
 }
 \value{
 A list of lists with the analysis results
@@ -137,21 +140,67 @@ If \code{continue_on_error} is set to FALSE, it will only export analysis level 
 Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.
 }
 \examples{
-\dontrun{
+library(magrittr)
+common_all_inputs <-add_item(
+util.sick = 0.8,
+util.sicker = 0.5,
+cost.sick = 3000,
+cost.sicker = 7000,
+cost.int = 1000,
+coef_noint = log(0.2),
+HR_int = 0.8,
+drc = 0.035, #different values than what's assumed by default
+drq = 0.035,
+random_seed_sicker_i = sample.int(100000,5,replace = FALSE)
+)
+
+common_pt_inputs <- add_item(death= max(0.0000001,rnorm(n=1, mean=12, sd=3))) 
+
+unique_pt_inputs <- add_item(fl.sick = 1,
+                             q_default = util.sick,
+                             c_default = cost.sick + if(arm=="int"){cost.int}else{0}) 
+                             
+init_event_list <- 
+add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={
+  sick <- 0
+  sicker <- draw_tte(1,dist="exp",
+   coef1=coef_noint, beta_tx = ifelse(arm=="int",HR_int,1),
+   seed = random_seed_sicker_i[i])
+  
+})   
+
+evt_react_list <-
+add_reactevt(name_evt = "sick",
+             input = {}) \%>\%
+  add_reactevt(name_evt = "sicker",
+               input = {
+                 modify_item(list(q_default = util.sicker,
+                                  c_default = cost.sicker + if(arm=="int"){cost.int}else{0},
+                                  fl.sick = 0)) 
+               }) \%>\%
+  add_reactevt(name_evt = "death",
+               input = {
+                 modify_item(list(q_default = 0,
+                                  c_default = 0, 
+                                  curtime = Inf)) 
+               }) 
+               
+util_ongoing <- "q_default"
+cost_ongoing <- "c_default"
+                          
+
 run_sim_parallel(arm_list=c("int","noint"),
 common_all_inputs = common_all_inputs,
 common_pt_inputs = common_pt_inputs,
 unique_pt_inputs = unique_pt_inputs,
 init_event_list = init_event_list,
 evt_react_list = evt_react_list,
-util_ongoing_list = util_ongoing_list,
-util_instant_list = util_instant_list,
-cost_ongoing_list = cost_ongoing_list,
-cost_instant_list = cost_instant_list,
-npats = 500,
+util_ongoing_list = util_ongoing,
+cost_ongoing_list = cost_ongoing,
+npats = 2,
 n_sim = 1,
 psa_bool = FALSE,
-ncores = future::availableCores(),
-ipd = 1)
-}
+ipd = 1,
+ncores = 1)
+
 }

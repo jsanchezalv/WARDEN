@@ -26,10 +26,8 @@ if(getRversion() >= "2.15.1") {
 #' 
 #'
 #' @examples
-#' \dontrun{
 #' replicate_profiles(profiles=data.frame(id=1:100,age=rnorm(100,60,5)),
 #' replications=200,probabilities=rep(1,100))
-#' }
 replicate_profiles <- function(profiles,
                                replications,
                                probabilities = NULL,
@@ -63,10 +61,9 @@ replicate_profiles <- function(profiles,
 #' n_elem_before is to be used when several indicators want to be used (e.g., for patient level and common level inputs) while facilitating readibility of the code
 #'
 #' @examples
-#' \dontrun{
 #'create_indicators(10,20,c(1,1,1,1))
 #'create_indicators(7,20,c(1,0,0,1,1,1,0,0,1,1),2)
-#' }
+
 create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
   
   if (n_sensitivity<sens) {
@@ -116,7 +113,6 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 #' While it's slightly lower than individually calling each function, it makes the code easier to read and more transparent
 #'
 #' @examples
-#' \dontrun{
 #' params <- list(
 #' param=list("a","b"),
 #' dist=list("rlnorm","rnorm"),
@@ -166,11 +162,7 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 #' dsa_min=list(c(1,2,3,4),2,1,0),
 #' dsa_max=list(c(1,2,3,4),3,3,2)
 #' )
-#'
-#'
-#'
-#' }
-#' 
+
 pick_psa <- function(f,...){
   args_called <- list(...)
   sapply(1:length(f), function(x) {
@@ -211,7 +203,6 @@ pick_psa <- function(f,...){
 #' This function allows to choose between using an approach where only the full parameters are varied, and an approach where subelements of the parameters can be changed
 #'
 #' @examples
-#' \dontrun{
 #' pick_val_v(base = list(0,0),
 #'              psa =list(rnorm(1,0,0.1),rnorm(1,0,0.1)),
 #'              sens = list(2,3),
@@ -242,7 +233,6 @@ pick_psa <- function(f,...){
 #'              covariances = list(0.1,0.1,matrix(c(1,0.1,0.1,1),2,2))
 #' )
 #'  
-#'} 
 pick_val_v <- function(base,
                          psa,
                          sens,
@@ -351,7 +341,8 @@ pick_val_v <- function(base,
 #' it should be implemented after a first `add_item()` (empty or with content) to avoid confusing the `.data` argument, or wrapping the function within `substitute()`
 #'
 #' @examples
-#' \dontrun{
+#' library(magrittr)
+#'
 #' add_item(fl.idfs = 0)
 #' add_item(util_idfs = if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}, util.mbc = 0.6, cost_idfs = 2500)
 #' common_inputs <- add_item() %>%
@@ -370,7 +361,6 @@ pick_val_v <- function(base,
 #'   names_out = l_statics[["parameter_name"]]
 #' )
 #' )
-#' }
 #'
 
 add_item <- function(.data=NULL,...){
@@ -397,7 +387,10 @@ add_item <- function(.data=NULL,...){
 #'
 #' @param evt Event name and event time
 #'
+#' @return No return value, adds event to `cur_evtlist` and integrates it with the main list for storage
+#'
 #' @importFrom stats setNames
+#' 
 #'
 #' @export
 #'
@@ -405,11 +398,11 @@ add_item <- function(.data=NULL,...){
 #' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 #' So rather than use two `new_event` with a list of one element, it's better to group them into a single `new_event` with a list of two elements.
 #'
+#' This function is intended to be used only within the `add_reactevt` function in its `input` parameter and should not be run elsewhere or it will return an error.
+#'
 #' @examples
-#' \dontrun{
-#' new_event(list("ae"=5))
-#' new_event(list("ae"=5,"nat.death" = 100))
-#' }
+#' add_reactevt(name_evt = "idfs",input = {new_event(list("ae"=5))})
+
 
 new_event <- function(evt){
   new_evt_name <- names(evt)
@@ -463,6 +456,8 @@ new_event <- function(evt){
 #' @param create_if_null A boolean.
 #'  If TRUE, it will create non-existing events with the chosen time to event.
 #'  If FALSE, it will ignore those.
+#'  
+#'  @return No return value, modifies/adds event to `cur_evtlist` and integrates it with the main list for storage
 #'
 #' @importFrom utils modifyList
 #' @importFrom stats setNames
@@ -475,10 +470,10 @@ new_event <- function(evt){
 #'
 #' This function does not evaluate sequentially.
 #'
+#' This function is intended to be used only within the `add_reactevt` function in its `input` parameter and should not be run elsewhere or it will return an error.
+#'
 #' @examples
-#' \dontrun{
-#' modify_event(list("os"=40, "ttot"=curtime+0.0001))
-#' }
+#' add_reactevt(name_evt = "idfs",input = {modify_event(list("os"=5))})
 
 modify_event <- function(evt,create_if_null=TRUE){
   input_list_arm <- parent.frame()$input_list_arm
@@ -548,6 +543,8 @@ modify_event <- function(evt,create_if_null=TRUE){
 #' Modify the value of existing items
 #'
 #' @param list_item A list of items and their values or expressions
+#' 
+#' @return No return value, modifies/adds item to the environment and integrates it with the main list for storage
 #'
 #' @export
 #'
@@ -559,10 +556,11 @@ modify_event <- function(evt,create_if_null=TRUE){
 #'  name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
 #'  This will overwrite the value defined in the corresponding cost/utility section.
 #'
+#' This function is intended to be used only within the `add_reactevt` function in its `input` parameter and should not be run elsewhere or it will return an error.
+#'
 #' @examples
-#' \dontrun{
-#' modify_item(list(cost.idfs = 500, cost.tx = cost.tx + 4000))
-#' }
+#' add_reactevt(name_evt = "idfs",input = {modify_item(list("cost.it"=5))})
+
 
 modify_item <- function(list_item){
   input_list_arm <- parent.frame()$input_list_arm
@@ -610,6 +608,8 @@ modify_item <- function(list_item){
 #'
 #' @param ... A list of items and their values or expressions. Will be evaluated sequentially (so one could have list(a= 1, b = a +2 ))
 #'
+#' @return No return value, modifies/adds items sequentially and deploys to the environment and with the main list for storage
+#'
 #' @export
 #'
 #' @details
@@ -623,11 +623,13 @@ modify_item <- function(list_item){
 #'  The function is different from modify_item in that this function evaluates sequentially the arguments within the list passed.
 #'   This implies a slower performance relative to modify_item, but it can be more cleaner and convenient in certain instances.
 #'
+#' This function is intended to be used only within the `add_reactevt` function in its `input` parameter and should not be run elsewhere or it will return an error.
+#'
 #' @examples
-#' \dontrun{
-#' modify_item_seq(list(cost.idfs = 500, cost.tx = cost.idfs + 4000))
-#' }
-#' 
+#' add_reactevt(name_evt = "idfs",input = {
+#'   modify_item_seq(list(cost.idfs = 500, cost.tx = cost.idfs + 4000))
+#'   })
+
 modify_item_seq <- function(...){
   
   input_list_arm <- parent.frame()$input_list_arm
@@ -687,6 +689,8 @@ modify_item_seq <- function(...){
 #' @param name_evt Name of the event for which reactions are defined.
 #' @param input Expressions that define what happens at the event, using functions as defined in the Details section
 #'
+#' @return A named list with the event name, and inside it the substituted expression saved for later evaluation
+#'
 #' @export
 #'
 #' @details
@@ -711,10 +715,8 @@ modify_item_seq <- function(...){
 #' The user can use `extract_from_reactions` function on the output to obtain a data.frame with all the relationships defined in the reactions in the model.
 #'
 #' @examples
-#' \dontrun{
 #' add_reactevt(name_evt = "start",input = {})
 #' add_reactevt(name_evt = "idfs",input = {modify_item(list("fl.idfs"= 0))})
-#' }
 
 add_reactevt <- function(.data=NULL,name_evt,input){
 
@@ -759,7 +761,6 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 #' For each event that is defined in this list, the user needs to add a reaction to the event using the `add_reactevt()` function which will determine what calculations will happen at an event.
 #'
 #' @examples
-#' \dontrun{
 #' add_tte(arm="int",evts = c("start","ttot","idfs","os"),
 #' input={
 #' start <- 0
@@ -767,7 +768,6 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 #' ttot <- min(draw_tte(1,'lnorm',coef1=1, coef2=4),idfs)
 #' os <- draw_tte(1,'lnorm',coef1=0.8, coef2=0.2)
 #' })
-#' }
 #'
 add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
   data_list <- .data
@@ -914,9 +914,9 @@ luck_adj <- function(prevsurv,cursurv,luck,condq=TRUE){
 #'
 #' @return Double based on continuous time discounting
 #'
-#' @examples \dontrun{
+#' @examples 
 #' disc_ongoing(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
-#' }
+#' 
 #'
 #' @export
 
@@ -947,9 +947,9 @@ disc_ongoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
 #'
 #' @return Double based on continuous time discounting
 #'
-#' @examples \dontrun{
+#' @examples 
 #' disc_ongoing_v(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
-#' }
+#' 
 #'
 #' @export
 
@@ -976,9 +976,9 @@ disc_ongoing_v <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
 #'
 #' @return Double based on discrete time discounting
 #'
-#' @examples \dontrun{
+#' @examples
 #' disc_instant_v(lcldr=0.035, lclcurtime=3, lclval=2500)
-#' }
+#' 
 #'
 #' @export
 #' 
@@ -998,9 +998,9 @@ disc_instant_v <- function(lcldr=0.035, lclcurtime, lclval){
 #'
 #' @return Double based on discrete time discounting
 #'
-#' @examples \dontrun{
+#' @examples 
 #' disc_instant(lcldr=0.035, lclcurtime=3, lclval=2500)
-#' }
+#' 
 #'
 #' @export
 #' 
@@ -1028,9 +1028,9 @@ disc_instant <- function(lcldr=0.035, lclcurtime, lclval){
 #'
 #' @return Double based on cycle discounting
 #'
-#' @examples \dontrun{
+#' @examples 
 #' disc_cycle(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
-#' }
+#' 
 #'
 #' @export
 
@@ -1101,9 +1101,9 @@ disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval
 #'
 #' @return Double based on cycle discounting
 #'
-#' @examples \dontrun{
+#' @examples 
 #' disc_cycle_v(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
-#' }
+#' 
 #'
 #' @export
 
@@ -1160,59 +1160,6 @@ disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclv
   return(addcycle)
 }
 
-
-#' Creates a random uniform 0-1 for a given random seed substream and updates the value
-#'
-#' @param n Number of elements
-#' @param random_seed Substream to be used
-#' @param gen Context in which the function is applied.
-#'  Can be values "event" (reaction to an event), 
-#'  "add_item" (when used within add_item for unique_pt_inputs argument in run_sim),
-#'  "initialize" (if used within the "add_tte" function), "event" if used in modify_item,
-#'  and "event_seq" (assumed that by default, so no need to be declared explicitly) for modify_item_seq
-#'
-#' @return A vector of uniform values between 0 and 1
-#'
-#' @examples \dontrun{
-#' x <- .Random.seed
-#' runif_stream(n=1, x, gen="event")
-#' }
-#'
-#' @export
-runif_stream <- function(n=1,random_seed,gen="event_seq"){
-  gen <- switch(gen,
-           event = 1,
-           event_seq = 3,
-           add_item = 5,
-           initialize = 5
-           )
-  
-  if(!is.null(parent.frame(gen)$input_list_arm)){
-    input_list_arm <- parent.frame(gen)$input_list_arm
-    temp_seed <- .Random.seed
-    assign(".Random.seed", random_seed, envir = .GlobalEnv)
-    out <- runif(n=n)
-    name_temp <- as.character((substitute(random_seed)))
-    input_list_arm[[name_temp]] <- .Random.seed
-    assign(name_temp, .Random.seed, envir = parent.frame(gen))
-    assign("input_list_arm", input_list_arm, envir = parent.frame(gen))
-    assign(".Random.seed", temp_seed, envir = .GlobalEnv)
-  }else{
-    input_list_pt <- parent.frame(gen)$input_list_pt
-    temp_seed <- .Random.seed
-    assign(".Random.seed", random_seed, envir = .GlobalEnv)
-    out <- runif(n=n)
-    name_temp <- as.character((substitute(random_seed)))
-    input_list_pt[[name_temp]] <- .Random.seed
-    assign(name_temp, .Random.seed, envir = parent.frame(gen))
-    assign("input_list_pt", input_list_pt, envir = parent.frame(gen))
-    assign(".Random.seed", temp_seed, envir = .GlobalEnv)
-  }
-
-  out
-} 
-
-
 # Model Events Interactions -------------------------------------------------------
 
 #' Extract all items and events and their interactions from the event reactions list
@@ -1248,7 +1195,52 @@ extract_from_reactions <- function(reactions){
 #'
 #' @return Nested list with the Abstract Syntax Tree (AST)
 #'
-#' @noRd
+#' @export
+#'
+#' @examples
+#' expr <- substitute({
+#' 
+#' a <- sum(5+7)
+#' 
+#' modify_item(list(afsa=ifelse(TRUE,"asda",NULL)))
+#' 
+#' modify_item_seq(list(
+#'   
+#'   o_other_q_gold1 = if(gold == 1) { utility } else { 0 },
+#'   
+#'   o_other_q_gold2 = if(gold == 2) { utility } else { 0 },
+#'   
+#'   o_other_q_gold3 = if(gold == 3) { utility } else { 0 },
+#'   
+#'   o_other_q_gold4 = if(gold == 4) { utility } else { 0 },
+#'   
+#'   o_other_q_on_dup = if(on_dup) { utility } else { 0 }
+#'  
+#' ))
+#' 
+#' if(a==1){
+#'   modify_item(list(a=list(6+b)))
+#'   
+#'   modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
+#' } else{
+#'   modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
+#'   if(a>6){
+#'     modify_item(list(a=8))
+#'   }
+#'   
+#' }
+#' 
+#' 
+#' if (sel_resp_incl == 1 & on_dup == 1) {
+#'   
+#'   modify_event(list(e_response = curtime, z = 6))
+#'   
+#' }
+#' 
+#' })
+#' 
+#' 
+#' out <- ast_as_list(expr)
 #' 
 ast_as_list <- function(ee) {
   purrr::map_if(as.list(ee), is.call, ast_as_list)
@@ -1264,7 +1256,6 @@ ast_as_list <- function(ee) {
 #'  and whether it's contained within a conditional statement
 #'  
 #' @examples
-#' \dontrun{
 #' expr <- substitute({
 #' 
 #' a <- sum(5+7)
@@ -1310,7 +1301,7 @@ ast_as_list <- function(ee) {
 #' out <- ast_as_list(expr)
 #' 
 #' results <- extract_elements_from_list(out)
-#' }
+#' 
 #' 
 #' @export
 #' 

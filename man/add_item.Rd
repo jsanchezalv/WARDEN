@@ -25,7 +25,8 @@ Whenever a function is directly implemented which must be evaluated later and th
 it should be implemented after a first \code{add_item()} (empty or with content) to avoid confusing the \code{.data} argument, or wrapping the function within \code{substitute()}
 }
 \examples{
-\dontrun{
+library(magrittr)
+
 add_item(fl.idfs = 0)
 add_item(util_idfs = if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}, util.mbc = 0.6, cost_idfs = 2500)
 common_inputs <- add_item() \%>\%
@@ -44,6 +45,5 @@ add_item(pick_val_v(
   names_out = l_statics[["parameter_name"]]
 )
 )
-}
 
 }

@@ -13,6 +13,9 @@ add_reactevt(.data = NULL, name_evt, input)
 
 \item{input}{Expressions that define what happens at the event, using functions as defined in the Details section}
 }
+\value{
+A named list with the event name, and inside it the substituted expression saved for later evaluation
+}
 \description{
 Define the modifications to other events, costs, utilities, or other items affected by the occurrence of the event
 }
@@ -38,8 +41,6 @@ The model will run until \code{curtime} is set to \code{Inf}, so the event that 
 The user can use \code{extract_from_reactions} function on the output to obtain a data.frame with all the relationships defined in the reactions in the model.
 }
 \examples{
-\dontrun{
 add_reactevt(name_evt = "start",input = {})
 add_reactevt(name_evt = "idfs",input = {modify_item(list("fl.idfs"= 0))})
-}
 }

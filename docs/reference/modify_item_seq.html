@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,10 @@
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>No return value, modifies/adds items sequentially and deploys to the environment and with the main list for storage</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two <code>modify_item</code> with a list of one element, it's better to group them into a single <code>modify_item</code> with a list of two elements.</p>
@@ -65,14 +69,22 @@ name is the name (e.g., "default") and category is the category used (e.g., "ins
 This will overwrite the value defined in the corresponding cost/utility section.</p>
 <p>The function is different from modify_item in that this function evaluates sequentially the arguments within the list passed.
 This implies a slower performance relative to modify_item, but it can be more cleaner and convenient in certain instances.</p>
+<p>This function is intended to be used only within the <code>add_reactevt</code> function in its <code>input</code> parameter and should not be run elsewhere or it will return an error.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="fu">modify_item_seq</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cost.idfs <span class="op">=</span> <span class="fl">500</span>, cost.tx <span class="op">=</span> <span class="va">cost.idfs</span> <span class="op">+</span> <span class="fl">4000</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
-<span class="r-in"><span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"idfs"</span>,input <span class="op">=</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu">modify_item_seq</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cost.idfs <span class="op">=</span> <span class="fl">500</span>, cost.tx <span class="op">=</span> <span class="va">cost.idfs</span> <span class="op">+</span> <span class="fl">4000</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $idfs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $idfs$react</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     modify_item_seq(list(cost.idfs = 500, cost.tx = cost.idfs + </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         4000))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

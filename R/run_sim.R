@@ -27,6 +27,7 @@
 #' @param debug If TRUE, will generate a log file
 #' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
 #' @param continue_on_error If TRUE, on error it will attempt to continue by skipping the current simulation 
+#' @param seed Starting seed to be used for the whole analysis. If null, it's set to 1 by default.
 #'
 #' @return A list of data frames with the simulation results
 #' @importFrom progressr with_progress
@@ -75,23 +76,68 @@
 #'   Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.
 #'
 #' @examples
-#' \dontrun{
+#' library(magrittr)
+#' common_all_inputs <-add_item(
+#' util.sick = 0.8,
+#' util.sicker = 0.5,
+#' cost.sick = 3000,
+#' cost.sicker = 7000,
+#' cost.int = 1000,
+#' coef_noint = log(0.2),
+#' HR_int = 0.8,
+#' drc = 0.035, #different values than what's assumed by default
+#' drq = 0.035,
+#' random_seed_sicker_i = sample.int(100000,5,replace = FALSE)
+#' )
+#' 
+#' common_pt_inputs <- add_item(death= max(0.0000001,rnorm(n=1, mean=12, sd=3))) 
+#' 
+#' unique_pt_inputs <- add_item(fl.sick = 1,
+#'                              q_default = util.sick,
+#'                              c_default = cost.sick + if(arm=="int"){cost.int}else{0}) 
+#'                              
+#' init_event_list <- 
+#' add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={
+#'   sick <- 0
+#'   sicker <- draw_tte(1,dist="exp",
+#'    coef1=coef_noint, beta_tx = ifelse(arm=="int",HR_int,1),
+#'     seed = random_seed_sicker_i[i])
+#'   
+#' })   
+#' 
+#' evt_react_list <-
+#' add_reactevt(name_evt = "sick",
+#'              input = {}) %>%
+#'   add_reactevt(name_evt = "sicker",
+#'                input = {
+#'                  modify_item(list(q_default = util.sicker,
+#'                                   c_default = cost.sicker + if(arm=="int"){cost.int}else{0},
+#'                                   fl.sick = 0)) 
+#'                }) %>%
+#'   add_reactevt(name_evt = "death",
+#'                input = {
+#'                  modify_item(list(q_default = 0,
+#'                                   c_default = 0, 
+#'                                   curtime = Inf)) 
+#'                }) 
+#'                
+#' util_ongoing <- "q_default"
+#' cost_ongoing <- "c_default"
+#'                           
+#' 
 #' run_sim(arm_list=c("int","noint"),
 #' common_all_inputs = common_all_inputs,
 #' common_pt_inputs = common_pt_inputs,
 #' unique_pt_inputs = unique_pt_inputs,
 #' init_event_list = init_event_list,
 #' evt_react_list = evt_react_list,
-#' util_ongoing_list = util_ongoing_list,
-#' util_instant_list = util_instant_list,
-#' cost_ongoing_list = cost_ongoing_list,
-#' cost_instant_list = cost_instant_list,
-#' other_ongoing_list = other_ongoing_list,
-#' npats = 500,
+#' util_ongoing_list = util_ongoing,
+#' cost_ongoing_list = cost_ongoing,
+#' npats = 2,
 #' n_sim = 1,
 #' psa_bool = FALSE,
 #' ipd = 1)
-#' }
+#' 
 
 run_sim <- function(arm_list=c("int","noint"),
                    sensitivity_inputs=NULL,
@@ -119,7 +165,8 @@ run_sim <- function(arm_list=c("int","noint"),
                    timed_freq = NULL,
                    debug = FALSE,
                    accum_backwards = FALSE,
-                   continue_on_error = FALSE){
+                   continue_on_error = FALSE,
+                   seed = NULL){
 
 
 
@@ -207,7 +254,7 @@ run_sim <- function(arm_list=c("int","noint"),
       
   #Need to figure out how to distinguish DSA (as many sensitivities as parameters) and Scenarios (as many sensivities as scenarios)
   for (sens in 1:length_sensitivities) {
-    print(paste0("Analysis number: ",sens))
+    message(paste0("Analysis number: ",sens))
     
     tryCatch({
     
@@ -286,7 +333,10 @@ run_sim <- function(arm_list=c("int","noint"),
                        log_list = list()
                       )
     
-    set.seed(100037)
+    if(is.null(seed)){
+      seed <- 1
+    }
+    set.seed(seed)
     
     
     # Draw Common parameters  -------------------------------
@@ -323,7 +373,7 @@ run_sim <- function(arm_list=c("int","noint"),
 
       
     for (simulation in 1:n_sim) {
-      print(paste0("Simulation number: ",simulation))
+      message(paste0("Simulation number: ",simulation))
       
       tryCatch({
         
@@ -332,7 +382,7 @@ run_sim <- function(arm_list=c("int","noint"),
       
       input_list <- c(input_list_sens,list(simulation=simulation))
       
-      set.seed(simulation*1007)
+      set.seed(simulation*1007*seed)
       
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
@@ -373,7 +423,8 @@ run_sim <- function(arm_list=c("int","noint"),
                                         common_pt_inputs=common_pt_inputs,
                                         unique_pt_inputs=unique_pt_inputs,
                                         input_list = input_list,
-                                   pb = pb)                    # run simulation
+                                        pb = pb,
+                                        seed = seed)                    
       
       if(!is.null(final_output$error_m)){
         if((n_sim > 1 | n_sensitivity > 1) & continue_on_error){
@@ -406,7 +457,7 @@ run_sim <- function(arm_list=c("int","noint"),
       
       output_sim[[sens]][[simulation]] <- final_output
   
-      print(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
+      message(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
       
       
       }, error = function(e) {
@@ -469,7 +520,7 @@ run_sim <- function(arm_list=c("int","noint"),
       
     }
 
-    print(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
+    message(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
     
     }, error = function(e) {
@@ -523,7 +574,7 @@ run_sim <- function(arm_list=c("int","noint"),
     
     }
     
-  print(paste0("Total time to run: ",  round(proc.time()[3]- start_time[3] , 2), "s"))
+     message(paste0("Total time to run: ",  round(proc.time()[3]- start_time[3] , 2), "s"))
 
 
   # Export results ----------------------------------------------------------

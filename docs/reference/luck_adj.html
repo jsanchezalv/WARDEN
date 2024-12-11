@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,20 +91,20 @@ This function can also work with vectors, which could allow to update multiple l
 <span class="r-in"><span> cursurv <span class="op">=</span> <span class="fl">0.7</span>,</span></span>
 <span class="r-in"><span> luck <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
 <span class="r-in"><span> condq <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.429</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4285714</span>
 <span class="r-in"><span> </span></span>
 <span class="r-in"><span><span class="fu">luck_adj</span><span class="op">(</span>prevsurv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.8</span>,<span class="fl">0.7</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span> cursurv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.7</span>,<span class="fl">0.6</span>,<span class="fl">0.5</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span> luck <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.6</span>,<span class="fl">0.7</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span> condq <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     A     B     C </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.286 0.467 0.580 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         A         B         C </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.2857143 0.4666667 0.5800000 </span>
 <span class="r-in"><span> </span></span>
 <span class="r-in"><span><span class="fu">luck_adj</span><span class="op">(</span>prevsurv <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
 <span class="r-in"><span> cursurv <span class="op">=</span> <span class="fl">0.7</span>,</span></span>
 <span class="r-in"><span> luck <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
 <span class="r-in"><span> condq <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co">#different results</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.562</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5625</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#Unconditional approach, timepoint of change is 25,</span></span></span>
 <span class="r-in"><span><span class="co"># parameter goes from 0.02 at time 10 to 0.025 to 0.015 at time 25,</span></span></span>
@@ -120,7 +120,7 @@ This function can also work with vectors, which could allow to update multiple l
 <span class="r-in"><span> condq <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co">#time 25 change</span></span></span>
 <span class="r-in"><span> </span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/Weibull.html" class="external-link">qweibull</a></span><span class="op">(</span><span class="va">new_luck</span>, <span class="fl">3</span>, <span class="fl">1</span><span class="op">/</span><span class="fl">0.015</span><span class="op">)</span> <span class="co">#final TTE </span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 43.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 43.52338</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#Conditional quantile approach </span></span></span>
 <span class="r-in"><span><span class="va">new_luck</span> <span class="op">&lt;-</span> <span class="fu">luck_adj</span><span class="op">(</span>prevsurv <span class="op">=</span> <span class="fl">1</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/stats/Weibull.html" class="external-link">pweibull</a></span><span class="op">(</span>q<span class="op">=</span><span class="fl">0</span>,<span class="fl">3</span>,<span class="fl">1</span><span class="op">/</span><span class="fl">0.02</span><span class="op">)</span>,</span></span>
@@ -137,7 +137,7 @@ This function can also work with vectors, which could allow to update multiple l
 <span class="r-in"><span>                     shape <span class="op">=</span> <span class="fl">3</span>,</span></span>
 <span class="r-in"><span>                     scale <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">0.015</span>,</span></span>
 <span class="r-in"><span>                     lower_bound <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span> <span class="fl">25</span> <span class="co">#final TTE</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 43.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 43.52338</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

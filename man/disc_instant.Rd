@@ -20,8 +20,7 @@ Double based on discrete time discounting
 Calculate instantaneous discounted costs or qalys
 }
 \examples{
-\dontrun{
 disc_instant(lcldr=0.035, lclcurtime=3, lclval=2500)
-}
+
 
 }

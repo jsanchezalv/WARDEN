@@ -31,9 +31,23 @@ if(getRversion() >= "2.15.1") {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' summary_results_det(results[[1]][[1]],arm="int")
-#' }
+#' 
+#' res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
+#' ), total_lys = c(int = 9.04687362556945, noint = 9.04687362556945
+#' ), total_qalys = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), total_costs = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), total_lys_undisc = c(int = 10.8986618377039, noint = 10.8986618377039
+#' ), total_qalys_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), total_costs_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), c_default = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), c_default_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), q_default = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), q_default_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), merged_df = list(simulation = 1L, sensitivity = 1L))))
+#' 
+#' 
+#' summary_results_det(res[[1]][[1]],arm="int")
+#' 
 
 summary_results_det <- function(out = results[[1]][[1]], arm = NULL, wtp = 50000){
   arm_ref <- ifelse(is.null(arm),1,match(arm,out$arm_list))
@@ -127,9 +141,21 @@ summary_results_det <- function(out = results[[1]][[1]], arm = NULL, wtp = 50000
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' summary_results_sim(results[[1]], arm="int")
-#' }
+#' res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
+#' ), total_lys = c(int = 9.04687362556945, noint = 9.04687362556945
+#' ), total_qalys = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), total_costs = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), total_lys_undisc = c(int = 10.8986618377039, noint = 10.8986618377039
+#' ), total_qalys_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), total_costs_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), c_default = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), c_default_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), q_default = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), q_default_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), merged_df = list(simulation = 1L, sensitivity = 1L))))
+#' 
+#' 
+#' summary_results_sim(res[[1]],arm="int")
 
 summary_results_sim <- function(out = results[[1]], arm=NULL, wtp = 50000){
 
@@ -227,9 +253,21 @@ summary_results_sim <- function(out = results[[1]], arm=NULL, wtp = 50000){
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' summary_results_sens(results, arm="int")
-#' }
+#' res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
+#' ), total_lys = c(int = 9.04687362556945, noint = 9.04687362556945
+#' ), total_qalys = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), total_costs = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), total_lys_undisc = c(int = 10.8986618377039, noint = 10.8986618377039
+#' ), total_qalys_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), total_costs_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), c_default = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), c_default_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), q_default = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), q_default_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), merged_df = list(simulation = 1L, sensitivity = 1L))))
+#' 
+#' 
+#' summary_results_sens(res,arm="int")
 
 summary_results_sens <- function(out = results, arm=NULL, wtp = 50000){
   
@@ -340,9 +378,21 @@ summary_results_sens <- function(out = results, arm=NULL, wtp = 50000){
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' extract_psa_result(results[[1]],"total_costs")
-#' }
+#' res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
+#' ), total_lys = c(int = 9.04687362556945, noint = 9.04687362556945
+#' ), total_qalys = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), total_costs = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), total_lys_undisc = c(int = 10.8986618377039, noint = 10.8986618377039
+#' ), total_qalys_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), total_costs_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), c_default = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), c_default_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), q_default = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), q_default_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), merged_df = list(simulation = 1L, sensitivity = 1L))))
+#' 
+#' 
+#' extract_psa_result(res[[1]],"total_costs")
 
 extract_psa_result <- function(x, element) {
   out <- as.data.frame(do.call(rbind, map(x,element)))
@@ -372,9 +422,21 @@ extract_psa_result <- function(x, element) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' ceac_des(seq(from=10000,to=500000,by=10000),results)
-#' }
+#' res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
+#' ), total_lys = c(int = 9.04687362556945, noint = 9.04687362556945
+#' ), total_qalys = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), total_costs = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), total_lys_undisc = c(int = 10.8986618377039, noint = 10.8986618377039
+#' ), total_qalys_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), total_costs_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), c_default = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), c_default_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), q_default = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), q_default_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), merged_df = list(simulation = 1L, sensitivity = 1L))))
+#' 
+#' ceac_des(seq(from=10000,to=500000,by=10000),res)
+#' 
 
 ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 
@@ -408,7 +470,7 @@ ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 
   ceac <- nmb %>%
     dplyr::group_by(wtp,comparator) %>%
-    dplyr::summarise(prob_best= sum(best_nmb==comparator)/n()) %>%
+    dplyr::summarise(prob_best= sum(best_nmb==comparator)/dplyr::n()) %>%
     dplyr::mutate(prob_best = ifelse(is.na(prob_best),0,prob_best))
 
 
@@ -433,9 +495,21 @@ ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' evpi_des(seq(from=10000,to=500000,by=10000),results)
-#' }
+#' res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
+#' ), total_lys = c(int = 9.04687362556945, noint = 9.04687362556945
+#' ), total_qalys = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), total_costs = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), total_lys_undisc = c(int = 10.8986618377039, noint = 10.8986618377039
+#' ), total_qalys_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), total_costs_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), c_default = c(int = 49921.6357486899, noint = 41225.2544659378
+#' ), c_default_undisc = c(int = 59831.3573929783, noint = 49293.1025437205
+#' ), q_default = c(int = 6.20743830697466, noint = 6.18115138126336
+#' ), q_default_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
+#' ), merged_df = list(simulation = 1L, sensitivity = 1L))))
+#' 
+#' evpi_des(seq(from=10000,to=500000,by=10000),res)
+#' 
 
 evpi_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 

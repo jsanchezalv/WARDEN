@@ -1,3 +1,9 @@
+# WARDEN 0.99.1
+* CRAN feedback implemented, including changes in documentation:
+  ** runif_stream function has been removed due to violation of CRAN policy of global environment modification.
+It is suggested that the user employs different methods (e.g., pre-drawing random numbers)
+  ** Now the user is allowed to select the starting seed for the analysis
+
 # WARDEN 0.99
 * Now debug and continue_on_error will work on all stages, not only for simulations
 * CRAN preparation changes

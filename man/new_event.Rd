@@ -9,16 +9,18 @@ new_event(evt)
 \arguments{
 \item{evt}{Event name and event time}
 }
+\value{
+No return value, adds event to \code{cur_evtlist} and integrates it with the main list for storage
+}
 \description{
 Generate new events to be added to existing vector of events
 }
 \details{
 The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two \code{new_event} with a list of one element, it's better to group them into a single \code{new_event} with a list of two elements.
+
+This function is intended to be used only within the \code{add_reactevt} function in its \code{input} parameter and should not be run elsewhere or it will return an error.
 }
 \examples{
-\dontrun{
-new_event(list("ae"=5))
-new_event(list("ae"=5,"nat.death" = 100))
-}
+add_reactevt(name_evt = "idfs",input = {new_event(list("ae"=5))})
 }

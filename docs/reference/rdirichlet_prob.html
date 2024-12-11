@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,24 +77,24 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">rdirichlet_prob</span><span class="op">(</span>n<span class="op">=</span><span class="fl">1</span>,alpha<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.7</span>,<span class="fl">0.3</span>,<span class="fl">0</span>,<span class="fl">0.1</span>,<span class="fl">0.7</span>,<span class="fl">0.2</span>,<span class="fl">0.1</span>,<span class="fl">0.2</span>,<span class="fl">0.7</span><span class="op">)</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>se<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.7</span>,<span class="fl">0.3</span>,<span class="fl">0</span>,<span class="fl">0.1</span>,<span class="fl">0.7</span>,<span class="fl">0.2</span>,<span class="fl">0.1</span>,<span class="fl">0.2</span>,<span class="fl">0.7</span><span class="op">)</span><span class="op">/</span><span class="fl">10</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       [,1]  [,2]  [,3]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.774 0.116 0.110</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.205 0.622 0.173</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.000 0.234 0.766</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]      [,2]      [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.7630275 0.1043778 0.1325947</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.2450966 0.5792438 0.1756596</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.0000000 0.2060366 0.7939634</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">rdirichlet_prob</span><span class="op">(</span>n<span class="op">=</span><span class="fl">2</span>,alpha<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.7</span>,<span class="fl">0.3</span>,<span class="fl">0</span>,<span class="fl">0.1</span>,<span class="fl">0.7</span>,<span class="fl">0.2</span>,<span class="fl">0.1</span>,<span class="fl">0.2</span>,<span class="fl">0.7</span><span class="op">)</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>se<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.7</span>,<span class="fl">0.3</span>,<span class="fl">0</span>,<span class="fl">0.1</span>,<span class="fl">0.7</span>,<span class="fl">0.2</span>,<span class="fl">0.1</span>,<span class="fl">0.2</span>,<span class="fl">0.7</span><span class="op">)</span><span class="op">/</span><span class="fl">10</span>,<span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       [,1]  [,2]  [,3]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.770 0.119 0.111</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.251 0.592 0.157</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.000 0.184 0.816</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]      [,2]      [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.7848568 0.1135213 0.1016218</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.2244580 0.6224550 0.1530870</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.0000000 0.2270288 0.7729712</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       [,1]  [,2]  [,3]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.765 0.115 0.120</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.248 0.562 0.190</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.000 0.242 0.758</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]       [,2]       [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.8057611 0.09723171 0.09700721</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.2754172 0.54169668 0.18288613</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.0000000 0.24125523 0.75874477</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,8 @@
 <span>  timed_freq <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  accum_backwards <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  continue_on_error <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  continue_on_error <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -187,6 +188,10 @@
 <dt id="arg-continue-on-error">continue_on_error<a class="anchor" aria-label="anchor" href="#arg-continue-on-error"></a></dt>
 <dd><p>If TRUE, on error it will attempt to continue by skipping the current simulation</p></dd>
 
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>Starting seed to be used for the whole analysis. If null, it's set to 1 by default.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -227,23 +232,186 @@ Note that this will make the progress bar not correct, as a set of patients that
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="add_item.html">add_item</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>util.sick <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
+<span class="r-in"><span>util.sicker <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
+<span class="r-in"><span>cost.sick <span class="op">=</span> <span class="fl">3000</span>,</span></span>
+<span class="r-in"><span>cost.sicker <span class="op">=</span> <span class="fl">7000</span>,</span></span>
+<span class="r-in"><span>cost.int <span class="op">=</span> <span class="fl">1000</span>,</span></span>
+<span class="r-in"><span>coef_noint <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>HR_int <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
+<span class="r-in"><span>drc <span class="op">=</span> <span class="fl">0.035</span>, <span class="co">#different values than what's assumed by default</span></span></span>
+<span class="r-in"><span>drq <span class="op">=</span> <span class="fl">0.035</span>,</span></span>
+<span class="r-in"><span>random_seed_sicker_i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int</a></span><span class="op">(</span><span class="fl">100000</span>,<span class="fl">5</span>,replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="add_item.html">add_item</a></span><span class="op">(</span>death<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fl">0.0000001</span>,<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">1</span>, mean<span class="op">=</span><span class="fl">12</span>, sd<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> </span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="add_item.html">add_item</a></span><span class="op">(</span>fl.sick <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>                             q_default <span class="op">=</span> <span class="va">util.sick</span>,</span></span>
+<span class="r-in"><span>                             c_default <span class="op">=</span> <span class="va">cost.sick</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>                             </span></span>
+<span class="r-in"><span><span class="va">init_event_list</span> <span class="op">&lt;-</span> </span></span>
+<span class="r-in"><span><span class="fu"><a href="add_tte.html">add_tte</a></span><span class="op">(</span>arm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"noint"</span>,<span class="st">"int"</span><span class="op">)</span>, evts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sick"</span>,<span class="st">"sicker"</span>,<span class="st">"death"</span><span class="op">)</span> ,input<span class="op">=</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">sick</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></span>
+<span class="r-in"><span>  <span class="va">sicker</span> <span class="op">&lt;-</span> <span class="fu"><a href="draw_tte.html">draw_tte</a></span><span class="op">(</span><span class="fl">1</span>,dist<span class="op">=</span><span class="st">"exp"</span>,</span></span>
+<span class="r-in"><span>   coef1<span class="op">=</span><span class="va">coef_noint</span>, beta_tx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span>,<span class="va">HR_int</span>,<span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    seed <span class="op">=</span> <span class="va">random_seed_sicker_i</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span>   </span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">evt_react_list</span> <span class="op">&lt;-</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"sick"</span>,</span></span>
+<span class="r-in"><span>             input <span class="op">=</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"sicker"</span>,</span></span>
+<span class="r-in"><span>               input <span class="op">=</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>                 <span class="fu"><a href="modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="va">util.sicker</span>,</span></span>
+<span class="r-in"><span>                                  c_default <span class="op">=</span> <span class="va">cost.sicker</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span>,</span></span>
+<span class="r-in"><span>                                  fl.sick <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"death"</span>,</span></span>
+<span class="r-in"><span>               input <span class="op">=</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>                 <span class="fu"><a href="modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="fl">0</span>,</span></span>
+<span class="r-in"><span>                                  c_default <span class="op">=</span> <span class="fl">0</span>, </span></span>
+<span class="r-in"><span>                                  curtime <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>               <span class="op">}</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>               </span></span>
+<span class="r-in"><span><span class="va">util_ongoing</span> <span class="op">&lt;-</span> <span class="st">"q_default"</span></span></span>
+<span class="r-in"><span><span class="va">cost_ongoing</span> <span class="op">&lt;-</span> <span class="st">"c_default"</span></span></span>
+<span class="r-in"><span>                          </span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">run_sim</span><span class="op">(</span>arm_list<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>common_all_inputs <span class="op">=</span> <span class="va">common_all_inputs</span>,</span></span>
 <span class="r-in"><span>common_pt_inputs <span class="op">=</span> <span class="va">common_pt_inputs</span>,</span></span>
 <span class="r-in"><span>unique_pt_inputs <span class="op">=</span> <span class="va">unique_pt_inputs</span>,</span></span>
 <span class="r-in"><span>init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,</span></span>
 <span class="r-in"><span>evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,</span></span>
-<span class="r-in"><span>util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing_list</span>,</span></span>
-<span class="r-in"><span>util_instant_list <span class="op">=</span> <span class="va">util_instant_list</span>,</span></span>
-<span class="r-in"><span>cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing_list</span>,</span></span>
-<span class="r-in"><span>cost_instant_list <span class="op">=</span> <span class="va">cost_instant_list</span>,</span></span>
-<span class="r-in"><span>other_ongoing_list <span class="op">=</span> <span class="va">other_ongoing_list</span>,</span></span>
-<span class="r-in"><span>npats <span class="op">=</span> <span class="fl">500</span>,</span></span>
+<span class="r-in"><span>util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span></span>
+<span class="r-in"><span>cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span></span>
+<span class="r-in"><span>npats <span class="op">=</span> <span class="fl">2</span>,</span></span>
 <span class="r-in"><span>n_sim <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>psa_bool <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>ipd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Analysis number: 1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation number: 1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time to run simulation 1: 0.12s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time to run analysis 1: 0.12s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Total time to run: 0.12s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$sensitivity_name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$arm_list</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "int"   "noint"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$total_lys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      int    noint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9.046874 9.046874 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$total_qalys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      int    noint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6.207438 6.181151 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$total_costs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      int    noint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49921.64 41225.25 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$total_lys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      int    noint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10.89866 10.89866 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$total_qalys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      int    noint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7.501176 7.474146 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$total_costs_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      int    noint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 59831.36 49293.10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$c_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      int    noint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49921.64 41225.25 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$c_default_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      int    noint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 59831.36 49293.10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$q_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      int    noint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6.207438 6.181151 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$q_default_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      int    noint </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7.501176 7.474146 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$merged_df</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Index: &lt;arm&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     evtname    evttime  prevtime pat_id    arm total_lys total_qalys</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;      &lt;num&gt;     &lt;num&gt;  &lt;int&gt; &lt;char&gt;     &lt;num&gt;       &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:    sick  0.0000000 0.0000000      1    int 10.339480    8.271584</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:   death 12.7779512 0.0000000      1    int 10.339480    8.271584</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:    sick  0.0000000 0.0000000      2    int  7.754267    4.143293</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:  sicker  0.9010175 0.0000000      2    int  7.754267    4.143293</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:   death  9.0193725 0.9010175      2    int  7.754267    4.143293</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:    sick  0.0000000 0.0000000      1  noint 10.339480    8.271584</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   death 12.7779512 0.0000000      1  noint 10.339480    8.271584</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:    sick  0.0000000 0.0000000      2  noint  7.754267    4.090719</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:  sicker  0.7208140 0.0000000      2  noint  7.754267    4.090719</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:   death  9.0193725 0.7208140      2  noint  7.754267    4.090719</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     total_costs total_costs_undisc total_qalys_undisc total_lys_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;num&gt;              &lt;num&gt;              &lt;num&gt;            &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:    41357.92           51111.80          10.222361        12.777951</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:    41357.92           51111.80          10.222361        12.777951</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:    58485.35           68550.91           4.779991         9.019372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:    58485.35           68550.91           4.779991         9.019372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:    58485.35           68550.91           4.779991         9.019372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:    31018.44           38333.85          10.222361        12.777951</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:    31018.44           38333.85          10.222361        12.777951</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:    51432.07           60252.35           4.725930         9.019372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:    51432.07           60252.35           4.725930         9.019372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:    51432.07           60252.35           4.725930         9.019372</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            lys     qalys     costs lys_undisc qalys_undisc costs_undisc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          &lt;num&gt;     &lt;num&gt;     &lt;num&gt;      &lt;num&gt;        &lt;num&gt;        &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1: 10.3394801 8.2715841 41357.920 12.7779512   10.2223609    51111.805</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:  0.0000000 0.0000000     0.000  0.0000000    0.0000000        0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:  0.8871965 0.7097572  3548.786  0.9010175    0.7208140     3604.070</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:  6.8670706 3.4335353 54936.565  8.1183550    4.0591775    64946.840</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:  0.0000000 0.0000000     0.000  0.0000000    0.0000000        0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6: 10.3394801 8.2715841 31018.440 12.7779512   10.2223609    38333.854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:  0.0000000 0.0000000     0.000  0.0000000    0.0000000        0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:  0.7119504 0.5695603  2135.851  0.7208140    0.5766512     2162.442</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:  7.0423168 3.5211584 49296.218  8.2985585    4.1492793    58089.910</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:  0.0000000 0.0000000     0.000  0.0000000    0.0000000        0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     c_default q_default c_default_undisc q_default_undisc   nexttime simulation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;num&gt;     &lt;num&gt;            &lt;num&gt;            &lt;num&gt;      &lt;num&gt;      &lt;int&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1: 41357.920 8.2715841        51111.805       10.2223609 12.7779512          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:     0.000 0.0000000            0.000        0.0000000 12.7779512          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:  3548.786 0.7097572         3604.070        0.7208140  0.9010175          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4: 54936.565 3.4335353        64946.840        4.0591775  9.0193725          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:     0.000 0.0000000            0.000        0.0000000  9.0193725          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6: 31018.440 8.2715841        38333.854       10.2223609 12.7779512          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:     0.000 0.0000000            0.000        0.0000000 12.7779512          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:  2135.851 0.5695603         2162.442        0.5766512  0.7208140          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9: 49296.218 3.5211584        58089.910        4.1492793  9.0193725          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:     0.000 0.0000000            0.000        0.0000000  9.0193725          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     sensitivity</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;int&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

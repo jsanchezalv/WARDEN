@@ -7,6 +7,7 @@
 #' uc_lists = list(util_ongoing_list,util_instant_list,util_cycle_list,cost_ongoing_list,cost_instant_list,cost_cycle_list),
 #' input_out,ipd,arm_list,simulation,npats,n_sim
 #' @param pb progress bar
+#' @param seed Starting seed to be used for the whole analysis
 #'
 #' @return A data frame with the simulation results
 #' @importFrom purrr map
@@ -21,7 +22,8 @@ run_engine <- function(arm_list,
                             common_pt_inputs=NULL,
                             unique_pt_inputs=NULL,
                             input_list = NULL,
-                       pb = pb){
+                            pb = pb,
+                            seed = seed){
   # Initial set-up --------------------------
   arm_list <- arm_list
   simulation <- input_list$simulation
@@ -42,7 +44,7 @@ run_engine <- function(arm_list,
   tryCatch({
   
   for (i in 1:npats) {
-    set.seed(simulation*1007 + i*53)
+    set.seed((simulation*1007 + i*53) * seed)
     if((((sens - 1) * n_sim * npats) + ((simulation - 1) * npats) + i) %% ceiling(npats*n_sim*length_sensitivities / min(npats*length_sensitivities*n_sim,50)) == 0){
       pb(sprintf("Simulation %g", simulation))
       }
@@ -89,7 +91,7 @@ run_engine <- function(arm_list,
     
     for (arm in arm_list) {
       
-      set.seed(simulation*1007 + i*53 + which(arm==arm_list))
+      set.seed(seed*(simulation*1007 + i*53 + which(arm==arm_list)))
       # Initialize values to prevent errors
       output_list <- list(curtime = 0)
       

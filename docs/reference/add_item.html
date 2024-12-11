@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,9 +74,26 @@ it should be implemented after a first <code>add_item()</code> (empty or with co
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">add_item</span><span class="op">(</span>fl.idfs <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $fl.idfs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">add_item</span><span class="op">(</span>util_idfs <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">psa_bool</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.8</span>,<span class="fl">0.2</span><span class="op">)</span><span class="op">}</span> <span class="kw">else</span><span class="op">{</span><span class="fl">0.8</span><span class="op">}</span>, util.mbc <span class="op">=</span> <span class="fl">0.6</span>, cost_idfs <span class="op">=</span> <span class="fl">2500</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $util_idfs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> if (psa_bool) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     rnorm(1, 0.8, 0.2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> } else {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     0.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $util.mbc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $cost_idfs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="va">common_inputs</span> <span class="op">&lt;-</span> <span class="fu">add_item</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span><span class="fu">add_item</span><span class="op">(</span><span class="fu"><a href="pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  base      <span class="op">=</span> <span class="va">l_statics</span><span class="op">[[</span><span class="st">"base"</span><span class="op">]</span><span class="op">]</span>,</span></span>
@@ -93,7 +110,6 @@ it should be implemented after a first <code>add_item()</code> (empty or with co
 <span class="r-in"><span>  names_out <span class="op">=</span> <span class="va">l_statics</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

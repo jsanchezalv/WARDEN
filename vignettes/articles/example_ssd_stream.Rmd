@@ -1,5 +1,5 @@
 ---
-title: 'Example for a Sick-Sicker-Dead model - Random Number Substreams & Luck Adjustment'
+title: 'Example for a Sick-Sicker-Dead model - Random Number Streams & Luck Adjustment'
 author: "Javier Sanchez Alvarez"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output: 
@@ -71,11 +71,10 @@ common_all_inputs <-add_item(
 
 
 #Put objects here that do not change as we loop through treatments for a patient
-common_pt_inputs <- add_item(substream_sick   = parallel::nextRNGSubStream(.Random.seed),
-                             substream_sicker = parallel::nextRNGSubStream(substream_sick),
-                             substream_death  = parallel::nextRNGSubStream(substream_sicker),
-                             rnd_a = runif_stream(1,substream_sicker,gen="add_item"),
-                             rnd_b = runif_stream(1,substream_death,gen="add_item")
+common_pt_inputs <- add_item(rnd_stream_a = runif(100), #arbitrary amount of random numbers to be used, should be >= max number of calls that use that random number (e.g., if item/event A requires 5 random numbers due to repeated calls, then at least 5 numbers should be generated )
+                             rnd_stream_b = runif(100),
+                             rnd_a = rnd_stream_a[1], 
+                             rnd_b = rnd_stream_b[1]
 )
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
@@ -143,7 +142,7 @@ The model will run until `curtime` is set to `Inf`, so the event that terminates
 
 Finally, note that there could be two different ways of accumulating continuous outcomes, backwards (i.e., in the example below, we would set q_default = util.sick at the sicker event, and modify the `q_default` value in the death event) and forwards (as in the example below). This option can be modified in the `run_sim` function using the `accum_backwards` argument, which assumes forwards by default.
 
-We use in this case a luck adjustment as we update the death time to event using the `luck_adj` function. The parameters go from mean 12 to 10, and sd from 3 to 2, so we update the random number and then we redraw the time to event. If instead we needed to reset the time to event (in the case of repeated independent events), then we would set `rnd_b = runif_stream(1,substream_death)` to regenerate the luck.
+We use in this case a luck adjustment as we update the death time to event using the `luck_adj` function. The parameters go from mean 12 to 10, and sd from 3 to 2, so we update the random number and then we redraw the time to event. If instead we needed to reset the time to event (in the case of repeated independent events), then we would set `rnd_b = random_stream_b[2]` to regenerate the luck. Note that if more occurences are expected to happen, then we would need to keep track of the index to make sure to grab the right random number. Additionally, for convergence purposes one may rely on quasi-random low discrepancy numbers sequence algorithms such as a Sobol sequence, for example through the `sobol` function in the `randtoolbox` package.
 
 ```{r model_reaction}
 evt_react_list <-

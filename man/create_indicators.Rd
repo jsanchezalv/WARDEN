@@ -25,8 +25,6 @@ Creates a vector of indicators (0 and 1) for sensitivity/DSA analysis
 n_elem_before is to be used when several indicators want to be used (e.g., for patient level and common level inputs) while facilitating readibility of the code
 }
 \examples{
-\dontrun{
 create_indicators(10,20,c(1,1,1,1))
 create_indicators(7,20,c(1,0,0,1,1,1,0,0,1,1),2)
-}
 }
