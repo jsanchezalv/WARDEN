@@ -11,9 +11,10 @@ modify_event(evt, create_if_null = TRUE)
 
 \item{create_if_null}{A boolean.
 If TRUE, it will create non-existing events with the chosen time to event.
-If FALSE, it will ignore those.
-
-@return No return value, modifies/adds event to \code{cur_evtlist} and integrates it with the main list for storage}
+If FALSE, it will ignore those.}
+}
+\value{
+No return value, modifies/adds event to \code{cur_evtlist} and integrates it with the main list for storage
 }
 \description{
 Modify the time of existing events

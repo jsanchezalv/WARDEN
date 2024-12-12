@@ -133,7 +133,7 @@ pasted with \code{cycle_l} and \code{cycle_starttime} (e.g., c_default_cycle_l a
 ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime
 being the starting time in which the variable started counting.
 
-`debug = TRUE`` will export a log file with the timestamp up the error in the main working directory.
+\code{debug = TRUE} will export a log file with the timestamp up the error in the main working directory.
 
 \code{continue_on_error} will skip the current simulation (so it won't continue for the rest of patient-arms) if TRUE.
 Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.

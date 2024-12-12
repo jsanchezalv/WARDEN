@@ -457,10 +457,11 @@ new_event <- function(evt){
 #'  If TRUE, it will create non-existing events with the chosen time to event.
 #'  If FALSE, it will ignore those.
 #'  
-#'  @return No return value, modifies/adds event to `cur_evtlist` and integrates it with the main list for storage
-#'
 #' @importFrom utils modifyList
 #' @importFrom stats setNames
+#' 
+#' @return No return value, modifies/adds event to `cur_evtlist` and integrates it with the main list for storage
+#'
 #'
 #' @export
 #'
