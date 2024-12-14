@@ -42,21 +42,23 @@ site](https://jsanchezalv.github.io/WARDEN/index.html) for more details
 on documentation and specific tutorials.
 
 For more details on the code, check our [Github
-repository](https://github.com/jsanchezalv/WARDEN).
+repository](https://github.com/jsanchezalv/WARDEN) or our [CRAN site](https://cran.rstudio.com/web/packages/WARDEN/).
 
 ## Installation
 
-`WARDEN` can the be installed directly from this repo via
+`WARDEN` can now be installed directly from CRAN or this repo via
 
 ``` r
+install.packages("WARDEN") #CRAN version 
+
 # install.packages("devtools")
-devtools::install_github("jsanchezalv/WARDEN", ref="main")
+devtools::install_github("jsanchezalv/WARDEN", ref="main") #github version
 ```
 
 ## Citation
 
 If you use `WARDEN`, please contact the authors for the most up to date
-appropiate citation.
+appropriate citation.
 
 <!-- badges: start -->
 
