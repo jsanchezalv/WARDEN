@@ -316,32 +316,31 @@ Note that `pick_val_v` and `pick_val` can be directly loaded as parameters (in f
 
 ```{r dsa_inputs}
 #Load some data
-df_par <- data.frame(parameter_name = c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
+df_par <- list(parameter_name = c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
                               base_value = c(0.8,0.5,3000,7000,1000,log(0.2),0.8),
                               DSA_min = c(0.6,0.3,1000,5000,800,log(0.1),0.5),
                               DSA_max = c(0.9,0.7,5000,9000,2000,log(0.4),0.9),
                               PSA_dist = c("rnorm","rbeta_mse","rgamma_mse","rgamma_mse","rgamma_mse","rnorm","rlnorm"),
-                              a=list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)),
-                              b=lapply(list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)), function(x) abs(x/10)),
+                              a = list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)),
+                              b = lapply(list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)), function(x) abs(x/10)),
                               scenario_1=c(0.6,0.3,1000,5000,800,log(0.1),0.5),
                               scenario_2=c(0.9,0.7,5000,9000,2000,log(0.4),0.9)
                               )
-rownames(df_par) <- df_par$parameter_name
 
 sensitivity_inputs <-add_item(
             pos_indicator = sens - n_sensitivity*floor((sens-1)/n_sensitivity), # which position to use to put the value 1 in indicator
-            indicators = append(rep(0, nrow(df_par))[-pos_indicator],1,pos_indicator-1), #vector of indicators, value 0 everywhere except at sens, where it takes value 1
+            indicators = append(rep(0, length(df_par$parameter_name))[-pos_indicator],1,pos_indicator-1) #vector of indicators, value 0 everywhere except at sens, where it takes value 1
                               )
 
 common_all_inputs <-add_item() %>% 
   add_item(
-            pick_val_v(base        = df_par[,"base_value"],
-                       psa         = pick_psa(df_par[,"PSA_dist"],rep(1,length(df_par[,"PSA_dist"])),df_par[,"a"],df_par[,"b"]),
-                       sens        = df_par[,sens_name_used],
+            pick_val_v(base        = df_par[["base_value"]],
+                       psa         = pick_psa(df_par[["PSA_dist"]],rep(1,length(df_par[["PSA_dist"]])),df_par[["a"]],df_par[["b"]]),
+                       sens        = df_par[[sens_name_used]],
                        psa_ind     = psa_bool,
                        sens_ind    = sensitivity_bool,
                        indicator   = indicators,
-                       names_out   = df_par[,"parameter_name"]
+                       names_out   = df_par[["parameter_name"]]
                        )
             )
 
@@ -365,8 +364,8 @@ results <- run_sim(
   sensitivity_inputs = sensitivity_inputs,
   sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = nrow(df_par),
-  input_out = c(df_par[,"parameter_name"])
+  n_sensitivity = length(df_par$parameter_name),
+  input_out = c(df_par[["parameter_name"]])
 )
 
 ```
@@ -401,8 +400,8 @@ results <- run_sim(
   sensitivity_inputs = sensitivity_inputs,
   sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = nrow(df_par),
-  input_out = c(df_par[,"parameter_name"])
+  n_sensitivity = length(df_par$parameter_name),
+  input_out = c(df_par[["parameter_name"]])
 )
 
 ```
