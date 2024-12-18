@@ -20,8 +20,6 @@ navbar:
           href: articles/example_ssd.html
         - text: "Example in a Sick-Sicker-Dead Model - Random Number Streams & Luck Adjustment"
           href: articles/example_ssd_stream.html
-        - text: "Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random"
-          href: articles/example_ssd_sobol.html
         - text: "Example in Early Breast Cancer"
           href: articles/example_eBC.html
         - text: "Example in a Markov Model"
