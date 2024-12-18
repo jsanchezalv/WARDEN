@@ -236,7 +236,7 @@ ggplot(merged_ipd, aes(x=pat_id,y=ICER, colour = type, fill = as.factor(simulati
 # Model with PSA
 ## Model Execution
 
-```{r model_run}
+```{r model_run_psa}
 #Load some data
 list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
                               base_value = list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
@@ -321,7 +321,7 @@ Once the models have been run, we merge the data and generate the cumulative ICE
 
 It can clearly be seen that the random uniform approach makes the model converge much more slowly than the sobol sequences. 
 
-```{r post-processing_summary}
+```{r post-processing_summary_psa}
 
 
 summary_results_sim(results_unif_psa[[1]]) 
