@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,8 +40,10 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Substreams</a></li>
+<li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
     <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
     <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
@@ -67,7 +69,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">December 14, 2024</h4>
+            <h4 data-toc-skip class="date">December 18, 2024</h4>
       
 
       <div class="d-none name"><code>example_ssd_stream.Rmd</code></div>
@@ -482,9 +484,9 @@ the <code>run_sim</code> function.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.88s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.88s</span></span>
-<span><span class="co">#&gt; Total time to run: 0.89s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 0.9s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.91s</span></span>
+<span><span class="co">#&gt; Total time to run: 0.91s</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -1608,32 +1610,31 @@ which the item list must be initiated by using <code><a href="../reference/add_i
 distributions.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Load some data</span></span>
-<span><span class="va">df_par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>parameter_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span><span class="op">)</span>,</span>
+<span><span class="va">df_par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>parameter_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span><span class="op">)</span>,</span>
 <span>                              base_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>,<span class="fl">0.5</span>,<span class="fl">3000</span>,<span class="fl">7000</span>,<span class="fl">1000</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span>,<span class="fl">0.8</span><span class="op">)</span>,</span>
 <span>                              DSA_min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>,<span class="fl">0.3</span>,<span class="fl">1000</span>,<span class="fl">5000</span>,<span class="fl">800</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span>,<span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>                              DSA_max <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>,<span class="fl">0.7</span>,<span class="fl">5000</span>,<span class="fl">9000</span>,<span class="fl">2000</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.4</span><span class="op">)</span>,<span class="fl">0.9</span><span class="op">)</span>,</span>
 <span>                              PSA_dist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rnorm"</span>,<span class="st">"rbeta_mse"</span>,<span class="st">"rgamma_mse"</span>,<span class="st">"rgamma_mse"</span>,<span class="st">"rgamma_mse"</span>,<span class="st">"rnorm"</span>,<span class="st">"rlnorm"</span><span class="op">)</span>,</span>
-<span>                              a<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>,<span class="fl">0.5</span>,<span class="fl">3000</span>,<span class="fl">7000</span>,<span class="fl">1000</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span>,<span class="fl">0.8</span><span class="op">)</span>,</span>
-<span>                              b<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>,<span class="fl">0.5</span>,<span class="fl">3000</span>,<span class="fl">7000</span>,<span class="fl">1000</span>,<span class="fl">0.1</span>,<span class="fl">0.8</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span>,</span>
+<span>                              a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">0.8</span>,<span class="fl">0.5</span>,<span class="fl">3000</span>,<span class="fl">7000</span>,<span class="fl">1000</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.8</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                              b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">0.8</span>,<span class="fl">0.5</span>,<span class="fl">3000</span>,<span class="fl">7000</span>,<span class="fl">1000</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.8</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">x</span><span class="op">/</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                              scenario_1<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>,<span class="fl">0.3</span>,<span class="fl">1000</span>,<span class="fl">5000</span>,<span class="fl">800</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span>,<span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>                              scenario_2<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>,<span class="fl">0.7</span>,<span class="fl">5000</span>,<span class="fl">9000</span>,<span class="fl">2000</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.4</span><span class="op">)</span>,<span class="fl">0.9</span><span class="op">)</span></span>
 <span>                              <span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">df_par</span><span class="op">$</span><span class="va">parameter_name</span></span>
 <span></span>
 <span><span class="va">sensitivity_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>            pos_indicator <span class="op">=</span> <span class="va">sens</span> <span class="op">-</span> <span class="va">n_sensitivity</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="op">(</span><span class="va">sens</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">n_sensitivity</span><span class="op">)</span>, <span class="co"># which position to use to put the value 1 in indicator</span></span>
-<span>            indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="va">pos_indicator</span><span class="op">]</span>,<span class="fl">1</span>,<span class="va">pos_indicator</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span>, <span class="co">#vector of indicators, value 0 everywhere except at sens, where it takes value 1</span></span>
+<span>            indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">$</span><span class="va">parameter_name</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="va">pos_indicator</span><span class="op">]</span>,<span class="fl">1</span>,<span class="va">pos_indicator</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="co">#vector of indicators, value 0 everywhere except at sens, where it takes value 1</span></span>
 <span>                              <span class="op">)</span></span>
 <span></span>
 <span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>            <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span>base        <span class="op">=</span> <span class="va">df_par</span><span class="op">[</span>,<span class="st">"base_value"</span><span class="op">]</span>,</span>
-<span>                       psa         <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[</span>,<span class="st">"PSA_dist"</span><span class="op">]</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[</span>,<span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,<span class="va">df_par</span><span class="op">[</span>,<span class="st">"a"</span><span class="op">]</span>,<span class="va">df_par</span><span class="op">[</span>,<span class="st">"b"</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>                       sens        <span class="op">=</span> <span class="va">df_par</span><span class="op">[</span>,<span class="va">sens_name_used</span><span class="op">]</span>,</span>
+<span>            <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span>base        <span class="op">=</span> <span class="va">df_par</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>                       psa         <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,<span class="va">df_par</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,<span class="va">df_par</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                       sens        <span class="op">=</span> <span class="va">df_par</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>                       psa_ind     <span class="op">=</span> <span class="va">psa_bool</span>,</span>
 <span>                       sens_ind    <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
 <span>                       indicator   <span class="op">=</span> <span class="va">indicators</span>,</span>
-<span>                       names_out   <span class="op">=</span> <span class="va">df_par</span><span class="op">[</span>,<span class="st">"parameter_name"</span><span class="op">]</span></span>
+<span>                       names_out   <span class="op">=</span> <span class="va">df_par</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span></span>
 <span>                       <span class="op">)</span></span>
 <span>            <span class="op">)</span></span></code></pre></div>
 </div>
@@ -1665,13 +1666,13 @@ variables altered in the scenario, and 0 otherwise.</p>
 <span>  sensitivity_inputs <span class="op">=</span> <span class="va">sensitivity_inputs</span>,</span>
 <span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>,<span class="st">"DSA_max"</span><span class="op">)</span>,</span>
 <span>  sensitivity_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">)</span>,</span>
-<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[</span>,<span class="st">"parameter_name"</span><span class="op">]</span><span class="op">)</span></span>
+<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">$</span><span class="va">parameter_name</span><span class="op">)</span>,</span>
+<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.17s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
@@ -1699,32 +1700,32 @@ variables altered in the scenario, and 0 otherwise.</p>
 <span><span class="co">#&gt; Analysis number: 8</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 8: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run analysis 8: 0.18s</span></span>
 <span><span class="co">#&gt; Analysis number: 9</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
 <span><span class="co">#&gt; Time to run analysis 9: 0.18s</span></span>
 <span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 10: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run analysis 10: 0.18s</span></span>
 <span><span class="co">#&gt; Analysis number: 11</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
 <span><span class="co">#&gt; Time to run analysis 11: 0.17s</span></span>
 <span><span class="co">#&gt; Analysis number: 12</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 12: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run analysis 12: 0.18s</span></span>
 <span><span class="co">#&gt; Analysis number: 13</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.21s</span></span>
-<span><span class="co">#&gt; Time to run analysis 13: 0.21s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.22s</span></span>
+<span><span class="co">#&gt; Time to run analysis 13: 0.22s</span></span>
 <span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
 <span><span class="co">#&gt; Time to run analysis 14: 0.18s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.47s</span></span></code></pre></div>
+<span><span class="co">#&gt; Total time to run: 2.49s</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="check-results">Check results<a class="anchor" aria-label="anchor" href="#check-results"></a>
@@ -1777,14 +1778,14 @@ option</p>
 <span>  sensitivity_inputs <span class="op">=</span> <span class="va">sensitivity_inputs</span>,</span>
 <span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>,<span class="st">"DSA_max"</span><span class="op">)</span>,</span>
 <span>  sensitivity_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">)</span>,</span>
-<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[</span>,<span class="st">"parameter_name"</span><span class="op">]</span><span class="op">)</span></span>
+<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">$</span><span class="va">parameter_name</span><span class="op">)</span>,</span>
+<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
@@ -1793,21 +1794,21 @@ option</p>
 <span><span class="co">#&gt; Time to run simulation 5: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 1.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 1.08s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.34s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.34s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.16s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 2: 1.18s</span></span>
+<span><span class="co">#&gt; Time to run analysis 2: 1.21s</span></span>
 <span><span class="co">#&gt; Analysis number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
@@ -1816,27 +1817,13 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.16s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 1.05s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 1.03s</span></span>
 <span><span class="co">#&gt; Analysis number: 4</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 4: 1.05s</span></span>
-<span><span class="co">#&gt; Analysis number: 5</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
@@ -1844,29 +1831,43 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.18s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.17s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run analysis 4: 1.07s</span></span>
+<span><span class="co">#&gt; Analysis number: 5</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.18s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 5: 1.05s</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run analysis 5: 1.07s</span></span>
 <span><span class="co">#&gt; Analysis number: 6</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.16s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 1.04s</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 1.03s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
@@ -1877,7 +1878,7 @@ option</p>
 <span><span class="co">#&gt; Time to run simulation 5: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
-<span><span class="co">#&gt; Time to run analysis 7: 1.05s</span></span>
+<span><span class="co">#&gt; Time to run analysis 7: 1.07s</span></span>
 <span><span class="co">#&gt; Analysis number: 8</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
@@ -1886,35 +1887,35 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
-<span><span class="co">#&gt; Time to run analysis 8: 1.08s</span></span>
+<span><span class="co">#&gt; Time to run analysis 8: 1.09s</span></span>
 <span><span class="co">#&gt; Analysis number: 9</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.2s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 9: 1.12s</span></span>
+<span><span class="co">#&gt; Time to run analysis 9: 1.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
@@ -1926,28 +1927,28 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.19s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.19s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.21s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
-<span><span class="co">#&gt; Time to run analysis 11: 1.15s</span></span>
-<span><span class="co">#&gt; Analysis number: 12</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.18s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run analysis 11: 1.13s</span></span>
+<span><span class="co">#&gt; Analysis number: 12</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.19s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.21s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.19s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.18s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
-<span><span class="co">#&gt; Time to run analysis 12: 1.1s</span></span>
+<span><span class="co">#&gt; Time to run analysis 12: 1.16s</span></span>
 <span><span class="co">#&gt; Analysis number: 13</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
@@ -1958,25 +1959,25 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
 <span><span class="co">#&gt; Time to run analysis 13: 1.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.2s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
 <span><span class="co">#&gt; Time to run analysis 14: 1.13s</span></span>
-<span><span class="co">#&gt; Total time to run: 15.32s</span></span></code></pre></div>
+<span><span class="co">#&gt; Total time to run: 15.45s</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="check-results-1">Check results<a class="anchor" aria-label="anchor" href="#check-results-1"></a>
@@ -1992,20 +1993,20 @@ corresponding parameter value.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 14 × 8</span></span></span>
 <span><span class="co">#&gt;    sensitivity util.sick util.sicker cost.sick cost.sicker cost.int coef_noint</span></span>
 <span><span class="co">#&gt;          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>           1     0.6         0.579     <span style="text-decoration: underline;">3</span>144.       <span style="text-decoration: underline;">7</span>963.    <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>           2     0.724       0.3       <span style="text-decoration: underline;">3</span>144.       <span style="text-decoration: underline;">7</span>963.    <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>           3     0.724       0.579     <span style="text-decoration: underline;">1</span>000        <span style="text-decoration: underline;">7</span>963.    <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>           4     0.724       0.579     <span style="text-decoration: underline;">3</span>144.       <span style="text-decoration: underline;">5</span>000     <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>           5     0.724       0.579     <span style="text-decoration: underline;">3</span>144.       <span style="text-decoration: underline;">7</span>963.     800      -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>           6     0.724       0.579     <span style="text-decoration: underline;">3</span>142.       <span style="text-decoration: underline;">7</span>961.    <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">2.30</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>           7     0.724       0.579     <span style="text-decoration: underline;">3</span>144.       <span style="text-decoration: underline;">7</span>962.    <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>           8     0.9         0.579     <span style="text-decoration: underline;">3</span>144.       <span style="text-decoration: underline;">7</span>963.    <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>           9     0.724       0.7       <span style="text-decoration: underline;">3</span>144.       <span style="text-decoration: underline;">7</span>963.    <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>          10     0.724       0.579     <span style="text-decoration: underline;">5</span>000        <span style="text-decoration: underline;">7</span>963.    <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>          11     0.724       0.579     <span style="text-decoration: underline;">3</span>144.       <span style="text-decoration: underline;">9</span>000     <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>          12     0.724       0.579     <span style="text-decoration: underline;">3</span>144.       <span style="text-decoration: underline;">7</span>963.    <span style="text-decoration: underline;">2</span>000      -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span>          13     0.724       0.579     <span style="text-decoration: underline;">3</span>144.       <span style="text-decoration: underline;">7</span>963.    <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">0.916</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span>          14     0.724       0.579     <span style="text-decoration: underline;">3</span>145.       <span style="text-decoration: underline;">7</span>963.    <span style="text-decoration: underline;">1</span>066.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>           1     0.6         0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>           2     0.762       0.3       <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>           3     0.762       0.541     <span style="text-decoration: underline;">1</span>000        <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>           4     0.762       0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">5</span>000     <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>           5     0.762       0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.     800      -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>           6     0.762       0.541     <span style="text-decoration: underline;">3</span>066.       <span style="text-decoration: underline;">7</span>506.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">2.30</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>           7     0.761       0.541     <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">7</span>510.    <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>           8     0.9         0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>           9     0.762       0.7       <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>          10     0.762       0.541     <span style="text-decoration: underline;">5</span>000        <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>          11     0.762       0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">9</span>000     <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>          12     0.762       0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">2</span>000      -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span>          13     0.762       0.541     <span style="text-decoration: underline;">3</span>066.       <span style="text-decoration: underline;">7</span>507.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">0.916</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span>          14     0.762       0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: HR_int &lt;dbl&gt;</span></span></span></code></pre></div>
 </div>
 </div>
