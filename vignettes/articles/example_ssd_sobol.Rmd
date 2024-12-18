@@ -23,6 +23,29 @@ knitr::opts_chunk$set(
 )
 ```
 
+# Main options
+
+```{r setup}
+library(WARDEN)
+
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+library(purrr)
+if(!require(randtoolbox)){
+    install.packages("randtoolbox")
+    library(randtoolbox)
+}
+
+```
+
+```{r main_opt, results='hide', message=FALSE}
+options(scipen = 999)
+options(digits=3)
+options(tibble.print_max = 50)
+```
+
+
 # Introduction
 This document runs a discrete event simulation model in the context of a late oncology model to show how using quasi-random numbers can radically change convergence speed by using quasi-random sobol sequences instead of purely random numbers.
 
@@ -54,27 +77,6 @@ ggplot(combined_df, aes(x = x, y = y, color = Type)) +
 
 When running a DES, it's important to consider speed. Simulation based models can be computationally expensive, which means that using efficient coding can have a substantial impact on performance. 
 
-## Main options
-
-```{r setup}
-library(WARDEN)
-
-library(dplyr)
-library(ggplot2)
-library(kableExtra)
-library(purrr)
-if(!require(randtoolbox)){
-    install.packages("randtoolbox")
-    library(randtoolbox)
-}
-
-```
-
-```{r main_opt, results='hide', message=FALSE}
-options(scipen = 999)
-options(digits=3)
-options(tibble.print_max = 50)
-```
 
 # General inputs with delayed execution
 When we generate inputs, we create two versions, one with random numbers generated from a uniform variable, and another generated from a sobol sequence.
