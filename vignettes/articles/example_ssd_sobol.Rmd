@@ -63,7 +63,10 @@ library(dplyr)
 library(ggplot2)
 library(kableExtra)
 library(purrr)
-library(randtoolbox)
+if(!require(randtoolbox)){
+    install.packages("randtoolbox")
+    library(randtoolbox)
+}
 
 ```
 
