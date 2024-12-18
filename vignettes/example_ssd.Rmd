@@ -314,8 +314,8 @@ list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","co
                               DSA_min = list(0.6,0.3,1000,5000,800,log(0.1),0.5),
                               DSA_max = list(0.9,0.7,5000,9000,2000,log(0.4),0.9),
                               PSA_dist = list("rnorm","rbeta_mse","rgamma_mse","rgamma_mse","rgamma_mse","rnorm","rlnorm"),
-                              a=list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
-                              b=lapply(list(0.8,0.5,3000,7000,1000,log(0.2),0.8), function(x) abs(x/5)),
+                              a=list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)),
+                              b=lapply(list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)), function(x) abs(x/5)),
                               scenario_1=list(0.6,0.3,1000,5000,800,log(0.1),0.5),
                               scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),0.9)
                               )

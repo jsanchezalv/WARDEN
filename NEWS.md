@@ -1,8 +1,12 @@
+# WARDEN 0.99.2
+* Added qgamma_mse function
+* Added two articles for the website explaining more in detail WARDEN and the use of sobol sequences
+
 # WARDEN 0.99.1
 * CRAN feedback implemented, including changes in documentation:
-  ** runif_stream function has been removed due to violation of CRAN policy of global environment modification.
+* runif_stream function has been removed due to violation of CRAN policy of global environment modification.
 It is suggested that the user employs different methods (e.g., pre-drawing random numbers)
-  ** Now the user is allowed to select the starting seed for the analysis
+* Now the user is allowed to select the starting seed for the analysis
 
 # WARDEN 0.99
 * Now debug and continue_on_error will work on all stages, not only for simulations
@@ -10,12 +14,12 @@ It is suggested that the user employs different methods (e.g., pre-drawing rando
 
 # WARDEN 0.98
 * Repository is now public, Github Website has been set up
-  ** Website references are now split by topic
+* Website references are now split by topic
 * Added auxiliary functions to extract items and events from reactions to easily see interconections in models
 
 # WARDEN 0.97
 * Update based on validation comments from Gabriel
-  ** Modified conditional quantile functions weibull and llogistic to better match default R stats behavior
+* Modified conditional quantile functions weibull and llogistic to better match default R stats behavior
 * Set License to be GPL >=3
 
 # WARDEN 0.96

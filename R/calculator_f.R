@@ -263,6 +263,40 @@ rgamma_mse <- function(n=1,mean_v,se,seed=NULL) {
   return(out)
 }
 
+# Quantile gamma distribution - accepts vectors--------
+
+#' Use quantiles from a gamma distribution based on mean and se
+#'
+#' @param q Quantile to draw
+#' @param mean_v A vector of the mean values
+#' @param se A vector of the standard errors of the means
+#' @param seed An integer which will be used to set the seed for this draw.
+#'
+#' @return A single estimate from the gamma distribution based on given parameters
+#'
+#' @importFrom stats rgamma
+#'
+#' @export
+#'
+#' @examples
+#' qgamma_mse(q=0.5,mean_v=0.8,se=0.2)
+#'
+
+qgamma_mse <- function(q=1,mean_v,se,seed=NULL) {
+  out <- NULL
+  
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
+  
+  bool_se <- se==0 | mean_v==0
+  scale <- se^2 / mean_v
+  shape <- mean_v / scale
+  out <- qgamma(q,shape,scale=scale)
+  out[bool_se] <- mean_v[bool_se]
+  
+  return(out)
+}
 
 #' Draw from a Conditional Gompertz distribution (lower and upper bound)
 #'

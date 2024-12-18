@@ -1,0 +1,350 @@
+---
+title: 'Example for a Sick-Sicker-Dead model, Quasi-Random Sobol Sequence vs. Purely Random'
+author: "Javier Sanchez Alvarez"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    embed-resources: true
+    self-contained-math: true
+vignette: >
+  %\VignetteIndexEntry{example_ssd_sobol}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE
+)
+```
+
+# Introduction
+This document runs a discrete event simulation model in the context of a late oncology model to show how using quasi-random numbers can radically change convergence speed by using quasi-random sobol sequences instead of purely random numbers.
+
+Sobol sequences are a deterministic way of generating numbers (between 0 and 1) in a way that fills the space very evenly. Several methods can be used to randomize the generation of these sequences, and to create multiple dimensions when we want to have multiple variables using these sequences. Sobol sequences can fill out the space more evenly than a random uniform distribution, so they can make a model converge faster. 
+
+This vignette explores how one can use sobol sequences to accelerate convergence and reduce the number of profiles needed.
+
+```{r sobol_vs_random}
+
+n_points <- 500
+
+sobol_seq <- randtoolbox::sobol(n = n_points, dim = 2)
+random_points <- matrix(runif(n_points * 2), ncol = 2)
+
+sobol_df <- data.frame(x = sobol_seq[, 1], y = sobol_seq[, 2], Type = "Sobol")
+random_df <- data.frame(x = random_points[, 1], y = random_points[, 2], Type = "Random Uniform")
+
+combined_df <- rbind(sobol_df, random_df)
+
+ggplot(combined_df, aes(x = x, y = y, color = Type)) +
+  geom_point(alpha = 0.7, size = 1) +
+  facet_wrap(~Type) +
+  theme_bw() + 
+  labs(
+    title = "Comparison of Sobol Sequence vs Random Uniform Sampling"
+  ) +
+  theme(legend.position = "none")
+```
+
+When running a DES, it's important to consider speed. Simulation based models can be computationally expensive, which means that using efficient coding can have a substantial impact on performance. 
+
+## Main options
+
+```{r setup}
+library(WARDEN)
+
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+library(purrr)
+library(randtoolbox)
+
+```
+
+```{r main_opt, results='hide', message=FALSE}
+options(scipen = 999)
+options(digits=3)
+options(tibble.print_max = 50)
+```
+
+# General inputs with delayed execution
+When we generate inputs, we create two versions, one with random numbers generated from a uniform variable, and another generated from a sobol sequence.
+```{r input_delayed}
+randtoolbox::sobol(1,2, init = TRUE) #initialize
+N <- 500
+sims <- 5
+common_all_inputs <-add_item(
+                      util.sick = 0.8,
+                      util.sicker = 0.5,
+                      cost.sick = 3000,
+                      cost.sicker = 7000,
+                      cost.int = 1000,
+                      coef_noint = log(0.2),
+                      HR_int = 0.8,
+                      drc = 0.035, 
+                      drq = 0.035
+                      )
+
+common_all_inputs_unif <- common_all_inputs %>%
+  add_item(random_n = runif(N),
+           random_n_death = runif(N)) #we draw N random uniform samples
+
+common_all_inputs_sobol <- common_all_inputs %>%
+  add_item(random_sobol = (randtoolbox::sobol(N,2, init = TRUE) + matrix(rep(runif(2), each = N), nrow = N, byrow = TRUE)) %% 1,
+           random_n = random_sobol[,1],
+           random_n_death = random_sobol[,2])  #we draw n sobol sequences, we need to do a small trick as scrambling and seeds are temporarely deactivated within the randtoolbox package
+
+common_pt_inputs <- add_item(death= max(0.0000001,qnorm(random_n_death[i], mean=12, sd=3)))  #use random number for death to draw from a normal distribution
+
+unique_pt_inputs <- add_item(fl.sick = 1,
+                             q_default = util.sick,
+                             c_default = cost.sick + if(arm=="int"){cost.int}else{0}) 
+
+```
+
+# Events
+## Add Initial Events
+
+Time to event for the exponential is drawn using the random number
+```{r model_evts}
+init_event_list <- 
+  add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={
+    sick <- 0
+    sicker <- qexp(random_n[i], rate = exp(coef_noint + log(ifelse(arm=="int",HR_int,1)))) #draw the TTE using the random number we created
+    
+  })
+
+```
+
+## Add Reaction to Those Events
+```{r model_reaction}
+evt_react_list <-
+  add_reactevt(name_evt = "sick",
+               input = {}) %>%
+  add_reactevt(name_evt = "sicker",
+               input = {
+                 modify_item(list(q_default = util.sicker,
+                                  c_default = cost.sicker + if(arm=="int"){cost.int}else{0},
+                                  fl.sick = 0)) 
+               }) %>%
+  add_reactevt(name_evt = "death",
+               input = {
+                 modify_item(list(q_default = 0,
+                                  c_default = 0, 
+                                  curtime = Inf)) 
+               }) 
+
+```
+
+# Costs and Utilities
+## Utilities
+
+```{r utilities}
+
+util_ongoing <- "q_default"
+
+```
+## Costs
+
+```{r costs}
+
+cost_ongoing <- "c_default"
+
+```
+
+# Model
+## Model Execution
+We run both versions of the model for a few simulations to showcase the different speed of convergence.
+
+```{r model_run}
+results_unif <- run_sim(  
+  npats=N,                               
+  n_sim=sims,                                  
+  psa_bool = FALSE,                         
+  arm_list = c("int", "noint"),             
+  common_all_inputs = common_all_inputs_unif,    
+  common_pt_inputs = common_pt_inputs,       
+  unique_pt_inputs = unique_pt_inputs,       
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,          
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  ipd = 2,
+  seed = 1
+)
+
+results_sobol <- run_sim(  
+  npats=N,                               
+  n_sim=sims,                                  
+  psa_bool = FALSE,                         
+  arm_list = c("int", "noint"),             
+  common_all_inputs = common_all_inputs_sobol,    
+  common_pt_inputs = common_pt_inputs,       
+  unique_pt_inputs = unique_pt_inputs,       
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,          
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  ipd = 2,
+  seed = 1
+)
+```
+# Post-processing of Model Outputs
+## Summary of Results
+
+Once the models have been run, we merge the data and generate the cumulative ICER to see how fast they converge to the final estimated value.
+
+It can clearly be seen that the random uniform approach makes the model converge much more slowly than the sobol sequences. 
+
+```{r post-processing_summary}
+
+
+summary_results_sim(results_unif[[1]]) 
+summary_results_sim(results_sobol[[1]]) 
+
+
+det_ipd_unif <- bind_rows(map(results_unif[[1]], "merged_df")) %>% mutate(type = "unif")
+det_ipd_sobol <- bind_rows(map(results_sobol[[1]], "merged_df")) %>% mutate(type = "sobol")
+
+merged_ipd <- rbind(det_ipd_unif,det_ipd_sobol) %>%
+  group_by(arm, type, simulation) %>%
+  mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
+         cumul_total_costs = cumsum(total_costs)/pat_id) %>%
+  transmute(type, pat_id, arm, simulation, cumul_total_qalys, cumul_total_costs) %>%
+  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
+  mutate(inc_costs = cumul_total_costs_int - cumul_total_costs_noint,
+         inc_qalys = cumul_total_qalys_int - cumul_total_qalys_noint,
+         ICER = inc_costs/ inc_qalys) 
+  
+
+ggplot(merged_ipd, aes(x=pat_id,y=ICER, colour = type, fill = as.factor(simulation)))+
+  geom_line() +
+  theme_bw() +
+  ylim(30000,45000)
+
+```
+
+
+
+
+# Model with PSA
+## Model Execution
+
+```{r model_run}
+#Load some data
+list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
+                              base_value = list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
+                              DSA_min = list(0.6,0.3,1000,5000,800,log(0.1),0.5),
+                              DSA_max = list(0.9,0.7,5000,9000,2000,log(0.4),0.9),
+                              PSA_dist = list("qnorm","qbeta_mse","qgamma_mse","qgamma_mse","qgamma_mse","qnorm","qlnorm"),
+                              a=list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)),
+                              b=lapply(list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)), function(x) abs(x/10)),
+                              scenario_1=list(0.6,0.3,1000,5000,800,log(0.1),0.5),
+                              scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),0.9)
+                              )
+
+sensitivity_inputs <-add_item(
+            indicators = if(sensitivity_bool){ create_indicators(sens,n_sensitivity*length(sensitivity_names),rep(1,length(list_par[[1]])))}else{
+                                rep(1,length(list_par[[1]]))} #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max, if not sensitivity analysis, then we activate all of them, i.e., in a PSA)
+                              )
+
+common_all_inputs <-  add_item(
+  random_sobol_psa = (randtoolbox::sobol(1,7, init = TRUE) + matrix(rep(runif(7), each = 1), nrow = 1, byrow = TRUE)) %% 1
+  ) %>% 
+  add_item(
+            pick_val_v(base        = list_par[["base_value"]],
+                       psa         = pick_psa(list_par[["PSA_dist"]],random_sobol_psa,list_par[["a"]],list_par[["b"]]),
+                       sens        = list_par[[sens_name_used]],
+                       psa_ind     = psa_bool,
+                       sens_ind    = sensitivity_bool,
+                       indicator   = indicators,
+                       names_out   = list_par[["parameter_name"]]
+                       )
+            ) 
+
+common_all_inputs_unif <- common_all_inputs %>%
+  add_item(random_n = runif(N),
+           random_n_death = runif(N)) #we draw N random uniform samples
+
+common_all_inputs_sobol <- common_all_inputs %>%
+  add_item(random_sobol = (randtoolbox::sobol(N,2, init = TRUE) + matrix(rep(runif(2), each = N), nrow = N, byrow = TRUE)) %% 1,
+           random_n = random_sobol[,1],
+           random_n_death = random_sobol[,2])  #we draw n sobol sequences, we need to do a small trick as scrambling and seeds are temporarely deactivated within the randtoolbox package
+
+
+
+results_unif_psa <- run_sim(  
+  npats=N,                               
+  n_sim=sims,                                  
+  psa_bool = TRUE,                         
+  arm_list = c("int", "noint"),
+  sensitivity_inputs = sensitivity_inputs,
+  common_all_inputs = common_all_inputs_unif,    
+  common_pt_inputs = common_pt_inputs,       
+  unique_pt_inputs = unique_pt_inputs,       
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,          
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  ipd = 2,
+  seed = 1
+)
+
+results_sobol_psa <- run_sim(  
+  npats=N,                               
+  n_sim=sims,                                  
+  psa_bool = TRUE,                         
+  arm_list = c("int", "noint"), 
+  sensitivity_inputs = sensitivity_inputs,
+  common_all_inputs = common_all_inputs_sobol,    
+  common_pt_inputs = common_pt_inputs,       
+  unique_pt_inputs = unique_pt_inputs,       
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,          
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  ipd = 2,
+  seed = 1
+)
+```
+
+# Post-processing of PSA Outputs
+## Summary of Results
+
+Once the models have been run, we merge the data and generate the cumulative ICER to see how fast they converge to the final estimated value.
+
+It can clearly be seen that the random uniform approach makes the model converge much more slowly than the sobol sequences. 
+
+```{r post-processing_summary}
+
+
+summary_results_sim(results_unif_psa[[1]]) 
+summary_results_sim(results_sobol_psa[[1]]) 
+
+
+psa_ipd_unif <- bind_rows(map(results_unif_psa[[1]], "merged_df")) %>% mutate(type = "unif")
+psa_ipd_sobol <- bind_rows(map(results_sobol_psa[[1]], "merged_df")) %>% mutate(type = "sobol")
+
+merged_ipd_psa <- rbind(psa_ipd_unif,psa_ipd_sobol) %>%
+  group_by(arm, type, simulation) %>%
+  mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
+         cumul_total_costs = cumsum(total_costs)/pat_id) %>%
+  transmute(type, pat_id, arm, simulation, cumul_total_qalys, cumul_total_costs) %>%
+  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
+  mutate(inc_costs = cumul_total_costs_int - cumul_total_costs_noint,
+         inc_qalys = cumul_total_qalys_int - cumul_total_qalys_noint,
+         ICER = inc_costs/ inc_qalys) 
+  
+
+ggplot(merged_ipd_psa, aes(x=pat_id,y=ICER, colour = type, fill = as.factor(simulation)))+
+  geom_line() +
+  theme_bw() + 
+  ylim(20000,80000)
+
+```

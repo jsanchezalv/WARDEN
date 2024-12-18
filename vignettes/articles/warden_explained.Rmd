@@ -1,0 +1,103 @@
+---
+title: 'WARDEN Explained'
+author: "Javier Sanchez Alvarez"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    embed-resources: true
+    self-contained-math: true
+vignette: >
+  %\VignetteIndexEntry{warden_explained}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE
+)
+```
+
+# Introduction
+This document explains the logic behind WARDEN main approach to simulate discrete event simulations, as well as explaining briefly the rationale for certain design decisions.
+
+## In a Nutshell
+WARDEN main simulation engine at its core is nothing but a nested loop at different levels. However, for this to work we need to delay the execution of the inputs provided by the user, so the relevant inputs provided through `add_tte`, `add_item` and `add_reactevt` are substituted for delayed execution and stored as lists.
+
+1. **Per Analysis (DSA, scenarios) "sens"**
+    1. Load inputs sequentially. If it's an unnamed list, unlist it and assign to the "sens" input list.
+    2. **Per Simulation (PSA or deterministic) "simulation"**
+        1. Load inputs sequentially. If it's an unnamed list, unlist it and store its components. The "sens" list is integrated into a new list with the  "simulation" input list.
+        2. **Per Patient "i"**
+            1. Load inputs sequentially. If it's an unnamed list, unlist it and store its components. The "simulation" list is integrated into a new list with the  "i" input list.
+            2. **Per Arm "arm"**
+                1. Load inputs sequentially. If it's an unnamed list, unlist it and store its components. The "i" list is integrated into a new list with the  "arm" input list.
+                2. Load initial time to events. First look into the initial time to event expression declared by  user; if not found, look into the input list already declared; if not found, set equal to `Inf`.
+                3. **While `curtime` (simulation time) is < `Inf`**
+                    1. Select the next event by checking the event with minimum time to event; in case of ties, untie using the order declared in `add_tte` for initial time to events. If there are no events left, set `curtime = Inf` (end simulation)
+                    1. Evaluate the reaction of the event by looking at the relevant expression from the list of event reactions
+        3. Once the specific "simulation" is done, compute outputs vectorized (discount outcomes as relevant based on their type, aggregate data as relevant, obtain timed frequency outputs if needed, etc.)                    
+
+The debug mode will store in a log the relevant data that is loaded or changed by the event reactions, and will be exported when the simulation stops (also on error). WARDEN allows to continue on error (though not recommended)
+
+WARDEN handles the random numbers automatically, setting the seeds differently at the simulation, patient and arm level. WARDEN uses L'Ecuyer-CMRG random number generator.
+
+The way WARDEN processes events through e.g., `modify_item` is by looking at what inputs are currently available from the relevant input list, evaluating the passed list (e.g., `modify_item_seq(list(a = 1, b = a + 1))`) and adding the resulting objects (`a` and `b`) to the parent environment as well as to the relevant input list for storage. This means that objects not included in `modify_item` will not be stored in the relevant input list but they will be available for evaluation, e.g.,
+
+```{r example, eval=FALSE, echo=TRUE}
+
+add_reactevt(name_evt = "event_1", input = {
+  z <- 2 #this will not be stored in the main input list, and will not be available in the next event reaction! so it's only available locally while we are evaluating this event
+  
+  modify_item_seq(list(a = 1, b = z + 1, z = z)) #this will work, because z is available locally while this specific event reaction is taking place, and we are actually saving it as well so it's also available in future events (by setting z = z)
+  
+  c <- b + 5 #b will be available as modify_item and modify_item_seq will update both the key input list and the parent environment. However c will not be stored as only is evaluated here locally, so it will be lost if it's not saved using modify_item or modify_item_seq!
+}
+
+#The above expression is equivalent to writing:
+
+add_reactevt(name_evt = "event_1", input = {
+  z <- 2 
+  a <- 1
+  b <- z + 1
+  modify_item(list(a = a, b = b, z = z)) 
+  
+  c <- b + 5 #b will be available as modify_item and modify_item_seq will update both the key input list and the parent environment. However c will not be stored as only is evaluated here locally, so it will be lost if it's not saved using modify_item or modify_item_seq!
+}
+
+
+#As well as
+add_reactevt(name_evt = "event_1", input = {
+  modify_item_seq(list(a = 1, z = 2, b = z + 1))  #modify_item_seq evaluates sequentially, so the value of z will be available for b
+  
+    c <- b + 5 #b will be available as modify_item and modify_item_seq will update both the key input list and the parent environment. However c will not be stored as only is evaluated here locally, so it will be lost if it's not saved using modify_item or modify_item_seq! e.g., writing modify_item(list(c=b+5))
+}
+
+#But note that this will not work!
+add_reactevt(name_evt = "event_1", input = {
+  modify_item(list(a = 1, z = 2, b = z + 1))  #modify_item is faster but does not evaluate sequentially (all at once), so the value of z will NOT be available for b
+}
+
+```
+
+## Storing Inputs, Making it Faster
+Multiple ways of storing inputs and processing events can be thought of. A few of these could be 1) data.frames, 2) lists, 3) environments, or 4) utilize a C++ implementation (among others). WARDEN uses lists to store inputs and to process events.
+
+Data.frames can be slow and memory-intense to manipulate, so they were avoided for this purpose.
+
+Lists and environments can behave quite similar, with environments being modified by reference, which can speed things up, and it could give more freedom for the user to declare how to set their event reactions instead of requiring them to declare `modify_item`. However, using environments and more "natural" R expressions (e.g., `a <- 1; b <- a + 1`instead of `modify_item_seq(list(a = 1, b = a + 1))`) made the debugging mode much harder to handle and far slower as we needed to check every time which items had been changed and which remained as is. Some internal experiments showed a 20% speed increase by switching from lists to environments in the normal mode. More careful examination will be needed to understand to what extent this trade off can be handled and an environment approach taken (or a hybrid approach, since one can switch from list to environment and the other way around quite easily).
+
+A C++ implementation was avoided as the purpose of WARDEN is to be user-friendly and to give the user as much as freedom as possible on how to define their inputs. While likely much faster, implementation in C++ would require very careful handling of every user input, likely forcing us to restrict it to very specific data types and functions. 
+
+## Parallel engine approach
+
+Furthermore, a parallel core/thread implementation is also available at the simulation level, i.e., it will perform the "simulation" loop in parallel. The reason to select the simulation and not the patient is that each patient normally takes a small amount of time to run, and the simulation level offers the right balance in terms of time to run.
+
+However, the user should expect it to be only slightly more efficient (perhaps 20-40% speed increase for medium to large simulations), as opposed to radically faster. Two factors will be important: the number of simulations to be run (`n_sim`), and the size of each simulation (given by the number of events and the number of patients and arms). If `n_sim` is small, it may not be worth it to use a parallel approach as there is a time loss to set up the different cores/threads (normally 2 to 5 seconds), so if each simulations runs fast because they are simple (a couple or seconds or so) it may not be worth it. Even if `n_sim` is large and each simulation is complex, the efficiency gain may be ~20-40%, even if using >5 cores. The reason is that RAM use increases fast as R creates new sessions with duplicated data (it's not shared among the cores/threads), and a medium to large simulation can easily become >2 GB of RAM use per simulation, so systems with large processing power AND large RAM (e.g., 32 or 64GB) will benefit the most from this approach. 
+
+The parallel implementation also has limitations in terms of exporting logs if there is an error in a simulation (due to the parallel set-up), so this approach is recommended when the user is quite confident that the simulation will run without issues.
