@@ -380,7 +380,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     }
     
     #Make sure there are no duplicated inputs in the model, if so, take the last one
-    duplic <- duplicated(names(input_list_sens),fromLast = T)
+    duplic <- duplicated(names(input_list_sens),fromLast = TRUE)
     if (sum(duplic)>0 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added.\n")  }
     input_list_sens <- input_list_sens[!duplic]
     
@@ -437,7 +437,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       }
   
       #Make sure there are no duplicated inputs in the model, if so, take the last one
-      duplic <- duplicated(names(input_list),fromLast = T)
+      duplic <- duplicated(names(input_list),fromLast = TRUE)
       if (sum(duplic)>0 & simulation==1 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added.\n")  }
       input_list <- input_list[!duplic]
   

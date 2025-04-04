@@ -1,3 +1,7 @@
+# WARDEN 0.99.3
+* Minor fix in run_sim_parallel to ensure compatibility with future package (had some "=T" instead of "=TRUE")
+* Added BugsReport link in Description
+
 # WARDEN 0.99.2
 * Added qgamma_mse function
 * Added two articles for the website explaining more in detail WARDEN and the use of sobol sequences

@@ -1,6 +1,6 @@
 Package: WARDEN
 Title: Workflows for Health Technology Assessments in R using Discrete EveNts
-Version: 0.99.2
+Version: 0.99.3
 Authors@R: 
     c(person(given = "Javier",
            family = "Sanchez Alvarez",
@@ -25,6 +25,7 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+BugReports: https://github.com/jsanchezalv/WARDEN/issues
 Suggests: 
     dplyr,
     ggplot2,
