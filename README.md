@@ -42,7 +42,7 @@ site](https://jsanchezalv.github.io/WARDEN/index.html) for more details
 on documentation and specific tutorials.
 
 For more details on the code, check our [Github
-repository](https://github.com/jsanchezalv/WARDEN) or our [CRAN site](https://cran.rstudio.com/web/packages/WARDEN/).
+repository](https://github.com/jsanchezalv/WARDEN) or our [CRAN site](https://cran.r-project.org/package=WARDEN).
 
 ## Installation
 

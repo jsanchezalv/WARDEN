@@ -12,3 +12,5 @@
 ^doc$
 ^Meta$
 ^LICENSE\.md$
+^cran-comments\.md$
+^CRAN-SUBMISSION$
