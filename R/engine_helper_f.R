@@ -46,9 +46,10 @@ load_inputs <- function(inputs,list_uneval_inputs){
     if(any(is.null(names(list.eval_inputs)), names(list.eval_inputs)=="") & length(list.eval_inputs)==1) {
       inputs[names(list.eval_inputs[[1]])] <- list.eval_inputs[[1]]
     } else{
-      if (!is.null(names(list.eval_inputs[[1]]))) {
-        warning("Item ", names(list.eval_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
-      }
+      # Remove warning for now, as it gets repeated a lot
+      # if (!is.null(names(list.eval_inputs[[1]]))) {
+      #   warning("Item ", names(list.eval_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
+      # }
       inputs[names(list.eval_inputs)] <- list.eval_inputs
       
     }
