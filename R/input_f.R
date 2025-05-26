@@ -319,7 +319,7 @@ pick_val_v <- function(base,
     names(output) <- names_out
   }
   
-  return(output)
+  return(as.list(output))
 } 
 
 
