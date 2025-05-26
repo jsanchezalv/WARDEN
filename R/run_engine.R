@@ -176,13 +176,16 @@ run_engine <- function(arm_list,
       n_evt <- 0
    
       if(input_list$accum_backwards){
+        input_list_arm$ongoing_inputs_lu <- paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate",recycle0 = TRUE)
         inputs_out_v <- c(input_list_arm$input_out,
-                             paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate",recycle0 = TRUE)
+                          input_list_arm$ongoing_inputs_lu
         )
       }else{
         inputs_out_v <-  input_list_arm$input_out
       }
       
+      input_list_arm <- as.environment(input_list_arm)
+      parent.env(input_list_arm) <- environment()
       
       while(input_list_arm$curtime < Inf){
 

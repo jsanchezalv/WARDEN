@@ -411,10 +411,11 @@ new_event <- function(evt){
     stop("New event times are not all numeric, please review")
   }
   
-  input_list_arm <- parent.frame()$input_list_arm
-  
+  input_list_arm <- parent.frame()
+
   evtlist_temp <- list(cur_evtlist = c(input_list_arm$cur_evtlist,
                                   new_evt))
+
   if(input_list_arm$debug){ #only works correctly with create_if_null==TRUE, to be modified in later versions
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                   "; Sim: ", input_list_arm$sim,
@@ -429,7 +430,7 @@ new_event <- function(evt){
       
     }else{
       dump_info <- list(
-        list(prev_value = setNames(rep(Inf, length(new_event_name))),
+        list(prev_value = setNames(rep(Inf, length(new_evt_name)),new_evt_name),
              cur_value = new_evt
         )
       )
@@ -442,9 +443,6 @@ new_event <- function(evt){
   
   
   input_list_arm[["cur_evtlist"]] <- evtlist_temp$cur_evtlist
-  
-  list2env(input_list_arm["cur_evtlist"],envir = parent.frame())
-  assign("input_list_arm",input_list_arm, envir = parent.frame())
 
 }
 
@@ -477,7 +475,7 @@ new_event <- function(evt){
 #' add_reactevt(name_evt = "idfs",input = {modify_event(list("os"=5))})
 
 modify_event <- function(evt,create_if_null=TRUE){
-  input_list_arm <- parent.frame()$input_list_arm
+  input_list_arm <- parent.frame()
   
   evt_unlist <- unlist(evt)
   if(!is.numeric(evt_unlist)){
@@ -528,10 +526,6 @@ modify_event <- function(evt,create_if_null=TRUE){
     input_list_arm[["cur_evtlist"]][names_evt] <- evt_unlist
   }
   
-   
-  list2env(input_list_arm["cur_evtlist"],envir = parent.frame())
-  assign("input_list_arm",input_list_arm, envir = parent.frame())
-  
 
 }
 
@@ -564,7 +558,7 @@ modify_event <- function(evt,create_if_null=TRUE){
 
 
 modify_item <- function(list_item){
-  input_list_arm <- parent.frame()$input_list_arm
+  input_list_arm <- parent.frame()
   
   if(input_list_arm$debug){ 
     
@@ -599,8 +593,7 @@ modify_item <- function(list_item){
   input_list_arm[paste0(names(list_item),"_lastupdate",recycle0=TRUE)] <- 1
   }
   
-  list2env(list_item,envir = parent.frame())
-  assign("input_list_arm",input_list_arm, envir = parent.frame())
+  
 }
 
 # Modify item in input list  evaluating sequentially -------------------------------------------------------------------------------------------------------------------------------
@@ -633,7 +626,7 @@ modify_item <- function(list_item){
 
 modify_item_seq <- function(...){
   
-  input_list_arm <- parent.frame()$input_list_arm
+  input_list_arm <- parent.frame()
   input_list <- as.list(substitute(...))[-1]
   list_out <- list()
   
@@ -677,9 +670,7 @@ modify_item_seq <- function(...){
   if(input_list_arm$accum_backwards){
   input_list_arm[paste0(names(input_list),"_lastupdate",recycle0=TRUE)] <- 1
   }
-  
-  assign("input_list_arm",input_list_arm, envir = parent.frame())
-  
+
 }
 
 # Add_reactevt -------------------------------------------------------------------------------------------------------------------------------------------

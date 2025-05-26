@@ -176,14 +176,21 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
   evt_arm <- paste(evt,arm,sep = "_")
   
   #Reset instantaneous costs/qalys/others
-
   if(!is.null(input_list_arm$uc_lists$instant_inputs)){
-    input_list_arm[input_list_arm$uc_lists$instant_inputs] <- 0
+    
+    for (var_name in input_list_arm$uc_lists$instant_inputs) {
+      assign(var_name, 0, envir = input_list_arm)
+    }
+    
+    #input_list_arm[input_list_arm$uc_lists$instant_inputs] <- 0
   }
   
   if(input_list_arm$accum_backwards){
     if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
-      input_list_arm[paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate")] <- 0
+      for (var_name in input_list_arm$ongoing_inputs_lu) {
+        assign(var_name, 0, envir = input_list_arm)
+      }
+      #input_list_arm[paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate")] <- 0
     }
   }
   
@@ -227,9 +234,8 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
 
 # Evaluate reaction -------------------------------------------------------
 
-    
-  eval(react_list[[position]][["react"]], input_list_arm)
-
+  return(eval(react_list[[position]][["react"]], input_list_arm, enclos = baseenv()))
+  
 }
 
 
