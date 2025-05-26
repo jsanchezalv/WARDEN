@@ -183,7 +183,7 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
   
   if(input_list_arm$accum_backwards){
     if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
-      input_list_arm[paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate")] <- 0
+      input_list_arm[input_list_arm$ongoing_inputs_lu] <- 0
     }
   }
   

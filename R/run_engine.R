@@ -174,8 +174,9 @@ run_engine <- function(arm_list,
       input_list_arm <- c(input_list_arm,output_list)
       
       if(input_list$accum_backwards){
+        input_list_arm$ongoing_inputs_lu <- paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate",recycle0 = TRUE)
         input_out_v <- c(input_list_arm$input_out,
-                                       paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate",recycle0 = TRUE)
+                         input_list_arm$ongoing_inputs_lu
         )
       }else{
         input_out_v <- c(input_list_arm$input_out)
