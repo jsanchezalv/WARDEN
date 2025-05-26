@@ -429,7 +429,7 @@ new_event <- function(evt){
       
     }else{
       dump_info <- list(
-        list(prev_value = setNames(rep(Inf, length(new_event_name))),
+        list(prev_value = setNames(rep(Inf, length(new_evt_name)),new_evt_name),
              cur_value = new_evt
         )
       )
