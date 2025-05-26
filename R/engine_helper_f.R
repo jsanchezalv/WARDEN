@@ -228,18 +228,7 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
 # Evaluate reaction -------------------------------------------------------
 
     
-    
-    input_list_arm <- local({
-      input_list_arm <- input_list_arm
-      eval(react_list[[position]][["react"]]) #run script
-      out <- input_list_arm
-    },input_list_arm)
-    
-    
-    
-  
-  return(input_list_arm)
-  
+  eval(react_list[[position]][["react"]], input_list_arm)
 
 }
 

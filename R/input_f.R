@@ -726,8 +726,13 @@ add_reactevt <- function(.data=NULL,name_evt,input){
   }
   
   data_list <- .data
+  
+  
+  input_sub <- substitute(input)
+  ret_sub <- substitute(return(environment()))
+  new_sub <- as.call(c(substitute(`{`), as.list(input_sub)[-1], ret_sub))
 
-  evt_r <- list(list(react=substitute(input)))
+  evt_r <- list(list(react=new_sub))
   
   names(evt_r) <- paste(name_evt)
 

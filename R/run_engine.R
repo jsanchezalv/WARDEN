@@ -167,13 +167,23 @@ run_engine <- function(arm_list,
       # 3 Loop per event --------------------------------------------------------
       #Main environment of reference is this one
       list_env <- list(list_env = environment())
-
+  
       input_list_arm <- c(input_list_arm, list_env)
       this_patient[[arm]]$evtlist <- NULL
 
       input_list_arm <- c(input_list_arm,output_list)
 
       n_evt <- 0
+   
+      if(input_list$accum_backwards){
+        inputs_out_v <- c(input_list_arm$input_out,
+                             paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate",recycle0 = TRUE)
+        )
+      }else{
+        inputs_out_v <-  input_list_arm$input_out
+      }
+      
+      
       while(input_list_arm$curtime < Inf){
 
         # Get next event, process, repeat
@@ -184,20 +194,14 @@ run_engine <- function(arm_list,
         n_evt <- n_evt +1
 
 
-        if (is.null(Evt)==F){  
+        if (is.null(Evt)==FALSE){  
           
           #Evalaute event
           input_list_arm <- react_evt(Evt, arm, input_list_arm)
           
           #Get extra objects to be exported
+          extra_data <-  mget(inputs_out_v, input_list_arm) 
           
-          if(input_list$accum_backwards){
-          extra_data <- input_list_arm[c(input_list_arm$input_out,
-                                         paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate",recycle0 = TRUE)
-                                         )]
-          }else{
-            extra_data <- input_list_arm[c(input_list_arm$input_out)]
-          }
           extra_data <- extra_data[!sapply(extra_data,is.null)]
  
               this_patient[[arm]]$evtlist[[n_evt]] <- c(evtname = Evt$evt ,
