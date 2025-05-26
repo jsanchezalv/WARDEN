@@ -558,6 +558,7 @@ modify_event <- function(evt,create_if_null=TRUE){
 
 
 modify_item <- function(list_item){
+
   input_list_arm <- parent.frame()
   
   if(input_list_arm$debug){ 
@@ -587,10 +588,12 @@ modify_item <- function(list_item){
   }
   
   
-  input_list_arm[names(list_item)] <- lapply(list_item, unname)
+  list2env(lapply(list_item, unname), parent.frame())
   
   if(input_list_arm$accum_backwards){
-  input_list_arm[paste0(names(list_item),"_lastupdate",recycle0=TRUE)] <- 1
+    l_temp <- as.list(rep(1,length(list_item)))
+    names(l_temp) <- paste0(names(list_item),"_lastupdate",recycle0=TRUE)
+    list2env(l_temp, parent.frame())
   }
   
   
@@ -625,20 +628,20 @@ modify_item <- function(list_item){
 #'   })
 
 modify_item_seq <- function(...){
-  
   input_list_arm <- parent.frame()
   input_list <- as.list(substitute(...))[-1]
   list_out <- list()
   
   if(input_list_arm$debug){ 
-    temp_dump <- input_list_arm[names(input_list)]
+    temp_dump <- mget(names(input_list),input_list_arm)
   }
   
   for (inp in 1:length(input_list)) {
-    name_temp <- names(input_list[inp])
-    list_out[[ name_temp ]] <- eval(input_list[[inp]], input_list_arm)
-    input_list_arm[name_temp] <- list_out[name_temp]
+    temp_obj <- as.list(eval(input_list[[inp]], input_list_arm))
+    names(temp_obj) <- names(input_list[inp])
+    list2env(temp_obj, input_list_arm)
   }
+  list_out <- mget(names(input_list),input_list_arm)
   
   if(input_list_arm$debug){ 
     
@@ -665,11 +668,16 @@ modify_item_seq <- function(...){
   }
   
   
-  list2env(list_out,envir = parent.frame())
   
+  
+  # list2env(list_out,envir = parent.frame())
+
   if(input_list_arm$accum_backwards){
-  input_list_arm[paste0(names(input_list),"_lastupdate",recycle0=TRUE)] <- 1
+    l_temp <- as.list(rep(1,length(input_list)))
+    names(l_temp) <- paste0(names(input_list),"_lastupdate",recycle0=TRUE)
+    list2env(l_temp, parent.frame())
   }
+  
 
 }
 
@@ -1433,4 +1441,87 @@ extract_defs <- function(lst){
 
 
 
+#' Extract assignments from expression for debug mode
+#'
+#' @param expr Expression of type language 
+#'
+#' @return Vector of cleaned character objects that are assigned. It will ignore objects created dynamically (e.g., by pasting in a loop)
+#'
+#' @noRd
+#'  
+#' @examples
+#' 
+#'  expr <- substitute({
+#'    q_default <- if (fl.idfs==1) {
+#'      util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+#'    } else if (fl.idfs==0 & fl.mbcs==0) {
+#'      util.remission * fl.remission + fl.recurrence*util.recurrence
+#'    } else if (fl.mbcs==1) {
+#'      util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+#'    }
+#'    c_default <- cost.recurrence * fl.recurrence
+#'    fl.recurrence <- 1
+#'    fl.remission <- 0
+#'    fl.mbcs <- 1
+#'    fl.mbcs.progression.mbc <- 1 #ad-hoc for plot
+#'    if(a){c<-5}else{d<-6}
+#'    if(e){assign("t",6)}else{j<-6}
+#'    for(i in 1:10){
+#'      assign(paste0("a_",i),1)
+#'    }
+#'    a = 5
+#'    d <- b <- c <- 5
+#'  })
+#'  
+#'  extract_assignment_targets(expr)' 
+#' 
+#' 
 
+extract_assignment_targets <- function(expr) {
+  assigned <- character()
+  
+  walk <- function(node) {
+    if (is.call(node)) {
+      fname <- as.character(node[[1]])
+      
+      # Handle <- and = assignment
+      if (fname %in% c("<-", "=")) {
+        lhs <- node[[2]]
+        if (is.symbol(lhs)) {
+          assigned <<- c(assigned, as.character(lhs))
+        } else if (is.call(lhs) && lhs[[1]] == as.name("$")) {
+          # x$y <- ...  => get "x"
+          assigned <<- c(assigned, as.character(lhs[[2]]))
+        } else if (is.call(lhs) && lhs[[1]] == as.name("[[")) {
+          # x[["y"]] <- ... => get "x"
+          assigned <<- c(assigned, as.character(lhs[[2]]))
+        } else if (is.call(lhs) && lhs[[1]] == as.name("[")) {
+          assigned <<- c(assigned, as.character(lhs[[2]]))
+        }
+        walk(node[[3]])  # Recurse on RHS
+      }
+      
+      # Handle assign("var", value)
+      else if (fname == "assign" && length(node) >= 2) {
+        varname <- node[[2]]
+        if (is.character(varname)) {
+          assigned <<- c(assigned, varname)
+        } else if (is.symbol(varname)) {
+          assigned <<- c(assigned, as.character(varname))
+        }
+        # Recurse on value
+        if (length(node) >= 3) walk(node[[3]])
+      }
+      
+      # Recurse into all sub-calls
+      for (arg in as.list(node)[-1]) {
+        walk(arg)
+      }
+    } else if (is.expression(node) || is.call(node)) {
+      for (item in as.list(node)) walk(item)
+    }
+  }
+  
+  walk(expr)
+  unique(assigned)
+}

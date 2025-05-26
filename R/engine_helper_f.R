@@ -181,8 +181,6 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
     for (var_name in input_list_arm$uc_lists$instant_inputs) {
       assign(var_name, 0, envir = input_list_arm)
     }
-    
-    #input_list_arm[input_list_arm$uc_lists$instant_inputs] <- 0
   }
   
   if(input_list_arm$accum_backwards){
@@ -190,7 +188,6 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
       for (var_name in input_list_arm$ongoing_inputs_lu) {
         assign(var_name, 0, envir = input_list_arm)
       }
-      #input_list_arm[paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate")] <- 0
     }
   }
   
@@ -234,7 +231,42 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
 
 # Evaluate reaction -------------------------------------------------------
 
-  return(eval(react_list[[position]][["react"]], input_list_arm, enclos = baseenv()))
+  if(input_list_arm$debug){
+    prev_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm, ifnotfound = Inf)
+    
+    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
+                  "; Sim: ", input_list_arm$sim,
+                  "; Patient: ", input_list_arm$i,
+                  "; Arm: ", input_list_arm$arm,
+                  "; Event: ", input_list_arm$evt,
+                  "; Time: ", round(input_list_arm$curtime,3)
+    )
+  }
+  
+  eval(react_list[[position]][["react"]], input_list_arm)
+  
+  if(input_list_arm$debug){
+    
+    cur_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm)
+    
+    if(!is.null(input_list_arm$log_list[[loc]])){
+      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value, prev_values)
+      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,cur_values)
+      
+    }else{
+      dump_info <- list(
+        list(
+          prev_value = prev_values,
+          cur_value = cur_values
+        )
+      )
+      names(dump_info) <- loc
+      
+      input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
+      
+    }
+  }
+  return(input_list_arm)
   
 }
 

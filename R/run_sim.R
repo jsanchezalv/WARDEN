@@ -70,7 +70,10 @@
 #'   ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime 
 #'   being the starting time in which the variable started counting.
 #'   
-#'  `debug = TRUE` will export a log file with the timestamp up the error in the main working directory.
+#'  `debug = TRUE` will export a log file with the timestamp up the error in the main working directory. Note that
+#'  using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
+#'  as the AST may not catch all the relevant assignments (e.g., an assigment like assign(paste("x_",i),5)
+#'   in a loop will not be identified, unless using modify_item(_seq)).
 #'  
 #'  `continue_on_error` will skip the current simulation (so it won't continue for the rest of patient-arms) if TRUE.
 #'   Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.
@@ -267,6 +270,12 @@ run_sim <- function(arm_list=c("int","noint"),
     sens_name_used <- sensitivity_names[ceiling(sens/n_sensitivity)] 
     } else{
     sens_name_used <- ""
+    }
+    
+    if(debug){
+      for (evt in names(evt_react_list)) {
+        evt_react_list[[evt]]$debug_vars <- extract_assignment_targets(evt_react_list[[evt]]$react)
+      }
     }
     
     input_list_sens <- list(

@@ -406,7 +406,7 @@ evt_react_list <-
                }) %>%
   add_reactevt(name_evt = "2ndline_mbc",
                input = {
-                 q_default = if (fl.idfs==1) {
+                 q_default <- if (fl.idfs==1) {
                                 util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
                               } else if (fl.idfs==0 & fl.mbcs==0) {
                                 util.remission * fl.remission + fl.recurrence*util.recurrence
