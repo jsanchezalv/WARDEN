@@ -234,9 +234,9 @@ evt_react_list <-
                input = {})  %>%
   add_reactevt(name_evt = "b1",
                input = {
-                 modify_item(list(q_default = 0,
-                                  c_default = 0, 
-                                  curtime = Inf)) 
+                 q_default = 0
+                 c_default = 0 
+                 curtime = Inf
                }) 
 
 util_ongoing <- "q_default"

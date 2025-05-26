@@ -150,29 +150,23 @@ evt_react_list <-
                input = {}) %>%
   add_reactevt(name_evt = "sicker",
                input = {
-                 modify_item(list(q_default = util.sicker,
-                                  c_default = cost.sicker + if(arm=="int"){cost.int}else{0},
-                                  fl.sick = 0)) 
-                 
+                 q_default <- util.sicker
+                 c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
+                 fl.sick <- 0 
                  
                  #We perform a luck adjustment randomly but being slightly more likely in the "noint" arm
                  if((runif(1) + ifelse(arm=="noint", 0.05,0) ) >0.8){
-                   modify_item(list(
-                     rnd_b = luck_adj(prevsurv = 1 - pnorm(q=curtime,12,3), cursurv = 1 - pnorm(q=curtime,10,2), luck = rnd_b, condq = FALSE)
-                     ))
-                   
-                   modify_event(list(
-                     death = max(0.0000001,qnorm(rnd_b, mean=10, sd=2))
-                                     ))
+                    rnd_b <- luck_adj(prevsurv = 1 - pnorm(q=curtime,12,3), cursurv = 1 - pnorm(q=curtime,10,2), luck = rnd_b, condq = FALSE)
+                    death <- max(0.0000001,qnorm(rnd_b, mean=10, sd=2))
                  }
                  
                  
                }) %>%
   add_reactevt(name_evt = "death",
                input = {
-                 modify_item(list(q_default = 0,
-                                  c_default = 0, 
-                                  curtime = Inf)) 
+                 q_default <- 0
+                 c_default <- 0
+                 curtime <- Inf
                }) 
 
 ```

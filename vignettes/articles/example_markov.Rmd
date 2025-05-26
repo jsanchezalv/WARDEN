@@ -167,19 +167,18 @@ evt_react_list <-
   add_reactevt(name_evt = "cycle",
                input = {
 
-                 modify_item_seq(list(
-                   q_default = trace %*% c(util1,util2,util3,util4),
-                   c_default = if(arm=="noint"){
+                 q_default <- trace %*% c(util1,util2,util3,util4)
+                 c_default <- if(arm=="noint"){
                                  trace %*% c(cost1+ cost_int,cost2+ cost_int,cost3+ cost_int,cost4)
                                } else{
                                  trace %*% c(cost1,cost2,cost3,cost4)
-                               },
-                   cycle_time = cycle_time + 1,
-                   trace = trace %*% transition #or transition_2
-                   )) 
+                               }
+                   cycle_time <- cycle_time + 1
+                   trace <- trace %*% transition #or transition_2
+                   
                  
                  if (max_n_cycles == cycle_time) {
-                   modify_item(list(curtime = Inf)) #Indicate end of simulation for patient
+                   curtime <- Inf #Indicate end of simulation for patient
                  }
                }) 
 
