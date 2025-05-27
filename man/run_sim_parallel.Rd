@@ -132,11 +132,14 @@ pasted with \code{cycle_l} and \code{cycle_starttime} (e.g., c_default_cycle_l a
 ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime
 being the starting time in which the variable started counting.
 
-\code{debug = TRUE} will export a log file with the timestamp up the error in the main working directory.
-If \code{continue_on_error} is set to FALSE, it will only export analysis level inputs due to the parallel engine
-(use single-engine for those inputs)
+\code{debug = TRUE} will export a log file with the timestamp up the error in the main working directory. Note that
+using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
+as the AST may not catch all the relevant assignments (e.g., an assigment like assign(paste("x_",i),5)
+in a loop will not be identified, unless using modify_item(_seq)).
 
-\code{continue_on_error} will skip the current simulation (so it won't continue for the rest of patient-arms) if TRUE.
+If \code{continue_on_error} is set to FALSE, it will only export analysis level inputs due to the parallel engine
+(use single-engine for those inputs) \code{continue_on_error} will skip the current simulation
+(so it won't continue for the rest of patient-arms) if TRUE.
 Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.
 }
 \examples{

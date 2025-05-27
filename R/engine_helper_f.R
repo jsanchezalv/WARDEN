@@ -243,7 +243,7 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
     )
   }
   
-  eval(react_list[[position]][["react"]], input_list_arm)
+  input_list_arm <- eval(react_list[[position]][["react"]], input_list_arm)
   
   if(input_list_arm$debug){
     

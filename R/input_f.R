@@ -659,7 +659,7 @@ modify_item_seq <- function(...){
   list_out <- list()
   
   if(input_list_arm$debug){ 
-    temp_dump <- mget(names(input_list),input_list_arm)
+    temp_dump <- mget(names(input_list),input_list_arm, ifnotfound = Inf)
   }
   
   for (inp in 1:length(input_list)) {
@@ -1211,16 +1211,7 @@ disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclv
 #'                  }
 #'                  if(j == TRUE){
 #'                    y[["w"]] <- 612-31+3
-#'                  }
-#'                }) %>%
-#'   add_reactevt(name_evt = "sicker",
-#'                input = {
-#'                  q_default <- util.sicker
-#'                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
-#'                  fl.sick   <- 0 
-#'                }) %>%
-#'   add_reactevt(name_evt = "death",
-#'                input = {
+#'                  }#'                
 #'                  q_default <- 0
 #'                  c_default <- 0
 #'                  curtime   <- Inf
@@ -1559,7 +1550,7 @@ extract_defs <- function(lst){
 #'    d <- b <- c <- 5
 #'  })
 #'  
-#'  extract_assignment_targets(expr)' 
+#'  extract_assignment_targets(expr)
 #' 
 #' 
 extract_assignment_targets <- function(expr) {
