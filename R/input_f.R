@@ -94,6 +94,32 @@ create_indicators <- function(sens,n_sensitivity,elem,n_elem_before=0){
 }
 
 
+# Create an iterator based on sens of the current iteration within a scenario (DSA) --------------------------------------------------------
+#' Create an iterator based on sens of the current iteration within a scenario (DSA)
+#'
+#' @param sens current analysis iterator
+#' @param n_sensitivity total number of analyses to be run
+#'
+#' @return Integer iterator based on the number of sensitivity analyses being run and the total iterator
+#' @export
+#' 
+#' @details
+#' In a situation like a DSA, where two (low and high) scenarios are run, sens will go from 1 to n_sensitivity*2. However,
+#' this is not ideal as the parameter selector may depend on knowing the parameter order (i.e., 1, 2, 3...), which means
+#' resetting the counter back to 1 once sens reaches n_sensitivity (or any multiple of n_sensitivity) is needed.
+#'
+#' @examples
+#' sens_iterator(5,20)
+#' sens_iterator(25,20)
+
+sens_iterator <- function(sens,n_sensitivity){
+  
+  out <- sens - n_sensitivity*floor((sens-1)/n_sensitivity)
+  
+  return(out)
+}
+
+
 # Helper to draw PSA values --------------------------------------------------------
 #' Helper function to create a list with random draws or whenever a series of functions needs to be called. Can be implemented within `pick_val_v`.
 #'
@@ -1175,12 +1201,32 @@ disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclv
 #'  and whether it's contained within a conditional statement
 #'
 #' @examples 
-#' a <- add_reactevt(name_evt="example",
-#'    input={
-#'       modify_item(list(w=5))
-#'    })
+#' evt_react_list2 <-
+#'   add_reactevt(name_evt = "sick",
+#'                input = {modify_item(list(a=1+5/3))
+#'                  assign("W", 5 + 3 / 6 )
+#'                  x[5] <- 18
+#'                  for(i in 1:5){
+#'                    assign(paste0("x_",i),5+3)
+#'                  }
+#'                  if(j == TRUE){
+#'                    y[["w"]] <- 612-31+3
+#'                  }
+#'                }) %>%
+#'   add_reactevt(name_evt = "sicker",
+#'                input = {
+#'                  q_default <- util.sicker
+#'                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
+#'                  fl.sick   <- 0 
+#'                }) %>%
+#'   add_reactevt(name_evt = "death",
+#'                input = {
+#'                  q_default <- 0
+#'                  c_default <- 0
+#'                  curtime   <- Inf
+#'                })
 #'    
-#'  extract_from_reactions(a)
+#'  extract_from_reactions(evt_react_list2)
 #' 
 #'
 #' @export
@@ -1252,7 +1298,7 @@ ast_as_list <- function(ee) {
   }
 
 
-#' Extracts items and events by looking into modify_item, modify_item_seq, modify_event and new_event
+#' Extracts items and events by looking into assignments, modify_item, modify_item_seq, modify_event and new_event
 #'
 #' @param node Relevant node within the nested AST list
 #' @param conditional_flag Boolean whether the statement is contained within a conditional statement
@@ -1319,21 +1365,16 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
     stringsAsFactors = FALSE
   )
   
-  # Base case: check if the node is a relevant function
   if (is.list(node)) {
-    # Safely extract and convert node[[1]] to character
     func_name <- if (!is.null(node[[1]])) as.character(node[[1]]) else NULL
     
+    # Case 1: modify_* / new_event
     if (!is.null(func_name) && any(func_name %in% c("modify_item_seq", "modify_item", "modify_event", "new_event"))) {
-      # Determine type
       type <- if (any(func_name %in% c("modify_item_seq", "modify_item"))) "item" else "event"
-      
-      # Extract list elements
       list_expr <- node[[2]]
       if (is.list(list_expr)) {
-        definition <- unlist(extract_defs(node),recursive=TRUE)
-        definition <- definition[!names(definition)==""]
-        
+        definition <- unlist(extract_defs(node), recursive = TRUE)
+        definition <- definition[!names(definition) == ""]
         results_temp <- data.frame(
           name = names(definition),
           type = type,
@@ -1341,19 +1382,65 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
           definition = definition,
           stringsAsFactors = FALSE
         )
-        
-        results <- rbind(results,results_temp)
+        results <- rbind(results, results_temp)
       }
     }
     
-    # Check if the node is an `if` block
-    if (!is.null(func_name) && any(func_name == "if")) {
-      # Process the condition
+    # Case 2: assignment via <- or =
+    if (!is.null(func_name) && func_name %in% c("<-", "=")) {
+
+      lhs <- node[[2]]
+      rhs <- node[[3]]
+      # Detect and extract from complex LHS expressions
+      if (is.symbol(lhs)) {
+        target_name <- as.character(lhs)
+      } else if (is.list(lhs)) {
+        target_name <- clean_output(expr_from_list(lhs))
+      } else {
+        target_name <- NA
+      }
+
+      if (!is.na(target_name)) {
+        results <- rbind(results, data.frame(
+          name = target_name,
+          type = "item",
+          conditional_flag = conditional_flag,
+          definition = clean_output(expr_from_list(rhs)),
+          stringsAsFactors = FALSE
+        ))
+      }
+    }
+    
+    # Case 3: assignment via assign()
+    if (!is.null(func_name) && func_name == "assign") {
+      if (length(node) >= 3) {
+        varname <- node[[2]]
+        if (is.character(varname)) {
+          varname <- as.character(varname)
+        } else if (is.list(varname)) {
+          varname <- clean_output(expr_from_list(varname))
+        }
+        
+        value_expr <- node[[3]]
+        if (is.character(varname)) {
+          results <- rbind(results, data.frame(
+            name = varname,
+            type = "item",
+            conditional_flag = conditional_flag,
+            definition = clean_output(expr_from_list(value_expr)),
+            stringsAsFactors = FALSE
+          ))
+        }
+      }
+    }
+    
+    # Case 4: if statement → propagate conditional flag
+    if (!is.null(func_name) && func_name == "if") {
       conditional_flag <- TRUE
     }
   }
   
-  # Recursive case: iterate through list elements
+  # Recursively walk children
   if (is.list(node)) {
     for (child in node) {
       results <- rbind(results, extract_elements_from_list(child, conditional_flag))
@@ -1361,10 +1448,9 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
   }
   
   results <- results[!(is.na(results$name) | results$name == "" | is.na(results$definition)), ]
-  
-  
-  return(results)
+  results
 }
+
 
 #' Loop to extract an expression from a list
 #'
@@ -1476,11 +1562,10 @@ extract_defs <- function(lst){
 #'  extract_assignment_targets(expr)' 
 #' 
 #' 
-
 extract_assignment_targets <- function(expr) {
   assigned <- character()
   
-  walk <- function(node) {
+  walk_node <- function(node) {
     if (is.call(node)) {
       fname <- as.character(node[[1]])
       
@@ -1498,7 +1583,7 @@ extract_assignment_targets <- function(expr) {
         } else if (is.call(lhs) && lhs[[1]] == as.name("[")) {
           assigned <<- c(assigned, as.character(lhs[[2]]))
         }
-        walk(node[[3]])  # Recurse on RHS
+        walk_node(node[[3]])  # Recurse on RHS
       }
       
       # Handle assign("var", value)
@@ -1510,18 +1595,18 @@ extract_assignment_targets <- function(expr) {
           assigned <<- c(assigned, as.character(varname))
         }
         # Recurse on value
-        if (length(node) >= 3) walk(node[[3]])
+        if (length(node) >= 3) walk_node(node[[3]])
       }
       
       # Recurse into all sub-calls
       for (arg in as.list(node)[-1]) {
-        walk(arg)
+        walk_node(arg)
       }
     } else if (is.expression(node) || is.call(node)) {
-      for (item in as.list(node)) walk(item)
+      for (item in as.list(node)) walk_node(item)
     }
   }
   
-  walk(expr)
+  walk_node(expr)
   unique(assigned)
 }
