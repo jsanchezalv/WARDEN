@@ -25,7 +25,7 @@
 #' @param ipd Integer taking value 1 for full IPD data returned, and 2 IPD data but aggregating events (returning last value for numeric/character/factor variables. For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear). Other values mean no IPD data returned (removes non-numerical or length>1 items)
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
-#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
+#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. If TRUE, user must use `modify_item` and `modify_item_seq` or results will be incorrect.
 #' @param continue_on_error If TRUE, on error it will attempt to continue by skipping the current simulation 
 #' @param seed Starting seed to be used for the whole analysis. If null, it's set to 1 by default.
 #'
@@ -60,11 +60,15 @@
 #'  so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically 
 #'  look back until event 1). Note that in previous versions of the package backward was the default, and now this has switched to forward.
 #'  
+#'  If using `accum_backwards = TRUE`, then it is mandatory for the user to use `modify_item` and `modify_item_seq` in event reactions,
+#'   as the standard assignment approach (e.g., `a <- 5`) will not calculate the right results, particularly in the presence of
+#'   conditional statements.  
+#'   
 #'  It is important to note that the QALYs and Costs (ongoing or instant or per cycle) used should be of length 1. 
 #'  If they were of length > 1, the model would expand the data,
 #'   so instead of having each event as a row, the event would have N rows (equal to the length of the costs/qalys to discount passed). 
 #'   This means more processing of the results data would be needed in order for it to provide the correct results.
-#'  
+#'   #'  
 #'  If the `cycle` lists are used, then it is expected the user will declare as well the name of the variable
 #'   pasted with `cycle_l` and `cycle_starttime` (e.g., c_default_cycle_l and c_default_cycle_starttime) to 
 #'   ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime 

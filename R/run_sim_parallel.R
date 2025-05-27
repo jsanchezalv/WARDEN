@@ -36,7 +36,7 @@ if(getRversion() >= "2.15.1") {
 #' @param ipd Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
-#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
+#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. If TRUE, user must use `modify_item` and `modify_item_seq` or results will be incorrect.
 #' @param continue_on_error If TRUE, on error  at patient stage will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1, not at the patient level)
 #' @param seed Starting seed to be used for the whole analysis. If null, it's set to 1 by default.
 #'
@@ -76,6 +76,10 @@ if(getRversion() >= "2.15.1") {
 #' changes looking forward (e.g., o_q = utility at event 1, at event 2 utility does not change, but at event 3 it does, 
 #' so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically 
 #' look back until event 1). Note that in previous versions of the package backward was the default, and now this has switched to forward.
+#' 
+#' If using `accum_backwards = TRUE`, then it is mandatory for the user to use `modify_item` and `modify_item_seq` in event reactions,
+#'   as the standard assignment approach (e.g., `a <- 5`) will not calculate the right results, particularly in the presence of
+#'   conditional statements.
 #' 
 #' If the `cycle` lists are used, then it is expected the user will declare as well the name of the variable
 #'  pasted with `cycle_l` and `cycle_starttime` (e.g., c_default_cycle_l and c_default_cycle_starttime) to 

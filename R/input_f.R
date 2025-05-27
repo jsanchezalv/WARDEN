@@ -1215,6 +1215,7 @@ disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclv
 #'                  q_default <- 0
 #'                  c_default <- 0
 #'                  curtime   <- Inf
+#'                  d <- c <- k <- 67
 #'                })
 #'    
 #'  extract_from_reactions(evt_react_list2)

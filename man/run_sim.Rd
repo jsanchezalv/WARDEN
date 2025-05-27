@@ -86,7 +86,7 @@ run_sim(
 
 \item{debug}{If TRUE, will generate a log file}
 
-\item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.}
+\item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. If TRUE, user must use \code{modify_item} and \code{modify_item_seq} or results will be incorrect.}
 
 \item{continue_on_error}{If TRUE, on error it will attempt to continue by skipping the current simulation}
 
@@ -123,11 +123,15 @@ changes looking forward (e.g., o_q = utility at event 1, at event 2 utility does
 so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically
 look back until event 1). Note that in previous versions of the package backward was the default, and now this has switched to forward.
 
+If using \code{accum_backwards = TRUE}, then it is mandatory for the user to use \code{modify_item} and \code{modify_item_seq} in event reactions,
+as the standard assignment approach (e.g., \code{a <- 5}) will not calculate the right results, particularly in the presence of
+conditional statements.
+
 It is important to note that the QALYs and Costs (ongoing or instant or per cycle) used should be of length 1.
 If they were of length > 1, the model would expand the data,
 so instead of having each event as a row, the event would have N rows (equal to the length of the costs/qalys to discount passed).
 This means more processing of the results data would be needed in order for it to provide the correct results.
-
+#'
 If the \code{cycle} lists are used, then it is expected the user will declare as well the name of the variable
 pasted with \code{cycle_l} and \code{cycle_starttime} (e.g., c_default_cycle_l and c_default_cycle_starttime) to
 ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime

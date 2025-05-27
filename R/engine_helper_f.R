@@ -230,7 +230,7 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
   }
 
 # Evaluate reaction -------------------------------------------------------
-
+  #debug bit (pre-evaluation)
   if(input_list_arm$debug){
     prev_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm, ifnotfound = Inf)
     
@@ -243,8 +243,10 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
     )
   }
   
+  #evaluate event
   input_list_arm <- eval(react_list[[position]][["react"]], input_list_arm)
   
+  #debug bit (after evaluation)
   if(input_list_arm$debug){
     
     cur_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm)
@@ -496,7 +498,7 @@ expand_evts_bwd <- function(data, time_points, reset_columns = NULL) {
     is_last_expansion <- sequence(num_expanded_rows) == num_expanded_rows
     
     # Reset the specified columns for all non-last expanded rows
-    expanded_data[!is_last_expansion, (columns_to_reset) := 0, with = FALSE]
+    expanded_data[!is_last_expansion, (columns_to_reset) := 0]
   }
   
   # Make sure prevtime doesn't exceed evttime
@@ -555,7 +557,7 @@ expand_evts_fwd <- function(data, time_points, reset_columns = NULL) {
     # Create a vector indicating which rows are the first in their expanded series
     is_first_expansion <- sequence(num_expanded_rows) == 1
     
-    expanded_data[!is_first_expansion, (columns_to_reset) := 0, with = FALSE]
+    expanded_data[!is_first_expansion, (columns_to_reset) := 0]
   }
   
   expanded_data[, prevtime := shift(evttime, fill = 0), by = .(pat_id, arm)]
@@ -914,7 +916,7 @@ compute_outputs <- function(patdata,input_list) {
   
 
   if(input_list$accum_backwards){ #if accumulating backwards, need to rewrite values
-  
+
     for (cat in input_list$uc_lists$ongoing_inputs) {
       cat_lastupdate <- paste0(cat, "_lastupdate")
   

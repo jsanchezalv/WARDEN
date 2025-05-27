@@ -31,6 +31,7 @@ evt_react_list2 <-
                  q_default <- 0
                  c_default <- 0
                  curtime   <- Inf
+                 d <- c <- k <- 67
                })
    
  extract_from_reactions(evt_react_list2)

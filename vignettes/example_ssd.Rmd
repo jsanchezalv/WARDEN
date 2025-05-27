@@ -157,6 +157,34 @@ evt_react_list <-
                  curtime   <- Inf
                }) 
 
+
+# Below how it would be set up if using `accum_backwards = TRUE` in `run_sim()` (and will give equal final results)
+# Note that we set the value applied in the reaction right up to the event, changing the interpretation of the reaction
+# It is also a slower method than the standard approach
+# In this case we use `modify_item_seq` in the reaction for death, but given that the items are not interacting with each other,
+# we could use `modify_item` instead and make the computation faster
+#
+# evt_react_list <-
+#     add_reactevt(name_evt = "sick",
+#                  input = {}) %>%
+#     add_reactevt(name_evt = "sicker",
+#                  input = {
+#                      modify_item(list(
+#                      q_default = util.sick,
+#                      c_default = cost.sick + if(arm=="int"){cost.int}else{0},
+#                      fl.sick = 0
+#                      ))
+#                  }) %>%
+#     add_reactevt(name_evt = "death",
+#                  input = {
+#                      c_dis <- if(fl.sick==1){cost.sick}else{cost.sicker} 
+#                      modify_item_seq(list(
+#                      q_default = if(fl.sick==1){util.sick}else{util.sicker},
+#                      c_default = c_dis + if(arm=="int"){cost.int}else{0},
+#                      curtime = Inf
+#                      ))
+#                  }) 
+
 ```
 
 ### Extract Interactions Within Events
