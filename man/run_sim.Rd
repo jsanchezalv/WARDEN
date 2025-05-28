@@ -115,7 +115,7 @@ c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "
 The engine uses the L'Ecuyer-CMRG for the random number generator.
 Note that the random seeds are set to be unique in their category (i.e., at patient level, patient-arm level, etc.)
 
-If no \code{drc} or `drq parameters are passed within any of the input lists, these are assigned value 0.03.
+If no \code{drc} or \code{drq} parameters are passed within \code{sensitivity} or \code{common_all} input lists, these are assigned a default value 0.03 for discounting costs, QALYs and others.
 
 Ongoing items will look backward to the last time updated when performing the discounting and accumulation.
 This means that the user does not necessarily need to keep updating the value, but only add it when the value

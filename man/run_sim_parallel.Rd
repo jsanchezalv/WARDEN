@@ -117,9 +117,9 @@ c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "
 The engine uses the L'Ecuyer-CMRG for the random number generator.
 Note that if ncores > 1, then results per simulation will only be exactly replicable if using run_sim_parallel
 (as seeds are automatically transformed to be seven integer seeds -i.e, L'Ecuyer-CMRG seeds-)
-
-If no \code{drc} or \code{drq} parameters are passed within any of the input lists, these are assigned value 0.03.
 Note that the random seeds are set to be unique in their category (i.e., at patient level, patient-arm level, etc.)
+
+If no \code{drc} or \code{drq} parameters are passed within \code{sensitivity} or \code{common_all} input lists, these are assigned a default value 0.03 for discounting costs, QALYs and others.
 
 Ongoing items will look backward to the last time updated when performing the discounting and accumulation.
 This means that the user does not necessarily need to keep updating the value, but only add it when the value
@@ -139,7 +139,7 @@ being the starting time in which the variable started counting.
 \code{debug = TRUE} will export a log file with the timestamp up the error in the main working directory. Note that
 using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
 as the AST may not catch all the relevant assignments (e.g., an assigment like assign(paste("x_",i),5)
-in a loop will not be identified, unless using modify_item(_seq)).
+in a loop will not be identified, unless using modify_item()).
 
 If \code{continue_on_error} is set to FALSE, it will only export analysis level inputs due to the parallel engine
 (use single-engine for those inputs) \code{continue_on_error} will skip the current simulation
