@@ -68,7 +68,7 @@ common_all_inputs <-add_item(
                       HR_int = 0.8,
                       drc = 0.035, #different values than what's assumed by default
                       drq = 0.035,
-                      random_seed_sicker_i = sample.int(100000,1000,replace = FALSE)
+                      random_seed_sicker_i = sample.int(100000,npats,replace = FALSE)
 )  #to be used as seeds to draw the time to event for sicker, to ensure same luck for the same patient independently of the arm
 
 
