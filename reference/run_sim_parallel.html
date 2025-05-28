@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -190,7 +190,7 @@
 
 
 <dt id="arg-accum-backwards">accum_backwards<a class="anchor" aria-label="anchor" href="#arg-accum-backwards"></a></dt>
-<dd><p>If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.</p></dd>
+<dd><p>If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. If TRUE, user must use <code>modify_item</code> and <code>modify_item_seq</code> or results will be incorrect.</p></dd>
 
 
 <dt id="arg-continue-on-error">continue_on_error<a class="anchor" aria-label="anchor" href="#arg-continue-on-error"></a></dt>
@@ -218,22 +218,28 @@ This time has been selected as it's relatively small yet not so small as to be i
 c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "i", "prevtime", "sens", "simulation", "sens_name_used","list_env","uc_lists","npats","ipd").</p>
 <p>The engine uses the L'Ecuyer-CMRG for the random number generator.
 Note that if ncores &gt; 1, then results per simulation will only be exactly replicable if using run_sim_parallel
-(as seeds are automatically transformed to be seven integer seeds -i.e, L'Ecuyer-CMRG seeds-)</p>
-<p>If no <code>drc</code> or <code>drq</code> parameters are passed within any of the input lists, these are assigned value 0.03.
+(as seeds are automatically transformed to be seven integer seeds -i.e, L'Ecuyer-CMRG seeds-)
 Note that the random seeds are set to be unique in their category (i.e., at patient level, patient-arm level, etc.)</p>
+<p>If no <code>drc</code> or <code>drq</code> parameters are passed within <code>sensitivity</code> or <code>common_all</code> input lists, these are assigned a default value 0.03 for discounting costs, QALYs and others.</p>
 <p>Ongoing items will look backward to the last time updated when performing the discounting and accumulation.
 This means that the user does not necessarily need to keep updating the value, but only add it when the value
 changes looking forward (e.g., o_q = utility at event 1, at event 2 utility does not change, but at event 3 it does,
 so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically
 look back until event 1). Note that in previous versions of the package backward was the default, and now this has switched to forward.</p>
+<p>If using <code>accum_backwards = TRUE</code>, then it is mandatory for the user to use <code>modify_item</code> and <code>modify_item_seq</code> in event reactions,
+as the standard assignment approach (e.g., <code>a &lt;- 5</code>) will not calculate the right results, particularly in the presence of
+conditional statements.</p>
 <p>If the <code>cycle</code> lists are used, then it is expected the user will declare as well the name of the variable
 pasted with <code>cycle_l</code> and <code>cycle_starttime</code> (e.g., c_default_cycle_l and c_default_cycle_starttime) to
 ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime
 being the starting time in which the variable started counting.</p>
-<p><code>debug = TRUE</code> will export a log file with the timestamp up the error in the main working directory.
-If <code>continue_on_error</code> is set to FALSE, it will only export analysis level inputs due to the parallel engine
-(use single-engine for those inputs)</p>
-<p><code>continue_on_error</code> will skip the current simulation (so it won't continue for the rest of patient-arms) if TRUE.
+<p><code>debug = TRUE</code> will export a log file with the timestamp up the error in the main working directory. Note that
+using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
+as the AST may not catch all the relevant assignments (e.g., an assigment like assign(paste("x_",i),5)
+in a loop will not be identified, unless using modify_item()).</p>
+<p>If <code>continue_on_error</code> is set to FALSE, it will only export analysis level inputs due to the parallel engine
+(use single-engine for those inputs) <code>continue_on_error</code> will skip the current simulation
+(so it won't continue for the rest of patient-arms) if TRUE.
 Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.</p>
     </div>
 
@@ -304,8 +310,8 @@ Note that this will make the progress bar not correct, as a set of patients that
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Analysis number: 1</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: foreach</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation number: 1</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Time to run analysis 1: 1.01s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Total time to run: 1.01s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time to run analysis 1: 0.99s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Total time to run: 0.99s</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]$sensitivity_name</span>

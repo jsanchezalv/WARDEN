@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">May 26, 2025</h4>
+            <h4 data-toc-skip class="date">May 28, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_ssd_sobol.Rmd" class="external-link"><code>vignettes/articles/example_ssd_sobol.Rmd</code></a></small>
       <div class="d-none name"><code>example_ssd_sobol.Rmd</code></div>
@@ -217,15 +217,15 @@ number</p>
 <span>               input <span class="op">=</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"sicker"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="va">util.sicker</span>,</span>
-<span>                                  c_default <span class="op">=</span> <span class="va">cost.sicker</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span>,</span>
-<span>                                  fl.sick <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="va">util.sicker</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.sicker</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span></span>
+<span>                 <span class="va">fl.sick</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"death"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>                                  c_default <span class="op">=</span> <span class="fl">0</span>, </span>
-<span>                                  curtime <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="fl">0</span> </span>
+<span>                 <span class="va">curtime</span> <span class="op">&lt;-</span> <span class="cn">Inf</span> </span>
 <span>               <span class="op">}</span><span class="op">)</span> </span></code></pre></div>
 </div>
 </div>
@@ -274,17 +274,17 @@ the different speed of convergence.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.5s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.44s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.63s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.58s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.42s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.42s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.42s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 2.4s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.4s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.37s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 2.11s</span></span>
+<span><span class="co">#&gt; Total time to run: 2.12s</span></span>
 <span></span>
 <span><span class="va">results_sobol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
 <span>  npats<span class="op">=</span><span class="va">N</span>,                               </span>
@@ -304,17 +304,17 @@ the different speed of convergence.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.42s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.42s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.42s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.37s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.43s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.43s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 2.13s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.14s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 5: 0.37s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 1.83s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.83s</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -480,17 +480,17 @@ model converge much more slowly than the sobol sequences.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.43s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.37s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.44s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.38s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.44s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.54s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.43s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.44s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 2.19s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.35s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 2s</span></span>
+<span><span class="co">#&gt; Total time to run: 2s</span></span>
 <span></span>
 <span><span class="va">results_sobol_psa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
 <span>  npats<span class="op">=</span><span class="va">N</span>,                               </span>
@@ -511,17 +511,17 @@ model converge much more slowly than the sobol sequences.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.44s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.44s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.35s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.45s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.43s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.44s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 2.2s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.2s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 5: 0.36s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 1.8s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.8s</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

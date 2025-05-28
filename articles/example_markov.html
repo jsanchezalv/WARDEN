@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">May 26, 2025</h4>
+            <h4 data-toc-skip class="date">May 28, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_markov.Rmd" class="external-link"><code>vignettes/articles/example_markov.Rmd</code></a></small>
       <div class="d-none name"><code>example_markov.Rmd</code></div>
@@ -277,19 +277,18 @@ post-processing to be adequate).</p>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"cycle"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
 <span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item_seq.html">modify_item_seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>                   q_default <span class="op">=</span> <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">util1</span>,<span class="va">util2</span>,<span class="va">util3</span>,<span class="va">util4</span><span class="op">)</span>,</span>
-<span>                   c_default <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">)</span><span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">util1</span>,<span class="va">util2</span>,<span class="va">util3</span>,<span class="va">util4</span><span class="op">)</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">)</span><span class="op">{</span></span>
 <span>                                 <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cost1</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost2</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost3</span><span class="op">+</span> <span class="va">cost_int</span>,<span class="va">cost4</span><span class="op">)</span></span>
 <span>                               <span class="op">}</span> <span class="kw">else</span><span class="op">{</span></span>
 <span>                                 <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cost1</span>,<span class="va">cost2</span>,<span class="va">cost3</span>,<span class="va">cost4</span><span class="op">)</span></span>
-<span>                               <span class="op">}</span>,</span>
-<span>                   cycle_time <span class="op">=</span> <span class="va">cycle_time</span> <span class="op">+</span> <span class="fl">1</span>,</span>
-<span>                   trace <span class="op">=</span> <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">transition</span> <span class="co">#or transition_2</span></span>
-<span>                   <span class="op">)</span><span class="op">)</span> </span>
+<span>                               <span class="op">}</span></span>
+<span>                   <span class="va">cycle_time</span> <span class="op">&lt;-</span> <span class="va">cycle_time</span> <span class="op">+</span> <span class="fl">1</span></span>
+<span>                   <span class="va">trace</span> <span class="op">&lt;-</span> <span class="va">trace</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">transition</span> <span class="co">#or transition_2</span></span>
+<span>                   </span>
 <span>                 </span>
 <span>                 <span class="kw">if</span> <span class="op">(</span><span class="va">max_n_cycles</span> <span class="op">==</span> <span class="va">cycle_time</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                   <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>curtime <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> <span class="co">#Indicate end of simulation for patient</span></span>
+<span>                   <span class="va">curtime</span> <span class="op">&lt;-</span> <span class="cn">Inf</span> <span class="co">#Indicate end of simulation for patient</span></span>
 <span>                 <span class="op">}</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> </span></code></pre></div>
 </div>
@@ -359,7 +358,7 @@ to indicate <code>npats = 1</code>.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Time to run analysis 1: 0.07s</span></span>
 <span><span class="co">#&gt; Total time to run: 0.07s</span></span></code></pre></div>
 </div>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,15 +67,37 @@ and whether it's contained within a conditional statement</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt<span class="op">=</span><span class="st">"example"</span>,</span></span>
-<span class="r-in"><span>   input<span class="op">=</span><span class="op">{</span></span></span>
-<span class="r-in"><span>      <span class="fu"><a href="modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>w<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>   <span class="op">}</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">evt_react_list2</span> <span class="op">&lt;-</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"sick"</span>,</span></span>
+<span class="r-in"><span>               input <span class="op">=</span> <span class="op">{</span><span class="fu"><a href="modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a<span class="op">=</span><span class="fl">1</span><span class="op">+</span><span class="fl">5</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                 <span class="fu"><a href="https://rdrr.io/r/base/assign.html" class="external-link">assign</a></span><span class="op">(</span><span class="st">"W"</span>, <span class="fl">5</span> <span class="op">+</span> <span class="fl">3</span> <span class="op">/</span> <span class="fl">6</span> <span class="op">)</span></span></span>
+<span class="r-in"><span>                 <span class="va">x</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">18</span></span></span>
+<span class="r-in"><span>                 <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>                   <span class="fu"><a href="https://rdrr.io/r/base/assign.html" class="external-link">assign</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"x_"</span>,<span class="va">i</span><span class="op">)</span>,<span class="fl">5</span><span class="op">+</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                 <span class="op">}</span></span></span>
+<span class="r-in"><span>                 <span class="kw">if</span><span class="op">(</span><span class="va">j</span> <span class="op">==</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>                   <span class="va">y</span><span class="op">[[</span><span class="st">"w"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">612</span><span class="op">-</span><span class="fl">31</span><span class="op">+</span><span class="fl">3</span></span></span>
+<span class="r-in"><span>                 <span class="op">}</span><span class="co">#'                </span></span></span>
+<span class="r-in"><span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></span>
+<span class="r-in"><span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></span>
+<span class="r-in"><span>                 <span class="va">curtime</span>   <span class="op">&lt;-</span> <span class="cn">Inf</span></span></span>
+<span class="r-in"><span>                 <span class="va">d</span> <span class="op">&lt;-</span> <span class="va">c</span> <span class="op">&lt;-</span> <span class="va">k</span> <span class="op">&lt;-</span> <span class="fl">67</span></span></span>
+<span class="r-in"><span>               <span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-in"><span>   </span></span>
-<span class="r-in"><span> <span class="fu">extract_from_reactions</span><span class="op">(</span><span class="va">a</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      event   name   type conditional_flag definition</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;lgcl&gt;     &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: example      w   item            FALSE          5</span>
+<span class="r-in"><span> <span class="fu">extract_from_reactions</span><span class="op">(</span><span class="va">evt_react_list2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      event            name   type conditional_flag   definition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;char&gt;          &lt;char&gt; &lt;char&gt;           &lt;lgcl&gt;       &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:   sick               a   item            FALSE      1 + 5/3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:   sick               W   item            FALSE      5 + 3/6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:   sick            x[5]   item            FALSE           18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:   sick paste0('x_', i)   item            FALSE        5 + 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:   sick        y[['w']]   item             TRUE 612 - 31 + 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   sick       q_default   item            FALSE            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   sick       c_default   item            FALSE            0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:   sick         curtime   item            FALSE          Inf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:   sick               d   item            FALSE c &lt;- k &lt;- 67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:   sick               c   item            FALSE      k &lt;- 67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11:   sick               k   item            FALSE           67</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
