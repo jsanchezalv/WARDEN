@@ -89,7 +89,7 @@ run_sim_parallel(
 
 \item{debug}{If TRUE, will generate a log file}
 
-\item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.}
+\item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. If TRUE, user must use \code{modify_item} and \code{modify_item_seq} or results will be incorrect.}
 
 \item{continue_on_error}{If TRUE, on error  at patient stage will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1, not at the patient level)}
 
@@ -117,9 +117,9 @@ c("arm", "arm_list", "categories_for_export", "cur_evtlist", "curtime", "evt", "
 The engine uses the L'Ecuyer-CMRG for the random number generator.
 Note that if ncores > 1, then results per simulation will only be exactly replicable if using run_sim_parallel
 (as seeds are automatically transformed to be seven integer seeds -i.e, L'Ecuyer-CMRG seeds-)
-
-If no \code{drc} or \code{drq} parameters are passed within any of the input lists, these are assigned value 0.03.
 Note that the random seeds are set to be unique in their category (i.e., at patient level, patient-arm level, etc.)
+
+If no \code{drc} or \code{drq} parameters are passed within \code{sensitivity} or \code{common_all} input lists, these are assigned a default value 0.03 for discounting costs, QALYs and others.
 
 Ongoing items will look backward to the last time updated when performing the discounting and accumulation.
 This means that the user does not necessarily need to keep updating the value, but only add it when the value
@@ -127,16 +127,23 @@ changes looking forward (e.g., o_q = utility at event 1, at event 2 utility does
 so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically
 look back until event 1). Note that in previous versions of the package backward was the default, and now this has switched to forward.
 
+If using \code{accum_backwards = TRUE}, then it is mandatory for the user to use \code{modify_item} and \code{modify_item_seq} in event reactions,
+as the standard assignment approach (e.g., \code{a <- 5}) will not calculate the right results, particularly in the presence of
+conditional statements.
+
 If the \code{cycle} lists are used, then it is expected the user will declare as well the name of the variable
 pasted with \code{cycle_l} and \code{cycle_starttime} (e.g., c_default_cycle_l and c_default_cycle_starttime) to
 ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime
 being the starting time in which the variable started counting.
 
-\code{debug = TRUE} will export a log file with the timestamp up the error in the main working directory.
-If \code{continue_on_error} is set to FALSE, it will only export analysis level inputs due to the parallel engine
-(use single-engine for those inputs)
+\code{debug = TRUE} will export a log file with the timestamp up the error in the main working directory. Note that
+using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
+as the AST may not catch all the relevant assignments (e.g., an assigment like assign(paste("x_",i),5)
+in a loop will not be identified, unless using modify_item()).
 
-\code{continue_on_error} will skip the current simulation (so it won't continue for the rest of patient-arms) if TRUE.
+If \code{continue_on_error} is set to FALSE, it will only export analysis level inputs due to the parallel engine
+(use single-engine for those inputs) \code{continue_on_error} will skip the current simulation
+(so it won't continue for the rest of patient-arms) if TRUE.
 Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.
 }
 \examples{

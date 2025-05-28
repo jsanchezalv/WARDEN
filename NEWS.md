@@ -1,3 +1,11 @@
+# WARDEN 1.0
+* Major update: now the engine uses environments instead of lists, which allows user to remove "modify_item" and "modify_item_seq" from their code,
+improving running speed by 20-40%
+* Secondary changes to accommodate this update applied throughout (extract reactions, debug mode).
+* Debug mode now uses abstract syntax tree to capture assignments, which can be limited in the presence of dynamic code assignments.
+* sens_iterator function added to facilitate looping through DSA or multiple scenarios in a single model run. 
+See the input selectors vignette in the website for an example.
+
 # WARDEN 0.99.3
 * Minor fix in run_sim_parallel to ensure compatibility with future package (had some "=T" instead of "=TRUE")
 * Added BugsReport link in Description

@@ -71,7 +71,7 @@ run_engine <- function(arm_list,
         )
         
         names(dump_info) <- paste0("Analysis: ", input_list_pt$sens," ", input_list_pt$sens_name_used,
-                                   "; Sim: ", input_list_pt$sim,
+                                   "; Sim: ", input_list_pt$simulation,
                                    "; Patient: ", input_list_pt$i,
                                    "; Initial Patient Conditions"
         )
@@ -116,7 +116,7 @@ run_engine <- function(arm_list,
           )
 
           names(dump_info) <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                                     "; Sim: ", input_list_arm$sim,
+                                     "; Sim: ", input_list_arm$simulation,
                                      "; Patient: ", input_list_arm$i,
                                      "; Initial Patient-Arm Conditions"
           )
@@ -151,7 +151,7 @@ run_engine <- function(arm_list,
       )
       
       names(dump_info) <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                                 "; Sim: ", input_list_arm$sim,
+                                 "; Sim: ", input_list_arm$simulation,
                                  "; Patient: ", input_list_arm$i,
                                  "; Initialize Time to Events for Patient-Arm"
       )
@@ -166,9 +166,9 @@ run_engine <- function(arm_list,
 
       # 3 Loop per event --------------------------------------------------------
       #Main environment of reference is this one
-      list_env <- list(list_env = environment())
-
-      input_list_arm <- c(input_list_arm, list_env)
+      # list_env <- list(list_env = environment())
+  
+      # input_list_arm <- c(input_list_arm, list_env)
       this_patient[[arm]]$evtlist <- NULL
 
       input_list_arm <- c(input_list_arm,output_list)
@@ -183,6 +183,20 @@ run_engine <- function(arm_list,
       }
 
       n_evt <- 0
+   
+      if(input_list$accum_backwards){
+        input_list_arm$ongoing_inputs_lu <- paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate",recycle0 = TRUE)
+        inputs_out_v <- c(input_list_arm$input_out,
+                          input_list_arm$ongoing_inputs_lu
+        )
+      }else{
+        inputs_out_v <-  input_list_arm$input_out
+      }
+      
+      input_list_arm <- as.environment(input_list_arm)
+      parent.env(input_list_arm) <- environment()
+      # list2env(list_env, input_list_arm)
+      
       while(input_list_arm$curtime < Inf){
 
         # Get next event, process, repeat
@@ -199,7 +213,9 @@ run_engine <- function(arm_list,
           input_list_arm <- react_evt(Evt, arm, input_list_arm)
           
           #Get extra objects to be exported
-          extra_data <- input_list_arm[input_out_v]
+
+          extra_data <-  mget(inputs_out_v, input_list_arm) 
+
           
           extra_data <- extra_data[!sapply(extra_data,is.null)]
  
