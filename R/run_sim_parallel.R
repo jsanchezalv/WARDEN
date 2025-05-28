@@ -473,6 +473,10 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                   if(exists("simulation")){simulation}else{"None"},
                   ". Error message: ",final_output$error_m
           )
+          if(debug){
+            return(list(final_output))
+          }
+          
           return(list(NULL))
         } else{
           stop(final_output$error_m)

@@ -437,7 +437,7 @@ run_sim <- function(arm_list=c("int","noint"),
                                         unique_pt_inputs=unique_pt_inputs,
                                         input_list = input_list,
                                         pb = pb,
-                                        seed = seed)                    
+                                        seed = seed)    
       
       if(!is.null(final_output$error_m)){
         if((n_sim > 1 | n_sensitivity > 1) & continue_on_error){
@@ -448,6 +448,10 @@ run_sim <- function(arm_list=c("int","noint"),
                   if(exists("simulation")){simulation}else{"None"},
                   ". Error message: ",final_output$error_m
                   )
+          if(debug){
+            output_sim[[sens]][[simulation]] <- final_output
+          }
+          
           next
         } else{
         stop(final_output$error_m)
@@ -459,7 +463,6 @@ run_sim <- function(arm_list=c("int","noint"),
       }
       
       final_output <- c(list(sensitivity_name = sens_name_used), final_output)
-      
       
       
       if(debug){
@@ -532,7 +535,7 @@ run_sim <- function(arm_list=c("int","noint"),
       if(.skip_to_next) { next } 
       
     }
-
+    
     message(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
     
