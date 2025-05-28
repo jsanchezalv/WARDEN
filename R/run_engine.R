@@ -166,9 +166,9 @@ run_engine <- function(arm_list,
 
       # 3 Loop per event --------------------------------------------------------
       #Main environment of reference is this one
-      list_env <- list(list_env = environment())
+      # list_env <- list(list_env = environment())
   
-      input_list_arm <- c(input_list_arm, list_env)
+      # input_list_arm <- c(input_list_arm, list_env)
       this_patient[[arm]]$evtlist <- NULL
 
       input_list_arm <- c(input_list_arm,output_list)
@@ -186,6 +186,7 @@ run_engine <- function(arm_list,
       
       input_list_arm <- as.environment(input_list_arm)
       parent.env(input_list_arm) <- environment()
+      # list2env(list_env, input_list_arm)
       
       while(input_list_arm$curtime < Inf){
 
