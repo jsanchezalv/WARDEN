@@ -5,8 +5,9 @@
 
 `WARDEN` is a user-friendly package that facilitates the use of discrete
 event simulations without resource constraints for cost-effectiveness
-analysis. The package supports a flexible, practical approach to
-discrete event simulation while keeping an acceptable performance.
+analysis. The package supports a flexible, transparent, practical
+approach to discrete event simulation while keeping an acceptable
+performance.
 
 The current version supports:
 
@@ -16,7 +17,9 @@ The current version supports:
 - Delayed execution of the main inputs to facilitate readability of the
   model
 - Implementation of structural and parameter uncertainty
-- Helper functions to facilitate drawing of time to events and the use of hazard ratios, as well as other functions to facilitate transparency
+- Helper functions to facilitate drawing of time to events and the use
+  of hazard ratios, as well as other functions to facilitate
+  transparency
 - Performing cost-effectiveness and uncertainty analysis
 
 It is recommended that the user checks the vignettes, first the simple
@@ -42,7 +45,8 @@ site](https://jsanchezalv.github.io/WARDEN/index.html) for more details
 on documentation and specific tutorials.
 
 For more details on the code, check our [Github
-repository](https://github.com/jsanchezalv/WARDEN) or our [CRAN site](https://cran.r-project.org/package=WARDEN).
+repository](https://github.com/jsanchezalv/WARDEN), or our [CRAN
+site](https://cran.r-project.org/package=WARDEN).
 
 ## Installation
 

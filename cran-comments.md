@@ -2,7 +2,7 @@
 
 * This is a package update. In this version I have:
 
-* Minor update to run_sim_parallel as it was using = T instead of = TRUE, which was flagged by future package as an issue for their next version
+* Fixed a few bugs when in debugging mode. Reworked some functions to use environment instead of lists for transparency and simulation speed improvements.
 
 ## R CMD check results
 
