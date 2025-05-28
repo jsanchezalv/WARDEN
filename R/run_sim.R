@@ -25,7 +25,7 @@
 #' @param ipd Integer taking value 1 for full IPD data returned, and 2 IPD data but aggregating events (returning last value for numeric/character/factor variables. For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear). Other values mean no IPD data returned (removes non-numerical or length>1 items)
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
-#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
+#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. If TRUE, user must use `modify_item` and `modify_item_seq` or results will be incorrect.
 #' @param continue_on_error If TRUE, on error it will attempt to continue by skipping the current simulation 
 #' @param seed Starting seed to be used for the whole analysis. If null, it's set to 1 by default.
 #'
@@ -52,7 +52,7 @@
 #'  The engine uses the L'Ecuyer-CMRG for the random number generator. 
 #'  Note that the random seeds are set to be unique in their category (i.e., at patient level, patient-arm level, etc.)
 #'  
-#'  If no `drc` or `drq parameters are passed within any of the input lists, these are assigned value 0.03.
+#'  If no `drc` or `drq` parameters are passed within `sensitivity` or `common_all` input lists, these are assigned a default value 0.03 for discounting costs, QALYs and others.
 #'  
 #'  Ongoing items will look backward to the last time updated when performing the discounting and accumulation.
 #'  This means that the user does not necessarily need to keep updating the value, but only add it when the value
@@ -60,17 +60,24 @@
 #'  so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically 
 #'  look back until event 1). Note that in previous versions of the package backward was the default, and now this has switched to forward.
 #'  
+#'  If using `accum_backwards = TRUE`, then it is mandatory for the user to use `modify_item` and `modify_item_seq` in event reactions,
+#'   as the standard assignment approach (e.g., `a <- 5`) will not calculate the right results, particularly in the presence of
+#'   conditional statements.  
+#'   
 #'  It is important to note that the QALYs and Costs (ongoing or instant or per cycle) used should be of length 1. 
 #'  If they were of length > 1, the model would expand the data,
 #'   so instead of having each event as a row, the event would have N rows (equal to the length of the costs/qalys to discount passed). 
 #'   This means more processing of the results data would be needed in order for it to provide the correct results.
-#'  
+#'   #'  
 #'  If the `cycle` lists are used, then it is expected the user will declare as well the name of the variable
 #'   pasted with `cycle_l` and `cycle_starttime` (e.g., c_default_cycle_l and c_default_cycle_starttime) to 
 #'   ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime 
 #'   being the starting time in which the variable started counting.
 #'   
-#'  `debug = TRUE` will export a log file with the timestamp up the error in the main working directory.
+#'  `debug = TRUE` will export a log file with the timestamp up the error in the main working directory. Note that
+#'  using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
+#'  as the AST may not catch all the relevant assignments (e.g., an assigment like assign(paste("x_",i),5)
+#'   in a loop will not be identified, unless using modify_item(_seq)).
 #'  
 #'  `continue_on_error` will skip the current simulation (so it won't continue for the rest of patient-arms) if TRUE.
 #'   Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.
@@ -269,6 +276,12 @@ run_sim <- function(arm_list=c("int","noint"),
     sens_name_used <- ""
     }
     
+    if(debug){
+      for (evt in names(evt_react_list)) {
+        evt_react_list[[evt]]$debug_vars <- extract_assignment_targets(evt_react_list[[evt]]$react)
+      }
+    }
+    
     input_list_sens <- list(
                        psa_bool = psa_bool,
                        init_event_list = init_event_list,
@@ -401,7 +414,7 @@ run_sim <- function(arm_list=c("int","noint"),
           )
           
           names(dump_info) <- paste0("Analysis: ", input_list$sens," ", input_list$sens_name_used,
-                                     "; Sim: ", input_list$sim,
+                                     "; Sim: ", input_list$simulation,
                                      "; Statics"
           )
           
@@ -424,7 +437,7 @@ run_sim <- function(arm_list=c("int","noint"),
                                         unique_pt_inputs=unique_pt_inputs,
                                         input_list = input_list,
                                         pb = pb,
-                                        seed = seed)                    
+                                        seed = seed)    
       
       if(!is.null(final_output$error_m)){
         if((n_sim > 1 | n_sensitivity > 1) & continue_on_error){
@@ -435,6 +448,10 @@ run_sim <- function(arm_list=c("int","noint"),
                   if(exists("simulation")){simulation}else{"None"},
                   ". Error message: ",final_output$error_m
                   )
+          if(debug){
+            output_sim[[sens]][[simulation]] <- final_output
+          }
+          
           next
         } else{
         stop(final_output$error_m)
@@ -446,7 +463,6 @@ run_sim <- function(arm_list=c("int","noint"),
       }
       
       final_output <- c(list(sensitivity_name = sens_name_used), final_output)
-      
       
       
       if(debug){
@@ -519,7 +535,7 @@ run_sim <- function(arm_list=c("int","noint"),
       if(.skip_to_next) { next } 
       
     }
-
+    
     message(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
     
@@ -535,7 +551,7 @@ run_sim <- function(arm_list=c("int","noint"),
                 e$message)
         } else{
         if(debug & flag_noerr_sim){
-          if(length(log_list)>0){
+          if(length(log_list)>0 | exists("output_sim") | exists("final_output")){
             if(!exists("final_output")){
               export_log(lapply(log_list,transform_debug),paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
               stop(e$message)
@@ -579,7 +595,7 @@ run_sim <- function(arm_list=c("int","noint"),
 
   # Export results ----------------------------------------------------------
   if(debug){
-    if(length(log_list)>0){
+    if(length(log_list)>0 | exists("output_sim")){
       if(exists("output_sim")){
         final_log <- unlist(
           unlist(

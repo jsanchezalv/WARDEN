@@ -188,14 +188,14 @@ as.data.frame(
 
 ## Integrating into a model
 
-We now use this setup in a very simple model, where we run a deterministic, probabilistic, probabilistic DSA and deterministic scenario analysis. Note that the `sens` iterator needs to be adjusted, as it just measures the total number of sensitivity iterations. If we have 2 sensitivities with 7 parameters each, sens will go from 1 to 14. As we have only 7 parameters, we need to create the `iterator_sensitivity` variable to "reset" the index back to 1, 2, 3... when it goes over 7, so that covers DSA_min and DSA_max.
+We now use this setup in a very simple model, where we run a deterministic, probabilistic, probabilistic DSA and deterministic scenario analysis. Note that the `sens` iterator needs to be adjusted, as it just measures the total number of sensitivity iterations. If we have 2 sensitivities with 7 parameters each, sens will go from 1 to 14. As we have only 7 parameters, we need to create the `iterator_sensitivity` variable to "reset" the index back to 1, 2, 3... when it goes over 7, so that covers DSA_min and DSA_max, and for that we simply use the `sens_iterator` function.
 
 ```{r simple_model, echo=TRUE}
 
 rm(sens, sens_name_used, sensitivity_bool, psa_bool) #remove global objects that may confuse program
 
 i_sensitivity <-add_item(
-  iterator_sensitivity = sens - n_sensitivity*floor((sens-1)/n_sensitivity)
+  iterator_sensitivity = sens_iterator(sens,n_sensitivity)
   ) %>%add_item(
             indicators = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){  create_indicators(iterator_sensitivity,n_sensitivity*length(sensitivity_names),rep(1,length(l_inputs[[1]]))) #only for DSA we use this approach
               }else{rep(1,length(l_inputs[[1]]))}
@@ -234,9 +234,9 @@ evt_react_list <-
                input = {})  %>%
   add_reactevt(name_evt = "b1",
                input = {
-                 modify_item(list(q_default = 0,
-                                  c_default = 0, 
-                                  curtime = Inf)) 
+                 q_default = 0
+                 c_default = 0 
+                 curtime = Inf
                }) 
 
 util_ongoing <- "q_default"
@@ -378,7 +378,7 @@ l_inputs_pat <- list(parameter_name = list("age","sex"),
                  )
 
 i_sensitivity <- add_item(
-  iterator_sensitivity = sens - n_sensitivity*floor((sens-1)/n_sensitivity) #resets back to 1 if it goes over n_sensitivity
+  iterator_sensitivity = sens_iterator(sens,n_sensitivity) #resets back to 1 if it goes over n_sensitivity
   ) %>%
   add_item(
             indicators = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){
@@ -489,7 +489,7 @@ l_inputs_pat <- list(parameter_name = list("age","sex"),
                  )
 
 i_sensitivity <- add_item(
-  iterator_sensitivity = sens - n_sensitivity*floor((sens-1)/n_sensitivity) #resets back to 1 if it goes over n_sensitivity
+  iterator_sensitivity = sens_iterator(sens,n_sensitivity) #resets back to 1 if it goes over n_sensitivity
   ) 
 
 

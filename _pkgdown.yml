@@ -54,6 +54,7 @@ reference:
   - subtitle: Modelling Auxiliary Functions
     contents:
       - create_indicators
+      - sens_iterator
       - pick_psa
       - pick_val_v
       - replicate_profiles

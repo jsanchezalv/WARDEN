@@ -17,12 +17,24 @@ and whether it's contained within a conditional statement
 Extract all items and events and their interactions from the event reactions list
 }
 \examples{
-a <- add_reactevt(name_evt="example",
-   input={
-      modify_item(list(w=5))
-   })
+evt_react_list2 <-
+  add_reactevt(name_evt = "sick",
+               input = {modify_item(list(a=1+5/3))
+                 assign("W", 5 + 3 / 6 )
+                 x[5] <- 18
+                 for(i in 1:5){
+                   assign(paste0("x_",i),5+3)
+                 }
+                 if(j == TRUE){
+                   y[["w"]] <- 612-31+3
+                 }#'                
+                 q_default <- 0
+                 c_default <- 0
+                 curtime   <- Inf
+                 d <- c <- k <- 67
+               })
    
- extract_from_reactions(a)
+ extract_from_reactions(evt_react_list2)
 
 
 }

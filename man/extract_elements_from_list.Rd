@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{extract_elements_from_list}
 \alias{extract_elements_from_list}
-\title{Extracts items and events by looking into modify_item, modify_item_seq, modify_event and new_event}
+\title{Extracts items and events by looking into assignments, modify_item, modify_item_seq, modify_event and new_event}
 \usage{
 extract_elements_from_list(node, conditional_flag = FALSE)
 }
@@ -16,7 +16,7 @@ A data.frame with the relevant item/event, the event where it's assigned,
 and whether it's contained within a conditional statement
 }
 \description{
-Extracts items and events by looking into modify_item, modify_item_seq, modify_event and new_event
+Extracts items and events by looking into assignments, modify_item, modify_item_seq, modify_event and new_event
 }
 \examples{
 expr <- substitute({

@@ -218,6 +218,8 @@ init_event_list <-
 ## Add Event Reactions
 Reactions for each individual event are defined in the following using the `add_reactevt()` function. Patients in the intervention arm discontinue treatment at progression. Occurrence of the progression-accelerated event results in an earlier progression (if it has not occurred yet). Note the use of the seed argument in the `draw_tte()` function which ensures that the same seed is being used in the original and the updated draw of the time to progression.
 
+As mentioned before, the user can choose whether to use `modify_item`, `modify_item_seq` or just use assignments. We leave this example below using `modify_item` to showcase it.
+
 ```{r model_reaction}
 
 evt_react_list <-
