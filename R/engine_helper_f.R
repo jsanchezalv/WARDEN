@@ -233,9 +233,9 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
   #debug bit (pre-evaluation)
   if(input_list_arm$debug){
     prev_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm, ifnotfound = Inf)
-    
+
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                  "; Sim: ", input_list_arm$sim,
+                  "; Sim: ", input_list_arm$simulation,
                   "; Patient: ", input_list_arm$i,
                   "; Arm: ", input_list_arm$arm,
                   "; Event: ", input_list_arm$evt,

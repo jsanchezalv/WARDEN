@@ -67,9 +67,9 @@ if(getRversion() >= "2.15.1") {
 #' The engine uses the L'Ecuyer-CMRG for the random number generator.
 #' Note that if ncores > 1, then results per simulation will only be exactly replicable if using run_sim_parallel 
 #' (as seeds are automatically transformed to be seven integer seeds -i.e, L'Ecuyer-CMRG seeds-)
-#' 
-#' If no `drc` or `drq` parameters are passed within any of the input lists, these are assigned value 0.03.
 #' Note that the random seeds are set to be unique in their category (i.e., at patient level, patient-arm level, etc.)
+#' 
+#'  If no `drc` or `drq` parameters are passed within `sensitivity` or `common_all` input lists, these are assigned a default value 0.03 for discounting costs, QALYs and others.
 #'
 #' Ongoing items will look backward to the last time updated when performing the discounting and accumulation. 
 #' This means that the user does not necessarily need to keep updating the value, but only add it when the value 
@@ -89,7 +89,7 @@ if(getRversion() >= "2.15.1") {
 #'  `debug = TRUE` will export a log file with the timestamp up the error in the main working directory. Note that
 #'  using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
 #'  as the AST may not catch all the relevant assignments (e.g., an assigment like assign(paste("x_",i),5)
-#'   in a loop will not be identified, unless using modify_item(_seq)).
+#'   in a loop will not be identified, unless using modify_item()).
 #'   
 #'   If `continue_on_error` is set to FALSE, it will only export analysis level inputs due to the parallel engine
 #'    (use single-engine for those inputs) `continue_on_error` will skip the current simulation 
@@ -440,7 +440,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
           )
           
           names(dump_info) <- paste0("Analysis: ", input_list$sens," ", input_list$sens_name_used,
-                                     "; Sim: ", input_list$sim,
+                                     "; Sim: ", input_list$simulation,
                                      "; Statics"
           )
           
@@ -487,7 +487,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       
       final_output <- c(list(sensitivity_name = sens_name_used), final_output)
       
-      if(debug){
+      if(input_list$debug){
         log_list <- lapply(log_list,transform_debug)
         
         final_output$log_list <- c(log_list,final_output$log_list)
@@ -530,7 +530,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       
      }
     
-    
 
     message(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
@@ -546,30 +545,30 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                 e$message)
       } else{
         if(debug){
-          if(length(log_list)>0){
-            if(!exists("final_output")){
+          if(!exists("final_output") & length(log_list)>0){
             export_log(lapply(log_list,transform_debug),paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
             stop(e$message)
-            }else{
-                if(exists("output_sim")){
-                  final_log <- unlist(
-                    unlist(
-                      lapply(output_sim, function(y) lapply(y, function(x) x$log_list )),
-                      recursive = FALSE),
-                    recursive = FALSE)
-                } else{
-                  log_list <- lapply(log_list,transform_debug)
-                  final_output <- list()
-                  final_output$log_list <- c(log_list,final_output$log_list)
-                  final_log <- final_output$log_list
-                }
-                
-                export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
-              } 
+          }else if(exists("output_sim")){
+            final_log <- unlist(
+              unlist(
+                lapply(output_sim, function(y) lapply(y, function(x) x$log_list )),
+                recursive = FALSE),
+              recursive = FALSE)
+            
+            export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+            
+          } else if(!exists("output_sim") & exists("final_output")){
+            log_list <- lapply(log_list,transform_debug)
+            final_output <- list()
+            final_output$log_list <- c(log_list,final_output$log_list)
+            final_log <- final_output$log_list
+            
+            export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
             
           } else{
             message("No data to export.")
           }
+          
           stop("Log will be exported if data exists. Error message at analysis ",
                sens,
                "; simulation: ",
@@ -590,7 +589,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
 
   # Export results ----------------------------------------------------------
   if(debug){
-    if(length(log_list)>0){
+    if(length(log_list)>0 | exists("output_sim")){
         if(exists("output_sim")){
           final_log <- unlist(
             unlist(

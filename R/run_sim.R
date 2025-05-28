@@ -52,7 +52,7 @@
 #'  The engine uses the L'Ecuyer-CMRG for the random number generator. 
 #'  Note that the random seeds are set to be unique in their category (i.e., at patient level, patient-arm level, etc.)
 #'  
-#'  If no `drc` or `drq parameters are passed within any of the input lists, these are assigned value 0.03.
+#'  If no `drc` or `drq` parameters are passed within `sensitivity` or `common_all` input lists, these are assigned a default value 0.03 for discounting costs, QALYs and others.
 #'  
 #'  Ongoing items will look backward to the last time updated when performing the discounting and accumulation.
 #'  This means that the user does not necessarily need to keep updating the value, but only add it when the value
@@ -414,7 +414,7 @@ run_sim <- function(arm_list=c("int","noint"),
           )
           
           names(dump_info) <- paste0("Analysis: ", input_list$sens," ", input_list$sens_name_used,
-                                     "; Sim: ", input_list$sim,
+                                     "; Sim: ", input_list$simulation,
                                      "; Statics"
           )
           
@@ -548,7 +548,7 @@ run_sim <- function(arm_list=c("int","noint"),
                 e$message)
         } else{
         if(debug & flag_noerr_sim){
-          if(length(log_list)>0){
+          if(length(log_list)>0 | exists("output_sim") | exists("final_output")){
             if(!exists("final_output")){
               export_log(lapply(log_list,transform_debug),paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
               stop(e$message)
@@ -592,7 +592,7 @@ run_sim <- function(arm_list=c("int","noint"),
 
   # Export results ----------------------------------------------------------
   if(debug){
-    if(length(log_list)>0){
+    if(length(log_list)>0 | exists("output_sim")){
       if(exists("output_sim")){
         final_log <- unlist(
           unlist(

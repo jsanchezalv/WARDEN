@@ -444,7 +444,7 @@ new_event <- function(evt){
 
   if(input_list_arm$debug){ #only works correctly with create_if_null==TRUE, to be modified in later versions
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                  "; Sim: ", input_list_arm$sim,
+                  "; Sim: ", input_list_arm$simulation,
                   "; Patient: ", input_list_arm$i,
                   "; Arm: ", input_list_arm$arm,
                   "; Event: ", input_list_arm$evt,
@@ -511,7 +511,7 @@ modify_event <- function(evt,create_if_null=TRUE){
   
   if(input_list_arm$debug){ #only works correctly with create_if_null==TRUE, to be modified in later versions
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                  "; Sim: ", input_list_arm$sim,
+                  "; Sim: ", input_list_arm$simulation,
                   "; Patient: ", input_list_arm$i,
                   "; Arm: ", input_list_arm$arm,
                   "; Event: ", input_list_arm$evt,
@@ -590,7 +590,7 @@ modify_item <- function(list_item){
   if(input_list_arm$debug){ 
     
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                  "; Sim: ", input_list_arm$sim,
+                  "; Sim: ", input_list_arm$simulation,
                   "; Patient: ", input_list_arm$i,
                   "; Arm: ", input_list_arm$arm,
                   "; Event: ", input_list_arm$evt,
@@ -672,7 +672,7 @@ modify_item_seq <- function(...){
   if(input_list_arm$debug){ 
     
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                  "; Sim: ", input_list_arm$sim,
+                  "; Sim: ", input_list_arm$simulation,
                   "; Patient: ", input_list_arm$i,
                   "; Arm: ", input_list_arm$arm,
                   "; Event: ", input_list_arm$evt,
