@@ -1,4 +1,4 @@
-# WARDEN (development version)
+# WARDEN 1.1.0
 * Added "add_item2", which allows to incorporate expressions directly instead of a list, being faster and more consistent with "add_tte" and "add_react_evt".
 * Engine now fully utilizes environment for slightly faster analysis when loading inputs.
 
