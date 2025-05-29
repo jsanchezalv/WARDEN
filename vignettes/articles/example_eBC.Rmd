@@ -72,7 +72,7 @@ Initial inputs and flags that will be used in the model can be defined below. We
 
 The flag `fl.remission` is drawn using a Bernoulli distribution with probability 0.8. This means that 80% of the patients will have a remission, while 20% will go into early metastatic BC. Note that this could also be modeled differently by using a time to remission and time to early metastatic BC, comparing these and choosing the pathway depending on which one is smaller. 
 
-We also define here the specific utilities and costs that will be used in the model. We create a named vector that identifies the costs and utilities, and then we assign them to each specific item. Note that while `util_v` or `cost_v` is a named vector, the specific items that will be used by the model (e.g. `util.remission`) are unnamed. It is strongly recommended to assign unnamed objects if they are going to be processed in the model. In this case, we're only using `util_v` and `cost_v` as an intermediate input and these objects will not be processed (we just use them to make the code more readable), so it's fine if we name them. However, naming the value of `util.remission` (e.g. using one bracket instead of two in `util_v[["util.remission"]]`) may cause the outputs from the model to change names, depending on use. This is because of how R works: it would correspond to a named list with a named vector/element, which R concatenates, so in this case it would end up generating `qaly.util.remission` as an output of the model instead of just `qaly`).
+We also define here the specific utilities and costs that will be used in the model. It is strongly recommended to assign unnamed objects if they are going to be processed in the model. In this case, this is not affected. However, keeping the name when extracting a value e.g. `util.remission` (e.g. using one bracket instead of two in `util_v[["util.remission"]]`) may cause the outputs from the model to change names, depending on use. This is because of how R works: it would correspond to a named list with a named vector/element, which R concatenates, so in this case it could end up generating `qaly.util.remission` as an output of the model instead of just `qaly`). However this is unlikely to occur most of the times, and if the inputs are intermediary (i.e., not utilities/costs that appear in `ongoing_inputs` and such), it would cause no trouble.
 
 ```{r input_delayed}
 #Each patient is identified through "i"
@@ -80,56 +80,62 @@ We also define here the specific utilities and costs that will be used in the mo
 #In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.
 
 #Put objects here that do not change on any patient or intervention loop
-common_all_inputs <- add_item() %>%
-  add_item( #utilities
-  pick_val_v(
-    base =  df_util$value,
-    psa = MASS::mvrnorm(1,df_util$value,diag(df_util$se^2)),
-    sens = df_util$value,
-    psa_ind = psa_bool,
-    sens_ind = sensitivity_bool,
-    indicator = rep(0, nrow(df_util)),
-    names_out =df_util$name
-  ),#costs
-  pick_val_v(
-    base =  df_cost$value,
-    psa = rgamma_mse(1,df_cost$value,df_cost$se),
-    sens = df_cost$value,
-    psa_ind = psa_bool,
-    sens_ind = sensitivity_bool,
-    indicator = rep(0, nrow(df_cost)),
-    names_out =df_cost$name
-  )
-)
+common_all_inputs <- add_item2(input={ 
+  #utilities
+        pick_val_v(
+            base =  df_util$value,
+            psa = MASS::mvrnorm(1,df_util$value,diag(df_util$se^2)),
+            sens = df_util$value,
+            psa_ind = psa_bool,
+            sens_ind = sensitivity_bool,
+            indicator = rep(0, nrow(df_util)),
+            names_out =df_util$name,
+            deploy_env=TRUE
+        )
+  #costs
+        pick_val_v(
+            base =  df_cost$value,
+            psa = rgamma_mse(1,df_cost$value,df_cost$se),
+            sens = df_cost$value,
+            psa_ind = psa_bool,
+            sens_ind = sensitivity_bool,
+            indicator = rep(0, nrow(df_cost)),
+            names_out =df_cost$name,
+            deploy_env=TRUE
+        )
+        })
 #Put objects here that do not change as we loop through interventions for a patient
-common_pt_inputs <- add_item(sex_pt = ifelse(rbinom(1,1,p=0.01),"male","female"),
-                             nat.os.s = rcond_gompertz(1,
-                                                     shape=if(sex_pt=="male"){0.102}else{0.115},
-                                                     rate=if(sex_pt=="male"){0.000016}else{0.0000041},
-                                                     lower_bound = 50) ) #in years, for a patient who is 50yo
+common_pt_inputs <- add_item2(input={
+    sex_pt <- ifelse(rbinom(1,1,p=0.01),"male","female")
+    nat.os.s <- rcond_gompertz(1,
+                               shape=if(sex_pt=="male"){0.102}else{0.115},
+                               rate=if(sex_pt=="male"){0.000016}else{0.0000041},
+                               lower_bound = 50) 
+    }) #in years, for a patient who is 50yo
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
 #common across arm but changes per pt could be implemented here (if (arm==)... )
-unique_pt_inputs <- add_item(
-  fl.idfs.ontx             = 1,
-  fl.idfs                  = 1,
-  fl.mbcs.ontx             = 1,
-  fl.mbcs.progression.mbc  = 1,
-  fl.tx.beva               = 1,  
-  fl.mbcs                  = 0,
-  fl.mbcs_2ndline          = 0,
-  fl.recurrence            = 0,
-  fl.remission             = rbinom(1,1,0.8), #80% probability of going into remission
-  q_default = if (fl.idfs==1) {
-                                util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
-                              } else if (fl.idfs==0 & fl.mbcs==0) {
-                                util.remission * fl.remission + fl.recurrence*util.recurrence
-                              } else if (fl.mbcs==1) {
-                                util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
-                              },
-  c_default = if(arm=="noint"){cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs}else{(cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs},
-  c_ae = 0
-)
+unique_pt_inputs <- add_item2(input={
+    fl.idfs.ontx              <- 1
+    fl.idfs                   <- 1
+    fl.mbcs.ontx              <- 1
+    fl.mbcs.progression.mbc   <- 1
+    fl.tx.beva                <- 1  
+    fl.mbcs                   <- 0
+    fl.mbcs_2ndline           <- 0
+    fl.recurrence             <- 0
+    fl.remission              <- rbinom(1,1,0.8) #80% probability of going into remission
+    q_default <- if (fl.idfs==1) {
+        util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
+    } else if (fl.idfs==0 & fl.mbcs==0) {
+        util.remission * fl.remission + fl.recurrence*util.recurrence
+    } else if (fl.mbcs==1) {
+        util.mbc.progression.mbc * fl.mbcs.progression.mbc + (1-fl.mbcs.progression.mbc)*util.mbc.pps
+    }
+    c_default <- if(arm=="noint"){cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs}else{(cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs}
+    c_ae <- 0
+})
+
 ```
 
 # Events
