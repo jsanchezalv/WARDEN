@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -226,9 +226,8 @@ conditional statements.</p>
 <p>It is important to note that the QALYs and Costs (ongoing or instant or per cycle) used should be of length 1.
 If they were of length &gt; 1, the model would expand the data,
 so instead of having each event as a row, the event would have N rows (equal to the length of the costs/qalys to discount passed).
-This means more processing of the results data would be needed in order for it to provide the correct results.
-#'
-If the <code>cycle</code> lists are used, then it is expected the user will declare as well the name of the variable
+This means more processing of the results data would be needed in order for it to provide the correct results.</p>
+<p>If the <code>cycle</code> lists are used, then it is expected the user will declare as well the name of the variable
 pasted with <code>cycle_l</code> and <code>cycle_starttime</code> (e.g., c_default_cycle_l and c_default_cycle_starttime) to
 ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime
 being the starting time in which the variable started counting.</p>
@@ -305,8 +304,8 @@ Note that this will make the progress bar not correct, as a set of patients that
 <span class="r-in"><span>ipd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Analysis number: 1</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation number: 1</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Time to run simulation 1: 0.05s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Time to run analysis 1: 0.05s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time to run simulation 1: 0.06s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time to run analysis 1: 0.06s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Total time to run: 0.06s</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]</span>

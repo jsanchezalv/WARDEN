@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,8 @@
 <span>  indicator_sens_binary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sens_iterator <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  distributions <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  covariances <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  covariances <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  deploy_env <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -115,6 +116,10 @@ If NULL, it's assumed to be a vector of 1s of length equal to length(indicator)<
 
 <dt id="arg-covariances">covariances<a class="anchor" aria-label="anchor" href="#arg-covariances"></a></dt>
 <dd><p>List with length equal to length of base where the variance/covariances are stored (only relevant if multivariate normal are being used)</p></dd>
+
+
+<dt id="arg-deploy-env">deploy_env<a class="anchor" aria-label="anchor" href="#arg-deploy-env"></a></dt>
+<dd><p>Boolean, if TRUE will deploy all objects in the environment where the function is called for. Must be active if using add_item2 (and FALSE if using add_item)</p></dd>
 
 </dl></div>
     <div class="section level2">
