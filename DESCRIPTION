@@ -49,6 +49,7 @@ Imports:
     zoo,
     progressr,
     magrittr,
+    rlang,
     tidyr
 VignetteBuilder: knitr
 Config/testthat/edition: 3

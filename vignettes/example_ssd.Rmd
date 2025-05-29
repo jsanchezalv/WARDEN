@@ -47,29 +47,30 @@ options(tibble.print_max = 50)
 ```
 
 # General inputs with delayed execution
-Initial inputs and flags that will be used in the model can be defined below. We can define inputs that will only change across scenarios (`sensitivity_inputs`), inputs which are common to all patients (`common_all_inputs`) within a simulation, inputs that are unique to a patient independently of the treatment (e.g. natural time to death, defined in `common_pt_inputs`), and inputs that are unique to that patient and that treatment (`unique_pt_inputs`). Items can be included through the `add_item` function, and can be used in subsequent items. All these inputs are generated before the events and the reaction to events are executed. Furthermore, the program first executes `common_all_inputs`, then `common_pt_inputs` and then `unique_pt_inputs`. So one could use the items generated in `common_all_inputs` in `unique_pt_inputs`. Note that inputs are "reset" after each patient, so if patient 1 arm "noint" changes `util.sick` to be = 2, even if it's a common parameter for everyone, it would be reset to 1 for patient 1 arm "int".
+Initial inputs and flags that will be used in the model can be defined below. We can define inputs that will only change across scenarios (`sensitivity_inputs`), inputs which are common to all patients (`common_all_inputs`) within a simulation, inputs that are unique to a patient independently of the treatment (e.g. natural time to death, defined in `common_pt_inputs`), and inputs that are unique to that patient and that treatment (`unique_pt_inputs`). Items can be included through both the `add_item` or `add_item2` functions, and can be used in subsequent items. All these inputs are generated before the events and the reaction to events are executed. Furthermore, the program first executes `common_all_inputs`, then `common_pt_inputs` and then `unique_pt_inputs`. So one could use the items generated in `common_all_inputs` in `unique_pt_inputs`. Note that inputs are "reset" after each patient, so if patient 1 arm "noint" changes `util.sick` to be = 2, even if it's a common parameter for everyone, it would be reset to 1 for patient 1 arm "int".
 
 Note that time to death is set in the common_pt_inputs, but it could also just be set in the `add_tte` function explained below. The user has full flexibility on how to implement this type of inputs.
 
-There are some auxiliary functions to help setting up inputs, like `pick_val_v` and `pick_val` (and `pick_psa`, see below the section on [Sensitivity Analysis](#sensitivity-analysis)). Note that `pick_val_v` and `pick_val` can be directly loaded as parameters (in fact, a named list will be loaded directly by R). A small tweak is needed if it's the first item added, in which the item list must be initiated by using `add_item()` (see below).
+There are some auxiliary functions to help setting up inputs, like `pick_val_v` and `pick_val` (and `pick_psa`, see below the section on [Sensitivity Analysis](#sensitivity-analysis)). Note that `pick_val_v` and `pick_val` can be directly loaded as parameters (in fact, a named list will be loaded directly by R). A small tweak is needed if it's the first item added, in which the item list must be initiated by using `add_item()` (see below). Alternatively, if using `add_item2()`, this is not needed, and `pick_val_v` just needs to be used with an additional argument `deploy_env = TRUE`.
 
 
 ```{r input_delayed}
 #We don't need to use sensitivity_inputs here, so we don't add that object
 
 #Put objects here that do not change on any patient or intervention loop
-common_all_inputs <-add_item(
-                      util.sick = 0.8,
-                      util.sicker = 0.5,
-                      cost.sick = 3000,
-                      cost.sicker = 7000,
-                      cost.int = 1000,
-                      coef_noint = log(0.2),
-                      HR_int = 0.8,
-                      drc = 0.035, #different values than what's assumed by default
-                      drq = 0.035,
-                      random_seed_sicker_i = sample.int(100000,npats,replace = FALSE)
-)  #to be used as seeds to draw the time to event for sicker, to ensure same luck for the same patient independently of the arm
+#We use add_item2 and add_item to showcase how the user can implement the inputs (either works, add_item2 is just faster)
+common_all_inputs <-add_item2(input = {
+                      util.sick   <- 0.8
+                      util.sicker <- 0.5
+                      cost.sick   <- 3000
+                      cost.sicker <- 7000
+                      cost.int    <- 1000
+                      coef_noint  <- log(0.2)
+                      HR_int      <- 0.8
+                      drc         <- 0.035 #different values than what's assumed by default
+                      drq         <- 0.035
+                      random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
+})  #to be used as seeds to draw the time to event for sicker, to ensure same luck for the same patient independently of the arm
 
 
 #Put objects here that do not change as we loop through treatments for a patient

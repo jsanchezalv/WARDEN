@@ -54,6 +54,22 @@ load_inputs <- function(inputs,list_uneval_inputs){
   return(inputs)
 }
 
+#' Function to load input expressions
+#'
+#' @param inputs Environment of existing inputs
+#' @param list_uneval_inputs List of unevaluated inputs (substituted expressions)
+#'
+#' @return Nothing (updated inputs environment)
+#'
+#' @examples
+#' load_inputs2(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
+#'
+#' @keywords internal
+#' @noRd
+load_inputs2 <- function(inputs,list_uneval_inputs){
+  eval(list_uneval_inputs, inputs)
+}
+
 # Initial event list --------------------------------------------------------------------------------------------------------------------------------------
 
 #' Execute the initial time to events and separate the events from other inputs that are stored

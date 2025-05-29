@@ -434,7 +434,7 @@ add_item <- function(.data=NULL,...){
 #'  util_idfs <- if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}
 #'  util.mbc <- 0.6
 #'  cost_idfs <- 2500})
-#' common_inputs <- add_item2(
+#' common_inputs <- add_item2(input = {
 #' pick_val_v(
 #'   base      = l_statics[["base"]],
 #'   psa       = pick_psa(
@@ -450,6 +450,7 @@ add_item <- function(.data=NULL,...){
 #'   names_out = l_statics[["parameter_name"]],
 #'   deploy_env = TRUE #Note this option must be active if using it at add_item2
 #' )
+#' }
 #' )
 #'
 add_item2 <- function(.data=NULL,input){

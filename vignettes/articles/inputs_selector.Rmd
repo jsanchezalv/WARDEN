@@ -42,6 +42,8 @@ options(tibble.print_max = 50)
 # Introduction
 This document explains how to use the set of functions related to automatic input selector, particularly `pick_val_v`, `pick_psa`, and `create_indicators`, so that the model takes care of everything in terms of running a deterministic analysis, DSA, PSA, probabilistic DSA, or scenario analyses.
 
+Note that while we use `add_item` for all the examples below, one could just do the same while using `add_item2`, the only differences are the way the input is added using `input = {...}` and the argument `deploy_env = TRUE` (e.g., `add_item(input = {pick_val_v(..., deploy_env = TRUE)})`).
+
 ## In a Nutshell
 The key function is `pick_val_v`. This function essentially hides a loop, which iterates over each of the inputs and depending on whether the parameter is a vector or single length, and whether the PSA or scenario flags are active, proceeds to select the right value. It also can consider multiple parameters being covaried at the same time in a scenario or DSA analysis.
 

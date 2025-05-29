@@ -1,4 +1,6 @@
 # WARDEN (development version)
+* Added "add_item2", which allows to incorporate expressions directly instead of a list, being faster and more consistent with "add_tte" and "add_react_evt".
+* Engine now fully utilizes environment for slightly faster analysis when loading inputs.
 
 # WARDEN 1.0
 * Major update: now the engine uses environments instead of lists, which allows user to remove "modify_item" and "modify_item_seq" from their code,
