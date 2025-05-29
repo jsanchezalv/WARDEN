@@ -49,6 +49,7 @@ if(getRversion() >= "2.15.1") {
 #' @importFrom progressr handlers
 #' @importFrom progressr progressor
 #' @importFrom progressr handler_txtprogressbar
+#' @importFrom rlang env_clone
 #'
 #' @export
 #' 
@@ -254,6 +255,10 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       if(!is.null(categories_other_instant)){categories_other_instant}
     ))
   
+  env_setup_sens <- is.language(sensitivity_inputs)
+  env_setup_sim <- is.language(common_all_inputs)
+  env_setup_pt <- is.language(common_pt_inputs)
+  env_setup_arm <- is.language(unique_pt_inputs)
   
   output_sim <- list()
   
@@ -359,7 +364,11 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        debug = debug,
                        accum_backwards = accum_backwards,
                        continue_on_error = continue_on_error,
-                       log_list = list()
+                       log_list = list(),
+                       env_setup_sens = env_setup_sens,
+                       env_setup_sim = env_setup_sim,
+                       env_setup_pt = env_setup_pt,
+                       env_setup_arm = env_setup_arm
                       )
     
     if(is.null(seed)){
@@ -368,9 +377,22 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     set.seed(seed)
     
     # Draw Common parameters  -------------------------------
+    input_list_sens <- as.environment(input_list_sens)
+    parent.env(input_list_sens) <- environment()
+    
+    # Draw Common parameters  -------------------------------
     if(!is.null(sensitivity_inputs)){
       
-      input_list_sens <- load_inputs(inputs = input_list_sens,list_uneval_inputs = sensitivity_inputs)
+      if(env_setup_sens){
+        load_inputs2(inputs = input_list_sens,list_uneval_inputs = sensitivity_inputs)
+      } else{
+        input_list_sens <- as.environment(
+          load_inputs(inputs = as.list(input_list_sens),
+                      list_uneval_inputs = sensitivity_inputs)
+        )
+        parent.env(input_list_sens) <- environment()
+        
+      }
       
       if(input_list_sens$debug){ 
         names_sens_input <- names(sensitivity_inputs)
@@ -378,7 +400,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
         dump_info <- list(
           list(
             prev_value = prev_value,
-            cur_value  = input_list_sens[names_sens_input]
+            cur_value  = mget(names_sens_input,input_list_sens)
           )
         )
         
@@ -391,10 +413,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       
     }
     
-    #Make sure there are no duplicated inputs in the model, if so, take the last one
-    duplic <- duplicated(names(input_list_sens),fromLast = TRUE)
-    if (sum(duplic)>0 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added.\n")  }
-    input_list_sens <- input_list_sens[!duplic]
     
 # Simulation loop ---------------------------------------------------------
     output_sim[[sens]] <- vector("list", length=n_sim) # empty list with n_sim elements
@@ -418,24 +436,32 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       start_time_sim <-  proc.time()
                            
                            
-      input_list <- c(input_list_sens,
-                      simulation = simulation)
+      input_list <- rlang::env_clone(input_list_sens , parent.env(input_list_sens))
+      input_list$simulation <- simulation
       
       set.seed(simulation*1007*seed)
       
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
         
-        input_list <- load_inputs(inputs = input_list,list_uneval_inputs = common_all_inputs)
+        if(env_setup_sim){
+          load_inputs2(inputs = input_list,list_uneval_inputs = common_all_inputs)
+        } else{
+          input_list <- as.environment(
+            load_inputs(inputs = as.list(input_list),
+                        list_uneval_inputs = common_all_inputs)
+          )
+          parent.env(input_list) <- parent.env(input_list_sens)
+        }
         
         if(input_list_sens$debug){ 
           names_all_input <- names(common_all_inputs)
           prev_value <- setNames(vector("list", length(common_all_inputs)), names_all_input)
-          prev_value[names_all_input] <- input_list_sens[names_all_input]
+          prev_value[names_all_input] <- mget(names_all_input,input_list_sens)
           dump_info <- list(
             list(
               prev_value = prev_value,
-              cur_value  = input_list[names_all_input]
+              cur_value  = mget(names_all_input,input_list) 
             )
           )
           
@@ -447,11 +473,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
           log_list <- c(log_list,dump_info)
         }
       }
-  
-      #Make sure there are no duplicated inputs in the model, if so, take the last one
-      duplic <- duplicated(names(input_list),fromLast = TRUE)
-      if (sum(duplic)>0 & simulation==1 & sens==1) { warning("Duplicated items detected in the Simulation, using the last one added.\n")  }
-      input_list <- input_list[!duplic]
   
       if(is.null(input_list$drc)){input_list$drc <- 0.03}
       if(is.null(input_list$drq)){input_list$drq <- 0.03}

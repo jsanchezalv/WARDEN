@@ -131,7 +131,7 @@ It is important to note that the QALYs and Costs (ongoing or instant or per cycl
 If they were of length > 1, the model would expand the data,
 so instead of having each event as a row, the event would have N rows (equal to the length of the costs/qalys to discount passed).
 This means more processing of the results data would be needed in order for it to provide the correct results.
-#'
+
 If the \code{cycle} lists are used, then it is expected the user will declare as well the name of the variable
 pasted with \code{cycle_l} and \code{cycle_starttime} (e.g., c_default_cycle_l and c_default_cycle_starttime) to
 ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime

@@ -33,7 +33,9 @@ run_engine <- function(arm_list,
   n_sim <- input_list$n_sim
   npats <- input_list$npats
   psa_bool <- input_list$psa_bool
-
+  env_setup_pt <- input_list$env_setup_pt
+  env_setup_arm <- input_list$env_setup_arm
+  
 
   #1 Loop per patient ----------------------------------------------------------
   patdata <- vector("list", length=npats) # empty list with npats elements
@@ -51,22 +53,32 @@ run_engine <- function(arm_list,
     
     #Create empty pat data for each arm
     this_patient <- list()
-    input_list_pt <- c(input_list,list(i=i))
+    input_list_pt <- rlang::env_clone(input_list , parent.env(input_list))
+    input_list_pt$i <- i
     
     #Extract the inputs that are common for each patient across interventions
     if(!is.null(common_pt_inputs)){
       
-      input_list_pt <- load_inputs(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
+      if(env_setup_pt){
+        load_inputs2(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
+      } else{
+        input_list_pt <- as.environment(
+          load_inputs(inputs = as.list(input_list_pt),
+                      list_uneval_inputs = common_pt_inputs)
+          )
+        parent.env(input_list_pt) <- parent.env(input_list)
+        
+      }
       
       
       if(input_list$debug){ 
         names_pt_input <- names(common_pt_inputs)
         prev_value <- setNames(vector("list", length(common_pt_inputs)), names_pt_input)
-        prev_value[names_pt_input] <- input_list[names_pt_input]
+        prev_value[names_pt_input] <- mget(names_pt_input,input_list)
         dump_info <- list(
           list(
             prev_value = prev_value,
-            cur_value  = input_list_pt[names_pt_input]
+            cur_value  = mget(names_pt_input,input_list_pt)
           )
         )
         
@@ -78,14 +90,8 @@ run_engine <- function(arm_list,
         
         temp_log_pt <- c(temp_log_pt,dump_info)
       }
-      
     }
-
-    #Make sure there are no duplicated inputs in the model, if so, take the last one
-    duplic <- duplicated(names(input_list_pt),fromLast = TRUE)
-    if (sum(duplic)>0 & i==1 & simulation==1 & sens==1) { warning("Duplicated items detected in the Patient, using the last one added.\n")  }
-    input_list_pt <- input_list_pt[!duplic]
-
+    
     #2 Loop per treatment ------------------------------------------------------
     temp_log <- list()
     
@@ -96,25 +102,32 @@ run_engine <- function(arm_list,
       output_list <- list(curtime = 0)
       
       #Extract the inputs that are unique for each patient-intervention
-      input_list_arm <- NULL
-      input_list_arm <- c(input_list_pt,list(arm=arm))
-      
+      input_list_arm <- rlang::env_clone(input_list_pt , parent.env(input_list_pt))
+      input_list_arm$arm <- arm
       
       if(!is.null(unique_pt_inputs)){
         
-        input_list_arm <- load_inputs(inputs = input_list_arm,list_uneval_inputs = unique_pt_inputs)
+        if(env_setup_arm){
+          load_inputs2(inputs = input_list_arm,list_uneval_inputs = unique_pt_inputs)
+        } else{
+          input_list_arm <- as.environment(
+            load_inputs(inputs = as.list(input_list_arm),
+                        list_uneval_inputs = unique_pt_inputs)
+            )
+          parent.env(input_list_arm) <- parent.env(input_list_pt)
+        }
         
         if(input_list_pt$debug){ 
           names_pt_input <- names(unique_pt_inputs)
           prev_value <- setNames(vector("list", length(unique_pt_inputs)), names_pt_input)
-          prev_value[names_pt_input] <- input_list_pt[names_pt_input]
+          prev_value[names_pt_input] <- mget(names_pt_input,input_list_pt)
           dump_info <- list(
             list(
               prev_value = prev_value,
-              cur_value  = input_list_arm[names_pt_input]
+              cur_value  = mget(names_pt_input,input_list_arm)
             )
           )
-
+          
           names(dump_info) <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                                      "; Sim: ", input_list_arm$simulation,
                                      "; Patient: ", input_list_arm$i,
@@ -124,12 +137,7 @@ run_engine <- function(arm_list,
           temp_log <- c(temp_log,dump_info)
         }
       }
-
-      #Make sure there are no duplicated inputs in the model, if so, take the last one
-      duplic <- duplicated(names(input_list_arm),fromLast = TRUE)
-      if (sum(duplic)>0 & i==1 & simulation==1 & sens==1) { warning("Duplicated items detected in the Arm, using the last one added.\n")  }
-      input_list_arm <- input_list_arm[!duplic]
-
+      
       # Generate event list
       #if noeventlist, then just make start at 0
       if (is.null(input_list_arm$init_event_list)) {
@@ -159,10 +167,9 @@ run_engine <- function(arm_list,
       temp_log <- c(temp_log,dump_info)
     }
   
+      list2env(as.list(evt_list$time_data), input_list_arm)
+      list2env(as.list(evt_list["cur_evtlist"]), input_list_arm)
 
-      input_list_arm <- c(input_list_arm,evt_list$time_data,evt_list["cur_evtlist"])
-      
-      
 
       # 3 Loop per event --------------------------------------------------------
       #Main environment of reference is this one
@@ -171,8 +178,8 @@ run_engine <- function(arm_list,
       # input_list_arm <- c(input_list_arm, list_env)
       this_patient[[arm]]$evtlist <- NULL
 
-      input_list_arm <- c(input_list_arm,output_list)
-      
+      list2env(as.list(output_list), input_list_arm)
+
       if(input_list$accum_backwards){
         input_list_arm$ongoing_inputs_lu <- paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate",recycle0 = TRUE)
         input_out_v <- c(input_list_arm$input_out,
@@ -192,11 +199,7 @@ run_engine <- function(arm_list,
       }else{
         inputs_out_v <-  input_list_arm$input_out
       }
-      
-      input_list_arm <- as.environment(input_list_arm)
-      parent.env(input_list_arm) <- environment()
-      # list2env(list_env, input_list_arm)
-      
+
       while(input_list_arm$curtime < Inf){
 
         # Get next event, process, repeat

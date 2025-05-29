@@ -42,6 +42,7 @@ reference:
   - subtitle: Modelling Core Functions
     contents:
       - add_item
+      - add_item2
       - add_reactevt
       - add_tte
       - modify_event

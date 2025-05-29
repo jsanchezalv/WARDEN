@@ -219,6 +219,7 @@ pick_psa <- function(f,...){
 #' @param sens_iterator Current iterator number of the DSA/scenario being run, e.g., 5 if it corresponds to the 5th DSA parameter being changed
 #' @param distributions List with length equal to length of base where the distributions are stored
 #' @param covariances List with length equal to length of base where the variance/covariances are stored (only relevant if multivariate normal are being used)
+#' @param deploy_env Boolean, if TRUE will deploy all objects in the environment where the function is called for. Must be active if using add_item2 (and FALSE if using add_item)
 #'
 #' @return List used for the inputs
 #' @export
@@ -270,7 +271,8 @@ pick_val_v <- function(base,
                          indicator_sens_binary = TRUE,
                          sens_iterator = NULL,
                          distributions = NULL,
-                         covariances = NULL
+                         covariances = NULL,
+                         deploy_env = FALSE
 ){
   
   output <- list()
@@ -345,7 +347,11 @@ pick_val_v <- function(base,
     names(output) <- names_out
   }
   
-  return(as.list(output))
+  if(deploy_env){
+    list2env(as.list(output), parent.frame())
+  } else{
+    return(as.list(output))
+  }
 } 
 
 
@@ -405,7 +411,61 @@ add_item <- function(.data=NULL,...){
   return(data_list)
 }
 
+# Add item/parameter (uses expressions) --------------------------------------------------------
 
+#' Defining parameters that may be used in model calculations
+#'
+#' @param .data Existing data
+#' @param input Items to define for the simulation as an expression (i.e., using {})
+#'
+#' @return A substituted expression to be evaluated by engine 
+#' @export
+#'
+#' @details
+#' The functions to add/modify events/inputs use lists. If chaining together add_item2, it will just append the expressions together in the order established.
+#'
+#' If using `pick_val_v`, note it should be used with the `deploy_env = TRUE` argument so that add_item2 process it correctly.
+#'
+#' @examples
+#' library(magrittr)
+#'
+#' add_item2(input = {fl.idfs <-  0})
+#' add_item2(input = {
+#'  util_idfs <- if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}
+#'  util.mbc <- 0.6
+#'  cost_idfs <- 2500})
+#' common_inputs <- add_item2(
+#' pick_val_v(
+#'   base      = l_statics[["base"]],
+#'   psa       = pick_psa(
+#'     l_statics[["function"]],
+#'     l_statics[["n"]],
+#'     l_statics[["a"]],
+#'     l_statics[["b"]]
+#'   ),
+#'   sens      = l_statics[[sens_name_used]],
+#'   psa_ind   = psa_bool,
+#'   sens_ind  = sensitivity_bool,
+#'   indicator = indicators_statics,
+#'   names_out = l_statics[["parameter_name"]],
+#'   deploy_env = TRUE #Note this option must be active if using it at add_item2
+#' )
+#' )
+#'
+add_item2 <- function(.data=NULL,input){
+  
+  data_list <- .data
+  
+  list_item <- substitute(input)
+  
+  if (is.null(data_list)) {
+    data_list <- list_item
+  } else{
+    data_list <- as.call(c(substitute(`{`), as.list(data_list)[-1], as.list(list_item)[-1]))
+  }
+  
+  return(data_list)
+}
 
 # Add event to list of events ---------------------------------------------
 
@@ -754,10 +814,8 @@ add_reactevt <- function(.data=NULL,name_evt,input){
   
   
   input_sub <- substitute(input)
-  ret_sub <- substitute(return(environment()))
-  new_sub <- as.call(c(substitute(`{`), as.list(input_sub)[-1], ret_sub))
 
-  evt_r <- list(list(react=new_sub))
+  evt_r <- list(list(react=input_sub))
   
   names(evt_r) <- paste(name_evt)
 

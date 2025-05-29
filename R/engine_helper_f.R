@@ -46,10 +46,6 @@ load_inputs <- function(inputs,list_uneval_inputs){
     if(any(is.null(names(list.eval_inputs)), names(list.eval_inputs)=="") & length(list.eval_inputs)==1) {
       inputs[names(list.eval_inputs[[1]])] <- list.eval_inputs[[1]]
     } else{
-      # Remove warning for now, as it gets repeated a lot
-      # if (!is.null(names(list.eval_inputs[[1]]))) {
-      #   warning("Item ", names(list.eval_inputs), " is named. It is advised to assign unnamed objects if they are going to be processed in the model, as they can create errors depending on how they are used within the model.\n")
-      # }
       inputs[names(list.eval_inputs)] <- list.eval_inputs
       
     }
@@ -57,7 +53,6 @@ load_inputs <- function(inputs,list_uneval_inputs){
   
   return(inputs)
 }
-
 
 # Initial event list --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -77,26 +72,24 @@ load_inputs <- function(inputs,list_uneval_inputs){
 
 initiate_evt <- function(arm_name,input_list_arm){
   position <- which(arm_name==names(input_list_arm$init_event_list))
-
-  time_data <- local({
-    evts_v <- input_list_arm$init_event_list[[position]][["evts"]]
-    
-    othert_v <- input_list_arm$init_event_list[[position]][["other_inp"]]
-    
-    list2env(mget(c(evts_v,othert_v),ifnotfound=Inf), envir=environment()) #initialize
-    
-    eval(input_list_arm$init_event_list[[position]][["expr"]]) #run script
-    
-    evttime <- lapply(mget(evts_v,ifnotfound=Inf),unname) #get event times and make sure they are unnamed
-    
-    othertime <- if(!is.null(othert_v)){mget(othert_v,ifnotfound=Inf)} else{NULL}  #get other inputs times
-    
-    out <- list(evttime=evttime, othertime=othertime)
-  },input_list_arm)
-
+  
+  evts_v <- input_list_arm$init_event_list[[position]][["evts"]]
+  
+  othert_v <- input_list_arm$init_event_list[[position]][["other_inp"]]
+  
+  list2env(mget(c(evts_v,othert_v),ifnotfound=Inf, envir=input_list_arm), envir=input_list_arm) #initialize
+  
+  eval(input_list_arm$init_event_list[[position]][["expr"]], input_list_arm) #run script
+  
+  evttime <- lapply(mget(evts_v,ifnotfound=Inf, envir=input_list_arm),unname) #get event times and make sure they are unnamed
+  othertime <- if(!is.null(othert_v)){mget(othert_v,ifnotfound=Inf, envir=input_list_arm)} else{NULL}  #get other inputs times
+  
+  time_data <- list(evttime=evttime, othertime=othertime)
+  
   #Event data
   cur_evtlist <- unlist(time_data$evttime)
   
+  #we should not need to have it return input_list_arm as it modifies by reference? 
   return(list(cur_evtlist = cur_evtlist, time_data = unlist(time_data$othertime)))
 }
 
@@ -246,7 +239,7 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
   }
   
   #evaluate event
-  input_list_arm <- eval(react_list[[position]][["react"]], input_list_arm)
+  eval(react_list[[position]][["react"]], input_list_arm)
   
   #debug bit (after evaluation)
   if(input_list_arm$debug){
