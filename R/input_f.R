@@ -357,7 +357,7 @@ pick_val_v <- function(base,
 
 # Add item/parameter to list --------------------------------------------------------
 
-#' Defining parameters that may be used in model calculations
+#' Define parameters that may be used in model calculations (list)
 #'
 #' @param .data Existing data
 #' @param ... Items to define for the simulation
@@ -413,7 +413,7 @@ add_item <- function(.data=NULL,...){
 
 # Add item/parameter (uses expressions) --------------------------------------------------------
 
-#' Defining parameters that may be used in model calculations
+#' Define parameters that may be used in model calculations (uses expressions)
 #'
 #' @param .data Existing data
 #' @param input Items to define for the simulation as an expression (i.e., using {})
