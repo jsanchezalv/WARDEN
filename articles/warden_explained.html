@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">May 29, 2025</h4>
+            <h4 data-toc-skip class="date">June 04, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/warden_explained.Rmd" class="external-link"><code>vignettes/articles/warden_explained.Rmd</code></a></small>
       <div class="d-none name"><code>warden_explained.Rmd</code></div>
@@ -149,15 +149,24 @@ or changed by the event reactions, and will be exported when the
 simulation stops (also on error). WARDEN allows to continue on error
 (though not recommended)</p>
 <p>WARDEN handles the random numbers automatically, setting the seeds
-differently at the simulation, patient and arm level. WARDEN uses
-L’Ecuyer-CMRG random number generator.</p>
+differently at the simulation, patient and arm level. WARDEN makes sure
+that the starting seed is cloned for a patient across interventions.
+However, it could be that conditional statements can alter the random
+state of R if they conditional trigger random expressions (e.g.,
+<code>if(arm==2){runif(1)}else{5}</code>) that change per intervention.
+To keep the random number cloned as intended, it’s recommended to
+pre-draw random numbers for each type of random object used and use
+those (see the
+<code>Example for a Sick-Sicker-Dead model - Random Number Streams &amp; Luck Adjustment</code>
+vignette for more information). WARDEN uses L’Ecuyer-CMRG random number
+generator.</p>
 <p>The way WARDEN processes events through e.g.,
 <code>modify_item</code> is by looking at what inputs are currently
 available from the relevant input list, evaluating the passed list
 (e.g., <code>modify_item_seq(list(a = 1, b = a + 1))</code>) and adding
 the resulting objects (<code>a</code> and <code>b</code>) to the parent
 environment as well as to the relevant input list for storage. With the
-latest update of WARDEN, mobjects not included in
+latest update of WARDEN, objects not included in
 <code>modify_item</code> will be stored in the relevant input list and
 they will be available for evaluation, e.g.,</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a></span>
