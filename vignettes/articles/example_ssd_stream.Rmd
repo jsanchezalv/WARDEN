@@ -98,9 +98,9 @@ We then proceed to generate the actual time to event. We use the `draw_tte()` fu
 
 ```{r model_evts}
 init_event_list <- 
-  add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={ #intervention
+  add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={ 
     sick <- 0
-    sicker <- qexp(rnd_stream_a$draw_n(),exp(coef_noint + ifelse(arm=="int",log(HR_int),0)))
+    sicker <- qexp(rnd_stream_a$draw_n(),exp(coef_noint + ifelse(arm=="int",log(HR_int),0))) #use draw_n to automatically use the random number and update it in rnd_stream_a
     death <-  max(0.0000001,qnorm(rnd_stream_b$draw_n(), mean=12, sd=3))
   })
 
@@ -157,9 +157,9 @@ evt_react_list <-
                  if((common_luck + ifelse(arm=="noint", 0.1,0) ) >0.7){
                     rnd_stream_b$random_n <- luck_adj(prevsurv = 1 - pnorm(q=curtime,12,3),
                                                       cursurv = 1 - pnorm(q=curtime,8,2),
-                                                      luck = rnd_stream_b$draw_n(),
+                                                      luck = rnd_stream_b$random_n,
                                                       condq = FALSE)
-                    death <- max(0.0000001,qnorm(rnd_stream_b$random_n, mean=10, sd=2))
+                    death <- max(0.0000001,qnorm(rnd_stream_b$random_n, mean=8, sd=2))
                  }
                  
                  
