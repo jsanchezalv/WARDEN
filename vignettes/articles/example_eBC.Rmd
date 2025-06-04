@@ -111,6 +111,7 @@ common_pt_inputs <- add_item2(input={
                                shape=if(sex_pt=="male"){0.102}else{0.115},
                                rate=if(sex_pt=="male"){0.000016}else{0.0000041},
                                lower_bound = 50) 
+    fl.remission <- rbinom(1,1,0.8) #80% probability of going into remission
     }) #in years, for a patient who is 50yo
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
@@ -124,7 +125,6 @@ unique_pt_inputs <- add_item2(input={
     fl.mbcs                   <- 0
     fl.mbcs_2ndline           <- 0
     fl.recurrence             <- 0
-    fl.remission              <- rbinom(1,1,0.8) #80% probability of going into remission
     q_default <- if (fl.idfs==1) {
         util.idfs.ontx * fl.idfs.ontx + (1-fl.idfs.ontx) * (1-fl.idfs.ontx) 
     } else if (fl.idfs==0 & fl.mbcs==0) {
@@ -524,7 +524,7 @@ Once the model has been run, we can use the results and summarize them using the
 ```{r post-processing_summary}
 
 
-summary_results_det(results[[1]][[1]]) #will print the last simulation!
+summary_results_det(results[[1]][[1]]) 
 
 summary_results_sim(results[[1]])
 
