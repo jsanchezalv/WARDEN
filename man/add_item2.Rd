@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{add_item2}
 \alias{add_item2}
-\title{Defining parameters that may be used in model calculations}
+\title{Define parameters that may be used in model calculations (uses expressions)}
 \usage{
 add_item2(.data = NULL, input)
 }
@@ -15,7 +15,7 @@ add_item2(.data = NULL, input)
 A substituted expression to be evaluated by engine
 }
 \description{
-Defining parameters that may be used in model calculations
+Define parameters that may be used in model calculations (uses expressions)
 }
 \details{
 The functions to add/modify events/inputs use lists. If chaining together add_item2, it will just append the expressions together in the order established.

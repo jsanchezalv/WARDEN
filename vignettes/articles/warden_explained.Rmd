@@ -45,9 +45,9 @@ WARDEN main simulation engine at its core is nothing but a nested loop at differ
 
 The debug mode will store in a log the relevant data that is loaded or changed by the event reactions, and will be exported when the simulation stops (also on error). WARDEN allows to continue on error (though not recommended)
 
-WARDEN handles the random numbers automatically, setting the seeds differently at the simulation, patient and arm level. WARDEN uses L'Ecuyer-CMRG random number generator.
+WARDEN handles the random numbers automatically, setting the seeds differently at the simulation, patient and arm level. WARDEN makes sure that the starting seed is cloned for a patient across interventions. However, it could be that conditional statements can alter the random state of R if they conditional trigger random expressions (e.g., `if(arm==2){runif(1)}else{5}`) that change per intervention. To keep the random number cloned as intended, it's recommended to pre-draw random numbers for each type of random object used and use those (see the `Example for a Sick-Sicker-Dead model - Random Number Streams & Luck Adjustment` vignette for more information). WARDEN uses L'Ecuyer-CMRG random number generator.
 
-The way WARDEN processes events through e.g., `modify_item` is by looking at what inputs are currently available from the relevant input list, evaluating the passed list (e.g., `modify_item_seq(list(a = 1, b = a + 1))`) and adding the resulting objects (`a` and `b`) to the parent environment as well as to the relevant input list for storage. With the latest update of WARDEN, mobjects not included in `modify_item` will be stored in the relevant input list and they will be available for evaluation, e.g.,
+The way WARDEN processes events through e.g., `modify_item` is by looking at what inputs are currently available from the relevant input list, evaluating the passed list (e.g., `modify_item_seq(list(a = 1, b = a + 1))`) and adding the resulting objects (`a` and `b`) to the parent environment as well as to the relevant input list for storage. With the latest update of WARDEN, objects not included in `modify_item` will be stored in the relevant input list and they will be available for evaluation, e.g.,
 
 ```{r example, eval=FALSE, echo=TRUE}
 

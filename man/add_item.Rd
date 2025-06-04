@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{add_item}
 \alias{add_item}
-\title{Defining parameters that may be used in model calculations}
+\title{Define parameters that may be used in model calculations (list)}
 \usage{
 add_item(.data = NULL, ...)
 }
@@ -15,7 +15,7 @@ add_item(.data = NULL, ...)
 A list of items
 }
 \description{
-Defining parameters that may be used in model calculations
+Define parameters that may be used in model calculations (list)
 }
 \details{
 The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.

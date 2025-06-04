@@ -98,6 +98,7 @@ run_engine <- function(arm_list,
     for (arm in arm_list) {
       
       set.seed(seed*(simulation*1007 + i*53 + which(arm==arm_list)))
+      # set.seed(seed*(simulation*1007 + i*191))
       # Initialize values to prevent errors
       output_list <- list(curtime = 0)
       
@@ -139,6 +140,8 @@ run_engine <- function(arm_list,
       }
       
       # Generate event list
+      set.seed(seed*(simulation*1007 + i*349))
+      
       #if noeventlist, then just make start at 0
       if (is.null(input_list_arm$init_event_list)) {
         evt_list <- list(cur_evtlist = setNames(0,"start"), time_data = NULL)

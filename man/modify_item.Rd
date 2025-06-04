@@ -19,6 +19,10 @@ Modify the value of existing items
 The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two \code{modify_item} with a list of one element, it's better to group them into a single \code{modify_item} with a list of two elements.
 
+Note that \code{modify_item} nor \code{modify_item_seq} can work on subelements (e.g.,
+\verb{modify_item(list(obj$item = 5))} will not work as intended, for that is better
+to assign directly using the expression approach, so \code{obj$item <- 5}).
+
 Costs and utilities can be modified by using the construction \code{type_name_category}, where type is either "qaly" or "cost",
 name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass \code{cost_default_instant} and modify the cost.
 This will overwrite the value defined in the corresponding cost/utility section.

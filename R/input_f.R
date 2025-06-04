@@ -633,6 +633,10 @@ modify_event <- function(evt,create_if_null=TRUE){
 #' @details
 #' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 #' So rather than use two `modify_item` with a list of one element, it's better to group them into a single `modify_item` with a list of two elements.
+#' 
+#' Note that `modify_item` nor `modify_item_seq` can work on subelements (e.g.,
+#' `modify_item(list(obj$item = 5))` will not work as intended, for that is better
+#' to assign directly using the expression approach, so `obj$item <- 5`).
 #'
 #' Costs and utilities can be modified by using the construction `type_name_category`, where type is either "qaly" or "cost",
 #'  name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
@@ -699,6 +703,10 @@ modify_item <- function(list_item){
 #' @details
 #' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 #' So rather than use two `modify_item` with a list of one element, it's better to group them into a single `modify_item` with a list of two elements.
+#'
+#' Note that `modify_item` nor `modify_item_seq` can work on subelements (e.g.,
+#' `modify_item_seq(list(obj$item = 5))` will not work as intended, for that is better
+#' to assign directly using the expression approach, so `obj$item <- 5`).
 #'
 #' Costs and utilities can be modified by using the construction `type_name_category`, where type is either "qaly" or "cost",
 #'  name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
@@ -830,7 +838,70 @@ add_reactevt <- function(.data=NULL,name_evt,input){
   return(data_list)
 }
 
+# Random stream of uniform numbers -------------------------------------------------------------------------------------------------------------------------------------------
 
+#' Creates an environment (similar to R6 class) of random uniform numbers to be drawn from
+#'
+#' @param stream_size Length of the vector of random uniform values to initialize
+#'
+#' @return Self (environment) behaving similar to R6 class
+#'
+#' @export
+#'
+#' @details
+#' This function creates an environment object that behaves similar to an R6 class
+#' but offers more speed vs. an R6 class.
+#' 
+#' The object is always initialized (see example below) to a specific vector of
+#'  random uniform values. The user can then call the object with `obj$draw_number(n)`,
+#'  where n is an integer, and will return the first n elements of the created
+#'  vector of uniform values. It will automatically remove those indexes from the
+#'  vector, so the next time the user calls `obj$draw_n()` it will already consider
+#'  the next index.
+#'  
+#' The user can also access the latest elements drawn by accessing `obj$random_n` 
+#'  (useful for when performing a luck adjustment), the current stream still 
+#'  to be drawn using `obj$stream` and the original size (when created) using 
+#'  `obj$stream_size`.
+#'  
+#'  If performing luck adjustment, the user can always modify the random value
+#'  by using `obj$random_n <- luck_adj(...)` (only valid if used with the expression
+#'  approach, not with `modify_item`)
+#' 
+#' 
+#' @examples
+#' stream_1 <- random_stream(1000)
+#' number_1 <- stream_1$draw_n() #extract 1st index from the vector created
+#' identical(number_1,stream_1$random_n) #same value
+#' number_2 <- stream_1$draw_n() #gets 1st index (considers previous)
+#' identical(number_2,stream_1$random_n) #same value
+
+random_stream <- function(stream_size = 100) {
+  self <- environment()
+  # Initialize the stream with random numbers
+  self$stream <- runif(stream_size)
+  self$stream_size <- stream_size
+  self$random_n <- numeric()
+  
+  # Function to generate a new stream of random numbers
+  self$generate_stream <- function(size = self$stream_size) {
+    self$stream <- runif(size)
+  }
+  # Function to draw a specified number of values from the stream and remove them
+  self$draw_n <- function(n=1) {
+    if (length(self$stream) < n) {
+      warning("Stream is smaller than the number of numbers drawn. Generating a new stream of the correct size.")
+      self$generate_stream(n)
+      self$stream_size <- n
+    }
+    seq_index <- seq_len(n)
+    self$random_n <- self$stream[seq_index]
+    self$stream <- self$stream[-seq_index]
+    return(self$random_n)
+  }
+  
+  return(self)
+}
 
 # Add drawing and initial event list -------------------------------------------------------------------------------------------------------------------------------------------
 
