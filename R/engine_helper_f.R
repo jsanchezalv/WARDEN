@@ -810,7 +810,7 @@ compute_outputs_timseq <- function(freq,
     
   }
   
-  final_out_sorted <- names(timed_output)[!names(timed_output) %in% vector_total_outputs]
+  final_out_sorted <- names(timed_output)[!names(timed_output) %chin% vector_total_outputs]
   order_final_output <- c(vector_total_outputs,final_out_sorted[order(final_out_sorted)])
   timed_output <- c(list(arm_list=arm_list),list(timepoints=time_points),timed_output[order_final_output])
   
@@ -833,7 +833,6 @@ compute_outputs_timseq <- function(freq,
 #' @import data.table
 #' @importFrom utils tail
 #' @importFrom zoo na.locf
-
 #' 
 #' @details
 #' It computes the discounted and undiscounted lys/costs/qalys. 
@@ -867,7 +866,7 @@ compute_outputs <- function(patdata,input_list) {
   list_patdata <- NULL
 
   #Split the data as to be exported as a data.table, and the extra data the user described
-  data_export_aslist <- input_list$input_out[!input_list$input_out %in% input_list$categories_for_export]
+  data_export_aslist <- input_list$input_out[!input_list$input_out %chin% input_list$categories_for_export]
   data_export_summarized_nonumeric <- data_export_aslist
     
   for (arm_i in arm_list) {
@@ -880,20 +879,20 @@ compute_outputs <- function(patdata,input_list) {
   #as there could be matrices or other objects not suitable for data.table
   
   items_length_greater_than_one <- unlist(list_patdata,recursive=FALSE)
-  items_length_greater_than_one <- items_length_greater_than_one[names(items_length_greater_than_one) %in% data_export_aslist]
+  items_length_greater_than_one <- items_length_greater_than_one[names(items_length_greater_than_one) %chin% data_export_aslist]
   
-  items_length_one_numeric <- unlist(lapply(items_length_greater_than_one, function(x) length(x)==1 & is.numeric(x)))
+  items_length_one_numeric <- (lengths(items_length_greater_than_one) == 1) & unlist(lapply(items_length_greater_than_one, function(x) is.numeric(x)))
   items_length_one_numeric <- items_length_one_numeric[items_length_one_numeric==TRUE]
   
-  items_length_greater_than_one <- unlist(lapply(items_length_greater_than_one, function(x) length(x)>1))
+  items_length_greater_than_one <- lengths(items_length_greater_than_one) > 1
   items_length_greater_than_one <- items_length_greater_than_one[items_length_greater_than_one==TRUE]
   
   data_export_aslist <- unique(names(items_length_greater_than_one))
   data_export_tobesummarized <- unique(names(items_length_one_numeric))
-  data_export_summarized_nonumeric <- data_export_summarized_nonumeric[!data_export_summarized_nonumeric %in% c(data_export_aslist,data_export_tobesummarized)]
+  data_export_summarized_nonumeric <- data_export_summarized_nonumeric[!data_export_summarized_nonumeric %chin% c(data_export_aslist,data_export_tobesummarized)]
   
   if (length(data_export_aslist)>0) {
-    list_patdata2 <- lapply(list_patdata,function(x) x[!names(x) %in% data_export_aslist])
+    list_patdata2 <- lapply(list_patdata,function(x) x[!names(x) %chin% data_export_aslist])
   } else{
     list_patdata2 <- list_patdata
   }
@@ -1075,25 +1074,56 @@ compute_outputs <- function(patdata,input_list) {
 
   #Add to final outputs the total outcomes as well as the cost/utility categories totals
   vector_other_outputs <- c(input_list$categories_for_export,prepared_outputs_v)
+  
+  agg_dt <- patdata_dt[,
+                       lapply(.SD, sum, na.rm = TRUE),
+                       by = .(pat_id, arm), 
+                       .SDcols = vector_total_outputs_search][,
+                                                              lapply(.SD, mean, na.rm = TRUE),
+                                                              by = arm,
+                                                              .SDcols = vector_total_outputs_search]
+  
+  agg_other_dt <- patdata_dt[,
+                             lapply(.SD, sum, na.rm = TRUE),
+                             by = .(pat_id, arm), 
+                             .SDcols = vector_other_outputs][,
+                                                             lapply(.SD, mean, na.rm = TRUE),
+                                                             by = arm,
+                                                             .SDcols = vector_other_outputs]
+  
+  #Gets last value from patient, then average for numeric
+  agg_export_dt <-  patdata_dt[,
+                               lapply(.SD, function(x) tail(x*is.finite(x),n=1,na.rm=TRUE)),
+                               by = .(pat_id, arm), 
+                               .SDcols = data_export_tobesummarized][,
+                                                                     lapply(.SD, mean, na.rm = TRUE),
+                                                                     by = arm,
+                                                                     .SDcols = data_export_tobesummarized]
+  
+  #Gets last value 
+  agg_nonnum_dt <-  patdata_dt[,
+                               lapply(.SD, tail, n=1,na.rm=TRUE),
+                               by = .(pat_id, arm), 
+                               .SDcols = data_export_summarized_nonumeric][,
+                                                                           lapply(.SD, tail, n=1, na.rm = TRUE),
+                                                                           by = arm,
+                                                                           .SDcols = data_export_summarized_nonumeric]
+  
   for (arm_i in arm_list) {
     for (output_i in 1:length(vector_total_outputs)) {
-      final_output[[vector_total_outputs[output_i]]][arm_i] <- patdata_dt[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+      final_output[[vector_total_outputs[output_i]]][arm_i] <- agg_dt[arm==arm_i,get(vector_total_outputs_search[output_i])]
     }
     for (output_i in vector_other_outputs) {
-      final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=sum(get(output_i),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+      final_output[[output_i]][arm_i] <- agg_other_dt[arm==arm_i,get(output_i)]
     }
-    
     for (output_i in data_export_tobesummarized) {
-        #Gets last value from patient, then average for numeric
-      final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),n=1,na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+      #Gets last value from patient, then average for numeric
+      final_output[[output_i]][arm_i] <-agg_export_dt[arm==arm_i,get(output_i)]
     }
     
     for (output_i in data_export_summarized_nonumeric) {
-      #Gets last value 
-      final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i),n=1,na.rm=TRUE)),by=.(pat_id)][,tail(out,n=1,na.rm=TRUE)]
+      final_output[[output_i]][arm_i] <- agg_nonnum_dt[arm==arm_i,get(output_i)]
     }
-    
-    
     for (output_i in data_export_aslist) {
       #Get last value
       temp <- Filter(function(sublist) sublist[["arm"]] == arm_i, list_patdata)
@@ -1101,9 +1131,35 @@ compute_outputs <- function(patdata,input_list) {
     }
   }
   
+  # for (arm_i in arm_list) {
+  #   for (output_i in 1:length(vector_total_outputs)) {
+  #     final_output[[vector_total_outputs[output_i]]][arm_i] <- patdata_dt[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+  #   }
+  #   for (output_i in vector_other_outputs) {
+  #     final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=sum(get(output_i),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+  #   }
+  #   
+  #   for (output_i in data_export_tobesummarized) {
+  #       #Gets last value from patient, then average for numeric
+  #     final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),n=1,na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
+  #   }
+  #   
+  #   for (output_i in data_export_summarized_nonumeric) {
+  #     #Gets last value 
+  #     final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i),n=1,na.rm=TRUE)),by=.(pat_id)][,tail(out,n=1,na.rm=TRUE)]
+  #   }
+  #   
+  #   
+  #   for (output_i in data_export_aslist) {
+  #     #Get last value
+  #     temp <- Filter(function(sublist) sublist[["arm"]] == arm_i, list_patdata)
+  #     final_output[[output_i]][[arm_i]] <- temp[[length(temp)]][[output_i]]
+  #   }
+  # }
+  
   rm(list_patdata)
   
-  final_out_sorted <- names(final_output)[!names(final_output) %in% vector_total_outputs]
+  final_out_sorted <- names(final_output)[!names(final_output) %chin% vector_total_outputs]
   order_final_output <- c(vector_total_outputs,final_out_sorted[order(final_out_sorted)])
   final_output <- c(list(arm_list=arm_list),final_output[order_final_output])
   
@@ -1118,14 +1174,14 @@ compute_outputs <- function(patdata,input_list) {
     #Get names of columns that will be used, 
     other_cols <- c("pat_id", "arm")
     #Columns that will not be summarized (event related columns, time and total_)
-    cols_to_rm <- colnames(patdata_dt)[grepl("total_",colnames(patdata_dt)) | colnames(patdata_dt) %in% c("evtname", "evttime", "prevtime")]
+    cols_to_rm <- colnames(patdata_dt)[grepl("total_",colnames(patdata_dt)) | colnames(patdata_dt) %chin% c("evtname", "evttime", "prevtime")]
     patdata_dt[,number_events:=1]
     #Numeric columns only
     numeric_c <- sapply(patdata_dt,is.numeric)
     #Columns to sum must be in the right list and also be numeric
-    cols_to_sum <- colnames(patdata_dt)[!colnames(patdata_dt) %in% c(other_cols,cols_to_rm,data_export_tobesummarized) & numeric_c]
+    cols_to_sum <- colnames(patdata_dt)[!colnames(patdata_dt) %chin% c(other_cols,cols_to_rm,data_export_tobesummarized) & numeric_c]
     #Other columns are left as is (takes last value of those)
-    cols_to_leave_as_is <- colnames(patdata_dt)[!colnames(patdata_dt) %in% c(other_cols,cols_to_rm) & !colnames(patdata_dt) %in% c(cols_to_sum)]
+    cols_to_leave_as_is <- colnames(patdata_dt)[!colnames(patdata_dt) %chin% c(other_cols,cols_to_rm) & !colnames(patdata_dt) %chin% c(cols_to_sum)]
     
     #Summarize the data as relevant
     patdata_temp <- patdata_dt[, lapply(.SD, sum, na.rm=TRUE), by=other_cols, .SDcols=cols_to_sum] #sum numeric variables in list
@@ -1137,7 +1193,7 @@ compute_outputs <- function(patdata,input_list) {
       final_output$merged_df <- patdata_temp
     }
     
-    colnames(final_output$merged_df)[colnames(final_output$merged_df) %in% c("qalys","costs","lys","qalys_undisc","costs_undisc","lys_undisc")] <- paste0("total_",colnames(final_output$merged_df)[colnames(final_output$merged_df) %in% c("qalys","costs","lys","qalys_undisc","costs_undisc","lys_undisc")])
+    colnames(final_output$merged_df)[colnames(final_output$merged_df) %chin% c("qalys","costs","lys","qalys_undisc","costs_undisc","lys_undisc")] <- paste0("total_",colnames(final_output$merged_df)[colnames(final_output$merged_df) %chin% c("qalys","costs","lys","qalys_undisc","costs_undisc","lys_undisc")])
 
 
     if (sens==1 & simulation==1) {

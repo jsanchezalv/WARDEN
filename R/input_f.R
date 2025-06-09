@@ -878,6 +878,7 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 
 random_stream <- function(stream_size = 100) {
   self <- environment()
+  
   # Initialize the stream with random numbers
   self$stream <- runif(stream_size)
   self$stream_size <- stream_size

@@ -222,9 +222,9 @@ run_engine <- function(arm_list,
 
           extra_data <-  mget(inputs_out_v, input_list_arm) 
 
+          # extra_data <- extra_data[!sapply(extra_data,is.null)]
+          extra_data <- extra_data[!vapply(extra_data, is.null, TRUE)]
           
-          extra_data <- extra_data[!sapply(extra_data,is.null)]
- 
               this_patient[[arm]]$evtlist[[n_evt]] <- c(evtname = Evt$evt ,
                                                         evttime = Evt$evttime,
                                                         pat_id = i,

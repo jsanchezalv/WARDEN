@@ -441,7 +441,7 @@ The model can now be executed as normal. Given that this modeling exercise relie
 
 ## Structural Uncertainty
 
-One way to test this is to run a few simulations for an increasing number of patients simulated. For example, below we run 6 deterministic simulations for 50, 100, 500, and 1,000 patients, to show how the model outcome can change depending on the random seed used. Note that this exercise can be very time consuming. It's important to note that the optimal number of patients simulated will depend on the dispersion of the distributions, the patient pathway, the number of possible outcomes and the difference among these. For example, an event with low probability but high impact and variability implies a higher number of patients simulated in order to obtain stable outcomes.
+One way to test this is to run a few simulations for an increasing number of patients simulated. For example, below we run 20 deterministic simulations for 50, 100, 500, and 1,000 patients, to show how the model outcome can change depending on the random seed used. Note that this exercise can be very time consuming. It's important to note that the optimal number of patients simulated will depend on the dispersion of the distributions, the patient pathway, the number of possible outcomes and the difference among these. For example, an event with low probability but high impact and variability implies a higher number of patients simulated in order to obtain stable outcomes.
 
 To do this test, we set `psa_bool = FALSE` and (optional) we set `ipd = FALSE`. This last option means that we are not exporting IPD data from all these simulations, but rather the aggregate outcomes (and the last simulation, which is included by default). This is important when simulating a large number of patients with a lot of simulations, which can generate very large objects (>1 GB). This option can also be especially relevant when running a PSA, which would require `psa_bool = TRUE` and a high number of simulations.
 
@@ -454,7 +454,7 @@ for (sample_size in sample_sizes) {
   results <- suppressWarnings( #run without warnings
       run_sim(  
     npats=sample_size,                        # number of patients to be simulated
-    n_sim=6,                                # number of simulations to run
+    n_sim=20,                                # number of simulations to run
     psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
     arm_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
@@ -544,7 +544,7 @@ for (sample_size in sample_sizes) {
   results <- suppressWarnings( #run without warnings
       run_sim(  
     npats=sample_size,                        # number of patients to be simulated
-    n_sim=6,                                # number of simulations to run
+    n_sim=20,                                # number of simulations to run
     psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
     arm_list = c("int", "noint"),             # intervention list
     common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation

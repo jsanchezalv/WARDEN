@@ -644,6 +644,9 @@ test_that("add_reactevt adds reactions correctly", {
 })
 
 
+# Luck_adj ----------------------------------------------------------------
+
+
 test_that("luck_adj adjusts luck correctly", {
   # Test single values
   adj <- luck_adj(prevsurv = 0.8, cursurv = 0.6, luck = 0.9, condq = TRUE)
@@ -660,5 +663,41 @@ test_that("luck_adj adjusts luck correctly", {
 })
 
 
+# Random Streams ----------------------------------------------------------
 
+
+test_that("random_stream initializes correctly", {
+  random_stream_instance <- random_stream(10)
+  
+  expect_type(random_stream_instance, "environment")
+  expect_equal(length(random_stream_instance$stream), 10, info = "The stream should initialize with 10 elements")
+})
+
+test_that("draw_n draws correct number of elements", {
+  random_stream_instance <- random_stream(10)
+  
+  drawn_numbers <- random_stream_instance$draw_n(3)
+  
+  expect_equal(length(drawn_numbers), 3, info = "draw_n should draw 3 elements")
+  expect_equal(length(random_stream_instance$stream), 7, info = "The stream should have 7 elements left after drawing 3")
+})
+
+test_that("draw_n with larger n regenerates stream", {
+  random_stream_instance <- random_stream(5)
+  
+  expect_warning(drawn_numbers_large <- random_stream_instance$draw_n(8),
+                 "Stream is smaller than the number of numbers drawn",
+                 info = "Should warn when trying to draw more elements than available")
+  
+  expect_equal(length(drawn_numbers_large), 8, info = "After regenerating, draw_n should return 8 elements")
+  expect_equal(length(random_stream_instance$stream), 0, info = "After drawing all elements, the stream should be empty")
+})
+
+test_that("generate_stream changes stream length", {
+  random_stream_instance <- random_stream(5)
+  
+  random_stream_instance$generate_stream(20)
+  
+  expect_equal(length(random_stream_instance$stream), 20, info = "generate_stream should change stream to the correct size")
+})
 

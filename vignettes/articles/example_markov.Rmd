@@ -159,8 +159,8 @@ Alternatively, we could just use the start event and iterate over each cycle, sa
 evt_react_list <-
   add_reactevt(name_evt = "start",
                input = {
-                 for (i in 2:max_n_cycles) {
-                   new_event(list("cycle" = curtime + i))
+                 for (cycle in 2:max_n_cycles) {
+                   new_event(list("cycle" = curtime + cycle))
                  }
                  
                }) %>%
@@ -267,7 +267,7 @@ life_years %>%
 results[[1]][[1]][["total_lys"]][["int"]] <- life_years$ly_final[life_years$arm=="int"]
 results[[1]][[1]][["total_lys"]][["noint"]] <- life_years$ly_final[life_years$arm=="noint"]
 
-summary_results_det(results[[1]][[1]]) #will print the last simulation!
+summary_results_det(results[[1]][[1]]) 
 
 ```
 
