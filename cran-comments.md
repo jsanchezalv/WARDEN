@@ -2,7 +2,8 @@
 
 * This is a package update. In this version I have:
 
-* Fixed a few bugs when in debugging mode. Reworked some functions to use environment instead of lists for transparency and simulation speed improvements.
+* Implemented a new function random_stream.
+* Improved run times by approximately 20% by optimizing code.
 
 ## R CMD check results
 

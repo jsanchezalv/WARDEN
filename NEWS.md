@@ -1,4 +1,6 @@
 # WARDEN 1.2.0
+* Speed gains from rewritten internal compute_outputs function.
+* Implemented "random_stream" function (using method similar to R6) to facilitate careful handling of random numbers.
 
 # WARDEN 1.1.0
 * Added "add_item2", which allows to incorporate expressions directly instead of a list, being faster and more consistent with "add_tte" and "add_react_evt".
