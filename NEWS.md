@@ -1,3 +1,5 @@
+# WARDEN (development version)
+
 # WARDEN 1.2.0
 * Speed gains from rewritten internal compute_outputs function.
 * Implemented "random_stream" function (using method similar to R6) to facilitate careful handling of random numbers.
