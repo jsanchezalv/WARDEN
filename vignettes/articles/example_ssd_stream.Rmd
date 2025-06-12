@@ -159,8 +159,10 @@ evt_react_list <-
                                                       cursurv = 1 - pnorm(q=curtime,8,2),
                                                       luck = rnd_stream_b$random_n,
                                                       condq = FALSE)
-                    death <- max(0.0000001,qnorm(rnd_stream_b$random_n, mean=8, sd=2))
-                 }
+                    modify_event(list(
+                      death = max(curtime,qnorm(rnd_stream_b$random_n, mean=8, sd=2))
+                    ))
+                    }
                  
                  
                }) %>%
