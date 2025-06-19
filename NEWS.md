@@ -1,4 +1,4 @@
-# WARDEN (development version)
+# WARDEN 1.2.1
 
 # WARDEN 1.2.0
 * Speed gains from rewritten internal compute_outputs function.
