@@ -1,9 +1,8 @@
 ## UPDATE
 
-* This is a package update. In this version I have:
+* This is a package fix. In this version I have:
 
-* Implemented a new function random_stream.
-* Improved run times by approximately 20% by optimizing code.
+* Fixed discounting rate separating now appropiately costs and health inputs.
 
 ## R CMD check results
 
