@@ -655,7 +655,7 @@ compute_outputs_timseq <- function(freq,
                                                                lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                                lclval=get(cat))]
     
-    final_filtered[,paste0(cat) := disc_ongoing_v(lcldr=input_list$drc,
+    final_filtered[,paste0(cat) := disc_ongoing_v(lcldr=if(cat %in% input_list$uc_lists$util_categories_ongoing){input_list$drq}else{input_list$drc},
                                                   lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                   lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                   lclval=get(cat))]
@@ -680,7 +680,7 @@ compute_outputs_timseq <- function(freq,
                                                                lclcurtime=evttime,
                                                                lclval=get(cat))]
     
-    final_filtered[,paste0(cat) := disc_instant_v(lcldr=input_list$drc,
+    final_filtered[,paste0(cat) := disc_instant_v(lcldr=if(cat %in% input_list$uc_lists$util_categories_instant){input_list$drq}else{input_list$drc},
                                                   lclcurtime=evttime,
                                                   lclval=get(cat))]
     
@@ -705,7 +705,7 @@ compute_outputs_timseq <- function(freq,
                                                              lclval= get(cat),
                                                              starttime = get(paste0(cat,"_","cycle_starttime")))] 
     
-    final_filtered[,paste0(cat) := disc_cycle_v(lcldr=input_list$drc,
+    final_filtered[,paste0(cat) := disc_cycle_v(lcldr=if(cat %in% input_list$uc_lists$util_categories_cycle){input_list$drq}else{input_list$drc},
                                                 lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                 cyclelength = get(paste0(cat,"_","cycle_l")),
                                                 lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
@@ -968,7 +968,7 @@ compute_outputs <- function(patdata,input_list) {
                                                                         lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                                         lclval=get(cat))]
     
-    patdata_dt[,paste0(cat) := disc_ongoing_v(lcldr=input_list$drc,
+    patdata_dt[,paste0(cat) := disc_ongoing_v(lcldr=if(cat %in% input_list$uc_lists$util_categories_ongoing){input_list$drq}else{input_list$drc},
                                                                  lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                                  lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                                  lclval=get(cat))]
@@ -993,7 +993,7 @@ compute_outputs <- function(patdata,input_list) {
                                                                         lclcurtime=evttime,
                                                                         lclval=get(cat))]
     
-    patdata_dt[,paste0(cat) := disc_instant_v(lcldr=input_list$drc,
+    patdata_dt[,paste0(cat) := disc_instant_v(lcldr=if(cat %in% input_list$uc_lists$util_categories_instant){input_list$drq}else{input_list$drc},
                                                                  lclcurtime=evttime,
                                                                  lclval=get(cat))]
     
@@ -1018,7 +1018,7 @@ compute_outputs <- function(patdata,input_list) {
                                                                     lclval= get(cat),
                                                                     starttime = get(paste0(cat,"_","cycle_starttime")))] 
     
-    patdata_dt[,paste0(cat) := disc_cycle_v(lcldr=input_list$drc,
+    patdata_dt[,paste0(cat) := disc_cycle_v(lcldr=if(cat %in% input_list$uc_lists$util_categories_cycle){input_list$drq}else{input_list$drc},
                                                              lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                              cyclelength = get(paste0(cat,"_","cycle_l")),
                                                              lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
