@@ -1,6 +1,8 @@
 url: https://jsanchezalv.github.io/WARDEN/
 template:
   bootstrap: 5
+  params:
+    google_analytics: G-494100369
 
 destination: docs
 

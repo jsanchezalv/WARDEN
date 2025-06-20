@@ -247,13 +247,14 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   categories_for_export <- unique(
     c(if(!is.null(categories_costs_ongoing)){categories_costs_ongoing},
       if(!is.null(categories_costs_instant)){categories_costs_instant},
-      if(!is.null(categories_costs_cycle)){categories_costs_cycle},
+      if(!is.null(categories_costs_cycle)){c(categories_costs_cycle,paste0(categories_costs_cycle,"_cycle_l"),paste0(categories_costs_cycle,"_cycle_starttime"))},
       if(!is.null(categories_utilities_ongoing)){categories_utilities_ongoing},
       if(!is.null(categories_utilities_instant)){categories_utilities_instant},
-      if(!is.null(categories_utilities_cycle)){categories_utilities_cycle},
+      if(!is.null(categories_utilities_cycle)){c(categories_utilities_cycle,paste0(categories_utilities_cycle,"_cycle_l"),paste0(categories_utilities_cycle,"_cycle_starttime"))},
       if(!is.null(categories_other_ongoing)){categories_other_ongoing},
       if(!is.null(categories_other_instant)){categories_other_instant}
     ))
+  
   
   env_setup_sens <- is.language(sensitivity_inputs)
   env_setup_sim <- is.language(common_all_inputs)
