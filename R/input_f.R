@@ -1189,6 +1189,11 @@ disc_instant <- function(lcldr=0.035, lclcurtime, lclval){
 #' @param starttime The start time for accrual of cycle costs (if not 0)
 #'
 #' @return Double based on cycle discounting
+#' 
+#' @details
+#' Note this function counts both extremes of the interval, so the example below
+#'  would consider 25 cycles, while disc_cycle_v leave the right interval open
+#'
 #'
 #' @examples 
 #' disc_cycle(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
@@ -1260,66 +1265,77 @@ disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval
 #' @param lclcurtime The time of the current event in the simulation
 #' @param lclval The  value to be discounted
 #' @param starttime The start time for accrual of cycle costs (if not 0)
+#' @param max_cycles The maximum number of cycles
 #'
-#' @return Double based on cycle discounting
+#' @return Double vector based on cycle discounting
+#' 
+#' @details
+#' This function per cycle discounting, i.e., considers that the cost/qaly is accrued
+#' per cycles, and performs it automatically without needing to create new events.
+#' It can accommodate changes in cycle length/value/starttime (e.g., in the case of 
+#' induction and maintenance doses) within the same item.
 #'
 #' @examples 
-#' disc_cycle_v(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
+#' disc_cycle_v(lcldr=0.03, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
+#' disc_cycle_v(lcldr=0.000001, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0, max_cycles = 4)
 #' 
-#'
+#' #Here we have a change in cycle length, max number of cylces and starttime at time 2 (e.g., induction to maintenance)
+#' #In the model, one would do this by redifining cycle_l, max_cycles and starttime of the corresponding item at a given event time. 
+#' disc_cycle_v(lcldr=0,
+#'  lclprvtime=c(0,1,2,2.5),
+#'  cyclelength=c(1/12, 1/12,1/2,1/2),
+#'  lclcurtime=c(1,2,2.5,4), lclval=c(500,500,500,500),
+#'  starttime=c(0,0,2,2), max_cycles = c(24,24,2,2)
+#'   )
 #' @export
 
-disc_cycle_v <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval,starttime=0){
+disc_cycle_v <- function(
+    lcldr = 0.035,
+    lclprvtime = 0,
+    cyclelength,
+    lclcurtime,
+    lclval,
+    starttime = 0,
+    max_cycles = NULL
+) {
+  n <- length(lclval)
   
-  addcycle <- rep(0,length(lclval))
-  
-  #Note this makes the cycle utilities work weird, so do not use cycle utilities for now!
-  for (i in 1:length(lclval)) {
-    lclval_i <- lclval[i]
-    starttime_i <- starttime[i]
-    cyclelength_i <- cyclelength[i]
-    lclcurtime_i <- lclcurtime[i]
-    lclprvtime_i <- lclprvtime[i]
-    
-    
-    if (lclval_i==0 ) {} else{
-      
-      cycle.time.total <- if(starttime_i>= lclcurtime_i){0}else{seq(from=starttime_i, to = lclcurtime_i , by= cyclelength_i)} #all cycles that happened until current time of event
-      
-      #If the cost starts at the selected starttime or at time 0, then include that time, otherwise exclude it
-      if (lclprvtime_i==0) {
-        cycle.time <- c(0,cycle.time.total[cycle.time.total >= lclprvtime_i])  #times at which the cycles take place during this event, put this condition to count also time 0
-        n_cycles <- length(unique(cycle.time))
-        s <- (1+lcldr)^cyclelength_i -1
-        if (lcldr==0) {
-          addcycle[i] <- sum(addcycle[i],lclval_i * n_cycles )
-        } else{
-          addcycle[i] <- sum(addcycle[i],lclval_i * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1) )
-        }
-      } else{
-        if (starttime_i ==lclprvtime_i & lclprvtime_i==0) {
-          cycle.time <- cycle.time.total[cycle.time.total >= lclprvtime_i]  #times at which the cycles take place during this event, put this condition to count also time of the previous event
-        } else{
-          cycle.time <- cycle.time.total[cycle.time.total > lclprvtime_i]  #times at which the cycles take place during this event
-        }
-        n_cycles_remaining <- length(cycle.time)
-        d <- lclprvtime_i/cyclelength_i
-        s <- (1+lcldr)^cyclelength_i -1
-        if (lcldr==0) {
-          addcycle[i] <- sum(addcycle[i], lclval_i * n_cycles_remaining )
-        } else{
-          addcycle[i] <- sum(addcycle[i], lclval_i * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d)) )
-        }
-      }
-      
-      #If starting from 0, can be changed substituting interest rate such that s = (1+r)^cyclelength - 1, and using the formula that lclvalq * (1 - (1+s)^-n_cycles)/(s*(1+s)^-1)
-      #If starting from time t, then compute transformed time as d = t/cyclelength and use lclvalq * (1 - (1+s)^-n_cycles_remaining)/(s*(1+s)^(d-1)), where
-      #n_cycles_remaining is the n_cycles - d (so the remaining cycles to be considered), e.g. if 13 cycles (From t=0), and delay 6 periods, then n_cycles_remaining = 7 and d=6
-    }
-    
-    
+  # Recycle scalar inputs if necessary
+  if (length(lclprvtime) == 1) lclprvtime <- rep(lclprvtime, n)
+  if (length(cyclelength) == 1) cyclelength <- rep(cyclelength, n)
+  if (length(lclcurtime) == 1) lclcurtime <- rep(lclcurtime, n)
+  if (length(starttime) == 1) starttime <- rep(starttime, n)
+  if (is.null(max_cycles)) {
+    max_cycles <- rep(NA, n)
+  } else if (length(max_cycles) == 1) {
+    max_cycles <- rep(max_cycles, n)
   }
-  return(addcycle)
+  
+  # Compute total possible cycles in this step
+  total_cycles <- pmax(0, ceiling((lclcurtime - starttime) / cyclelength))
+  prev_cycles <-  pmax(0, ceiling((lclprvtime - starttime) / cyclelength))
+  n_cycles <- total_cycles - prev_cycles
+  
+  # Adjust n_cycles to account for the starting condition
+  n_cycles <- ifelse(lclprvtime == 0 & lclcurtime == 0, 1, n_cycles)
+  
+  # Cap using max_cycles
+  remaining_cycles <- ifelse(is.na(max_cycles), n_cycles, pmax(0, max_cycles - prev_cycles))
+  effective_cycles <- pmin(n_cycles, remaining_cycles)
+  
+  # Compute discount factor per row
+  s <- (1 + lcldr)^cyclelength - 1
+  d <- ifelse(lclprvtime==0,-1,lclprvtime / cyclelength)
+  
+  discounted <- numeric(n)
+  
+  if (lcldr == 0) {
+    discounted <- lclval * effective_cycles
+  } else {
+    discounted <- lclval * (1 - (1 + s)^(-effective_cycles)) / (s * (1 + s)^d)
+  }
+  
+  return(discounted)
 }
 
 # Model Events Interactions -------------------------------------------------------

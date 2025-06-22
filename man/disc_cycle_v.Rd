@@ -10,7 +10,8 @@ disc_cycle_v(
   cyclelength,
   lclcurtime,
   lclval,
-  starttime = 0
+  starttime = 0,
+  max_cycles = NULL
 )
 }
 \arguments{
@@ -25,15 +26,31 @@ disc_cycle_v(
 \item{lclval}{The  value to be discounted}
 
 \item{starttime}{The start time for accrual of cycle costs (if not 0)}
+
+\item{max_cycles}{The maximum number of cycles}
 }
 \value{
-Double based on cycle discounting
+Double vector based on cycle discounting
 }
 \description{
 Cycle discounting for vectors
 }
+\details{
+This function per cycle discounting, i.e., considers that the cost/qaly is accrued
+per cycles, and performs it automatically without needing to create new events.
+It can accommodate changes in cycle length/value/starttime (e.g., in the case of
+induction and maintenance doses) within the same item.
+}
 \examples{
-disc_cycle_v(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
+disc_cycle_v(lcldr=0.03, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
+disc_cycle_v(lcldr=0.000001, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0, max_cycles = 4)
 
-
+#Here we have a change in cycle length, max number of cylces and starttime at time 2 (e.g., induction to maintenance)
+#In the model, one would do this by redifining cycle_l, max_cycles and starttime of the corresponding item at a given event time. 
+disc_cycle_v(lcldr=0,
+ lclprvtime=c(0,1,2,2.5),
+ cyclelength=c(1/12, 1/12,1/2,1/2),
+ lclcurtime=c(1,2,2.5,4), lclval=c(500,500,500,500),
+ starttime=c(0,0,2,2), max_cycles = c(24,24,2,2)
+  )
 }

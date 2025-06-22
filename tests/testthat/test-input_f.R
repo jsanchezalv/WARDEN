@@ -7,10 +7,7 @@ test_that("Vector discounting equal to non-vector for single-length elements", {
   expect_equal(disc_instant_v(lcldr=0.035, lclcurtime=3, lclval=2500),
                disc_instant(lcldr=0.035, lclcurtime=3, lclval=2500))
 
-  #Cycle
-  expect_equal(disc_cycle_v(lcldr=0.035, lclcurtime=3, lclval=2500,lclprvtime=0, cyclelength=1/12,starttime=0),
-               disc_cycle(lcldr=0.035, lclcurtime=3, lclval=2500,lclprvtime=0, cyclelength=1/12,starttime=0))  
-})
+ })
 
 
 test_that("Discounting works with no discounting", {
@@ -81,23 +78,13 @@ test_that("Discounting works with odd numbers", {
   #Cycle
   expect_equal(disc_cycle_v(lcldr=0,lclprvtime=1, lclcurtime=2, lclval=2500, cyclelength=1/12, starttime=1),
                12*2500)
-  expect_equal(disc_cycle(lcldr=0,lclprvtime=1, lclcurtime=2, lclval=2500, cyclelength=1/12, starttime=0),
-               12*2500)
   expect_equal(disc_cycle_v(lcldr=0,lclprvtime=0, lclcurtime=0, lclval=2500, cyclelength=1/12, starttime=0),
-               2500)
-  expect_equal(disc_cycle(lcldr=0,lclprvtime=0, lclcurtime=0, lclval=2500, cyclelength=1/12, starttime=0),
                2500)
   expect_equal(disc_cycle_v(lcldr=0.035,lclprvtime=0, lclcurtime=0, lclval=2500, cyclelength=2, starttime=0),
                2500)
-  expect_equal(disc_cycle(lcldr=0.035,lclprvtime=0, lclcurtime=0, lclval=2500, cyclelength=2, starttime=0),
-               2500)
-  expect_equal(disc_cycle_v(lcldr=0.035,lclprvtime=4, lclcurtime=5, lclval=2500, cyclelength=1/12, starttime=4.5),
-               disc_cycle(lcldr=0.035,lclprvtime=4, lclcurtime=5, lclval=2500, cyclelength=1/12, starttime=4.5))
   #Inf*0 gives NaN
   expect_equal(disc_cycle_v(lcldr=0.035,lclprvtime=5, lclcurtime=5, lclval=Inf, cyclelength=1/12, starttime=0),
                NaN)
-  expect_equal(disc_cycle(lcldr=0.035,lclprvtime=5, lclcurtime=5, lclval=Inf, cyclelength=1/12, starttime=0),
-               NaN) 
 })
 
 

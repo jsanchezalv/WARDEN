@@ -32,6 +32,10 @@ Double based on cycle discounting
 \description{
 Cycle discounting
 }
+\details{
+Note this function counts both extremes of the interval, so the example below
+would consider 25 cycles, while disc_cycle_v leave the right interval open
+}
 \examples{
 disc_cycle(lcldr=0.035, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
 

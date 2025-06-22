@@ -290,7 +290,7 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
 #'
 #' @param x The specific cost/utility and its type (ongoing, instant...) to be used
 #' @param ifnull Value to be used if the input has not been defined
-#' @param type Identifies what type of input is being used. Can be "cost", "util", "cycle_l" (cycle length) and "cycle_starttime" (starting time of the cycle)
+#' @param type Identifies what type of input is being used. Can be "cost", "util", "cycle_l" (cycle length), "max_cycles" and "cycle_starttime" (starting time of the cycle)
 #' @param evt_arm_i The event-intervention identifier to understand which specific input to use, separated by an underscore
 #' @param input_list_arm_i  A list of simulation inputs
 #'
@@ -703,14 +703,16 @@ compute_outputs_timseq <- function(freq,
                                                              cyclelength = get(paste0(cat,"_","cycle_l")),
                                                              lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                              lclval= get(cat),
-                                                             starttime = get(paste0(cat,"_","cycle_starttime")))] 
+                                                             starttime = get(paste0(cat,"_","cycle_starttime")),
+                                                             max_cycles = get(paste0(cat,"_","max_cycles")))] 
     
     final_filtered[,paste0(cat) := disc_cycle_v(lcldr=if(cat %in% input_list$uc_lists$cost_categories_cycle){input_list$drc}else{input_list$drq},
                                                 lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                 cyclelength = get(paste0(cat,"_","cycle_l")),
                                                 lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                 lclval= get(cat),
-                                                starttime = get(paste0(cat,"_","cycle_starttime")))]
+                                                starttime = get(paste0(cat,"_","cycle_starttime")),
+                                                max_cycles = get(paste0(cat,"_","max_cycles")))]
     
     if(cat %in% input_list$uc_lists$cost_categories_cycle){
       final_filtered[, "costs" := costs + get(cat)]
@@ -1016,14 +1018,16 @@ compute_outputs <- function(patdata,input_list) {
                                                                     cyclelength = get(paste0(cat,"_","cycle_l")),
                                                                     lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                                     lclval= get(cat),
-                                                                    starttime = get(paste0(cat,"_","cycle_starttime")))] 
+                                                                    starttime = get(paste0(cat,"_","cycle_starttime")),
+                                                                    max_cycles = get(paste0(cat,"_","max_cycles")))] 
     
     patdata_dt[,paste0(cat) := disc_cycle_v(lcldr=if(cat %in% input_list$uc_lists$cost_categories_cycle){input_list$drc}else{input_list$drq},
                                                              lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                              cyclelength = get(paste0(cat,"_","cycle_l")),
                                                              lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
                                                              lclval= get(cat),
-                                                             starttime = get(paste0(cat,"_","cycle_starttime")))]
+                                                             starttime = get(paste0(cat,"_","cycle_starttime")),
+                                                             max_cycles = get(paste0(cat,"_","max_cycles")))]
     
     if(cat %in% input_list$uc_lists$cost_categories_cycle){
       patdata_dt[, "costs" := costs + get(cat)]

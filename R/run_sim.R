@@ -73,7 +73,8 @@
 #'  If the `cycle` lists are used, then it is expected the user will declare as well the name of the variable
 #'   pasted with `cycle_l` and `cycle_starttime` (e.g., c_default_cycle_l and c_default_cycle_starttime) to 
 #'   ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime 
-#'   being the starting time in which the variable started counting.
+#'   being the starting time in which the variable started counting. Optionally, `max_cycles` can also be added if there is a 
+#'   maximum number of cycles.
 #'   
 #'  `debug = TRUE` will export a log file with the timestamp up the error in the main working directory. Note that
 #'  using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
@@ -229,10 +230,10 @@ run_sim <- function(arm_list=c("int","noint"),
   categories_for_export <- unique(
     c(if(!is.null(categories_costs_ongoing)){categories_costs_ongoing},
       if(!is.null(categories_costs_instant)){categories_costs_instant},
-      if(!is.null(categories_costs_cycle)){c(categories_costs_cycle,paste0(categories_costs_cycle,"_cycle_l"),paste0(categories_costs_cycle,"_cycle_starttime"))},
+      if(!is.null(categories_costs_cycle)){c(categories_costs_cycle,paste0(categories_costs_cycle,"_cycle_l"),paste0(categories_costs_cycle,"_cycle_starttime"),paste0(categories_costs_cycle,"_max_cycles"))},
       if(!is.null(categories_utilities_ongoing)){categories_utilities_ongoing},
       if(!is.null(categories_utilities_instant)){categories_utilities_instant},
-      if(!is.null(categories_utilities_cycle)){c(categories_utilities_cycle,paste0(categories_utilities_cycle,"_cycle_l"),paste0(categories_utilities_cycle,"_cycle_starttime"))},
+      if(!is.null(categories_utilities_cycle)){c(categories_utilities_cycle,paste0(categories_utilities_cycle,"_cycle_l"),paste0(categories_utilities_cycle,"_cycle_starttime"),paste0(categories_utilities_cycle,"_max_cycles"))},
       if(!is.null(categories_other_ongoing)){categories_other_ongoing},
       if(!is.null(categories_other_instant)){categories_other_instant}
     ))
@@ -428,7 +429,6 @@ run_sim <- function(arm_list=c("int","noint"),
             )
           parent.env(input_list) <- parent.env(input_list_sens)
         }
-        
         if(input_list_sens$debug){ 
           names_all_input <- names(common_all_inputs)
           prev_value <- setNames(vector("list", length(common_all_inputs)), names_all_input)
