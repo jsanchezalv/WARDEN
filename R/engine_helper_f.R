@@ -70,6 +70,38 @@ load_inputs2 <- function(inputs,list_uneval_inputs){
   eval(list_uneval_inputs, inputs)
 }
 
+#' Function for debugging export
+#'
+#' @param old_data Old inputs before changes
+#' @param new_data New inputs after changes
+#'
+#' @return dump_info list of previous and current values
+#'
+#' @examples
+#' debug_inputs(input_list_pt,input_list_arm)
+#'
+#' @keywords internal
+#' @noRd
+debug_inputs <- function(old_data=NULL,new_data){
+  if(is.null(old_data)){
+    old_data <- environment()
+  }
+  names_new_inputs <- names(new_data)[!names(new_data) %in% new_data$names_rm_debug]
+  names_new_inputs <- names_new_inputs[!is.na(names_new_inputs)]
+  prev_value <- setNames(vector("list", length(names_new_inputs)), names_new_inputs)
+  prev_value[names_new_inputs] <- mget(names_new_inputs,old_data, ifnotfound = list(NULL))
+  cur_value <- mget(names_new_inputs,new_data)
+  
+  dif_vals <- !sapply(names_new_inputs, function(x) identical(prev_value[[x]],cur_value[[x]]))
+  dump_info <- list(
+    list(
+      prev_value = prev_value[dif_vals],
+      cur_value  = cur_value[dif_vals]
+    )
+  )
+  
+}
+
 # Initial event list --------------------------------------------------------------------------------------------------------------------------------------
 
 #' Execute the initial time to events and separate the events from other inputs that are stored

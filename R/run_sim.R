@@ -358,6 +358,8 @@ run_sim <- function(arm_list=c("int","noint"),
                        env_setup_arm = env_setup_arm
     )
     
+    
+    
     if(is.null(seed)){
       seed <- 1
     }
@@ -383,14 +385,7 @@ run_sim <- function(arm_list=c("int","noint"),
     }
     
     if(input_list_sens$debug){ 
-      names_sens_input <- names(sensitivity_inputs)
-      prev_value <- setNames(vector("list", length(sensitivity_inputs)), names_sens_input)
-      dump_info <- list(
-        list(
-          prev_value = prev_value,
-          cur_value  = mget(names_sens_input,input_list_sens)
-        )
-      )
+      dump_info <- debug_inputs(NULL,input_list_sens)
       
       names(dump_info) <- paste0("Analysis: ", input_list_sens$sens," ", input_list_sens$sens_name_used,
                                  "; Structural"
@@ -402,7 +397,7 @@ run_sim <- function(arm_list=c("int","noint"),
   }
 
 # Simulation loop ---------------------------------------------------------
-
+  
       
     for (simulation in 1:n_sim) {
       message(paste0("Simulation number: ",simulation))
@@ -429,16 +424,10 @@ run_sim <- function(arm_list=c("int","noint"),
             )
           parent.env(input_list) <- parent.env(input_list_sens)
         }
+        
         if(input_list_sens$debug){ 
-          names_all_input <- names(common_all_inputs)
-          prev_value <- setNames(vector("list", length(common_all_inputs)), names_all_input)
-          prev_value[names_all_input] <- mget(names_all_input,input_list_sens)
-          dump_info <- list(
-            list(
-              prev_value = prev_value,
-              cur_value  = mget(names_all_input,input_list) 
-            )
-          )
+          dump_info <- debug_inputs(input_list_sens,input_list)
+          
           
           names(dump_info) <- paste0("Analysis: ", input_list$sens," ", input_list$sens_name_used,
                                      "; Sim: ", input_list$simulation,

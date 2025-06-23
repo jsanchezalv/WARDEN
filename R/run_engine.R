@@ -72,15 +72,8 @@ run_engine <- function(arm_list,
       
       
       if(input_list$debug){ 
-        names_pt_input <- names(common_pt_inputs)
-        prev_value <- setNames(vector("list", length(common_pt_inputs)), names_pt_input)
-        prev_value[names_pt_input] <- mget(names_pt_input,input_list)
-        dump_info <- list(
-          list(
-            prev_value = prev_value,
-            cur_value  = mget(names_pt_input,input_list_pt)
-          )
-        )
+        dump_info <- debug_inputs(input_list,input_list_pt)
+        
         
         names(dump_info) <- paste0("Analysis: ", input_list_pt$sens," ", input_list_pt$sens_name_used,
                                    "; Sim: ", input_list_pt$simulation,
@@ -119,15 +112,7 @@ run_engine <- function(arm_list,
         }
         
         if(input_list_pt$debug){ 
-          names_pt_input <- names(unique_pt_inputs)
-          prev_value <- setNames(vector("list", length(unique_pt_inputs)), names_pt_input)
-          prev_value[names_pt_input] <- mget(names_pt_input,input_list_pt)
-          dump_info <- list(
-            list(
-              prev_value = prev_value,
-              cur_value  = mget(names_pt_input,input_list_arm)
-            )
-          )
+          dump_info <- debug_inputs(input_list_pt,input_list_arm)
           
           names(dump_info) <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                                      "; Sim: ", input_list_arm$simulation,
