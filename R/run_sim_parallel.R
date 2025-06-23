@@ -519,7 +519,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                   sens,
                   "; simulation: ",
                   if(exists("simulation")){simulation}else{"None"},
-                  ". Error message: ",e$message)
+                  ". Error message: ",e$message," in ", e$call)
         } else{
           if(debug){
             stop("Due to using a parallel engine for simulations, debug file will only include analysis inputs if continue_on_error = FALSE.
@@ -528,14 +528,14 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                   "; simulation: ",
                   if(exists("simulation")){simulation}else{"None"},
                   ". Error message: ",
-                  e$message)
+                  e$message," in ", e$call)
           }else{
             stop("Error message at analysis ",
                  sens,
                  "; simulation: ",
                  if(exists("simulation")){simulation}else{"None"},
                  ". Error message: ",
-                 e$message)
+                 e$message," in ", e$call)
           }
         }
       }
@@ -556,7 +556,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                 "; simulation: ",
                 if(exists("simulation")){simulation}else{"None"},
                 ". Error message: ",
-                e$message)
+                e$message," in ", e$call)
       } else{
         if(debug){
           if(!exists("final_output") & length(log_list)>0){
@@ -588,7 +588,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                "; simulation: ",
                if(exists("simulation")){simulation}else{"None"},
                ". Error message: ",
-               e$message)
+               e$message," in ", e$call)
         }else{
           stop(e$message)
         }

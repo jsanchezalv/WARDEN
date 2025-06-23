@@ -260,7 +260,7 @@ run_engine <- function(arm_list,
       
       final_output <- list()  
       final_output$log_list <- lapply(temp_log_pt,transform_debug)
-      final_output$error_m <- paste0(e$message,
+      final_output$error_m <- paste0(e$message," in ", e$call,
                                      paste0(". Error in patient: ", if(exists("i")){i},
                                              "; arm: ", if(exists("arm")){arm},
                                              "; event: ", if(exists("Evt")){Evt$evt},
@@ -270,7 +270,7 @@ run_engine <- function(arm_list,
     }else if(input_list$continue_on_error){
       final_output <- list()  
       
-      final_output$error_m <- paste0(e$message,
+      final_output$error_m <- paste0(e$message," in ", e$call,
                                      paste0(". Error in patient: ", if(exists("i")){i},
                                              "; arm: ", if(exists("arm")){arm},
                                              "; event: ", if(exists("Evt")){Evt$evt},
@@ -279,8 +279,9 @@ run_engine <- function(arm_list,
       return(final_output)
       
     } else{
-      stop(paste0(e$message,
-                  paste0("Error in patient: ", if(exists("i")){i},
+      
+      stop(paste0(" ", e$message," in ", e$call,
+                  paste0(". Error in patient: ", if(exists("i")){i},
                            "; arm: ", if(exists("arm")){arm},
                            "; event: ", if(exists("Evt")){Evt$evt},
                            "; time: ", if(exists("Evt")){Evt$evttime})

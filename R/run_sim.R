@@ -495,7 +495,7 @@ run_sim <- function(arm_list=c("int","noint"),
                   sens,
                   "; simulation: ",
                   if(exists("simulation")){simulation}else{"None"},
-                  ". Error message: ",e$message)
+                  ". Error message: ",e$message," in ", e$call)
         } else{
           if(debug){
             flag_noerr_sim <<- FALSE
@@ -531,14 +531,14 @@ run_sim <- function(arm_list=c("int","noint"),
                   "; simulation: ",
                   if(exists("simulation")){simulation}else{"None"},
                   ". Error message: ",
-                  e$message)
+                  e$message," in ", e$call)
           }else{
             stop("Error message at analysis ",
                  sens,
                  "; simulation: ",
                  if(exists("simulation")){simulation}else{"None"},
                  ". Error message: ",
-                 e$message)
+                 e$message," in ", e$call)
           }
         }
       }
@@ -559,7 +559,7 @@ run_sim <- function(arm_list=c("int","noint"),
                 "; simulation: ",
                 if(exists("simulation")){simulation}else{"None"},
                 ". Error message: ",
-                e$message)
+                e$message," in ", e$call)
         } else{
         if(debug & flag_noerr_sim){
           if(length(log_list)>0 | exists("output_sim") | exists("final_output")){
@@ -590,7 +590,7 @@ run_sim <- function(arm_list=c("int","noint"),
                "; simulation: ",
                if(exists("simulation")){simulation}else{"None"},
                ". Error message: ",
-               e$message)
+               e$message," in ", e$call)
         }else{
           stop(e$message)
         }
