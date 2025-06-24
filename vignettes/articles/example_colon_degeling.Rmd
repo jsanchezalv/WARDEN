@@ -1995,7 +1995,7 @@ results_psa <- run_sim_parallel(
   cost_instant_list = cost_instant,
   cost_cycle_list = cost_cycle,
   ipd = 3,
-  ncores = min(availableCores(omit=1),4)
+  ncores = min(future::availableCores(omit=1),4)
 )
   
 summary_results_sim(results_psa[[1]], arm ="two") 
