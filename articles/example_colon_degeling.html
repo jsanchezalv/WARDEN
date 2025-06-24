@@ -88,7 +88,7 @@ Alvarez</h4>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This document makes use of the code provided by <a href="https://link.springer.com/article/10.1007/s40258-025-00983-8" class="external-link">Deleging
+<p>This document makes use of the code provided by <a href="https://link.springer.com/article/10.1007/s40258-025-00983-8" class="external-link">Degeling
 et al. (2025)</a> which use simmer in their original approach, to
 showcase how the same model would be written with WARDEN instead of
 using simmer, reflecting on the advantages and disadvantages of each
@@ -481,9 +481,9 @@ results.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 11.83s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 11.83s</span></span>
-<span><span class="co">#&gt; Total time to run: 11.84s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 11.42s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 11.42s</span></span>
+<span><span class="co">#&gt; Total time to run: 11.42s</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -1364,9 +1364,9 @@ structure.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 5.99s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 6s</span></span>
-<span><span class="co">#&gt; Total time to run: 6s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 5.78s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 5.78s</span></span>
+<span><span class="co">#&gt; Total time to run: 5.79s</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="summary-of-results">Summary of Results<a class="anchor" aria-label="anchor" href="#summary-of-results"></a>
 </h3>
@@ -2498,19 +2498,11 @@ two
 </tr>
 </tbody>
 </table>
-<pre><code><span><span class="co">#&gt; Warning: Removed 22 rows containing missing values or values outside the scale range</span></span>
-<span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre>
-<p><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; Warning: Removed 14 rows containing missing values or values outside the scale range</span></span>
-<span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre>
-<p><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; Warning: Removed 21 rows containing missing values or values outside the scale range</span></span>
-<span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre>
-<p><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-3.png" width="700">
+<p><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-1.png" width="700"><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-2.png" width="700"><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-3.png" width="700">
 # Probabilistic Case We will now use the<code>pick_val_v</code>
 function. We just showcase this, and will not run it for the sake of
 saving computation time.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">thetaToProb</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -2681,8 +2673,8 @@ saving computation time.</p>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 6.94s</span></span>
-<span><span class="co">#&gt; Total time to run: 6.94s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 6.69s</span></span>
+<span><span class="co">#&gt; Total time to run: 6.7s</span></span>
 <span>  </span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results_psa</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, arm <span class="op">=</span><span class="st">"two"</span><span class="op">)</span> </span>
 <span><span class="co">#&gt;                                                    one</span></span>
