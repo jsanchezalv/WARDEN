@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,7 @@
     <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
     <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jsanchezalv/WARDEN" aria-label="View on Github"><span class="fa fa-github"></span></a></li>
       </ul></div>
@@ -236,8 +237,8 @@ This means more processing of the results data would be needed in order for it t
 <p>If the <code>cycle</code> lists are used, then it is expected the user will declare as well the name of the variable
 pasted with <code>cycle_l</code> and <code>cycle_starttime</code> (e.g., c_default_cycle_l and c_default_cycle_starttime) to
 ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime
-being the starting time in which the variable started counting. Optionally, <code>max_cycles</code> can also be added if there is a
-maximum number of cycles.</p>
+being the starting time in which the variable started counting. Optionally, <code>max_cycles</code> must also be added (if no
+maximum number of cycles, it should be set equal to NA).</p>
 <p><code>debug = TRUE</code> will export a log file with the timestamp up the error in the main working directory. Note that
 using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
 as the AST may not catch all the relevant assignments (e.g., an assigment like assign(paste("x_",i),5)

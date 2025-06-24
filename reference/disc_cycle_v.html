@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,7 @@
     <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
     <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jsanchezalv/WARDEN" aria-label="View on Github"><span class="fa fa-github"></span></a></li>
       </ul></div>
@@ -113,11 +114,20 @@ induction and maintenance doses) within the same item.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">disc_cycle_v</span><span class="op">(</span>lcldr<span class="op">=</span><span class="fl">0.03</span>, lclprvtime<span class="op">=</span><span class="fl">0</span>, cyclelength<span class="op">=</span><span class="fl">1</span><span class="op">/</span><span class="fl">12</span>, lclcurtime<span class="op">=</span><span class="fl">2</span>, lclval<span class="op">=</span><span class="fl">500</span>,starttime<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 11666.54</span>
-<span class="r-in"><span><span class="fu">disc_cycle_v</span><span class="op">(</span>lcldr<span class="op">=</span><span class="fl">0.000001</span>, lclprvtime<span class="op">=</span><span class="fl">0</span>, cyclelength<span class="op">=</span><span class="fl">1</span><span class="op">/</span><span class="fl">12</span>, lclcurtime<span class="op">=</span><span class="fl">2</span>, lclval<span class="op">=</span><span class="fl">500</span>,starttime<span class="op">=</span><span class="fl">0</span>, max_cycles <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">disc_cycle_v</span><span class="op">(</span></span></span>
+<span class="r-in"><span> lcldr<span class="op">=</span><span class="fl">0.000001</span>,</span></span>
+<span class="r-in"><span> lclprvtime<span class="op">=</span><span class="fl">0</span>,</span></span>
+<span class="r-in"><span> cyclelength<span class="op">=</span><span class="fl">1</span><span class="op">/</span><span class="fl">12</span>,</span></span>
+<span class="r-in"><span> lclcurtime<span class="op">=</span><span class="fl">2</span>,</span></span>
+<span class="r-in"><span> lclval<span class="op">=</span><span class="fl">500</span>,</span></span>
+<span class="r-in"><span> starttime<span class="op">=</span><span class="fl">0</span>,</span></span>
+<span class="r-in"><span> max_cycles <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2000</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">#Here we have a change in cycle length, max number of cylces and starttime at time 2 (e.g., induction to maintenance)</span></span></span>
-<span class="r-in"><span><span class="co">#In the model, one would do this by redifining cycle_l, max_cycles and starttime of the corresponding item at a given event time. </span></span></span>
+<span class="r-in"><span><span class="co">#Here we have a change in cycle length, max number of cylces and starttime at time 2</span></span></span>
+<span class="r-in"><span> <span class="co">#(e.g., induction to maintenance)</span></span></span>
+<span class="r-in"><span><span class="co">#In the model, one would do this by redifining cycle_l, max_cycles and starttime</span></span></span>
+<span class="r-in"><span> <span class="co">#of the corresponding item at a given event time. </span></span></span>
 <span class="r-in"><span><span class="fu">disc_cycle_v</span><span class="op">(</span>lcldr<span class="op">=</span><span class="fl">0</span>,</span></span>
 <span class="r-in"><span> lclprvtime<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2.5</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span> cyclelength<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">12</span>, <span class="fl">1</span><span class="op">/</span><span class="fl">12</span>,<span class="fl">1</span><span class="op">/</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,</span></span>
