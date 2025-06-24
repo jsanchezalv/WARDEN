@@ -930,9 +930,9 @@ compute_outputs <- function(patdata,input_list) {
   } else{
     list_patdata2 <- list_patdata
   }
-  
+ 
   patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata2,fill=TRUE)))
-  
+
   rm(list_patdata2)
   
   #Extract only extra data that the user wants to export
@@ -1045,6 +1045,7 @@ compute_outputs <- function(patdata,input_list) {
   
   #Discount and undiscount cycle
   for (cat in input_list$uc_lists$cycle_inputs) {
+    
     patdata_dt[,paste0(cat,"_","undisc") := disc_cycle_v(lcldr=0,
                                                                     lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                                     cyclelength = get(paste0(cat,"_","cycle_l")),

@@ -73,8 +73,8 @@
 #'  If the `cycle` lists are used, then it is expected the user will declare as well the name of the variable
 #'   pasted with `cycle_l` and `cycle_starttime` (e.g., c_default_cycle_l and c_default_cycle_starttime) to 
 #'   ensure the discounting can be computed using cycles, with cycle_l being the cycle length, and cycle_starttime 
-#'   being the starting time in which the variable started counting. Optionally, `max_cycles` can also be added if there is a 
-#'   maximum number of cycles.
+#'   being the starting time in which the variable started counting. Optionally, `max_cycles` must also be added (if no
+#'   maximum number of cycles, it should be set equal to NA).
 #'   
 #'  `debug = TRUE` will export a log file with the timestamp up the error in the main working directory. Note that
 #'  using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
