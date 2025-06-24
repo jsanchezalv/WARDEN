@@ -2,7 +2,7 @@
 
 * This is a package fix. In this version I have:
 
-* Fixed discounting rate separating now appropiately costs and health inputs.
+* Fixed per cycle discounting.
 
 ## R CMD check results
 

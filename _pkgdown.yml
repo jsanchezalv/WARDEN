@@ -44,6 +44,8 @@ navbar:
           href: articles/example_uncertainty.html
         - text: "Example for Individual Patient Data"
           href: articles/example_ipd.html
+        - text: "Degeling (2025) using WARDEN instead of simmer"
+          href: articles/example_colon_degeling.html
   right:
     - icon: fa-github
       href: https://github.com/jsanchezalv/WARDEN

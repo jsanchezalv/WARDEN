@@ -1,6 +1,7 @@
 # WARDEN (development version)
 
 # WARDEN 1.2.1
+* Discounting now correctly allocates to drq or drc depending on output. Other inputs use drc.
 
 # WARDEN 1.2.0
 * Speed gains from rewritten internal compute_outputs function.

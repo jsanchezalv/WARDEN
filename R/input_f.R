@@ -1277,10 +1277,19 @@ disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval
 #'
 #' @examples 
 #' disc_cycle_v(lcldr=0.03, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0)
-#' disc_cycle_v(lcldr=0.000001, lclprvtime=0, cyclelength=1/12, lclcurtime=2, lclval=500,starttime=0, max_cycles = 4)
+#' disc_cycle_v(
+#'  lcldr=0.000001,
+#'  lclprvtime=0,
+#'  cyclelength=1/12,
+#'  lclcurtime=2,
+#'  lclval=500,
+#'  starttime=0,
+#'  max_cycles = 4)
 #' 
-#' #Here we have a change in cycle length, max number of cylces and starttime at time 2 (e.g., induction to maintenance)
-#' #In the model, one would do this by redifining cycle_l, max_cycles and starttime of the corresponding item at a given event time. 
+#' #Here we have a change in cycle length, max number of cylces and starttime at time 2
+#'  (e.g., induction to maintenance)
+#' #In the model, one would do this by redifining cycle_l, max_cycles and starttime
+#'  of the corresponding item at a given event time. 
 #' disc_cycle_v(lcldr=0,
 #'  lclprvtime=c(0,1,2,2.5),
 #'  cyclelength=c(1/12, 1/12,1/2,1/2),
