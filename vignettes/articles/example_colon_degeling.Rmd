@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-This document makes use of the code provided by [Deleging et al. (2025)](https://link.springer.com/article/10.1007/s40258-025-00983-8) which use simmer in their original approach, to showcase how the same model would be written with WARDEN instead of using simmer, reflecting on the advantages and disadvantages of each approach.
+This document makes use of the code provided by [Degeling et al. (2025)](https://link.springer.com/article/10.1007/s40258-025-00983-8) which use simmer in their original approach, to showcase how the same model would be written with WARDEN instead of using simmer, reflecting on the advantages and disadvantages of each approach.
 
 Note that the model used is not resource constrained, which implies WARDEN can be used to replicate the model. We will then see an alternative approach that could have been taken in the model design to simplify the code and reduce the number of events defined.
 
@@ -1805,7 +1805,7 @@ We have plotted the observations through the simulation run for simmer with 3 di
 
 The running times with the original WARDEN approach are comparable to those of simmer shown by the paper, even if simmer uses a C++ implementation in the back-end. By using the reworked approach, WARDEN is able to cut running time by half. In my computer simmer took between 220 and 300 seconds to run 100,000 simulations. With WARDEN, the "one to one" approach took around 200 seconds. The reworked approach took 100 seconds.
 
-```{r echo = FALSE}
+```{r echo = FALSE, warning=FALSE, message=FALSE}
 
 
 summary_results_det(results2[[1]][[1]], arm ="two") #print first simulation
@@ -1821,19 +1821,22 @@ ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","W
        , aes(x=pat_id,y=ICER, col = type,linetype=linetype))+
    geom_line(linewidth=1.1) +
   theme_bw() +
-  ylim(45000,52000)
+  ylim(45000,52000)+
+    theme(legend.position="bottom")
 
 ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
        aes(x=pat_id,y=inc_costs, col = type,linetype=linetype))+
     geom_line(linewidth=1.1) +
   theme_bw()  +
-  ylim(92500,94500)
+  ylim(92500,94500)+
+    theme(legend.position="bottom")
 
 ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
        aes(x=pat_id,y=inc_qalys, col = type,linetype=linetype))+
   geom_line(linewidth=1.1) +
   theme_bw() +
-  ylim(1.8,2.1)
+  ylim(1.8,2.1)+
+    theme(legend.position="bottom")
 
 
 ```
