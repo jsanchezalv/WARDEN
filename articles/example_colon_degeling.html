@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -481,9 +481,9 @@ results.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 11.75s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 11.75s</span></span>
-<span><span class="co">#&gt; Total time to run: 11.75s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 11.69s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 11.69s</span></span>
+<span><span class="co">#&gt; Total time to run: 11.69s</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -1364,7 +1364,7 @@ structure.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 5.86s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 5.87s</span></span>
 <span><span class="co">#&gt; Time to run analysis 1: 5.87s</span></span>
 <span><span class="co">#&gt; Total time to run: 5.87s</span></span></code></pre></div>
 <div class="section level3">
@@ -2498,10 +2498,14 @@ two
 </tr>
 </tbody>
 </table>
-<p><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-1.png" width="700"><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-2.png" width="700"><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-3.png" width="700">
-# Probabilistic Case We will now use the<code>pick_val_v</code>
-function. We just showcase this, and will not run it for the sake of
-saving computation time.</p>
+<p><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-1.png" width="700"><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-2.png" width="700"><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-3.png" width="700"></p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="probabilistic-case">Probabilistic Case<a class="anchor" aria-label="anchor" href="#probabilistic-case"></a>
+</h2>
+<p>We will now use the<code>pick_val_v</code> function. We just showcase
+this, and will not run it for the sake of saving computation time.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">thetaToProb</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -2673,87 +2677,87 @@ saving computation time.</p>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 8.21s</span></span>
-<span><span class="co">#&gt; Total time to run: 8.21s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 6.84s</span></span>
+<span><span class="co">#&gt; Total time to run: 6.85s</span></span>
 <span>  </span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results_psa</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, arm <span class="op">=</span><span class="st">"two"</span><span class="op">)</span> </span>
 <span><span class="co">#&gt;                                                    one</span></span>
-<span><span class="co">#&gt; costs                          75,042 (72,611; 76,518)</span></span>
-<span><span class="co">#&gt; dcosts                         91,894 (88,448; 94,004)</span></span>
-<span><span class="co">#&gt; lys                                  8.48 (7.61; 9.22)</span></span>
-<span><span class="co">#&gt; dlys                                 2.21 (1.28; 3.57)</span></span>
-<span><span class="co">#&gt; qalys                                6.53 (5.75; 7.15)</span></span>
-<span><span class="co">#&gt; dqalys                               1.83 (1.06; 2.89)</span></span>
-<span><span class="co">#&gt; ICER                           47,471 (25,299; 73,664)</span></span>
-<span><span class="co">#&gt; ICUR                           57,348 (31,093; 88,616)</span></span>
-<span><span class="co">#&gt; INMB                            -609 (-39,893; 56,060)</span></span>
-<span><span class="co">#&gt; costs_undisc                   77,315 (74,609; 78,985)</span></span>
-<span><span class="co">#&gt; dcosts_undisc                  92,708 (88,869; 95,069)</span></span>
-<span><span class="co">#&gt; lys_undisc                           9.95 (8.86; 10.9)</span></span>
-<span><span class="co">#&gt; dlys_undisc                          2.78 (1.61; 4.49)</span></span>
-<span><span class="co">#&gt; qalys_undisc                         7.69 (6.73; 8.46)</span></span>
-<span><span class="co">#&gt; dqalys_undisc                        2.28 (1.33; 3.62)</span></span>
-<span><span class="co">#&gt; ICER_undisc                    38,238 (20,226; 59,058)</span></span>
-<span><span class="co">#&gt; ICUR_undisc                    46,395 (24,942; 71,456)</span></span>
-<span><span class="co">#&gt; INMB_undisc                   21,248 (-27,465; 92,243)</span></span>
-<span><span class="co">#&gt; cost_adj                       46,079 (45,551; 46,697)</span></span>
-<span><span class="co">#&gt; dcost_adj                      95,023 (93,972; 96,851)</span></span>
+<span><span class="co">#&gt; costs                          75,042 (72,335; 76,571)</span></span>
+<span><span class="co">#&gt; dcosts                         91,894 (88,203; 94,048)</span></span>
+<span><span class="co">#&gt; lys                                  8.48 (7.56; 9.24)</span></span>
+<span><span class="co">#&gt; dlys                                 2.21 (1.22; 3.71)</span></span>
+<span><span class="co">#&gt; qalys                                6.53 (5.69; 7.19)</span></span>
+<span><span class="co">#&gt; dqalys                               1.83 (1.02; 2.99)</span></span>
+<span><span class="co">#&gt; ICER                           47,471 (23,789; 76,107)</span></span>
+<span><span class="co">#&gt; ICUR                           57,348 (29,506; 91,418)</span></span>
+<span><span class="co">#&gt; INMB                            -609 (-42,117; 61,262)</span></span>
+<span><span class="co">#&gt; costs_undisc                   77,315 (74,305; 79,047)</span></span>
+<span><span class="co">#&gt; dcosts_undisc                  92,708 (88,590; 95,131)</span></span>
+<span><span class="co">#&gt; lys_undisc                            9.95 (8.8; 10.9)</span></span>
+<span><span class="co">#&gt; dlys_undisc                          2.78 (1.54; 4.67)</span></span>
+<span><span class="co">#&gt; qalys_undisc                         7.69 (6.65; 8.52)</span></span>
+<span><span class="co">#&gt; dqalys_undisc                        2.28 (1.27; 3.75)</span></span>
+<span><span class="co">#&gt; ICER_undisc                    38,238 (18,990; 60,959)</span></span>
+<span><span class="co">#&gt; ICUR_undisc                    46,395 (23,637; 73,645)</span></span>
+<span><span class="co">#&gt; INMB_undisc                   21,248 (-30,157; 98,810)</span></span>
+<span><span class="co">#&gt; cost_adj                       46,079 (45,526; 46,724)</span></span>
+<span><span class="co">#&gt; dcost_adj                      95,023 (93,947; 96,982)</span></span>
 <span><span class="co">#&gt; cost_adj_cycle_l                       0.2 (0.19; 0.2)</span></span>
-<span><span class="co">#&gt; dcost_adj_cycle_l               -0.004 (-0.01; -0.002)</span></span>
+<span><span class="co">#&gt; dcost_adj_cycle_l              -0.004 (-0.011; -0.001)</span></span>
 <span><span class="co">#&gt; cost_adj_cycle_starttime                      0 (0; 0)</span></span>
 <span><span class="co">#&gt; dcost_adj_cycle_starttime                     0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_adj_max_cycles                  34.4 (33.6; 34.9)</span></span>
-<span><span class="co">#&gt; dcost_adj_max_cycles            -0.778 (-1.73; -0.267)</span></span>
-<span><span class="co">#&gt; cost_adj_undisc                46,531 (45,996; 47,158)</span></span>
-<span><span class="co">#&gt; dcost_adj_undisc               95,972 (94,906; 97,828)</span></span>
-<span><span class="co">#&gt; cost_advanced                  24,760 (22,763; 26,467)</span></span>
-<span><span class="co">#&gt; dcost_advanced                 -5,292 (-8,423; -3,356)</span></span>
-<span><span class="co">#&gt; cost_advanced_undisc           26,269 (23,987; 28,191)</span></span>
-<span><span class="co">#&gt; dcost_advanced_undisc          -5,523 (-9,075; -3,402)</span></span>
-<span><span class="co">#&gt; cost_monitor                      2,183 (2,076; 2,271)</span></span>
-<span><span class="co">#&gt; dcost_monitor                           477 (322; 669)</span></span>
-<span><span class="co">#&gt; cost_monitor_cycle_l                 3.44 (3.37; 3.48)</span></span>
-<span><span class="co">#&gt; dcost_monitor_cycle_l          -0.078 (-0.173; -0.027)</span></span>
+<span><span class="co">#&gt; dcost_adj_max_cycles             -0.778 (-1.83; -0.26)</span></span>
+<span><span class="co">#&gt; cost_adj_undisc                46,531 (45,970; 47,185)</span></span>
+<span><span class="co">#&gt; dcost_adj_undisc               95,972 (94,880; 97,960)</span></span>
+<span><span class="co">#&gt; cost_advanced                  24,760 (22,591; 26,587)</span></span>
+<span><span class="co">#&gt; dcost_advanced                 -5,292 (-8,788; -3,248)</span></span>
+<span><span class="co">#&gt; cost_advanced_undisc           26,269 (23,788; 28,322)</span></span>
+<span><span class="co">#&gt; dcost_advanced_undisc          -5,523 (-9,481; -3,284)</span></span>
+<span><span class="co">#&gt; cost_monitor                      2,183 (2,066; 2,277)</span></span>
+<span><span class="co">#&gt; dcost_monitor                           477 (311; 683)</span></span>
+<span><span class="co">#&gt; cost_monitor_cycle_l                 3.44 (3.36; 3.48)</span></span>
+<span><span class="co">#&gt; dcost_monitor_cycle_l          -0.078 (-0.183; -0.026)</span></span>
 <span><span class="co">#&gt; cost_monitor_cycle_starttime         2.71 (2.67; 2.74)</span></span>
-<span><span class="co">#&gt; dcost_monitor_cycle_starttime  -0.094 (-0.149; -0.059)</span></span>
+<span><span class="co">#&gt; dcost_monitor_cycle_starttime  -0.094 (-0.156; -0.057)</span></span>
 <span><span class="co">#&gt; cost_monitor_max_cycles              17.2 (16.8; 17.4)</span></span>
-<span><span class="co">#&gt; dcost_monitor_max_cycles       -0.389 (-0.867; -0.133)</span></span>
-<span><span class="co">#&gt; cost_monitor_undisc               2,475 (2,348; 2,581)</span></span>
-<span><span class="co">#&gt; dcost_monitor_undisc                    556 (373; 783)</span></span>
-<span><span class="co">#&gt; cost_tox                          2,020 (1,784; 2,257)</span></span>
-<span><span class="co">#&gt; dcost_tox                         1,686 (1,413; 1,983)</span></span>
+<span><span class="co">#&gt; dcost_monitor_max_cycles        -0.389 (-0.915; -0.13)</span></span>
+<span><span class="co">#&gt; cost_monitor_undisc               2,475 (2,337; 2,588)</span></span>
+<span><span class="co">#&gt; dcost_monitor_undisc                    556 (360; 801)</span></span>
+<span><span class="co">#&gt; cost_tox                          2,020 (1,766; 2,273)</span></span>
+<span><span class="co">#&gt; dcost_tox                         1,686 (1,405; 1,999)</span></span>
 <span><span class="co">#&gt; cost_tox_cycle_l                       0.2 (0.19; 0.2)</span></span>
-<span><span class="co">#&gt; dcost_tox_cycle_l               -0.004 (-0.01; -0.002)</span></span>
+<span><span class="co">#&gt; dcost_tox_cycle_l              -0.004 (-0.011; -0.001)</span></span>
 <span><span class="co">#&gt; cost_tox_cycle_starttime                      0 (0; 0)</span></span>
 <span><span class="co">#&gt; dcost_tox_cycle_starttime                     0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_tox_max_cycles                  34.4 (33.6; 34.9)</span></span>
-<span><span class="co">#&gt; dcost_tox_max_cycles            -0.778 (-1.73; -0.267)</span></span>
-<span><span class="co">#&gt; cost_tox_undisc                   2,040 (1,802; 2,280)</span></span>
-<span><span class="co">#&gt; dcost_tox_undisc                  1,703 (1,427; 2,003)</span></span>
-<span><span class="co">#&gt; q_total                              6.53 (5.75; 7.15)</span></span>
-<span><span class="co">#&gt; dq_total                             1.83 (1.06; 2.89)</span></span>
-<span><span class="co">#&gt; q_total_undisc                       7.69 (6.73; 8.46)</span></span>
-<span><span class="co">#&gt; dq_total_undisc                      2.28 (1.33; 3.62)</span></span>
+<span><span class="co">#&gt; dcost_tox_max_cycles             -0.778 (-1.83; -0.26)</span></span>
+<span><span class="co">#&gt; cost_tox_undisc                   2,040 (1,784; 2,295)</span></span>
+<span><span class="co">#&gt; dcost_tox_undisc                  1,703 (1,419; 2,019)</span></span>
+<span><span class="co">#&gt; q_total                              6.53 (5.69; 7.19)</span></span>
+<span><span class="co">#&gt; dq_total                             1.83 (1.02; 2.99)</span></span>
+<span><span class="co">#&gt; q_total_undisc                       7.69 (6.65; 8.52)</span></span>
+<span><span class="co">#&gt; dq_total_undisc                      2.28 (1.27; 3.75)</span></span>
 <span><span class="co">#&gt;                                                      two</span></span>
-<span><span class="co">#&gt; costs                         166,937 (164,827; 169,604)</span></span>
+<span><span class="co">#&gt; costs                         166,937 (164,775; 169,655)</span></span>
 <span><span class="co">#&gt; dcosts                                          0 (0; 0)</span></span>
-<span><span class="co">#&gt; lys                                    10.7 (10.1; 11.2)</span></span>
+<span><span class="co">#&gt; lys                                    10.7 (10.1; 11.3)</span></span>
 <span><span class="co">#&gt; dlys                                            0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys                                  8.35 (7.98; 8.74)</span></span>
+<span><span class="co">#&gt; qalys                                  8.35 (7.96; 8.74)</span></span>
 <span><span class="co">#&gt; dqalys                                          0 (0; 0)</span></span>
 <span><span class="co">#&gt; ICER                                        NaN (NA; NA)</span></span>
 <span><span class="co">#&gt; ICUR                                        NaN (NA; NA)</span></span>
 <span><span class="co">#&gt; INMB                                        NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; costs_undisc                  170,023 (167,696; 172,895)</span></span>
+<span><span class="co">#&gt; costs_undisc                  170,023 (167,637; 172,942)</span></span>
 <span><span class="co">#&gt; dcosts_undisc                                   0 (0; 0)</span></span>
-<span><span class="co">#&gt; lys_undisc                               12.7 (12; 13.4)</span></span>
+<span><span class="co">#&gt; lys_undisc                             12.7 (11.9; 13.5)</span></span>
 <span><span class="co">#&gt; dlys_undisc                                     0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys_undisc                            9.96 (9.5; 10.4)</span></span>
+<span><span class="co">#&gt; qalys_undisc                           9.96 (9.47; 10.4)</span></span>
 <span><span class="co">#&gt; dqalys_undisc                                   0 (0; 0)</span></span>
 <span><span class="co">#&gt; ICER_undisc                                 NaN (NA; NA)</span></span>
 <span><span class="co">#&gt; ICUR_undisc                                 NaN (NA; NA)</span></span>
 <span><span class="co">#&gt; INMB_undisc                                 NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; cost_adj                      141,102 (139,724; 143,331)</span></span>
+<span><span class="co">#&gt; cost_adj                      141,102 (139,724; 143,435)</span></span>
 <span><span class="co">#&gt; dcost_adj                                       0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_adj_cycle_l                        0.19 (0.19; 0.2)</span></span>
 <span><span class="co">#&gt; dcost_adj_cycle_l                               0 (0; 0)</span></span>
@@ -2761,13 +2765,13 @@ saving computation time.</p>
 <span><span class="co">#&gt; dcost_adj_cycle_starttime                       0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_adj_max_cycles                      33.6 (33; 34.2)</span></span>
 <span><span class="co">#&gt; dcost_adj_max_cycles                            0 (0; 0)</span></span>
-<span><span class="co">#&gt; cost_adj_undisc               142,503 (141,105; 144,765)</span></span>
+<span><span class="co">#&gt; cost_adj_undisc               142,503 (141,105; 144,870)</span></span>
 <span><span class="co">#&gt; dcost_adj_undisc                                0 (0; 0)</span></span>
-<span><span class="co">#&gt; cost_advanced                    19,468 (17,953; 20,937)</span></span>
+<span><span class="co">#&gt; cost_advanced                    19,468 (17,798; 21,064)</span></span>
 <span><span class="co">#&gt; dcost_advanced                                  0 (0; 0)</span></span>
-<span><span class="co">#&gt; cost_advanced_undisc             20,746 (19,007; 22,390)</span></span>
+<span><span class="co">#&gt; cost_advanced_undisc             20,746 (18,841; 22,543)</span></span>
 <span><span class="co">#&gt; dcost_advanced_undisc                           0 (0; 0)</span></span>
-<span><span class="co">#&gt; cost_monitor                        2,660 (2,584; 2,758)</span></span>
+<span><span class="co">#&gt; cost_monitor                        2,660 (2,584; 2,759)</span></span>
 <span><span class="co">#&gt; dcost_monitor                                   0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_monitor_cycle_l                    3.36 (3.3; 3.42)</span></span>
 <span><span class="co">#&gt; dcost_monitor_cycle_l                           0 (0; 0)</span></span>
@@ -2775,9 +2779,9 @@ saving computation time.</p>
 <span><span class="co">#&gt; dcost_monitor_cycle_starttime                   0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_monitor_max_cycles                16.8 (16.5; 17.1)</span></span>
 <span><span class="co">#&gt; dcost_monitor_max_cycles                        0 (0; 0)</span></span>
-<span><span class="co">#&gt; cost_monitor_undisc                 3,030 (2,938; 3,141)</span></span>
+<span><span class="co">#&gt; cost_monitor_undisc                 3,030 (2,937; 3,141)</span></span>
 <span><span class="co">#&gt; dcost_monitor_undisc                            0 (0; 0)</span></span>
-<span><span class="co">#&gt; cost_tox                            3,706 (3,605; 3,970)</span></span>
+<span><span class="co">#&gt; cost_tox                            3,706 (3,605; 4,003)</span></span>
 <span><span class="co">#&gt; dcost_tox                                       0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_tox_cycle_l                        0.19 (0.19; 0.2)</span></span>
 <span><span class="co">#&gt; dcost_tox_cycle_l                               0 (0; 0)</span></span>
@@ -2785,13 +2789,12 @@ saving computation time.</p>
 <span><span class="co">#&gt; dcost_tox_cycle_starttime                       0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_tox_max_cycles                      33.6 (33; 34.2)</span></span>
 <span><span class="co">#&gt; dcost_tox_max_cycles                            0 (0; 0)</span></span>
-<span><span class="co">#&gt; cost_tox_undisc                     3,743 (3,641; 4,010)</span></span>
+<span><span class="co">#&gt; cost_tox_undisc                     3,743 (3,641; 4,042)</span></span>
 <span><span class="co">#&gt; dcost_tox_undisc                                0 (0; 0)</span></span>
-<span><span class="co">#&gt; q_total                                8.35 (7.98; 8.74)</span></span>
+<span><span class="co">#&gt; q_total                                8.35 (7.96; 8.74)</span></span>
 <span><span class="co">#&gt; dq_total                                        0 (0; 0)</span></span>
-<span><span class="co">#&gt; q_total_undisc                          9.96 (9.5; 10.4)</span></span>
+<span><span class="co">#&gt; q_total_undisc                         9.96 (9.47; 10.4)</span></span>
 <span><span class="co">#&gt; dq_total_undisc                                 0 (0; 0)</span></span></code></pre></div>
-</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
