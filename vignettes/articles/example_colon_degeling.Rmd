@@ -1818,21 +1818,21 @@ psa_ipd2[1:10,] %>%
 
 
 ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")) 
-       , aes(x=pat_id,y=ICER, col = type,linetype=linetype))+
+       , aes(x=pat_id,y=ICER, group = type, col = linetype))+
    geom_line(linewidth=1.1) +
   theme_bw() +
   ylim(45000,52000)+
     theme(legend.position="bottom")
 
 ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
-       aes(x=pat_id,y=inc_costs, col = type,linetype=linetype))+
+       aes(x=pat_id,y=inc_costs, group = type, col = linetype))+
     geom_line(linewidth=1.1) +
   theme_bw()  +
   ylim(92500,94500)+
     theme(legend.position="bottom")
 
 ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
-       aes(x=pat_id,y=inc_qalys, col = type,linetype=linetype))+
+       aes(x=pat_id,y=inc_qalys, group = type, col = linetype))+
   geom_line(linewidth=1.1) +
   theme_bw() +
   ylim(1.8,2.1)+
