@@ -1,3 +1,8 @@
+# WARDEN 1.2.3
+* Added model run unit tests
+* Now the model can be run without specifying utilities, costs or other outputs (only LYs will be accounted for)
+* Fixed an issue when timed_freq was active (now outputs are correct)
+
 # WARDEN 1.2.2
 * Per cycle outcomes now correctly work, and a maximum number of cycles argument has been implemented.
 
