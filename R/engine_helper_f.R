@@ -570,14 +570,18 @@ expand_evts_fwd <- function(data, time_points, reset_columns = NULL) {
   
   data[,evt_id := .I]
   
+
   # Get the relevant time_points for each evttime and nexttime, vectorized
-  relevant_timepoints <- lapply(1:nrow(data), function(i) {
-    time_points[time_points > data$evttime[i] & time_points < data$nexttime[i]]
+  # relevant_timepoints <- lapply(1:nrow(data), function(i) {
+  #   time_points[time_points > data$evttime[i] & time_points < data$nexttime[i]]
+  # })
+  relevant_timepoints2 <- lapply(1:nrow(data), function(i) {
+    time_points[time_points >= data$evttime[i] & time_points < data$nexttime[i]]
   })
   
   # Create start_times and end_times based on evttime, relevant time_points, and nexttime
-  start_times <- mapply(c, data$evttime, relevant_timepoints)
-  end_times <- mapply(c, relevant_timepoints, data$nexttime)
+  start_times <- mapply(c, data$evttime, relevant_timepoints2)
+  end_times <- mapply(c, relevant_timepoints2, data$nexttime)
   
   num_expanded_rows <- lengths(start_times)
   
@@ -589,17 +593,25 @@ expand_evts_fwd <- function(data, time_points, reset_columns = NULL) {
   
   max_time <- max(time_points)
   # Add the time_points column (rounded up to the nearest time point)
-  expanded_data[, time_points := ceiling(evttime)]
+  idx <- findInterval(unlist(start_times), time_points)
+  too_early <- expanded_data$nexttime > time_points[idx]
+  idx[too_early] <- idx[too_early] + 1
+  idx[idx > length(time_points)] <- length(time_points)
+  final_time_points <- time_points[idx]
+  expanded_data[, time_points := final_time_points]
   expanded_data[time_points > max_time, time_points := max_time]
+  
+  cols_leave_as_is <- c(reset_columns,paste0(reset_columns,"_undisc"),"pat_id","evttime","prevtime","nexttime","time_points","evt_id")
+  cols_to_reset <- colnames(data)[sapply(data, is.numeric) & !colnames(data) %in% cols_leave_as_is & !grepl("_cycle_l$",colnames(data))]
+  
+  is_first_expansion <- sequence(num_expanded_rows) == 1
+  expanded_data[is_first_expansion & evttime == time_points,(cols_to_reset):=0]
 
   # Reset specified columns for all but the first expanded row for each original row
   if (!is.null(reset_columns)) {
     reset_columns_undisc <- paste0(reset_columns, "_undisc")
     columns_to_reset <- c(reset_columns, reset_columns_undisc)
-    
     # Create a vector indicating which rows are the first in their expanded series
-    is_first_expansion <- sequence(num_expanded_rows) == 1
-    
     expanded_data[!is_first_expansion, (columns_to_reset) := 0]
   }
   
@@ -796,7 +808,7 @@ compute_outputs_timseq <- function(freq,
   
   #Add to final outputs the total outcomes as well as the cost/utility categories totals
   vector_other_outputs <- c(input_list$categories_for_export,prepared_outputs_v)
-  
+
   for (arm_i in arm_list) {
     for (output_i in 1:length(vector_total_outputs)) {
       temp_vec <- final_filtered[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]),na.rm=TRUE)/input_list$npats),by=.(time_points)][,cumsum(out)]
@@ -1168,32 +1180,6 @@ compute_outputs <- function(patdata,input_list) {
       final_output[[output_i]][[arm_i]] <- temp[[length(temp)]][[output_i]]
     }
   }
-  
-  # for (arm_i in arm_list) {
-  #   for (output_i in 1:length(vector_total_outputs)) {
-  #     final_output[[vector_total_outputs[output_i]]][arm_i] <- patdata_dt[arm==arm_i,.(out=sum(get(vector_total_outputs_search[output_i]),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
-  #   }
-  #   for (output_i in vector_other_outputs) {
-  #     final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=sum(get(output_i),na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
-  #   }
-  #   
-  #   for (output_i in data_export_tobesummarized) {
-  #       #Gets last value from patient, then average for numeric
-  #     final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i)*is.finite(get(output_i)),n=1,na.rm=TRUE)),by=.(pat_id)][,mean(out,na.rm=TRUE)]
-  #   }
-  #   
-  #   for (output_i in data_export_summarized_nonumeric) {
-  #     #Gets last value 
-  #     final_output[[output_i]][arm_i] <- patdata_dt[arm==arm_i,.(out=tail(get(output_i),n=1,na.rm=TRUE)),by=.(pat_id)][,tail(out,n=1,na.rm=TRUE)]
-  #   }
-  #   
-  #   
-  #   for (output_i in data_export_aslist) {
-  #     #Get last value
-  #     temp <- Filter(function(sublist) sublist[["arm"]] == arm_i, list_patdata)
-  #     final_output[[output_i]][[arm_i]] <- temp[[length(temp)]][[output_i]]
-  #   }
-  # }
   
   rm(list_patdata)
   

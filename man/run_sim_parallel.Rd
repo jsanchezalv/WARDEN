@@ -27,7 +27,7 @@ run_sim_parallel(
   sensitivity_names = NULL,
   n_sensitivity = 1,
   ncores = 1,
-  input_out = NULL,
+  input_out = character(),
   ipd = 1,
   timed_freq = NULL,
   debug = FALSE,

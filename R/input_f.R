@@ -1321,8 +1321,8 @@ disc_cycle_v <- function(
   }
   
   # Compute total possible cycles in this step
-  total_cycles <- pmax(0, ceiling((lclcurtime - starttime) / cyclelength))
-  prev_cycles <-  pmax(0, ceiling((lclprvtime - starttime) / cyclelength))
+  total_cycles <- pmax(0, ceiling((lclcurtime - starttime) / cyclelength),na.rm=TRUE)
+  prev_cycles <-  pmax(0, ceiling((lclprvtime - starttime) / cyclelength),na.rm=TRUE)
   n_cycles <- total_cycles - prev_cycles
   
   # Adjust n_cycles to account for the starting condition
