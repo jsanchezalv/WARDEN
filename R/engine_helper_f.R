@@ -392,11 +392,11 @@ get_input <-  function(x,ifnull=0,type,evt_arm_i =evt_arm, input_list_arm_i=inpu
 #' @noRd
 
 interval_out <- function(output_sim, element,round_digit=2) {
-  out <- paste0(apply(do.call(rbind, map(output_sim,element)),2,function(x) format(round(mean(x,na.rm=TRUE),round_digit), big.mark=",", scientific=FALSE)),
+  out <- paste0(apply(do.call(rbind, map(output_sim,element)),2,function(x) format(round(mean(x,na.rm=TRUE, type = 2),round_digit), big.mark=",", scientific=FALSE)),
                 " (",
-                apply(do.call(rbind, map(output_sim,element)),2,function(x) format(round(quantile(x,0.025,na.rm=TRUE),round_digit), big.mark=",", scientific=FALSE)) ,
+                apply(do.call(rbind, map(output_sim,element)),2,function(x) format(round(quantile(x,0.025,na.rm=TRUE, type = 2),round_digit), big.mark=",", scientific=FALSE)) ,
                 "; ",
-                apply(do.call(rbind, map(output_sim,element)),2,function(x) format(round(quantile(x,0.975,na.rm=TRUE),round_digit), big.mark=",", scientific=FALSE)) ,
+                apply(do.call(rbind, map(output_sim,element)),2,function(x) format(round(quantile(x,0.975,na.rm=TRUE, type = 2),round_digit), big.mark=",", scientific=FALSE)) ,
                 ")"
   )
   return(out)
@@ -898,7 +898,7 @@ compute_outputs <- function(patdata,input_list) {
   
   patdata_dt <- NULL
   list_patdata <- NULL
-
+  
   #Split the data as to be exported as a data.table, and the extra data the user described
   data_export_aslist <- input_list$input_out[!input_list$input_out %chin% input_list$categories_for_export]
   data_export_summarized_nonumeric <- data_export_aslist
@@ -1127,6 +1127,7 @@ compute_outputs <- function(patdata,input_list) {
                                                              lapply(.SD, mean, na.rm = TRUE),
                                                              by = arm,
                                                              .SDcols = vector_other_outputs]
+  
   
   #Gets last value from patient, then average for numeric
   agg_export_dt <-  patdata_dt[,

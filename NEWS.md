@@ -1,4 +1,5 @@
 # WARDEN 1.2.2
+* Per cycle outcomes now correctly work, and a maximum number of cycles argument has been implemented.
 
 # WARDEN 1.2.1
 * Discounting now correctly allocates to drq or drc depending on output. Other inputs use drc.

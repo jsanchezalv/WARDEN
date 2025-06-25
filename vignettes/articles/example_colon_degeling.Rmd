@@ -1840,6 +1840,7 @@ ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","W
 
 
 ```
+
 # Probabilistic Case
 We will now use the`pick_val_v` function. We just showcase this, and will not run it for the sake of saving computation time.
 

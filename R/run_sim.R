@@ -169,7 +169,7 @@ run_sim <- function(arm_list=c("int","noint"),
                    sensitivity_bool = FALSE,
                    sensitivity_names = NULL,
                    n_sensitivity = 1,
-                   input_out = NULL,
+                   input_out = character(),
                    ipd = 1,
                    timed_freq = NULL,
                    debug = FALSE,
@@ -237,6 +237,7 @@ run_sim <- function(arm_list=c("int","noint"),
       if(!is.null(categories_other_ongoing)){categories_other_ongoing},
       if(!is.null(categories_other_instant)){categories_other_instant}
     ))
+  categories_for_export <- if(is.null(categories_for_export)){character()}else{categories_for_export}
   
   
   env_setup_sens <- is.language(sensitivity_inputs)
