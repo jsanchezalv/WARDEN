@@ -529,17 +529,26 @@ expand_evts_bwd <- function(data, time_points, reset_columns = NULL) {
   
   max_time <- max(time_points)
   # Add the time_points column (rounded up to the nearest time point)
-  expanded_data[, time_points := ceiling(evttime)]
-  expanded_data[time_points > max_time, time_points := max_time]
   
+  idx <- findInterval(unlist(end_times), time_points)
+  too_early <- expanded_data$evttime > time_points[idx]
+  idx[too_early] <- idx[too_early] + 1
+  idx[idx > length(time_points)] <- length(time_points)
+  final_time_points <- time_points[idx]
+  expanded_data[, time_points := final_time_points]
+  
+  expanded_data[time_points > max_time, time_points := max_time]
+
   # Reset specified columns for all but the first expanded row for each original row
   if (!is.null(reset_columns)) {
     reset_columns_undisc <- paste0(reset_columns, "_undisc")
     columns_to_reset <- c(reset_columns, reset_columns_undisc)
     
     # Create a vector indicating which rows are the last in their expanded series
-    is_last_expansion <- sequence(num_expanded_rows) == num_expanded_rows
-    
+    seq_vec <- sequence(num_expanded_rows)
+    is_last_expansion <- rep(FALSE, sum(num_expanded_rows))
+    is_last_expansion[cumsum(num_expanded_rows)] <- TRUE
+
     # Reset the specified columns for all non-last expanded rows
     expanded_data[!is_last_expansion, (columns_to_reset) := 0]
   }

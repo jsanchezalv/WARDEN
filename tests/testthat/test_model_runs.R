@@ -378,5 +378,74 @@ test_that("Test minimal model runs with some basic settings", {
     expect_equal(results[[1]][[1]]$total_lys[["aa"]],max(results[[1]][[1]]$timed_outputs$total_lys$aa))
     expect_equal(results[[1]][[1]]$total_qalys[["aa"]],max(results[[1]][[1]]$timed_outputs$total_qalys$aa))
     
+    
+    
+    # Over time outputs make sense, backwards --------------------------------------------
+    common_all_inputs <-add_item2(input = {
+      drc         <- 0 
+      drq         <- 0
+      q_default <- 0.8
+      
+      cost_a <- 0
+      cost_a_cycle_starttime <- 0
+      cost_a_cycle_l <- 0.125
+      cost_a_max_cycles <- 100
+    })
+    
+    init_event_list <- 
+      add_tte(arm=c("aa","bb"), evts = c("start","cycle","death") ,input={
+        start <- 0
+        death <- 10.1
+        cycle <- 1
+      })
+    evt_react_list <-
+      add_reactevt(name_evt = "start",
+                   input = {
+                     cost_insta <- 100
+                     
+                   }) %>%
+      add_reactevt(name_evt = "cycle",
+                   input = {
+                     if(curtime<9){
+                       new_event(list(cycle = curtime + 1.1))
+                     }
+                     cost_insta <- 200
+                     cost_a <- 1
+                     
+                   }) %>%
+      add_reactevt(name_evt = "death",
+                   input = {
+                   }) 
+    
+    results <- run_sim(  
+      npats=10,                              
+      n_sim=1,                                  
+      psa_bool = TRUE,                         
+      arm_list = c("aa", "bb"),             
+      common_all_inputs = common_all_inputs,    
+      init_event_list = init_event_list,        
+      evt_react_list = evt_react_list,
+      util_ongoing_list = 'q_default',
+      cost_instant_list = "cost_insta",
+      cost_cycle_list = "cost_a",
+      ipd = 1,
+      timed_freq = 0.25, accum_backwards = TRUE
+    )
+    
+    expect_equal(results[[1]][[1]]$timed_outputs$total_lys$aa, c(seq(0,10.1, by = 0.25),10.1))
+    expect_equal(results[[1]][[1]]$timed_outputs$timepoints, c(seq(0,10.1, by = 0.25),10.1))
+    expect_equal(results[[1]][[1]]$timed_outputs$cost_insta$aa,
+                 c(100, 100, 100, 100, 300, 300, 300, 300, 300, 500, 500, 500, 
+                   500, 700, 700, 700, 700, 700, 900, 900, 900, 900, 1100, 1100, 
+                   1100, 1100, 1300, 1300, 1300, 1300, 1300, 1500, 1500, 1500, 1500, 
+                   1700, 1700, 1700, 1700, 1700, 1900, 1900))
+    expect_equal(results[[1]][[1]]$timed_outputs$cost_a$aa,
+                 c(0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 
+                   32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 
+                   64, 66, 68, 70, 72, 74, 76, 78, 80, 81))
+    expect_equal(results[[1]][[1]]$cost_a[["aa"]],max(results[[1]][[1]]$timed_outputs$cost_a$aa))
+    expect_equal(results[[1]][[1]]$total_lys[["aa"]],max(results[[1]][[1]]$timed_outputs$total_lys$aa))
+    expect_equal(results[[1]][[1]]$total_qalys[["aa"]],max(results[[1]][[1]]$timed_outputs$total_qalys$aa))
+    
 })
     
