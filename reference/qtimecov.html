@@ -144,7 +144,7 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span>  a_fun <span class="op">=</span> <span class="va">rate_exp</span>,</span></span>
 <span class="r-in"><span>  dist <span class="op">=</span> <span class="st">"exp"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = runif(1), a_fun = rate_exp, dist = "exp"):</span> could not find function "qtimecov"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 24.52825</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 2. Gamma Example</span></span></span>
@@ -156,7 +156,7 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span>  b_fun <span class="op">=</span> <span class="va">rate_gamma</span>,</span></span>
 <span class="r-in"><span>  dist <span class="op">=</span> <span class="st">"gamma"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = runif(1), a_fun = shape_gamma, b_fun = rate_gamma,     dist = "gamma"):</span> could not find function "qtimecov"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 22.22001</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 3. Lognormal Example</span></span></span>
@@ -168,7 +168,7 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span>  b_fun <span class="op">=</span> <span class="va">sdlog_lnorm</span>,</span></span>
 <span class="r-in"><span>  dist <span class="op">=</span> <span class="st">"lnorm"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = runif(1), a_fun = meanlog_lnorm, b_fun = sdlog_lnorm,     dist = "lnorm"):</span> could not find function "qtimecov"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6.555032</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 4. Normal Example</span></span></span>
@@ -180,7 +180,7 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span>  b_fun <span class="op">=</span> <span class="va">sd_norm</span>,</span></span>
 <span class="r-in"><span>  dist <span class="op">=</span> <span class="st">"norm"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = runif(1), a_fun = mean_norm, b_fun = sd_norm,     dist = "norm"):</span> could not find function "qtimecov"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 11.8122</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 5. Weibull Example</span></span></span>
@@ -192,7 +192,7 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span>  b_fun <span class="op">=</span> <span class="va">scale_weibull</span>,</span></span>
 <span class="r-in"><span>  dist <span class="op">=</span> <span class="st">"weibull"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = runif(1), a_fun = shape_weibull, b_fun = scale_weibull,     dist = "weibull"):</span> could not find function "qtimecov"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10.03201</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 6. Loglogistic Example</span></span></span>
@@ -204,7 +204,7 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span>  b_fun <span class="op">=</span> <span class="va">scale_llogis</span>,</span></span>
 <span class="r-in"><span>  dist <span class="op">=</span> <span class="st">"llogis"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = runif(1), a_fun = shape_llogis, b_fun = scale_llogis,     dist = "llogis"):</span> could not find function "qtimecov"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7.736007</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 7. Gompertz Example</span></span></span>
@@ -216,7 +216,7 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span>  b_fun <span class="op">=</span> <span class="va">rate_gomp</span>,</span></span>
 <span class="r-in"><span>  dist <span class="op">=</span> <span class="st">"gompertz"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = runif(1), a_fun = shape_gomp, b_fun = rate_gomp,     dist = "gompertz"):</span> could not find function "qtimecov"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 13.57996</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#Time varying example, with change at time 8</span></span></span>
 <span class="r-in"><span><span class="va">rate_exp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fl">0.1</span> <span class="op">+</span> <span class="fl">0.01</span><span class="op">*</span><span class="va">t</span> <span class="op">*</span> <span class="fl">0.00001</span><span class="op">*</span><span class="va">t</span><span class="op">^</span><span class="fl">2</span></span></span>
@@ -226,9 +226,8 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">init_luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span>,</span></span>
 <span class="r-in"><span>                      max_time <span class="op">=</span> <span class="va">time_change</span>, return_luck <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = init_luck, a_fun = rate_exp, dist = "exp", dt = 0.005,     max_time = time_change, return_luck = TRUE):</span> could not find function "qtimecov"</span>
 <span class="r-in"><span><span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp2</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span>, start_time<span class="op">=</span><span class="va">a</span><span class="op">$</span><span class="va">tte</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = a$luck, a_fun = rate_exp2, dist = "exp", dt = 0.005,     start_time = a$tte):</span> could not find function "qtimecov"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 11.69083</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#An example of how it would work in the model, this would also work with time varying covariates!</span></span></span>
@@ -238,14 +237,13 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span><span class="va">init_luck</span> <span class="op">&lt;-</span> <span class="fl">0.95</span></span></span>
 <span class="r-in"><span><span class="co">#at start, we would just draw TTE</span></span></span>
 <span class="r-in"><span><span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">init_luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = init_luck, a_fun = rate_exp, dist = "exp", dt = 0.005):</span> could not find function "qtimecov"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 29.95232</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#at event in which rate changes (at time 10) we need to do this:</span></span></span>
 <span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">init_luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span>,</span></span>
 <span class="r-in"><span>                      max_time <span class="op">=</span> <span class="va">time_change</span>, return_luck <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = init_luck, a_fun = rate_exp, dist = "exp", dt = 0.005,     max_time = time_change, return_luck = TRUE):</span> could not find function "qtimecov"</span>
 <span class="r-in"><span><span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp2</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span>, start_time<span class="op">=</span><span class="va">a</span><span class="op">$</span><span class="va">tte</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in qtimecov(luck = a$luck, a_fun = rate_exp2, dist = "exp", dt = 0.005,     start_time = a$tte):</span> could not find function "qtimecov"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 19.97366</span>
 <span class="r-in"><span>  </span></span>
 </code></pre></div>
     </div>
