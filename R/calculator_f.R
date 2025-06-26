@@ -807,11 +807,11 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #'
 #' @return Numeric. Simulated time-to-event.
 #' 
-#' @export
-#' 
 #' 
 #' @importFrom flexsurv pllogis pgompertz
 #' @importFrom stats pexp pgamma plnorm pnorm pweibull
+#' 
+#' @export
 #' 
 #' @details The objective of this function is to avoid the user to have cycle events
 #' with the only scope of updating some variables that depend on time and re-evaluate
