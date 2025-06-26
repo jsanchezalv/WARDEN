@@ -78,7 +78,7 @@ conditional quantile functions, plus luck adjustment to simulate the event time.
 
 
 <dl><dt id="arg-luck">luck<a class="anchor" aria-label="anchor" href="#arg-luck"></a></dt>
-<dd><p>Numeric in 0,1. Initial random quantile (luck).</p></dd>
+<dd><p>Numeric between 0 and 1. Initial random quantile (luck).</p></dd>
 
 
 <dt id="arg-a-fun">a_fun<a class="anchor" aria-label="anchor" href="#arg-a-fun"></a></dt>
@@ -103,6 +103,10 @@ conditional quantile functions, plus luck adjustment to simulate the event time.
 
 <dt id="arg-return-luck">return_luck<a class="anchor" aria-label="anchor" href="#arg-return-luck"></a></dt>
 <dd><p>Boolean. If TRUE, returns a list with tte and luck (useful if max_time caps TTE)</p></dd>
+
+
+<dt id="arg-start-time">start_time<a class="anchor" aria-label="anchor" href="#arg-start-time"></a></dt>
+<dd><p>Numeric. Time to use as a starting point of reference (e.g., curtime).</p></dd>
 
 </dl></div>
     <div class="section level2">
