@@ -88,6 +88,7 @@ reference:
       - draw_tte
       - random_stream
       - luck_adj
+      - qtimecov
   - subtitle: Statistics Distributions Functions
     contents:
       - cond_dirichlet

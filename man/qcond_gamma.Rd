@@ -4,14 +4,14 @@
 \alias{qcond_gamma}
 \title{Conditional quantile function for gamma distribution}
 \usage{
-qcond_gamma(rnd = 0.5, rate, shape, lower_bound = 0, s_obs)
+qcond_gamma(rnd = 0.5, shape, rate, lower_bound = 0, s_obs)
 }
 \arguments{
 \item{rnd}{Vector of quantiles}
 
-\item{rate}{The rate parameter}
-
 \item{shape}{The shape parameter}
+
+\item{rate}{The rate parameter}
 
 \item{lower_bound}{The lower bound to be used (current time)}
 
@@ -25,5 +25,5 @@ Estimate(s) from the conditional gamma distribution based on given parameters
 Conditional quantile function for gamma distribution
 }
 \examples{
-qcond_gamma(rnd = 0.5, rate = 1.06178, shape = 0.01108,lower_bound = 1, s_obs=0.8)
+qcond_gamma(rnd = 0.5, shape = 1.06178, rate = 0.01108,lower_bound = 1, s_obs=0.8)
 }

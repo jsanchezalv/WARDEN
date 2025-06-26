@@ -777,12 +777,228 @@ qcond_norm <- function(rnd = 0.5, mean,sd, lower_bound=0, s_obs) {
 #' @export
 #'
 #' @examples
-#' qcond_gamma(rnd = 0.5, rate = 1.06178, shape = 0.01108,lower_bound = 1, s_obs=0.8)
+#' qcond_gamma(rnd = 0.5, shape = 1.06178, rate = 0.01108,lower_bound = 1, s_obs=0.8)
 
-qcond_gamma <- function(rnd = 0.5, rate,shape, lower_bound=0, s_obs) {
+qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
   if(rnd <0 | rnd > 1){
     stop("rnd is <0 or >1")
   }
   
-  qgamma(1 - s_obs*(1-rnd),rate,shape) - lower_bound
+  qgamma(1 - s_obs*(1-rnd),rate = rate, shape = shape) - lower_bound
 }
+
+
+
+#' Draw Time-to-Event with Time-Dependent Covariates and Luck Adjustment
+#'
+#' Simulate a time-to-event (TTE) from a parametric distribution with parameters varying over time.
+#' User provides parameter functions and distribution name. The function uses internal survival and
+#' conditional quantile functions, plus luck adjustment to simulate the event time.
+#' 
+#'
+#' @param luck Numeric in [0,1]. Initial random quantile (luck).
+#' @param a_fun Function of time t returning the first distribution parameter (e.g., rate, shape, meanlog).
+#' @param b_fun Function of time t returning the second distribution parameter (e.g., scale, sdlog). Defaults to a function returning NA.
+#' @param dist Character string specifying the distribution. Supported: "exp", "gamma", "lnorm", "norm", "weibull", "llogis", "gompertz".
+#' @param dt Numeric. Time step increment to update parameters and survival. Default 0.1.
+#' @param max_time Numeric. Max allowed event time to prevent infinite loops. Default 100.
+#' @param return_luck Boolean. If TRUE, returns a list with tte and luck (useful if max_time caps TTE)
+#'
+#' @return Numeric. Simulated time-to-event.
+#' 
+#' @importFrom flexsurv pllogis pgompertz
+#' 
+#' @details The objective of this function is to avoid the user to have cycle events
+#' with the only scope of updating some variables that depend on time and re-evaluate
+#' a TTE. The idea is that this function should only be called at start and when 
+#' an event impacts a variable (e.g., stroke event impacting death TTE), in which case
+#' it would need to be called again at that point. In that case, the user would need to 
+#' call e.g., `a <- qtimecov` with `max_time = curtime, return_luck = TRUE` arguments,
+#' and then call it again with no max_time, return_luck = FALSE, and
+#' `luck = a$luck, start_time=a$tte` (so there is no need to add curtime to the resulting time).
+#' 
+#' It's recommended to play with `dt` argument to balance running time and precision of the estimates.
+#' For example, if we know we only update the equation annually (not continuously),
+#' then we could just set `dt = 1`, which would make computations faster.
+#'
+#' @examples
+#'
+#' param_fun_factory <- function(p0, p1, p2, p3) {
+#'   function(t) p0 + p1*t + p2*t^2 + p3*(floor(t) + 1)
+#' }
+#' 
+#' set.seed(42)
+#' 
+#' # 1. Exponential Example
+#' rate_exp <- param_fun_factory(0.1, 0, 0, 0)
+#' qtimecov(
+#'   luck = runif(1),
+#'   a_fun = rate_exp,
+#'   dist = "exp"
+#' )
+#' 
+#' 
+#' # 2. Gamma Example
+#' shape_gamma <- param_fun_factory(2, 0, 0, 0)
+#' rate_gamma <- param_fun_factory(0.2, 0, 0, 0)
+#' qtimecov(
+#'   luck = runif(1),
+#'   a_fun = shape_gamma,
+#'   b_fun = rate_gamma,
+#'   dist = "gamma"
+#' )
+#' 
+#' 
+#' # 3. Lognormal Example
+#' meanlog_lnorm <- param_fun_factory(log(10) - 0.5*0.5^2, 0, 0, 0)
+#' sdlog_lnorm <- param_fun_factory(0.5, 0, 0, 0)
+#' qtimecov(
+#'   luck = runif(1),
+#'   a_fun = meanlog_lnorm,
+#'   b_fun = sdlog_lnorm,
+#'   dist = "lnorm"
+#' )
+#' 
+#' 
+#' # 4. Normal Example
+#' mean_norm <- param_fun_factory(10, 0, 0, 0)
+#' sd_norm <- param_fun_factory(2, 0, 0, 0)
+#' qtimecov(
+#'   luck = runif(1),
+#'   a_fun = mean_norm,
+#'   b_fun = sd_norm,
+#'   dist = "norm"
+#' )
+#' 
+#' 
+#' # 5. Weibull Example
+#' shape_weibull <- param_fun_factory(2, 0, 0, 0)
+#' scale_weibull <- param_fun_factory(10, 0, 0, 0)
+#' qtimecov(
+#'   luck = runif(1),
+#'   a_fun = shape_weibull,
+#'   b_fun = scale_weibull,
+#'   dist = "weibull"
+#' )
+#' 
+#' 
+#' # 6. Loglogistic Example
+#' shape_llogis <- param_fun_factory(2.5, 0, 0, 0)
+#' scale_llogis <- param_fun_factory(7.6, 0, 0, 0)
+#' qtimecov(
+#'   luck = runif(1),
+#'   a_fun = shape_llogis,
+#'   b_fun = scale_llogis,
+#'   dist = "llogis"
+#' )
+#' 
+#' 
+#' # 7. Gompertz Example
+#' shape_gomp <- param_fun_factory(0.01, 0, 0, 0)
+#' rate_gomp <- param_fun_factory(0.091, 0, 0, 0)
+#' qtimecov(
+#'   luck = runif(1),
+#'   a_fun = shape_gomp,
+#'   b_fun = rate_gomp,
+#'   dist = "gompertz"
+#' )
+#'
+#' #Time varying example, with change at time 8
+#' rate_exp <- function(t) 0.1 + 0.01*t * 0.00001*t^2
+#' rate_exp2 <- function(t) 0.2 + 0.02*t
+#' time_change <- 8
+#' init_luck <- 0.95
+#'
+#' a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.005,
+#'                       max_time = time_change, return_luck = TRUE)
+#' qtimecov(luck = a$luck,a_fun = rate_exp2,dist = "exp", dt = 0.005, start_time=a$tte)
+#' 
+#' 
+#' #An example of how it would work in the model, this would also work with time varying covariates!
+#' rate_exp <- function(t) 0.1
+#' rate_exp2 <- function(t) 0.2
+#' time_change <- 10
+#' init_luck <- 0.95
+#' #at start, we would just draw TTE
+#' qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.005)
+#' 
+#' #at event in which rate changes (at time 10) we need to do this:
+#' a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.005,
+#'                       max_time = time_change, return_luck = TRUE)
+#' qtimecov(luck = a$luck,a_fun = rate_exp2,dist = "exp", dt = 0.005, start_time=a$tte)
+#'   
+
+qtimecov <- function(
+    luck,
+    a_fun,
+    b_fun = function(t) NA,
+    dist,
+    dt = 0.1,
+    max_time = 100,
+    return_luck = FALSE,
+    start_time = 0
+) {
+  # Internal survival and conditional quantile functions (require flexsurv for some)
+  sf_fun <- switch(dist,
+                   exp     = function(t, rate, ...) 1 - pexp(t, rate),
+                   gamma   = function(t, shape, rate) 1 - pgamma(t, shape = shape, rate = rate),
+                   lnorm   = function(t, meanlog, sdlog) 1 - plnorm(t, meanlog, sdlog),
+                   norm    = function(t, mean, sd) 1 - pnorm(t, mean, sd),
+                   weibull = function(t, shape, scale) 1 - pweibull(t, shape, scale),
+                   llogis  = function(t, shape, scale) flexsurv::pllogis(q = t, shape = shape, scale = scale, lower.tail = FALSE),
+                   gompertz= function(t, shape, rate) flexsurv::pgompertz(q = t, shape = shape, rate = rate, lower.tail = FALSE),
+                   stop("Unsupported distribution")
+  )
+  
+  qcond_fun <- switch(dist,
+                      exp     = qcond_exp,
+                      gamma   = qcond_gamma,
+                      lnorm   = qcond_lnorm,
+                      norm    = qcond_norm,
+                      weibull = qcond_weibull,
+                      llogis  = qcond_llogis,
+                      gompertz= qcond_gompertz,
+                      stop("Unsupported distribution")
+  )
+  
+  t <- start_time
+  a_prev <- a_fun(t)
+  b_prev <- b_fun(t)
+  surv_prev <- sf_fun(t, a_prev, b_prev)
+  
+  repeat {
+    t <- t + dt
+    a_curr <- a_fun(t)
+    b_curr <- b_fun(t)
+    
+    # Correctly compute survival at t - dt for luck adjustment
+    surv_prev <- sf_fun(t - dt, a_fun(t - dt), b_fun(t - dt))
+    surv_curr <- sf_fun(t, a_curr, b_curr)
+    
+    # Use condq = TRUE for conditional quantiles
+    luck <- luck_adj(prevsurv = surv_prev, cursurv = surv_curr, luck = luck, condq = TRUE)
+    
+    residual_tte <- switch(dist,
+                           exp      = qcond_exp(luck, rate = a_curr),
+                           gamma    = qcond_gamma(luck, rate = b_curr, shape = a_curr, lower_bound = t - dt, s_obs = surv_prev),
+                           lnorm    = qcond_lnorm(luck, meanlog = a_curr, sdlog = b_curr, lower_bound = t - dt, s_obs = surv_prev),
+                           norm     = qcond_norm(luck, mean = a_curr, sd = b_curr, lower_bound = t - dt, s_obs = surv_prev),
+                           weibull  = qcond_weibull(luck, shape = a_curr, scale = b_curr, lower_bound = t - dt),
+                           llogis   = qcond_llogis(luck, shape = a_curr, scale = b_curr, lower_bound = t - dt),
+                           gompertz = qcond_gompertz(luck, shape = a_curr, rate = b_curr, lower_bound = t - dt),
+                           stop("Unsupported distribution")
+    )
+    
+    total_tte <- t - dt + residual_tte
+    
+    if (residual_tte <= dt || total_tte <= t || t >= max_time) {
+      if (return_luck == TRUE) {
+        return(list(tte = min(total_tte, max_time), luck = luck))
+      } else {
+        return(min(total_tte, max_time))
+      }
+    }
+  }
+}
+
+
