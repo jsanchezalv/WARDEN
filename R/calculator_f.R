@@ -922,7 +922,9 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #' #An example of how it would work in the model, this would also work with time varying covariates!
 #' rate_exp <- function(t) 0.1
 #' rate_exp2 <- function(t) 0.2
-#' time_change <- 10
+#' rate_exp3 <- function(t) 0.3
+#' time_change <- 10 #evt 1
+#' time_change2 <- 15 #evt2
 #' init_luck <- 0.95
 #' #at start, we would just draw TTE
 #' qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.005)
@@ -930,7 +932,15 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #' #at event in which rate changes (at time 10) we need to do this:
 #' a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.005,
 #'                       max_time = time_change, return_luck = TRUE)
-#' qtimecov(luck = a$luck,a_fun = rate_exp2,dist = "exp", dt = 0.005, start_time=a$tte)
+#' new_luck <- a$luck
+#' qtimecov(luck = new_luck,a_fun = rate_exp2,dist = "exp", dt = 0.005, start_time=a$tte)
+#' 
+#' #at second  event in which rate changes again (at time 15) we need to do this:
+#' a <- qtimecov(luck = new_luck,a_fun = rate_exp2,dist = "exp", dt = 0.005,
+#'                       max_time = time_change2, return_luck = TRUE, start_time=a$tte)
+#' new_luck <- a$luck
+#' #final TTE is
+#' qtimecov(luck = new_luck,a_fun = rate_exp3,dist = "exp", dt = 0.005, start_time=a$tte)
 #'   
 
 qtimecov <- function(
