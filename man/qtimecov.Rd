@@ -16,7 +16,7 @@ qtimecov(
 )
 }
 \arguments{
-\item{luck}{Numeric in \link{0,1}. Initial random quantile (luck).}
+\item{luck}{Numeric between 0 and 1. Initial random quantile (luck).}
 
 \item{a_fun}{Function of time t returning the first distribution parameter (e.g., rate, shape, meanlog).}
 
@@ -29,6 +29,8 @@ qtimecov(
 \item{max_time}{Numeric. Max allowed event time to prevent infinite loops. Default 100.}
 
 \item{return_luck}{Boolean. If TRUE, returns a list with tte and luck (useful if max_time caps TTE)}
+
+\item{start_time}{Numeric. Time to use as a starting point of reference (e.g., curtime).}
 }
 \value{
 Numeric. Simulated time-to-event.

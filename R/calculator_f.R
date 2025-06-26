@@ -796,17 +796,22 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #' conditional quantile functions, plus luck adjustment to simulate the event time.
 #' 
 #'
-#' @param luck Numeric in [0,1]. Initial random quantile (luck).
+#' @param luck Numeric between 0 and 1. Initial random quantile (luck).
 #' @param a_fun Function of time t returning the first distribution parameter (e.g., rate, shape, meanlog).
 #' @param b_fun Function of time t returning the second distribution parameter (e.g., scale, sdlog). Defaults to a function returning NA.
 #' @param dist Character string specifying the distribution. Supported: "exp", "gamma", "lnorm", "norm", "weibull", "llogis", "gompertz".
 #' @param dt Numeric. Time step increment to update parameters and survival. Default 0.1.
 #' @param max_time Numeric. Max allowed event time to prevent infinite loops. Default 100.
 #' @param return_luck Boolean. If TRUE, returns a list with tte and luck (useful if max_time caps TTE)
+#' @param start_time Numeric. Time to use as a starting point of reference (e.g., curtime).
 #'
 #' @return Numeric. Simulated time-to-event.
 #' 
+#' @export
+#' 
+#' 
 #' @importFrom flexsurv pllogis pgompertz
+#' @importFrom stats pexp pgamma plnorm pnorm pweibull
 #' 
 #' @details The objective of this function is to avoid the user to have cycle events
 #' with the only scope of updating some variables that depend on time and re-evaluate
