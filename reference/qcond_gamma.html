@@ -55,7 +55,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">qcond_gamma</span><span class="op">(</span>rnd <span class="op">=</span> <span class="fl">0.5</span>, <span class="va">rate</span>, <span class="va">shape</span>, lower_bound <span class="op">=</span> <span class="fl">0</span>, <span class="va">s_obs</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">qcond_gamma</span><span class="op">(</span>rnd <span class="op">=</span> <span class="fl">0.5</span>, <span class="va">shape</span>, <span class="va">rate</span>, lower_bound <span class="op">=</span> <span class="fl">0</span>, <span class="va">s_obs</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -66,12 +66,12 @@
 <dd><p>Vector of quantiles</p></dd>
 
 
-<dt id="arg-rate">rate<a class="anchor" aria-label="anchor" href="#arg-rate"></a></dt>
-<dd><p>The rate parameter</p></dd>
-
-
 <dt id="arg-shape">shape<a class="anchor" aria-label="anchor" href="#arg-shape"></a></dt>
 <dd><p>The shape parameter</p></dd>
+
+
+<dt id="arg-rate">rate<a class="anchor" aria-label="anchor" href="#arg-rate"></a></dt>
+<dd><p>The rate parameter</p></dd>
 
 
 <dt id="arg-lower-bound">lower_bound<a class="anchor" aria-label="anchor" href="#arg-lower-bound"></a></dt>
@@ -90,7 +90,7 @@ normally defined from time 0 as 1 - pgamma(q = lower_bound, rate, shape) but may
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">qcond_gamma</span><span class="op">(</span>rnd <span class="op">=</span> <span class="fl">0.5</span>, rate <span class="op">=</span> <span class="fl">1.06178</span>, shape <span class="op">=</span> <span class="fl">0.01108</span>,lower_bound <span class="op">=</span> <span class="fl">1</span>, s_obs<span class="op">=</span><span class="fl">0.8</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">qcond_gamma</span><span class="op">(</span>rnd <span class="op">=</span> <span class="fl">0.5</span>, shape <span class="op">=</span> <span class="fl">1.06178</span>, rate <span class="op">=</span> <span class="fl">0.01108</span>,lower_bound <span class="op">=</span> <span class="fl">1</span>, s_obs<span class="op">=</span><span class="fl">0.8</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 87.94889</span>
 </code></pre></div>
     </div>
