@@ -1,3 +1,8 @@
+# WARDEN 1.2.4
+* Added "adj_val" function, to reduce the need to call cycle events which can hinder model speed.
+* Added "qtimecov" function, to predict time to events with time changing covariates, 
+to reduce the need to call cycle events which can hinder model speed.
+
 # WARDEN 1.2.3
 * Added model run unit tests
 * Now the model can be run without specifying utilities, costs or other outputs (only LYs will be accounted for)

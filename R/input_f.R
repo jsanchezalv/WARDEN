@@ -1076,6 +1076,8 @@ luck_adj <- function(prevsurv,cursurv,luck,condq=TRUE){
 #' @param by Numeric. The step size for evaluation within the interval.
 #' @param expression An expression evaluated at each step. Use `time` as the variable within the expression.
 #' @param discount Numeric or NULL. The discount rate to apply, or NULL for no discounting.
+#' 
+#' @export
 #'
 #' @return Numeric. The calculated adjusted value.
 #' 
