@@ -784,6 +784,14 @@ test_that("qtimecov works for all supported distributions", {
     tolerance = 0.01)
   
   
+  
+  init_luck <- 0.3
+  expect_equal(qtimecov(luck = init_luck,a_fun = rate_exp,b_fun = function(t) 90000 ,dist = "weibull", dt = 0.001),{
+    a <- qtimecov(luck = init_luck,a_fun = rate_exp,b_fun = function(t) 90000,dist = "weibull", dt = 0.001, return_luck = TRUE,max_time = 1)
+    
+    qtimecov(luck = a$luck,a_fun = rate_exp,b_fun = function(t) 90000,dist = "weibull", dt = 0.001, start_time=a$tte)},
+    tolerance = 0.01)
+  
   rate_exp <- function(t) 0.1
   rate_exp2 <- function(t) 0.2
   time_change <- 10
@@ -874,4 +882,26 @@ test_that("qtimecov respects max_time bound", {
     max_time = 10
   )
   expect_lte(tte, 10)
+})
+
+
+test_that("adj_val works as intended",{
+  
+  bs_age <- 1
+  vec <- 1:15/10
+  expect_equal(adj_val(0,0,by=1, vec[floor(time + bs_age)], discount = Inf), 0)
+  expect_equal(adj_val(0,5,by=1, vec[floor(time + bs_age)], discount = Inf), 0)
+  expect_error(adj_val(0,20,by=1, vec[floor(time + bs_age)]))
+  expect_error(adj_val(0,20,by=1, vec[floor(time + bs_age)]))
+  expect_error(adj_val(0,-5,by=1, vec[floor(time + bs_age)]))
+  expect_equal(adj_val(0,0,by=1, vec[floor(time + bs_age)]), 0)
+  expect_equal(adj_val(0,0.1,by=1, vec[floor(time + bs_age)], discount = 0),0.1)
+  expect_equal(adj_val(0,1.1,by=1, vec[floor(time + bs_age)] * time, discount = 0),(0*1+0.2*0.1)/1.1)
+  expect_equal(adj_val(0,0.1,by=1, vec[floor(time + bs_age)] * time, discount = 0),0)
+  expect_equal(adj_val(0,0.1,by=1, vec[floor(time + bs_age)] * time, discount = 0.03),0)
+  expect_equal(adj_val(8,9,by=0.2, vec[floor(time + bs_age)], discount = 0),0.9)
+  expect_equal(adj_val(8,9,by=0.5, vec[floor(time + bs_age)], discount = Inf),0)
+  expect_equal(adj_val(8,9,by=0.5, 1),1)
+  expect_equal(adj_val(0,4,by=1, time),1.5)
+  
 })

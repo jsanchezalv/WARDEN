@@ -1065,6 +1065,75 @@ luck_adj <- function(prevsurv,cursurv,luck,condq=TRUE){
   return(adj_luck)
 }
 
+#' Adjusted Value Calculation
+#'
+#' This function calculates an adjusted value over a time interval with optional discounting.
+#' This is useful for instances when adding cycles may not be desirable, so one can perform
+#' "cycle-like" calculations without needing cycles, offering performance speeds.
+#'
+#' @param curtime Numeric. The current time point.
+#' @param nexttime Numeric. The next time point. Must be greater than or equal to `curtime`.
+#' @param by Numeric. The step size for evaluation within the interval.
+#' @param expression An expression evaluated at each step. Use `time` as the variable within the expression.
+#' @param discount Numeric or NULL. The discount rate to apply, or NULL for no discounting.
+#'
+#' @return Numeric. The calculated adjusted value.
+#' 
+#' @details
+#'  The user can use the `time` variable to select the corresponding time of the sequence being evaluated.
+#'  For example, in c`urtime = 0, nexttime = 4, by = 1`, `time` would correspond to `0, 1, 2, 3`.
+#'  If using `nexttime = 4.2`, `0, 1, 2, 3, 4`
+#' 
+#'
+#' @examples
+#' # Define a function or vector to evaluate
+#' bs_age <- 1
+#' vec <- 1:8/10
+#' 
+#' # Calculate adjusted value without discounting
+#' adj_val(0, 4, by = 1, expression = vec[floor(time + bs_age)])
+#' adj_val(0, 4, by = 1, expression = time * 1.1)
+#'
+#' # Calculate adjusted value with discounting
+#' adj_val(0, 4, by = 1, expression = vec[floor(time + bs_age)], discount = 0.03)
+adj_val <- function(curtime, nexttime, by, expression, discount = NULL) {
+  duration <- nexttime - curtime
+  if (duration < 0) stop("curtime - nexttime is negative (negative duration)")
+  if (duration == 0) return(0)
+  if (!is.null(discount) && is.infinite(discount)) return(0)
+  
+  n_steps <- floor(duration / by)
+  times <- curtime + by * seq(0, n_steps)
+  if (length(times) == 0 || tail(times, 1) < nexttime) {
+    times <- c(times, nexttime)
+  }
+  
+  intervals <- diff(times)
+  eval_times <- head(times, -1)
+  
+  parent <- parent.frame()
+  expr_sub <- substitute(expression)
+  
+  values <- vapply(eval_times, function(tt) {
+    val <- eval(expr_sub, envir = list(time = tt), enclos = parent)
+    if (is.na(val)) stop("NA value encountered during evaluation at time: ", tt)
+    val
+  }, numeric(1))
+  
+  if (!is.null(discount)) {
+    discounted_values <- disc_ongoing_v(
+      lcldr = discount,
+      lclprvtime = eval_times,
+      lclcurtime = times[-1],
+      lclval = values
+    )
+    return(sum(discounted_values) / duration)
+  } else {
+    return(sum(values * intervals) / duration)
+  }
+}
+
+
 # Continuous and instantaneous discounting ----------------------------------------------------------------------------------------------------------------
 
 #' Calculate discounted costs and qalys between events
