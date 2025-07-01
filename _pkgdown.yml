@@ -105,6 +105,7 @@ reference:
       - qcond_lnorm
       - qcond_norm
       - qcond_weibull
+      - qcond_weibullPH
       - rbeta_mse
       - rcond_gompertz
       - rcond_gompertz_lu
