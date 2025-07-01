@@ -685,6 +685,32 @@ qcond_weibull <- function(rnd = 0.5, shape, scale, lower_bound=0) {
   ((lower_bound/scale)^shape - log(1-rnd))^(1/shape)*scale - lower_bound
 }
 
+#' Conditional quantile function for WeibullPH (flexsurv)
+#'
+#' @param rnd Vector of quantiles (between 0 and 1)
+#' @param shape Shape parameter of WeibullPH
+#' @param scale Scale (rate) parameter of WeibullPH (i.e., as in hazard = scale * t^(shape - 1))
+#' @param lower_bound Lower bound (current time)
+#'
+#' @return Estimate(s) from the conditional weibullPH distribution based on given parameters
+#'
+#' @export
+#'
+#' @examples
+#' qcond_weibullPH(rnd = 0.5, shape = 2, scale = 0.01, lower_bound = 5)
+qcond_weibullPH <- function(rnd = 0.5, shape, scale, lower_bound = 0) {
+  if (any(rnd < 0 | rnd > 1)) {
+    stop("rnd must be between 0 and 1")
+  }
+  
+  base <- lower_bound^shape - log(1 - rnd) / scale
+  base[base < 0] <- NA  # to avoid complex numbers due to numerical issues
+  
+  residual <- base^(1 / shape) - lower_bound
+  return(residual)
+}
+
+
 #' Conditional quantile function for loglogistic distribution 
 #'
 #' @param rnd Vector of quantiles
@@ -808,7 +834,7 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #' @return Numeric. Simulated time-to-event.
 #' 
 #' 
-#' @importFrom flexsurv pllogis pgompertz
+#' @importFrom flexsurv pllogis pgompertz pweibullPH
 #' @importFrom stats pexp pgamma plnorm pnorm pweibull
 #' 
 #' @export
@@ -955,24 +981,26 @@ qtimecov <- function(
 ) {
   # Internal survival and conditional quantile functions (require flexsurv for some)
   sf_fun <- switch(dist,
-                   exp     = function(.time, rate, ...) 1 - pexp(.time, rate),
-                   gamma   = function(.time, shape, rate) 1 - pgamma(.time, shape = shape, rate = rate),
-                   lnorm   = function(.time, meanlog, sdlog) 1 - plnorm(.time, meanlog, sdlog),
-                   norm    = function(.time, mean, sd) 1 - pnorm(.time, mean, sd),
-                   weibull = function(.time, shape, scale) 1 - pweibull(.time, shape, scale),
-                   llogis  = function(.time, shape, scale) flexsurv::pllogis(q = .time, shape = shape, scale = scale, lower.tail = FALSE),
-                   gompertz= function(.time, shape, rate) flexsurv::pgompertz(q = .time, shape = shape, rate = rate, lower.tail = FALSE),
+                   exp       = function(.time, rate, ...) 1 - pexp(.time, rate),
+                   gamma     = function(.time, shape, rate) 1 - pgamma(.time, shape = shape, rate = rate),
+                   lnorm     = function(.time, meanlog, sdlog) 1 - plnorm(.time, meanlog, sdlog),
+                   norm      = function(.time, mean, sd) 1 - pnorm(.time, mean, sd),
+                   weibull   = function(.time, shape, scale) 1 - pweibull(.time, shape, scale),
+                   weibullPH = function(.time, shape, scale) 1 - flexsurv::pweibullPH(.time, shape, scale),
+                   llogis    = function(.time, shape, scale) flexsurv::pllogis(q = .time, shape = shape, scale = scale, lower.tail = FALSE),
+                   gompertz  = function(.time, shape, rate) flexsurv::pgompertz(q = .time, shape = shape, rate = rate, lower.tail = FALSE),
                    stop("Unsupported distribution")
   )
   
   qcond_fun <- switch(dist,
-                      exp     = qcond_exp,
-                      gamma   = qcond_gamma,
-                      lnorm   = qcond_lnorm,
-                      norm    = qcond_norm,
-                      weibull = qcond_weibull,
-                      llogis  = qcond_llogis,
-                      gompertz= qcond_gompertz,
+                      exp       = qcond_exp,
+                      gamma     = qcond_gamma,
+                      lnorm     = qcond_lnorm,
+                      norm      = qcond_norm,
+                      weibull   = qcond_weibull,
+                      weibullPH = qcond_weibullPH,
+                      llogis    = qcond_llogis,
+                      gompertz  = qcond_gompertz,
                       stop("Unsupported distribution")
   )
   
@@ -994,13 +1022,14 @@ qtimecov <- function(
     luck <- luck_adj(prevsurv = surv_prev, cursurv = surv_curr, luck = luck, condq = TRUE)
     
     residual_tte <- switch(dist,
-                           exp      = qcond_exp(luck, rate = a_curr),
-                           gamma    = qcond_gamma(luck, rate = b_curr, shape = a_curr, lower_bound = .time - dt, s_obs = surv_prev),
-                           lnorm    = qcond_lnorm(luck, meanlog = a_curr, sdlog = b_curr, lower_bound = .time - dt, s_obs = surv_prev),
-                           norm     = qcond_norm(luck, mean = a_curr, sd = b_curr, lower_bound = .time - dt, s_obs = surv_prev),
-                           weibull  = qcond_weibull(luck, shape = a_curr, scale = b_curr, lower_bound = .time - dt),
-                           llogis   = qcond_llogis(luck, shape = a_curr, scale = b_curr, lower_bound = .time - dt),
-                           gompertz = qcond_gompertz(luck, shape = a_curr, rate = b_curr, lower_bound = .time - dt),
+                           exp       = qcond_exp(luck, rate = a_curr),
+                           gamma     = qcond_gamma(luck, rate = b_curr, shape = a_curr, lower_bound = .time - dt, s_obs = surv_prev),
+                           lnorm     = qcond_lnorm(luck, meanlog = a_curr, sdlog = b_curr, lower_bound = .time - dt, s_obs = surv_prev),
+                           norm      = qcond_norm(luck, mean = a_curr, sd = b_curr, lower_bound = .time - dt, s_obs = surv_prev),
+                           weibull   = qcond_weibull(luck, shape = a_curr, scale = b_curr, lower_bound = .time - dt),
+                           weibullPH = qcond_weibullPH(luck, shape = a_curr, scale = b_curr, lower_bound = .time - dt),
+                           llogis    = qcond_llogis(luck, shape = a_curr, scale = b_curr, lower_bound = .time - dt),
+                           gompertz  = qcond_gompertz(luck, shape = a_curr, rate = b_curr, lower_bound = .time - dt),
                            stop("Unsupported distribution")
     )
     

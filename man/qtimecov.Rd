@@ -18,9 +18,9 @@ qtimecov(
 \arguments{
 \item{luck}{Numeric between 0 and 1. Initial random quantile (luck).}
 
-\item{a_fun}{Function of time t returning the first distribution parameter (e.g., rate, shape, meanlog).}
+\item{a_fun}{Function of time .time returning the first distribution parameter (e.g., rate, shape, meanlog).}
 
-\item{b_fun}{Function of time t returning the second distribution parameter (e.g., scale, sdlog). Defaults to a function returning NA.}
+\item{b_fun}{Function of time .time returning the second distribution parameter (e.g., scale, sdlog). Defaults to a function returning NA.}
 
 \item{dist}{Character string specifying the distribution. Supported: "exp", "gamma", "lnorm", "norm", "weibull", "llogis", "gompertz".}
 

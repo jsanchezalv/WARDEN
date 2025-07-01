@@ -746,6 +746,13 @@ test_that("qtimecov works for all supported distributions", {
   expect_equal(qtimecov(0.5, a_fun = shape, b_fun = scale, dist = "weibull",dt=0.01),
                qweibull(0.5,2,10), tolerance = 0.01)
   
+  # 5.1 WeibullPH
+  shape <- param_fun_factory(2, 0, 0, 0)
+  scale <- param_fun_factory(0.01, 0, 0, 0)
+  expect_silent(qtimecov(runif(1), a_fun = shape, b_fun = scale, dist = "weibullPH"))
+  expect_equal(qtimecov(0.5, a_fun = shape, b_fun = scale, dist = "weibullPH",dt=0.01),
+               flexsurv::qweibullPH(0.5,2,0.01), tolerance = 0.01)
+  
   # 6. Loglogistic
   shape <- param_fun_factory(2.5, 0, 0, 0)
   scale <- param_fun_factory(7.6, 0, 0, 0)
@@ -963,3 +970,21 @@ test_that("adj_val works as intended",{
   })
   
 })
+
+test_that("qcondweibull and qcondweibullPH can give same results",
+          {
+            # Set base R parameters
+            shape <- 2
+            scale_base <- 10
+            # Convert to PH parameter
+            scale_PH <- (1 / scale_base)^shape  # = 0.01
+            
+            # Set common inputs
+            p <- 0.5
+            t0 <- 5
+            
+            # Evaluate both
+            expect_equal(qcond_weibull(p, shape, scale_base, lower_bound = t0),
+            qcond_weibullPH(p, shape, scale_PH, lower_bound = t0))
+            }
+          )
