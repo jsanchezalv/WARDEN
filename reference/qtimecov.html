@@ -17,7 +17,7 @@ conditional quantile functions, plus luck adjustment to simulate the event time.
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@ conditional quantile functions, plus luck adjustment to simulate the event time.
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">qtimecov</span><span class="op">(</span></span>
 <span>  <span class="va">luck</span>,</span>
 <span>  <span class="va">a_fun</span>,</span>
-<span>  b_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="cn">NA</span>,</span>
+<span>  b_fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">.time</span><span class="op">)</span> <span class="cn">NA</span>,</span>
 <span>  <span class="va">dist</span>,</span>
 <span>  dt <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  max_time <span class="op">=</span> <span class="fl">100</span>,</span>
@@ -132,7 +132,7 @@ then we could just set <code>dt = 1</code>, which would make computations faster
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">param_fun_factory</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">p0</span>, <span class="va">p1</span>, <span class="va">p2</span>, <span class="va">p3</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="va">p0</span> <span class="op">+</span> <span class="va">p1</span><span class="op">*</span><span class="va">t</span> <span class="op">+</span> <span class="va">p2</span><span class="op">*</span><span class="va">t</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">p3</span><span class="op">*</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="kw">function</span><span class="op">(</span><span class="va">.time</span><span class="op">)</span> <span class="va">p0</span> <span class="op">+</span> <span class="va">p1</span><span class="op">*</span><span class="va">.time</span> <span class="op">+</span> <span class="va">p2</span><span class="op">*</span><span class="va">.time</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">p3</span><span class="op">*</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="va">.time</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
@@ -219,8 +219,8 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 13.57996</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#Time varying example, with change at time 8</span></span></span>
-<span class="r-in"><span><span class="va">rate_exp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fl">0.1</span> <span class="op">+</span> <span class="fl">0.01</span><span class="op">*</span><span class="va">t</span> <span class="op">*</span> <span class="fl">0.00001</span><span class="op">*</span><span class="va">t</span><span class="op">^</span><span class="fl">2</span></span></span>
-<span class="r-in"><span><span class="va">rate_exp2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fl">0.2</span> <span class="op">+</span> <span class="fl">0.02</span><span class="op">*</span><span class="va">t</span></span></span>
+<span class="r-in"><span><span class="va">rate_exp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">.time</span><span class="op">)</span> <span class="fl">0.1</span> <span class="op">+</span> <span class="fl">0.01</span><span class="op">*</span><span class="va">.time</span> <span class="op">*</span> <span class="fl">0.00001</span><span class="op">*</span><span class="va">.time</span><span class="op">^</span><span class="fl">2</span></span></span>
+<span class="r-in"><span><span class="va">rate_exp2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">.time</span><span class="op">)</span> <span class="fl">0.2</span> <span class="op">+</span> <span class="fl">0.02</span><span class="op">*</span><span class="va">.time</span></span></span>
 <span class="r-in"><span><span class="va">time_change</span> <span class="op">&lt;-</span> <span class="fl">8</span></span></span>
 <span class="r-in"><span><span class="va">init_luck</span> <span class="op">&lt;-</span> <span class="fl">0.95</span></span></span>
 <span class="r-in"><span></span></span>
@@ -231,9 +231,11 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#An example of how it would work in the model, this would also work with time varying covariates!</span></span></span>
-<span class="r-in"><span><span class="va">rate_exp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fl">0.1</span></span></span>
-<span class="r-in"><span><span class="va">rate_exp2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="fl">0.2</span></span></span>
-<span class="r-in"><span><span class="va">time_change</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
+<span class="r-in"><span><span class="va">rate_exp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">.time</span><span class="op">)</span> <span class="fl">0.1</span></span></span>
+<span class="r-in"><span><span class="va">rate_exp2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">.time</span><span class="op">)</span> <span class="fl">0.2</span></span></span>
+<span class="r-in"><span><span class="va">rate_exp3</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">.time</span><span class="op">)</span> <span class="fl">0.3</span></span></span>
+<span class="r-in"><span><span class="va">time_change</span> <span class="op">&lt;-</span> <span class="fl">10</span> <span class="co">#evt 1</span></span></span>
+<span class="r-in"><span><span class="va">time_change2</span> <span class="op">&lt;-</span> <span class="fl">15</span> <span class="co">#evt2</span></span></span>
 <span class="r-in"><span><span class="va">init_luck</span> <span class="op">&lt;-</span> <span class="fl">0.95</span></span></span>
 <span class="r-in"><span><span class="co">#at start, we would just draw TTE</span></span></span>
 <span class="r-in"><span><span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">init_luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span><span class="op">)</span></span></span>
@@ -242,8 +244,17 @@ then we could just set <code>dt = 1</code>, which would make computations faster
 <span class="r-in"><span><span class="co">#at event in which rate changes (at time 10) we need to do this:</span></span></span>
 <span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">init_luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span>,</span></span>
 <span class="r-in"><span>                      max_time <span class="op">=</span> <span class="va">time_change</span>, return_luck <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp2</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span>, start_time<span class="op">=</span><span class="va">a</span><span class="op">$</span><span class="va">tte</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">new_luck</span> <span class="op">&lt;-</span> <span class="va">a</span><span class="op">$</span><span class="va">luck</span></span></span>
+<span class="r-in"><span><span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">new_luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp2</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span>, start_time<span class="op">=</span><span class="va">a</span><span class="op">$</span><span class="va">tte</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 19.97366</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#at second  event in which rate changes again (at time 15) we need to do this:</span></span></span>
+<span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">new_luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp2</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span>,</span></span>
+<span class="r-in"><span>                      max_time <span class="op">=</span> <span class="va">time_change2</span>, return_luck <span class="op">=</span> <span class="cn">TRUE</span>, start_time<span class="op">=</span><span class="va">a</span><span class="op">$</span><span class="va">tte</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">new_luck</span> <span class="op">&lt;-</span> <span class="va">a</span><span class="op">$</span><span class="va">luck</span></span></span>
+<span class="r-in"><span><span class="co">#final TTE is</span></span></span>
+<span class="r-in"><span><span class="fu">qtimecov</span><span class="op">(</span>luck <span class="op">=</span> <span class="va">new_luck</span>,a_fun <span class="op">=</span> <span class="va">rate_exp3</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">0.005</span>, start_time<span class="op">=</span><span class="va">a</span><span class="op">$</span><span class="va">tte</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 18.31411</span>
 <span class="r-in"><span>  </span></span>
 </code></pre></div>
     </div>
