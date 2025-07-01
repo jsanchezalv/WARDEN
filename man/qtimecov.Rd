@@ -7,7 +7,7 @@
 qtimecov(
   luck,
   a_fun,
-  b_fun = function(t) NA,
+  b_fun = function(.time) NA,
   dist,
   dt = 0.1,
   max_time = 100,
@@ -57,7 +57,7 @@ then we could just set \code{dt = 1}, which would make computations faster.
 \examples{
 
 param_fun_factory <- function(p0, p1, p2, p3) {
-  function(t) p0 + p1*t + p2*t^2 + p3*(floor(t) + 1)
+  function(.time) p0 + p1*.time + p2*.time^2 + p3*(floor(.time) + 1)
 }
 
 set.seed(42)
@@ -137,8 +137,8 @@ qtimecov(
 )
 
 #Time varying example, with change at time 8
-rate_exp <- function(t) 0.1 + 0.01*t * 0.00001*t^2
-rate_exp2 <- function(t) 0.2 + 0.02*t
+rate_exp <- function(.time) 0.1 + 0.01*.time * 0.00001*.time^2
+rate_exp2 <- function(.time) 0.2 + 0.02*.time
 time_change <- 8
 init_luck <- 0.95
 
@@ -148,9 +148,9 @@ qtimecov(luck = a$luck,a_fun = rate_exp2,dist = "exp", dt = 0.005, start_time=a$
 
 
 #An example of how it would work in the model, this would also work with time varying covariates!
-rate_exp <- function(t) 0.1
-rate_exp2 <- function(t) 0.2
-rate_exp3 <- function(t) 0.3
+rate_exp <- function(.time) 0.1
+rate_exp2 <- function(.time) 0.2
+rate_exp3 <- function(.time) 0.3
 time_change <- 10 #evt 1
 time_change2 <- 15 #evt2
 init_luck <- 0.95

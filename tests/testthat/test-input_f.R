@@ -709,7 +709,7 @@ test_that("qtimecov returns numeric scalar within bounds", {
 test_that("qtimecov works for all supported distributions", {
   set.seed(1)
   param_fun_factory <- function(p0, p1, p2, p3) {
-    function(t) p0 + p1 * t + p2 * t^2 + p3 * (floor(t) + 1)
+    function(.time) p0 + p1 * .time + p2 * .time^2 + p3 * (floor(.time) + 1)
   }
   
   # 1. Exponential
@@ -792,8 +792,8 @@ test_that("qtimecov works for all supported distributions", {
     qtimecov(luck = a$luck,a_fun = rate_exp,b_fun = function(t) 90000,dist = "weibull", dt = 0.001, start_time=a$tte)},
     tolerance = 0.01)
   
-  rate_exp <- function(t) 0.1
-  rate_exp2 <- function(t) 0.2
+  rate_exp <- function(.time) 0.1
+  rate_exp2 <- function(.time) 0.2
   time_change <- 10
   init_luck <- 0.95
   
@@ -813,8 +813,8 @@ test_that("qtimecov works for all supported distributions", {
 
 # time varying and an event -----------------------------------------------
 
-  rate_exp <- function(t) 0.1 + 0.01*t * 0.00001*t^2
-  rate_exp2 <- function(t) 0.2 + 0.02*t
+  rate_exp <- function(.time) 0.1 + 0.01*.time * 0.00001*.time^2
+  rate_exp2 <- function(.time) 0.2 + 0.02*.time
   time_change <- 8
   init_luck <- 0.95
   
@@ -862,19 +862,40 @@ test_that("qtimecov works for all supported distributions", {
     }
     
     total_tte
-  }, tolerance = 0.01)  
+  }, tolerance = 0.01)
+  
+  rate_exp <- function(.time) 0.1 + floor(.time)*0.01
+  init_luck <- 0.95
+  
+  #30x faster 
+  expect_equal({
+    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 1)
+    a
+  },{
+    time_vec <- 0:100
+    new_luck <- init_luck
+    for (i in 2:length(time_vec)) {
+      new_luck <- luck_adj(prevsurv = 1 - pexp(q=time_vec[i-1],rate_exp(time_vec[i-1])),
+                           cursurv = 1 - pexp(q=time_vec[i],rate_exp(time_vec[i])),
+                           luck = new_luck,
+                           condq = FALSE) 
+      qexp(new_luck,rate_exp(1))
+    }
+    a
+  }, tolerance = 0.01)
+  
   
 })
 
 
 
 test_that("qtimecov throws error for unsupported distribution", {
-  dummy <- function(t) 1
+  dummy <- function(.time) 1
   expect_error(qtimecov(runif(1), a_fun = dummy, dist = "beta"), "Unsupported distribution")
 })
 
 test_that("qtimecov respects max_time bound", {
-  slow_fun <- function(t) 0.00001
+  slow_fun <- function(.time) 0.00001
   tte <- qtimecov(
     luck = 0.999,
     a_fun = slow_fun,
@@ -889,23 +910,23 @@ test_that("adj_val works as intended",{
   
   bs_age <- 1
   vec <- 1 - seq(from =0, to = 0.2, by = 0.02)
-  expect_equal(adj_val(0,0,by=1, vec[floor(time + bs_age)], discount = Inf), 0)
-  expect_equal(adj_val(0,5,by=1, vec[floor(time + bs_age)], discount = Inf), 0)
-  expect_error(adj_val(0,20,by=1, vec[floor(time + bs_age)]))
-  expect_error(adj_val(0,20,by=1, vec[floor(time + bs_age)]))
-  expect_error(adj_val(0,-5,by=1, vec[floor(time + bs_age)]))
-  expect_equal(adj_val(0,0,by=1, vec[floor(time + bs_age)]), 0)
-  expect_equal(adj_val(0,0.1,by=1, vec[floor(time + bs_age)], discount = 0),1)
-  expect_equal(adj_val(0,1.1,by=1, vec[floor(time + bs_age)] * time, discount = 0),(1*0+0.98*0.1)/1.1)
-  expect_equal(adj_val(0,0.1,by=1, vec[floor(time + bs_age)] * time, discount = 0),0)
-  expect_equal(adj_val(0,0.1,by=1, vec[floor(time + bs_age)] * time, discount = 0.03),0)
-  expect_equal(adj_val(8,9,by=0.2, vec[floor(time + bs_age)], discount = 0),0.84)
-  expect_equal(adj_val(8,9,by=0.5, vec[floor(time + bs_age)], discount = Inf),0)
+  expect_equal(adj_val(0,0,by=1, vec[floor(.time + bs_age)], discount = Inf), 0)
+  expect_equal(adj_val(0,5,by=1, vec[floor(.time + bs_age)], discount = Inf), 0)
+  expect_error(adj_val(0,20,by=1, vec[floor(.time + bs_age)]))
+  expect_error(adj_val(0,20,by=1, vec[floor(.time + bs_age)]))
+  expect_error(adj_val(0,-5,by=1, vec[floor(.time + bs_age)]))
+  expect_equal(adj_val(0,0,by=1, vec[floor(.time + bs_age)]), 0)
+  expect_equal(adj_val(0,0.1,by=1, vec[floor(.time + bs_age)], discount = 0),1)
+  expect_equal(adj_val(0,1.1,by=1, vec[floor(.time + bs_age)] * .time, discount = 0),(1*0+0.98*0.1)/1.1)
+  expect_equal(adj_val(0,0.1,by=1, vec[floor(.time + bs_age)] * .time, discount = 0),0)
+  expect_equal(adj_val(0,0.1,by=1, vec[floor(.time + bs_age)] * .time, discount = 0.03),0)
+  expect_equal(adj_val(8,9,by=0.2, vec[floor(.time + bs_age)], discount = 0),0.84)
+  expect_equal(adj_val(8,9,by=0.5, vec[floor(.time + bs_age)], discount = Inf),0)
   expect_equal(adj_val(8,9,by=0.5, 1),1)
-  expect_equal(adj_val(0,4,by=1, time),1.5)
+  expect_equal(adj_val(0,4,by=1, .time),1.5)
   
   expect_equal({
-    val <- 0.8 * adj_val(0,5.2,by=1, vec[floor(time + bs_age)], discount = 0.03)
+    val <- 0.8 * adj_val(0,5.2,by=1, vec[floor(.time + bs_age)], discount = 0.03)
     disc_ongoing_v(0.03,
                    0,
                    5.2,
@@ -922,8 +943,9 @@ test_that("adj_val works as intended",{
     a
   })
   
+  #17x faster
   expect_equal({
-    val <- 0.8 * adj_val(0,5.2,by=1, vec[floor(time + bs_age)], discount = 0)
+    val <- 0.8 * adj_val(0,5.2,by=1, vec[floor(.time + bs_age)], discount = 0)
     disc_ongoing_v(0,
                    0,
                    5.2,

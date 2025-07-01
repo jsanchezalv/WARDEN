@@ -26,7 +26,7 @@ This is useful for instances when adding cycles may not be desirable, so one can
 "cycle-like" calculations without needing cycles, offering performance speeds.
 }
 \details{
-The user can use the \code{time} variable to select the corresponding time of the sequence being evaluated.
+The user can use the \code{.time} variable to select the corresponding time of the sequence being evaluated.
 For example, in c\verb{urtime = 0, nexttime = 4, by = 1}, \code{time} would correspond to \verb{0, 1, 2, 3}.
 If using \code{nexttime = 4.2}, \verb{0, 1, 2, 3, 4}
 }
@@ -36,10 +36,10 @@ bs_age <- 1
 vec <- 1:8/10
 
 # Calculate adjusted value without discounting
-adj_val(0, 4, by = 1, expression = vec[floor(time + bs_age)])
-adj_val(0, 4, by = 1, expression = time * 1.1)
+adj_val(0, 4, by = 1, expression = vec[floor(.time + bs_age)])
+adj_val(0, 4, by = 1, expression = .time * 1.1)
 
 # Calculate adjusted value with discounting
-adj_val(0, 4, by = 1, expression = vec[floor(time + bs_age)], discount = 0.03)
+adj_val(0, 4, by = 1, expression = vec[floor(.time + bs_age)], discount = 0.03)
 
 }

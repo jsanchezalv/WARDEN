@@ -797,8 +797,8 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #' 
 #'
 #' @param luck Numeric between 0 and 1. Initial random quantile (luck).
-#' @param a_fun Function of time t returning the first distribution parameter (e.g., rate, shape, meanlog).
-#' @param b_fun Function of time t returning the second distribution parameter (e.g., scale, sdlog). Defaults to a function returning NA.
+#' @param a_fun Function of time .time returning the first distribution parameter (e.g., rate, shape, meanlog).
+#' @param b_fun Function of time .time returning the second distribution parameter (e.g., scale, sdlog). Defaults to a function returning NA.
 #' @param dist Character string specifying the distribution. Supported: "exp", "gamma", "lnorm", "norm", "weibull", "llogis", "gompertz".
 #' @param dt Numeric. Time step increment to update parameters and survival. Default 0.1.
 #' @param max_time Numeric. Max allowed event time to prevent infinite loops. Default 100.
@@ -829,7 +829,7 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #' @examples
 #'
 #' param_fun_factory <- function(p0, p1, p2, p3) {
-#'   function(t) p0 + p1*t + p2*t^2 + p3*(floor(t) + 1)
+#'   function(.time) p0 + p1*.time + p2*.time^2 + p3*(floor(.time) + 1)
 #' }
 #' 
 #' set.seed(42)
@@ -909,8 +909,8 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #' )
 #'
 #' #Time varying example, with change at time 8
-#' rate_exp <- function(t) 0.1 + 0.01*t * 0.00001*t^2
-#' rate_exp2 <- function(t) 0.2 + 0.02*t
+#' rate_exp <- function(.time) 0.1 + 0.01*.time * 0.00001*.time^2
+#' rate_exp2 <- function(.time) 0.2 + 0.02*.time
 #' time_change <- 8
 #' init_luck <- 0.95
 #'
@@ -920,9 +920,9 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #' 
 #' 
 #' #An example of how it would work in the model, this would also work with time varying covariates!
-#' rate_exp <- function(t) 0.1
-#' rate_exp2 <- function(t) 0.2
-#' rate_exp3 <- function(t) 0.3
+#' rate_exp <- function(.time) 0.1
+#' rate_exp2 <- function(.time) 0.2
+#' rate_exp3 <- function(.time) 0.3
 #' time_change <- 10 #evt 1
 #' time_change2 <- 15 #evt2
 #' init_luck <- 0.95
@@ -946,7 +946,7 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 qtimecov <- function(
     luck,
     a_fun,
-    b_fun = function(t) NA,
+    b_fun = function(.time) NA,
     dist,
     dt = 0.1,
     max_time = 100,
@@ -955,13 +955,13 @@ qtimecov <- function(
 ) {
   # Internal survival and conditional quantile functions (require flexsurv for some)
   sf_fun <- switch(dist,
-                   exp     = function(t, rate, ...) 1 - pexp(t, rate),
-                   gamma   = function(t, shape, rate) 1 - pgamma(t, shape = shape, rate = rate),
-                   lnorm   = function(t, meanlog, sdlog) 1 - plnorm(t, meanlog, sdlog),
-                   norm    = function(t, mean, sd) 1 - pnorm(t, mean, sd),
-                   weibull = function(t, shape, scale) 1 - pweibull(t, shape, scale),
-                   llogis  = function(t, shape, scale) flexsurv::pllogis(q = t, shape = shape, scale = scale, lower.tail = FALSE),
-                   gompertz= function(t, shape, rate) flexsurv::pgompertz(q = t, shape = shape, rate = rate, lower.tail = FALSE),
+                   exp     = function(.time, rate, ...) 1 - pexp(.time, rate),
+                   gamma   = function(.time, shape, rate) 1 - pgamma(.time, shape = shape, rate = rate),
+                   lnorm   = function(.time, meanlog, sdlog) 1 - plnorm(.time, meanlog, sdlog),
+                   norm    = function(.time, mean, sd) 1 - pnorm(.time, mean, sd),
+                   weibull = function(.time, shape, scale) 1 - pweibull(.time, shape, scale),
+                   llogis  = function(.time, shape, scale) flexsurv::pllogis(q = .time, shape = shape, scale = scale, lower.tail = FALSE),
+                   gompertz= function(.time, shape, rate) flexsurv::pgompertz(q = .time, shape = shape, rate = rate, lower.tail = FALSE),
                    stop("Unsupported distribution")
   )
   
@@ -976,37 +976,37 @@ qtimecov <- function(
                       stop("Unsupported distribution")
   )
   
-  t <- start_time
-  a_prev <- a_fun(t)
-  b_prev <- b_fun(t)
-  surv_prev <- sf_fun(t, a_prev, b_prev)
+  .time <- start_time
+  a_prev <- a_fun(.time)
+  b_prev <- b_fun(.time)
+  surv_prev <- sf_fun(.time, a_prev, b_prev)
   
   repeat {
-    t <- t + dt
-    a_curr <- a_fun(t)
-    b_curr <- b_fun(t)
+    .time <- .time + dt
+    a_curr <- a_fun(.time)
+    b_curr <- b_fun(.time)
     
-    # Correctly compute survival at t - dt for luck adjustment
-    surv_prev <- sf_fun(t - dt, a_fun(t - dt), b_fun(t - dt))
-    surv_curr <- sf_fun(t, a_curr, b_curr)
+    # Correctly compute survival at .time - dt for luck adjustment
+    surv_prev <- sf_fun(.time - dt, a_fun(.time - dt), b_fun(.time - dt))
+    surv_curr <- sf_fun(.time, a_curr, b_curr)
     
     # Use condq = TRUE for conditional quantiles
     luck <- luck_adj(prevsurv = surv_prev, cursurv = surv_curr, luck = luck, condq = TRUE)
     
     residual_tte <- switch(dist,
                            exp      = qcond_exp(luck, rate = a_curr),
-                           gamma    = qcond_gamma(luck, rate = b_curr, shape = a_curr, lower_bound = t - dt, s_obs = surv_prev),
-                           lnorm    = qcond_lnorm(luck, meanlog = a_curr, sdlog = b_curr, lower_bound = t - dt, s_obs = surv_prev),
-                           norm     = qcond_norm(luck, mean = a_curr, sd = b_curr, lower_bound = t - dt, s_obs = surv_prev),
-                           weibull  = qcond_weibull(luck, shape = a_curr, scale = b_curr, lower_bound = t - dt),
-                           llogis   = qcond_llogis(luck, shape = a_curr, scale = b_curr, lower_bound = t - dt),
-                           gompertz = qcond_gompertz(luck, shape = a_curr, rate = b_curr, lower_bound = t - dt),
+                           gamma    = qcond_gamma(luck, rate = b_curr, shape = a_curr, lower_bound = .time - dt, s_obs = surv_prev),
+                           lnorm    = qcond_lnorm(luck, meanlog = a_curr, sdlog = b_curr, lower_bound = .time - dt, s_obs = surv_prev),
+                           norm     = qcond_norm(luck, mean = a_curr, sd = b_curr, lower_bound = .time - dt, s_obs = surv_prev),
+                           weibull  = qcond_weibull(luck, shape = a_curr, scale = b_curr, lower_bound = .time - dt),
+                           llogis   = qcond_llogis(luck, shape = a_curr, scale = b_curr, lower_bound = .time - dt),
+                           gompertz = qcond_gompertz(luck, shape = a_curr, rate = b_curr, lower_bound = .time - dt),
                            stop("Unsupported distribution")
     )
     
-    total_tte <- t - dt + residual_tte
+    total_tte <- .time - dt + residual_tte
     
-    if (residual_tte <= dt || total_tte <= t || t >= max_time) {
+    if (residual_tte <= dt || total_tte <= .time || .time >= max_time) {
       if (return_luck == TRUE) {
         return(list(tte = min(total_tte, max_time), luck = luck))
       } else {

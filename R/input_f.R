@@ -1081,8 +1081,11 @@ luck_adj <- function(prevsurv,cursurv,luck,condq=TRUE){
 #'
 #' @return Numeric. The calculated adjusted value.
 #' 
+#' @importFrom stats weighted.mean
+#' @importFrom utils head
+#' 
 #' @details
-#'  The user can use the `time` variable to select the corresponding time of the sequence being evaluated.
+#'  The user can use the `.time` variable to select the corresponding time of the sequence being evaluated.
 #'  For example, in c`urtime = 0, nexttime = 4, by = 1`, `time` would correspond to `0, 1, 2, 3`.
 #'  If using `nexttime = 4.2`, `0, 1, 2, 3, 4`
 #' 
@@ -1093,11 +1096,11 @@ luck_adj <- function(prevsurv,cursurv,luck,condq=TRUE){
 #' vec <- 1:8/10
 #' 
 #' # Calculate adjusted value without discounting
-#' adj_val(0, 4, by = 1, expression = vec[floor(time + bs_age)])
-#' adj_val(0, 4, by = 1, expression = time * 1.1)
+#' adj_val(0, 4, by = 1, expression = vec[floor(.time + bs_age)])
+#' adj_val(0, 4, by = 1, expression = .time * 1.1)
 #'
 #' # Calculate adjusted value with discounting
-#' adj_val(0, 4, by = 1, expression = vec[floor(time + bs_age)], discount = 0.03)
+#' adj_val(0, 4, by = 1, expression = vec[floor(.time + bs_age)], discount = 0.03)
 #' 
 adj_val <- function(curtime, nexttime, by, expression, discount = NULL) {
   duration <- nexttime - curtime
@@ -1118,7 +1121,7 @@ adj_val <- function(curtime, nexttime, by, expression, discount = NULL) {
   expr_sub <- substitute(expression)
   
   values <- vapply(eval_times, function(tt) {
-    val <- eval(expr_sub, envir = list(time = tt), enclos = parent)
+    val <- eval(expr_sub, envir = list(.time = tt), enclos = parent)
     if (is.na(val)) stop("NA value encountered during evaluation at time: ", tt)
     val
   }, numeric(1))
