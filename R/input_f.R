@@ -1098,6 +1098,7 @@ luck_adj <- function(prevsurv,cursurv,luck,condq=TRUE){
 #'
 #' # Calculate adjusted value with discounting
 #' adj_val(0, 4, by = 1, expression = vec[floor(time + bs_age)], discount = 0.03)
+#' 
 adj_val <- function(curtime, nexttime, by, expression, discount = NULL) {
   duration <- nexttime - curtime
   if (duration < 0) stop("curtime - nexttime is negative (negative duration)")
@@ -1123,13 +1124,14 @@ adj_val <- function(curtime, nexttime, by, expression, discount = NULL) {
   }, numeric(1))
   
   if (!is.null(discount)) {
-    discounted_values <- disc_ongoing_v(
+    # Compute present value of $1 over each interval (weights)
+    weights <- disc_ongoing_v(
       lcldr = discount,
       lclprvtime = eval_times,
       lclcurtime = times[-1],
-      lclval = values
+      lclval = rep(1, length(eval_times))
     )
-    return(sum(discounted_values) / duration)
+    return(weighted.mean(values, w = weights))
   } else {
     return(sum(values * intervals) / duration)
   }

@@ -888,20 +888,56 @@ test_that("qtimecov respects max_time bound", {
 test_that("adj_val works as intended",{
   
   bs_age <- 1
-  vec <- 1:15/10
+  vec <- 1 - seq(from =0, to = 0.2, by = 0.02)
   expect_equal(adj_val(0,0,by=1, vec[floor(time + bs_age)], discount = Inf), 0)
   expect_equal(adj_val(0,5,by=1, vec[floor(time + bs_age)], discount = Inf), 0)
   expect_error(adj_val(0,20,by=1, vec[floor(time + bs_age)]))
   expect_error(adj_val(0,20,by=1, vec[floor(time + bs_age)]))
   expect_error(adj_val(0,-5,by=1, vec[floor(time + bs_age)]))
   expect_equal(adj_val(0,0,by=1, vec[floor(time + bs_age)]), 0)
-  expect_equal(adj_val(0,0.1,by=1, vec[floor(time + bs_age)], discount = 0),0.1)
-  expect_equal(adj_val(0,1.1,by=1, vec[floor(time + bs_age)] * time, discount = 0),(0*1+0.2*0.1)/1.1)
+  expect_equal(adj_val(0,0.1,by=1, vec[floor(time + bs_age)], discount = 0),1)
+  expect_equal(adj_val(0,1.1,by=1, vec[floor(time + bs_age)] * time, discount = 0),(1*0+0.98*0.1)/1.1)
   expect_equal(adj_val(0,0.1,by=1, vec[floor(time + bs_age)] * time, discount = 0),0)
   expect_equal(adj_val(0,0.1,by=1, vec[floor(time + bs_age)] * time, discount = 0.03),0)
-  expect_equal(adj_val(8,9,by=0.2, vec[floor(time + bs_age)], discount = 0),0.9)
+  expect_equal(adj_val(8,9,by=0.2, vec[floor(time + bs_age)], discount = 0),0.84)
   expect_equal(adj_val(8,9,by=0.5, vec[floor(time + bs_age)], discount = Inf),0)
   expect_equal(adj_val(8,9,by=0.5, 1),1)
   expect_equal(adj_val(0,4,by=1, time),1.5)
+  
+  expect_equal({
+    val <- 0.8 * adj_val(0,5.2,by=1, vec[floor(time + bs_age)], discount = 0.03)
+    disc_ongoing_v(0.03,
+                   0,
+                   5.2,
+                   val)
+  },{
+    a <- 0
+    time_vec <- c(0,1,2,3,4,5,5.2)
+    for (i in 1:(length(time_vec)-1)) {
+      a <-  a + disc_ongoing_v(0.03,
+                               time_vec[i],
+                               time_vec[i+1],
+                               0.8 * vec[floor(time_vec[i] + bs_age)])
+    }
+    a
+  })
+  
+  expect_equal({
+    val <- 0.8 * adj_val(0,5.2,by=1, vec[floor(time + bs_age)], discount = 0)
+    disc_ongoing_v(0,
+                   0,
+                   5.2,
+                   val)
+  },{
+    a <- 0
+    time_vec <- c(0,1,2,3,4,5,5.2)
+    for (i in 1:(length(time_vec)-1)) {
+      a <-  a + disc_ongoing_v(0,
+                               time_vec[i],
+                               time_vec[i+1],
+                               0.8 * vec[floor(time_vec[i] + bs_age)])
+    }
+    a
+  })
   
 })

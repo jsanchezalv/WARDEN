@@ -41,4 +41,5 @@ adj_val(0, 4, by = 1, expression = time * 1.1)
 
 # Calculate adjusted value with discounting
 adj_val(0, 4, by = 1, expression = vec[floor(time + bs_age)], discount = 0.03)
+
 }
