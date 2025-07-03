@@ -100,7 +100,12 @@ test_that("Vectorial discounting working as expected with vectors", {
   
   #Cycle
   expect_equal(disc_cycle_v(lcldr=0.035, lclcurtime=c(3,3,3), lclval=c(0,1000,Inf),lclprvtime=c(0.5,0.5,0.5), cyclelength=c(1/12,1/12,1/12),starttime=c(0,0,0)),
-               c(0,28215.4394,Inf))  
+               c(0,28296.443022132232727,Inf))  
+  
+  expect_equal(disc_cycle_v(0.035,0,1,1,1000,0,5),1000)
+  expect_equal(disc_cycle_v(0.035,1,1,1,1000,0,5),966.1835748792273)
+  expect_equal(disc_cycle_v(0.035,0,1,0,1000,0,5),1000)
+  expect_equal(disc_cycle_v(0.035,0,1,2,1000,0,5),1966.1835748792273)
 })
 
 test_that("Create indicators works correctly",{
@@ -836,12 +841,12 @@ test_that("qtimecov works for all supported distributions", {
     repeat {
       t <- t + dt
       s_prev <- 1 - pexp(t - dt, rate = rate_exp(t - dt))
-      s_curr <- 1 - pexp(t,       rate = rate_exp(t))
+      s_curr <- 1 - pexp(t,       rate = rate_exp(t - dt))
       
       luck <- luck_adj(prevsurv = s_prev, cursurv = s_curr, luck = luck, condq = TRUE)
       
       res_tte <- qcond_exp(luck, rate = rate_exp(t))
-      total_tte <- t - dt + res_tte
+      total_tte <- t + res_tte
       
       if (res_tte <= dt || total_tte <= t || t >= time_change) {
         break
@@ -856,12 +861,12 @@ test_that("qtimecov works for all supported distributions", {
     repeat {
       t <- t + dt
       s_prev <- 1 - pexp(t - dt, rate = rate_exp2(t - dt))
-      s_curr <- 1 - pexp(t,       rate = rate_exp2(t))
+      s_curr <- 1 - pexp(t,       rate = rate_exp2(t - dt))
       
       luck <- luck_adj(prevsurv = s_prev, cursurv = s_curr, luck = luck, condq = TRUE)
       
       res_tte <- qcond_exp(luck, rate = rate_exp2(t))
-      total_tte <- t - dt + res_tte
+      total_tte <- t  + res_tte
       
       if (res_tte <= dt || total_tte <= t) {
         break
@@ -891,6 +896,47 @@ test_that("qtimecov works for all supported distributions", {
     a
   }, tolerance = 0.01)
   
+  
+  expect_equal({
+    bs_rate <- 0.08
+    time_cov <- 0.0002271
+    bs_rate_f <- function(.time) bs_rate + time_cov * floor(.time)
+    luck <- 0.403
+    t <- 0
+    
+    # First rate and quantile (from time 0)
+    new_rate <- bs_rate_f(0)
+    ttdeath <- qexp(luck, rate = new_rate)
+    
+    # Unconditional quantile loop
+    while (t < ttdeath) {
+      old_rate <- new_rate
+      new_rate <- bs_rate_f(t)
+      
+      # Both survival values are evaluated at time t (NOT t+1)
+      prev_surv <- 1 - pexp(q = t, rate = old_rate)
+      cur_surv  <- 1 - pexp(q = t, rate = new_rate)
+      
+      # Use condq = FALSE for unconditional approach
+      luck <- luck_adj(prevsurv = prev_surv, cursurv = cur_surv, luck = luck, condq = FALSE)
+      
+      # Unconditional quantile from time 0
+      ttdeath <- qexp(luck, rate = new_rate)
+      
+      t <- t + 1
+    }
+    
+    # Final time-to-event
+    ttdeath
+    
+  },{
+    new_rate <-bs_rate <-  0.08
+    bs_rate_f <- function(.time){bs_rate + (time_cov * floor(.time))}
+    luck <- 0.403
+    time_cov <- 0.0002271
+    t <- 0
+    qtimecov(luck = luck,a_fun = bs_rate_f,dist = "exp", dt = 1)
+  }, tolerance = 0.01)
   
 })
 

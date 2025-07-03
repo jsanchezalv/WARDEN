@@ -1005,18 +1005,40 @@ qtimecov <- function(
   )
   
   .time <- start_time
-  a_prev <- a_fun(.time)
-  b_prev <- b_fun(.time)
-  surv_prev <- sf_fun(.time, a_prev, b_prev)
+  a_curr <- a_fun(.time)
+  b_curr <- b_fun(.time)
+  surv_prev <- sf_fun(.time, a_curr, b_curr)
+  
+  
+  # Early exit: check whether event occurs in [0, dt]
+  residual_tte <- switch(dist,
+                         exp       = qcond_exp(luck, rate = a_curr),
+                         gamma     = qcond_gamma(luck, rate = b_curr, shape = a_curr, lower_bound = start_time, s_obs = surv_prev),
+                         lnorm     = qcond_lnorm(luck, meanlog = a_curr, sdlog = b_curr, lower_bound = start_time, s_obs = surv_prev),
+                         norm      = qcond_norm(luck, mean = a_curr, sd = b_curr, lower_bound = start_time, s_obs = surv_prev),
+                         weibull   = qcond_weibull(luck, shape = a_curr, scale = b_curr, lower_bound = start_time),
+                         weibullPH = qcond_weibullPH(luck, shape = a_curr, scale = b_curr, lower_bound = start_time),
+                         llogis    = qcond_llogis(luck, shape = a_curr, scale = b_curr, lower_bound = start_time),
+                         gompertz  = qcond_gompertz(luck, shape = a_curr, rate = b_curr, lower_bound = start_time),
+                         stop("Unsupported distribution")
+  )
+  
+  if (residual_tte <= dt) {
+    if (return_luck == TRUE) {
+      return(list(tte = residual_tte + .time, luck = luck))
+    } else {
+      return(residual_tte)
+    }
+  }
   
   repeat {
     .time <- .time + dt
+
+    # Correctly compute survival at .time - dt for luck adjustment
+    surv_prev <- sf_fun(.time - dt, a_curr, b_curr)
+    surv_curr <- sf_fun(.time, a_curr, b_curr)
     a_curr <- a_fun(.time)
     b_curr <- b_fun(.time)
-    
-    # Correctly compute survival at .time - dt for luck adjustment
-    surv_prev <- sf_fun(.time - dt, a_fun(.time - dt), b_fun(.time - dt))
-    surv_curr <- sf_fun(.time, a_curr, b_curr)
     
     # Use condq = TRUE for conditional quantiles
     luck <- luck_adj(prevsurv = surv_prev, cursurv = surv_curr, luck = luck, condq = TRUE)
@@ -1033,7 +1055,7 @@ qtimecov <- function(
                            stop("Unsupported distribution")
     )
     
-    total_tte <- .time - dt + residual_tte
+    total_tte <- .time + residual_tte
     
     if (residual_tte <= dt || total_tte <= .time || .time >= max_time) {
       if (return_luck == TRUE) {

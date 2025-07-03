@@ -1402,7 +1402,7 @@ disc_cycle_v <- function(
   n_cycles <- total_cycles - prev_cycles
   
   # Adjust n_cycles to account for the starting condition
-  n_cycles <- ifelse(lclprvtime == 0 & lclcurtime == 0, 1, n_cycles)
+  n_cycles <- ifelse(lclprvtime == lclcurtime & (lclcurtime - starttime) %% cyclelength == 0, n_cycles+1, n_cycles)
   
   # Cap using max_cycles
   remaining_cycles <- ifelse(is.na(max_cycles), n_cycles, pmax(0, max_cycles - prev_cycles))
@@ -1410,7 +1410,7 @@ disc_cycle_v <- function(
   
   # Compute discount factor per row
   s <- (1 + lcldr)^cyclelength - 1
-  d <- ifelse(lclprvtime==0,-1,lclprvtime / cyclelength)
+  d <- ifelse(lclprvtime==0,0,lclprvtime / cyclelength)-1
   
   discounted <- numeric(n)
   
