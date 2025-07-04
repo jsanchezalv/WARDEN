@@ -49,9 +49,12 @@ Imports:
     progressr,
     magrittr,
     rlang,
-    tidyr
+    tidyr,
+    Rcpp
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
 URL: https://jsanchezalv.github.io/WARDEN/
+LinkingTo: 
+    Rcpp
