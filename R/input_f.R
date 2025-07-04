@@ -1069,7 +1069,8 @@ luck_adj <- function(prevsurv,cursurv,luck,condq=TRUE){
 #'
 #' This function calculates an adjusted value over a time interval with optional discounting.
 #' This is useful for instances when adding cycles may not be desirable, so one can perform
-#' "cycle-like" calculations without needing cycles, offering performance speeds.
+#' "cycle-like" calculations without needing cycles, offering performance speeds. See
+#' the vignette on avoiding cycles for an example in a model.
 #'
 #' @param curtime Numeric. The current time point.
 #' @param nexttime Numeric. The next time point. Must be greater than or equal to `curtime`.

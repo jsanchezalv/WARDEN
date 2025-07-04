@@ -46,34 +46,7 @@ options(tibble.print_max = 50)
 ```
 
 # Model concept
-The model is represented below. All patients start in the progression-free state and may move to the progressed state. At any point in time they can die, depending on the risk of each disease stage. Patients may also experience a disease event which accelerates progression. 
-
-```{r diagram, echo= FALSE}
-
-DiagrammeR::grViz("
-  digraph graph1 {
-  
-  graph [layout = dot, rankdir = LR, nodesep='1', fontsize = 12]
-  
-  # node definitions with substituted label text
-  
-  node [shape = oval]
-  a [label = 'Progression-free']
-  b [label = 'Progressed']
-  d [label = 'Death']
-  
-  node [shape = box]
-  c [label = 'Progression-accelerating event', style = dashed]
-  
-  a -> d
-  a -> b
-  b -> d
-  c -> b [style = dashed]
-  
-  }", 
-  height = 300)
-  
-```
+All patients start in the progression-free state and may move to the progressed state. At any point in time they can die, depending on the risk of each disease stage. Patients may also experience a disease event which accelerates progression. 
 
 # Generate dummy IPD trial data and fit survival models
 The dummy IPD trial data was generated below from using the `sim_adtte()` function from the `flexsurvPlus` package.

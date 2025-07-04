@@ -32,7 +32,6 @@ Suggests:
     knitr,
     rmarkdown,
     kableExtra,
-    DiagrammeR,
     testthat (>= 3.0.0),
     survminer,
     survival

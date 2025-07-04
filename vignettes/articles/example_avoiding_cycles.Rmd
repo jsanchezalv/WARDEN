@@ -1,0 +1,269 @@
+---
+title: 'How to Avoid Using Cycles to Speed Up Model'
+author: "Javier Sanchez Alvarez"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    embed-resources: true
+    self-contained-math: true
+vignette: >
+  %\VignetteIndexEntry{example_avoiding_cycles}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE
+)
+```
+
+# Introduction
+
+This document shows how one can substantially reduce running time in models where cycle events are used by utilizing three features of WARDEN: 1) per cycle costs and qalys, 2) time to event predictions which take into account time-varying covariates through `qtimecov` and 3) adjustment of ongoing outputs to be corrected by cycle-type of adjustments (e.g., utility adjustment by age) through `adj_val`.
+
+30% speed gains can be expected, though the final impact depends on the number of cycles and complexity at each cycle. Note that no function has been implemented in C++, so if discounting, `qtimecov` and `adj_val` are implemented in C++, substantial gains can be expected.
+
+Note as well that this approach to avoid cycles could smoothly handle treatment waning, changes in covariates (like weight, BMI, etc), etc.
+
+## Main options
+
+```{r setup}
+library(WARDEN)
+library(flexsurv)
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+library(purrr)
+library(tidyr)
+
+```
+
+```{r main_opt, results='hide', message=FALSE}
+options(scipen = 999)
+options(digits=3)
+options(tibble.print_max = 50)
+```
+
+
+# Model using cycles
+This is a very simple model, where we just have a time to death given by an exponential, but the underlying risk changes every year given by a patient-specific time covariate. This means that in the traditional approach, we would create yearly cycles to make the adjustments to the time to event.
+
+Additionally, we have a multiplicative utility age adjustment factor, so at every yearly cycle we also adjust for that factor. 
+
+Treatment costs are yearly as well, so we add them as an instantaneous cost at every cycle, including time 0.
+## Inputs
+```{r input_delayed}
+
+common_all_inputs <-add_item2(input = {
+  u_bs <- 0.8
+  u_age <- 1 - seq(from = 0, to = 0.5, by = 0.005)
+  bs_rate <- 0.07
+  trt_eff <- 0.02
+})  
+
+common_pt_inputs <- add_item2(input={
+    bs_age <- rnorm(1,40,5)
+    time_cov <- runif(1)/500
+    luck <- runif(1)
+}) 
+
+
+unique_pt_inputs <- add_item2(input = {
+    cost_trt_ins <- ifelse(arm=="int",1000,500)
+    bs_rate <- bs_rate - ifelse(arm=="int",trt_eff,0)
+    bs_rate_f <- function(.time){bs_rate + (time_cov * floor(.time))}
+
+})
+
+
+init_event_list <- 
+  add_tte(arm=c("int","noint"), evts = c("start","cycle","death") ,input={
+    start <- 0
+    cycle <- 1
+    death <- qcond_exp(luck, rate = bs_rate)
+  })
+
+
+
+evt_react_list <-
+  add_reactevt(name_evt = "start",
+               input = {
+                 new_rate <- bs_rate
+                 q_default <- u_bs * u_age[min(100,floor(curtime + bs_age))]
+                 cost_trt <- cost_trt_ins
+               }) %>%
+  add_reactevt(name_evt = "cycle",
+               input = {
+                 # if(curtime >= 100 - bs_age){
+                 #   curtime <- Inf
+                 # }
+              
+              new_event(list(cycle = curtime + 1))
+                 
+              q_default <- u_bs * u_age[min(100,floor(curtime + bs_age))]
+              if(curtime<5){
+              cost_trt <- cost_trt_ins
+              }
+              
+              old_rate <- new_rate
+              new_rate <- bs_rate_f(curtime)
+              prev_surv <- 1 - pexp(curtime - 1, old_rate)
+              cur_surv <- 1 - pexp(curtime, old_rate)
+              
+              luck <- luck_adj(prevsurv = prev_surv, cursurv = cur_surv, luck = luck, condq = TRUE)
+              ttdeath <- qcond_exp(luck, rate = new_rate) + curtime
+              modify_event(list(death = max(curtime, ttdeath)))
+
+               })%>%
+  add_reactevt(name_evt = "death",
+               input = {
+                 curtime <- Inf
+               }) 
+
+util_ongoing <- "q_default"
+
+cost_instant <- "cost_trt"
+
+results <- run_sim(  
+  npats=5000,                               
+  n_sim=1,                                  
+  psa_bool = FALSE,                         
+  arm_list = c("int", "noint"),             
+  common_all_inputs = common_all_inputs,   
+  common_pt_inputs = common_pt_inputs,      
+  unique_pt_inputs = unique_pt_inputs,
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,          
+  util_ongoing_list = util_ongoing,
+  cost_instant_list = cost_instant,
+  ipd = 2, input_out = c("luck","time_cov")
+)
+```
+## Summary of Results
+
+```{r echo = FALSE, warning=FALSE, message=FALSE}
+
+
+summary_results_det(results[[1]][[1]])
+
+psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
+
+psa_ipd[1:10,] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+
+```
+
+
+
+# Model avoiding cycles
+We now avoid to use cycles. 
+
+To fix the time to death with time varying covariates, we use `timecov` with yearly updates (`dt = 1`) and passing the parameter as a function of time, so the function automatically iterates over each year to obtain the relevant time to event. This means we can obtain the final time to event in one go at start. While still iterative, it's less time consuming than having events created at every year.
+
+The multiplicative utility age adjustment factor is implemented by `adj_val`, a function that given an expression that changes with time, reweighs the evaluated values by the ongoing discounting factor that would apply so that even if a single value is returned, the discounted outcome will still be the same as in the traditional cycle approach. Note however that undiscounted outcomes will not be correct (in this case we do not care about it, but we could just create another value like `other_q_default` where the `adj_val` is used with 0 discounting, and that value will be correct undiscounted).
+
+Treatment costs are yearly, so we just use the per cycle approach instead of instantaneous costs at every year.
+## Inputs
+```{r input_delayed}
+
+common_all_inputs <-add_item2(input = {
+  u_bs <- 0.8
+  u_age <- 1 - seq(from = 0, to = 0.5, by = 0.005)
+  bs_rate <- 0.07
+  trt_eff <- 0.02
+  
+  #set costs as cycle
+  cost_trt_cycle_l <- 1
+  cost_trt_cycle_starttime <- 0
+  cost_trt_max_cycles <- 5
+})  
+
+common_pt_inputs <- add_item2(input={
+    bs_age <- rnorm(1,40,5)
+    time_cov <- runif(1)/500
+    luck <- runif(1)
+}) 
+
+
+unique_pt_inputs <- add_item2(input = {
+    cost_trt <- ifelse(arm=="int",1000,500)
+    bs_rate <- bs_rate - ifelse(arm=="int",trt_eff,0)
+    #rate is a function of time, with yearly changes
+    bs_rate_f <- function(.time){bs_rate + (time_cov * floor(.time))}
+   
+})
+
+
+init_event_list <- 
+  add_tte(arm=c("int","noint"), evts = c("start","death") ,input={
+    start <- 0
+    #we can immediately know what the final TTE will be even with time changing covariates
+    death <- qtimecov(luck = luck,a_fun = bs_rate_f,dist = "exp", dt = 1)
+  })
+
+
+
+evt_react_list <-
+  add_reactevt(name_evt = "start",
+               input = {
+                 new_rate <- bs_rate
+                 #this is the way to obtain utility adjustment by age as a single value, it reweighs the u_age by their discounting value so final discounted outcomes are correct
+                 adj_factor <- adj_val(
+                   curtime,
+                   min(cur_evtlist),
+                   by = 1,
+                   u_age[min(100,floor(.time + bs_age))],
+                   discount = drq
+                   )
+                 q_default <- u_bs * adj_factor
+               }) %>%
+  add_reactevt(name_evt = "death",
+               input = {
+                 curtime <- Inf
+               }) 
+
+util_ongoing <- "q_default"
+
+cost_cycle <- "cost_trt"
+
+results2 <- run_sim(  
+  npats=5000,                               
+  n_sim=1,                                  
+  psa_bool = FALSE,                         
+  arm_list = c("int", "noint"),             
+  common_all_inputs = common_all_inputs,   
+  common_pt_inputs = common_pt_inputs,      
+  unique_pt_inputs = unique_pt_inputs,
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,          
+  util_ongoing_list = util_ongoing,
+  cost_cycle_list = cost_cycle,
+  ipd = 2, input_out = c("luck","time_cov")
+)
+```
+## Summary of Results
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+
+summary_results_det(results2[[1]][[1]])
+
+psa_ipd2 <- bind_rows(map(results2[[1]], "merged_df")) 
+
+psa_ipd2[1:10,] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+
+```

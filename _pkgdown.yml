@@ -32,6 +32,8 @@ navbar:
           href: articles/example_ssd.html
         - text: "How to Use the Automatic Input Selector"
           href: articles/inputs_selector.html
+        - text: "How to Avoid Using Cycles to Speed Up Model"
+          href: articles/example_avoiding_cycles.html
         - text: "Example in a Sick-Sicker-Dead Model - Random Number Streams & Luck Adjustment"
           href: articles/example_ssd_stream.html
         - text: "Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random"

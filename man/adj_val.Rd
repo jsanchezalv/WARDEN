@@ -23,7 +23,8 @@ Numeric. The calculated adjusted value.
 \description{
 This function calculates an adjusted value over a time interval with optional discounting.
 This is useful for instances when adding cycles may not be desirable, so one can perform
-"cycle-like" calculations without needing cycles, offering performance speeds.
+"cycle-like" calculations without needing cycles, offering performance speeds. See
+the vignette on avoiding cycles for an example in a model.
 }
 \details{
 The user can use the \code{.time} variable to select the corresponding time of the sequence being evaluated.

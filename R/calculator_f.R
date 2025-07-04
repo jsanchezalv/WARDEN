@@ -819,7 +819,8 @@ qcond_gamma <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #'
 #' Simulate a time-to-event (TTE) from a parametric distribution with parameters varying over time.
 #' User provides parameter functions and distribution name. The function uses internal survival and
-#' conditional quantile functions, plus luck adjustment to simulate the event time.
+#' conditional quantile functions, plus luck adjustment to simulate the event time. See
+#' the vignette on avoiding cycles for an example in a model.
 #' 
 #'
 #' @param luck Numeric between 0 and 1. Initial random quantile (luck).
