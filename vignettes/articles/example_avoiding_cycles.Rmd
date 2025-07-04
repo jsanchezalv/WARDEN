@@ -59,7 +59,7 @@ Additionally, we have a multiplicative utility age adjustment factor, so at ever
 
 Treatment costs are yearly as well, so we add them as an instantaneous cost at every cycle, including time 0.
 ## Inputs
-```{r input_delayed}
+```{r cycles}
 
 common_all_inputs <-add_item2(input = {
   u_bs <- 0.8
@@ -174,7 +174,7 @@ The multiplicative utility age adjustment factor is implemented by `adj_val`, a 
 
 Treatment costs are yearly, so we just use the per cycle approach instead of instantaneous costs at every year.
 ## Inputs
-```{r input_delayed}
+```{r noncycles}
 
 common_all_inputs <-add_item2(input = {
   u_bs <- 0.8
