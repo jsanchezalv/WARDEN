@@ -49,6 +49,7 @@
 <li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
     <li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
     <li><a class="dropdown-item" href="../articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
+    <li><a class="dropdown-item" href="../articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
     <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
     <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
@@ -70,15 +71,14 @@
 
 
 
-<script src="example_ipd_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><script src="example_ipd_files/viz-1.8.2/viz.js"></script><link href="example_ipd_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
-<script src="example_ipd_files/grViz-binding-1.0.11/grViz.js"></script><script src="example_ipd_files/kePrint-0.0.1/kePrint.js"></script><link href="example_ipd_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+<script src="example_ipd_files/kePrint-0.0.1/kePrint.js"></script><link href="example_ipd_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Example with IPD trial data</h1>
                         <h4 data-toc-skip class="author">Valerie Aponte
 Ribero and Javier Sanchez Alvarez</h4>
             
-            <h4 data-toc-skip class="date">July 03, 2025</h4>
+            <h4 data-toc-skip class="date">July 04, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_ipd.Rmd" class="external-link"><code>vignettes/articles/example_ipd.Rmd</code></a></small>
       <div class="d-none name"><code>example_ipd.Rmd</code></div>
@@ -112,13 +112,10 @@ generate a model when IPD from a trial is available.</p>
 <div class="section level2">
 <h2 id="model-concept">Model concept<a class="anchor" aria-label="anchor" href="#model-concept"></a>
 </h2>
-<p>The model is represented below. All patients start in the
-progression-free state and may move to the progressed state. At any
-point in time they can die, depending on the risk of each disease stage.
-Patients may also experience a disease event which accelerates
-progression.</p>
-<div id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:700px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"diagram":"\n  digraph graph1 {\n  \n  graph [layout = dot, rankdir = LR, nodesep=\"1\", fontsize = 12]\n  \n  # node definitions with substituted label text\n  \n  node [shape = oval]\n  a [label = \"Progression-free\"]\n  b [label = \"Progressed\"]\n  d [label = \"Death\"]\n  \n  node [shape = box]\n  c [label = \"Progression-accelerating event\", style = dashed]\n  \n  a -> d\n  a -> b\n  b -> d\n  c -> b [style = dashed]\n  \n  }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p>All patients start in the progression-free state and may move to the
+progressed state. At any point in time they can die, depending on the
+risk of each disease stage. Patients may also experience a disease event
+which accelerates progression.</p>
 </div>
 <div class="section level2">
 <h2 id="generate-dummy-ipd-trial-data-and-fit-survival-models">Generate dummy IPD trial data and fit survival models<a class="anchor" aria-label="anchor" href="#generate-dummy-ipd-trial-data-and-fit-survival-models"></a>
@@ -417,9 +414,9 @@ defined for each patient in the simulated data set.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.77s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.77s</span></span>
-<span><span class="co">#&gt; Total time to run: 0.78s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 0.75s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.76s</span></span>
+<span><span class="co">#&gt; Total time to run: 0.77s</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
