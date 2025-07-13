@@ -1,4 +1,6 @@
-# WARDEN (development version)
+# WARDEN 1.3.0
+* Rcpp versions of key functions have been implemented for speed improvements:
+disc_cycle_v, disc_ongoing_v, disc_instant_v, qcond_*, qtimecov, luck_adj
 
 # WARDEN 1.2.4
 * Added "adj_val" function, to reduce the need to call cycle events which can hinder model speed.

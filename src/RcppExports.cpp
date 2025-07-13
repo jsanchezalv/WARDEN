@@ -10,9 +10,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// luck_adj_rcpp
-NumericVector luck_adj_rcpp(NumericVector prevsurv, NumericVector cursurv, NumericVector luck, bool condq);
-RcppExport SEXP _WARDEN_luck_adj_rcpp(SEXP prevsurvSEXP, SEXP cursurvSEXP, SEXP luckSEXP, SEXP condqSEXP) {
+// luck_adj
+NumericVector luck_adj(NumericVector prevsurv, NumericVector cursurv, NumericVector luck, bool condq);
+RcppExport SEXP _WARDEN_luck_adj(SEXP prevsurvSEXP, SEXP cursurvSEXP, SEXP luckSEXP, SEXP condqSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,25 +20,25 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type cursurv(cursurvSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type luck(luckSEXP);
     Rcpp::traits::input_parameter< bool >::type condq(condqSEXP);
-    rcpp_result_gen = Rcpp::wrap(luck_adj_rcpp(prevsurv, cursurv, luck, condq));
+    rcpp_result_gen = Rcpp::wrap(luck_adj(prevsurv, cursurv, luck, condq));
     return rcpp_result_gen;
 END_RCPP
 }
-// qcond_exp_cpp
-NumericVector qcond_exp_cpp(NumericVector rnd, NumericVector rate);
-RcppExport SEXP _WARDEN_qcond_exp_cpp(SEXP rndSEXP, SEXP rateSEXP) {
+// qcond_exp
+NumericVector qcond_exp(NumericVector rnd, NumericVector rate);
+RcppExport SEXP _WARDEN_qcond_exp(SEXP rndSEXP, SEXP rateSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type rnd(rndSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type rate(rateSEXP);
-    rcpp_result_gen = Rcpp::wrap(qcond_exp_cpp(rnd, rate));
+    rcpp_result_gen = Rcpp::wrap(qcond_exp(rnd, rate));
     return rcpp_result_gen;
 END_RCPP
 }
-// qcond_weibull_cpp
-NumericVector qcond_weibull_cpp(NumericVector rnd, NumericVector shape, NumericVector scale, NumericVector lower_bound);
-RcppExport SEXP _WARDEN_qcond_weibull_cpp(SEXP rndSEXP, SEXP shapeSEXP, SEXP scaleSEXP, SEXP lower_boundSEXP) {
+// qcond_weibull
+NumericVector qcond_weibull(NumericVector rnd, NumericVector shape, NumericVector scale, NumericVector lower_bound);
+RcppExport SEXP _WARDEN_qcond_weibull(SEXP rndSEXP, SEXP shapeSEXP, SEXP scaleSEXP, SEXP lower_boundSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -46,13 +46,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type shape(shapeSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type scale(scaleSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lower_bound(lower_boundSEXP);
-    rcpp_result_gen = Rcpp::wrap(qcond_weibull_cpp(rnd, shape, scale, lower_bound));
+    rcpp_result_gen = Rcpp::wrap(qcond_weibull(rnd, shape, scale, lower_bound));
     return rcpp_result_gen;
 END_RCPP
 }
-// qcond_weibullPH_cpp
-NumericVector qcond_weibullPH_cpp(NumericVector rnd, NumericVector shape, NumericVector scale, NumericVector lower_bound);
-RcppExport SEXP _WARDEN_qcond_weibullPH_cpp(SEXP rndSEXP, SEXP shapeSEXP, SEXP scaleSEXP, SEXP lower_boundSEXP) {
+// qcond_weibullPH
+NumericVector qcond_weibullPH(NumericVector rnd, NumericVector shape, NumericVector scale, NumericVector lower_bound);
+RcppExport SEXP _WARDEN_qcond_weibullPH(SEXP rndSEXP, SEXP shapeSEXP, SEXP scaleSEXP, SEXP lower_boundSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -60,13 +60,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type shape(shapeSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type scale(scaleSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lower_bound(lower_boundSEXP);
-    rcpp_result_gen = Rcpp::wrap(qcond_weibullPH_cpp(rnd, shape, scale, lower_bound));
+    rcpp_result_gen = Rcpp::wrap(qcond_weibullPH(rnd, shape, scale, lower_bound));
     return rcpp_result_gen;
 END_RCPP
 }
-// qcond_llogis_cpp
-NumericVector qcond_llogis_cpp(NumericVector rnd, NumericVector shape, NumericVector scale, NumericVector lower_bound);
-RcppExport SEXP _WARDEN_qcond_llogis_cpp(SEXP rndSEXP, SEXP shapeSEXP, SEXP scaleSEXP, SEXP lower_boundSEXP) {
+// qcond_llogis
+NumericVector qcond_llogis(NumericVector rnd, NumericVector shape, NumericVector scale, NumericVector lower_bound);
+RcppExport SEXP _WARDEN_qcond_llogis(SEXP rndSEXP, SEXP shapeSEXP, SEXP scaleSEXP, SEXP lower_boundSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -74,13 +74,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type shape(shapeSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type scale(scaleSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lower_bound(lower_boundSEXP);
-    rcpp_result_gen = Rcpp::wrap(qcond_llogis_cpp(rnd, shape, scale, lower_bound));
+    rcpp_result_gen = Rcpp::wrap(qcond_llogis(rnd, shape, scale, lower_bound));
     return rcpp_result_gen;
 END_RCPP
 }
-// qcond_gompertz_cpp
-NumericVector qcond_gompertz_cpp(NumericVector rnd, NumericVector shape, NumericVector rate, NumericVector lower_bound);
-RcppExport SEXP _WARDEN_qcond_gompertz_cpp(SEXP rndSEXP, SEXP shapeSEXP, SEXP rateSEXP, SEXP lower_boundSEXP) {
+// qcond_gompertz
+NumericVector qcond_gompertz(NumericVector rnd, NumericVector shape, NumericVector rate, NumericVector lower_bound);
+RcppExport SEXP _WARDEN_qcond_gompertz(SEXP rndSEXP, SEXP shapeSEXP, SEXP rateSEXP, SEXP lower_boundSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -88,13 +88,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type shape(shapeSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type rate(rateSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lower_bound(lower_boundSEXP);
-    rcpp_result_gen = Rcpp::wrap(qcond_gompertz_cpp(rnd, shape, rate, lower_bound));
+    rcpp_result_gen = Rcpp::wrap(qcond_gompertz(rnd, shape, rate, lower_bound));
     return rcpp_result_gen;
 END_RCPP
 }
-// qcond_lnorm_cpp
-NumericVector qcond_lnorm_cpp(NumericVector rnd, NumericVector meanlog, NumericVector sdlog, NumericVector lower_bound, NumericVector s_obs);
-RcppExport SEXP _WARDEN_qcond_lnorm_cpp(SEXP rndSEXP, SEXP meanlogSEXP, SEXP sdlogSEXP, SEXP lower_boundSEXP, SEXP s_obsSEXP) {
+// qcond_lnorm
+NumericVector qcond_lnorm(NumericVector rnd, NumericVector meanlog, NumericVector sdlog, NumericVector lower_bound, NumericVector s_obs);
+RcppExport SEXP _WARDEN_qcond_lnorm(SEXP rndSEXP, SEXP meanlogSEXP, SEXP sdlogSEXP, SEXP lower_boundSEXP, SEXP s_obsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -103,13 +103,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type sdlog(sdlogSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lower_bound(lower_boundSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type s_obs(s_obsSEXP);
-    rcpp_result_gen = Rcpp::wrap(qcond_lnorm_cpp(rnd, meanlog, sdlog, lower_bound, s_obs));
+    rcpp_result_gen = Rcpp::wrap(qcond_lnorm(rnd, meanlog, sdlog, lower_bound, s_obs));
     return rcpp_result_gen;
 END_RCPP
 }
-// qcond_norm_cpp
-NumericVector qcond_norm_cpp(NumericVector rnd, NumericVector mean, NumericVector sd, NumericVector lower_bound, NumericVector s_obs);
-RcppExport SEXP _WARDEN_qcond_norm_cpp(SEXP rndSEXP, SEXP meanSEXP, SEXP sdSEXP, SEXP lower_boundSEXP, SEXP s_obsSEXP) {
+// qcond_norm
+NumericVector qcond_norm(NumericVector rnd, NumericVector mean, NumericVector sd, NumericVector lower_bound, NumericVector s_obs);
+RcppExport SEXP _WARDEN_qcond_norm(SEXP rndSEXP, SEXP meanSEXP, SEXP sdSEXP, SEXP lower_boundSEXP, SEXP s_obsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -118,13 +118,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type sd(sdSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lower_bound(lower_boundSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type s_obs(s_obsSEXP);
-    rcpp_result_gen = Rcpp::wrap(qcond_norm_cpp(rnd, mean, sd, lower_bound, s_obs));
+    rcpp_result_gen = Rcpp::wrap(qcond_norm(rnd, mean, sd, lower_bound, s_obs));
     return rcpp_result_gen;
 END_RCPP
 }
-// qcond_gamma_cpp
-NumericVector qcond_gamma_cpp(NumericVector rnd, NumericVector shape, NumericVector rate, NumericVector lower_bound, NumericVector s_obs);
-RcppExport SEXP _WARDEN_qcond_gamma_cpp(SEXP rndSEXP, SEXP shapeSEXP, SEXP rateSEXP, SEXP lower_boundSEXP, SEXP s_obsSEXP) {
+// qcond_gamma
+NumericVector qcond_gamma(NumericVector rnd, NumericVector shape, NumericVector rate, NumericVector lower_bound, NumericVector s_obs);
+RcppExport SEXP _WARDEN_qcond_gamma(SEXP rndSEXP, SEXP shapeSEXP, SEXP rateSEXP, SEXP lower_boundSEXP, SEXP s_obsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -133,13 +133,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type rate(rateSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lower_bound(lower_boundSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type s_obs(s_obsSEXP);
-    rcpp_result_gen = Rcpp::wrap(qcond_gamma_cpp(rnd, shape, rate, lower_bound, s_obs));
+    rcpp_result_gen = Rcpp::wrap(qcond_gamma(rnd, shape, rate, lower_bound, s_obs));
     return rcpp_result_gen;
 END_RCPP
 }
-// qtimecov_cpp
-List qtimecov_cpp(double luck, Function a_fun, RObject b_fun, std::string dist, double dt, double max_time, double start_time);
-RcppExport SEXP _WARDEN_qtimecov_cpp(SEXP luckSEXP, SEXP a_funSEXP, SEXP b_funSEXP, SEXP distSEXP, SEXP dtSEXP, SEXP max_timeSEXP, SEXP start_timeSEXP) {
+// qtimecov
+List qtimecov(double luck, Function a_fun, RObject b_fun, std::string dist, double dt, double max_time, double start_time);
+RcppExport SEXP _WARDEN_qtimecov(SEXP luckSEXP, SEXP a_funSEXP, SEXP b_funSEXP, SEXP distSEXP, SEXP dtSEXP, SEXP max_timeSEXP, SEXP start_timeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -150,13 +150,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type dt(dtSEXP);
     Rcpp::traits::input_parameter< double >::type max_time(max_timeSEXP);
     Rcpp::traits::input_parameter< double >::type start_time(start_timeSEXP);
-    rcpp_result_gen = Rcpp::wrap(qtimecov_cpp(luck, a_fun, b_fun, dist, dt, max_time, start_time));
+    rcpp_result_gen = Rcpp::wrap(qtimecov(luck, a_fun, b_fun, dist, dt, max_time, start_time));
     return rcpp_result_gen;
 END_RCPP
 }
-// disc_cycle_rcpp
-NumericVector disc_cycle_rcpp(double lcldr, NumericVector lclprvtime, NumericVector cyclelength, NumericVector lclcurtime, NumericVector lclval, NumericVector starttime, Nullable<NumericVector> max_cycles);
-RcppExport SEXP _WARDEN_disc_cycle_rcpp(SEXP lcldrSEXP, SEXP lclprvtimeSEXP, SEXP cyclelengthSEXP, SEXP lclcurtimeSEXP, SEXP lclvalSEXP, SEXP starttimeSEXP, SEXP max_cyclesSEXP) {
+// disc_cycle_v
+NumericVector disc_cycle_v(double lcldr, NumericVector lclprvtime, NumericVector cyclelength, NumericVector lclcurtime, NumericVector lclval, NumericVector starttime, Nullable<NumericVector> max_cycles);
+RcppExport SEXP _WARDEN_disc_cycle_v(SEXP lcldrSEXP, SEXP lclprvtimeSEXP, SEXP cyclelengthSEXP, SEXP lclcurtimeSEXP, SEXP lclvalSEXP, SEXP starttimeSEXP, SEXP max_cyclesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -167,26 +167,26 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type lclval(lclvalSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type starttime(starttimeSEXP);
     Rcpp::traits::input_parameter< Nullable<NumericVector> >::type max_cycles(max_cyclesSEXP);
-    rcpp_result_gen = Rcpp::wrap(disc_cycle_rcpp(lcldr, lclprvtime, cyclelength, lclcurtime, lclval, starttime, max_cycles));
+    rcpp_result_gen = Rcpp::wrap(disc_cycle_v(lcldr, lclprvtime, cyclelength, lclcurtime, lclval, starttime, max_cycles));
     return rcpp_result_gen;
 END_RCPP
 }
-// disc_instant_rcpp
-NumericVector disc_instant_rcpp(double lcldr, NumericVector lclcurtime, NumericVector lclval);
-RcppExport SEXP _WARDEN_disc_instant_rcpp(SEXP lcldrSEXP, SEXP lclcurtimeSEXP, SEXP lclvalSEXP) {
+// disc_instant_v
+NumericVector disc_instant_v(double lcldr, NumericVector lclcurtime, NumericVector lclval);
+RcppExport SEXP _WARDEN_disc_instant_v(SEXP lcldrSEXP, SEXP lclcurtimeSEXP, SEXP lclvalSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< double >::type lcldr(lcldrSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lclcurtime(lclcurtimeSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lclval(lclvalSEXP);
-    rcpp_result_gen = Rcpp::wrap(disc_instant_rcpp(lcldr, lclcurtime, lclval));
+    rcpp_result_gen = Rcpp::wrap(disc_instant_v(lcldr, lclcurtime, lclval));
     return rcpp_result_gen;
 END_RCPP
 }
-// disc_ongoing_rcpp
-NumericVector disc_ongoing_rcpp(double lcldr, NumericVector lclprvtime, NumericVector lclcurtime, NumericVector lclval);
-RcppExport SEXP _WARDEN_disc_ongoing_rcpp(SEXP lcldrSEXP, SEXP lclprvtimeSEXP, SEXP lclcurtimeSEXP, SEXP lclvalSEXP) {
+// disc_ongoing_v
+NumericVector disc_ongoing_v(double lcldr, NumericVector lclprvtime, NumericVector lclcurtime, NumericVector lclval);
+RcppExport SEXP _WARDEN_disc_ongoing_v(SEXP lcldrSEXP, SEXP lclprvtimeSEXP, SEXP lclcurtimeSEXP, SEXP lclvalSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -194,25 +194,25 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type lclprvtime(lclprvtimeSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lclcurtime(lclcurtimeSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lclval(lclvalSEXP);
-    rcpp_result_gen = Rcpp::wrap(disc_ongoing_rcpp(lcldr, lclprvtime, lclcurtime, lclval));
+    rcpp_result_gen = Rcpp::wrap(disc_ongoing_v(lcldr, lclprvtime, lclcurtime, lclval));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_WARDEN_luck_adj_rcpp", (DL_FUNC) &_WARDEN_luck_adj_rcpp, 4},
-    {"_WARDEN_qcond_exp_cpp", (DL_FUNC) &_WARDEN_qcond_exp_cpp, 2},
-    {"_WARDEN_qcond_weibull_cpp", (DL_FUNC) &_WARDEN_qcond_weibull_cpp, 4},
-    {"_WARDEN_qcond_weibullPH_cpp", (DL_FUNC) &_WARDEN_qcond_weibullPH_cpp, 4},
-    {"_WARDEN_qcond_llogis_cpp", (DL_FUNC) &_WARDEN_qcond_llogis_cpp, 4},
-    {"_WARDEN_qcond_gompertz_cpp", (DL_FUNC) &_WARDEN_qcond_gompertz_cpp, 4},
-    {"_WARDEN_qcond_lnorm_cpp", (DL_FUNC) &_WARDEN_qcond_lnorm_cpp, 5},
-    {"_WARDEN_qcond_norm_cpp", (DL_FUNC) &_WARDEN_qcond_norm_cpp, 5},
-    {"_WARDEN_qcond_gamma_cpp", (DL_FUNC) &_WARDEN_qcond_gamma_cpp, 5},
-    {"_WARDEN_qtimecov_cpp", (DL_FUNC) &_WARDEN_qtimecov_cpp, 7},
-    {"_WARDEN_disc_cycle_rcpp", (DL_FUNC) &_WARDEN_disc_cycle_rcpp, 7},
-    {"_WARDEN_disc_instant_rcpp", (DL_FUNC) &_WARDEN_disc_instant_rcpp, 3},
-    {"_WARDEN_disc_ongoing_rcpp", (DL_FUNC) &_WARDEN_disc_ongoing_rcpp, 4},
+    {"_WARDEN_luck_adj", (DL_FUNC) &_WARDEN_luck_adj, 4},
+    {"_WARDEN_qcond_exp", (DL_FUNC) &_WARDEN_qcond_exp, 2},
+    {"_WARDEN_qcond_weibull", (DL_FUNC) &_WARDEN_qcond_weibull, 4},
+    {"_WARDEN_qcond_weibullPH", (DL_FUNC) &_WARDEN_qcond_weibullPH, 4},
+    {"_WARDEN_qcond_llogis", (DL_FUNC) &_WARDEN_qcond_llogis, 4},
+    {"_WARDEN_qcond_gompertz", (DL_FUNC) &_WARDEN_qcond_gompertz, 4},
+    {"_WARDEN_qcond_lnorm", (DL_FUNC) &_WARDEN_qcond_lnorm, 5},
+    {"_WARDEN_qcond_norm", (DL_FUNC) &_WARDEN_qcond_norm, 5},
+    {"_WARDEN_qcond_gamma", (DL_FUNC) &_WARDEN_qcond_gamma, 5},
+    {"_WARDEN_qtimecov", (DL_FUNC) &_WARDEN_qtimecov, 7},
+    {"_WARDEN_disc_cycle_v", (DL_FUNC) &_WARDEN_disc_cycle_v, 7},
+    {"_WARDEN_disc_instant_v", (DL_FUNC) &_WARDEN_disc_instant_v, 3},
+    {"_WARDEN_disc_ongoing_v", (DL_FUNC) &_WARDEN_disc_ongoing_v, 4},
     {NULL, NULL, 0}
 };
 

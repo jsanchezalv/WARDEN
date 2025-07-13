@@ -1017,7 +1017,6 @@ compute_outputs <- function(patdata,input_list) {
   #Discount and undiscount ongoing
   
   for (cat in input_list$uc_lists$ongoing_inputs) {
-
     patdata_dt[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
                                                                         lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                                         lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},

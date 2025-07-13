@@ -1,8 +1,8 @@
 ## UPDATE
 
-* This is a package fix. In this version I have:
+* This is a package update. In this version I have:
 
-* Fixed per cycle discounting.
+* Converted several functions from R to c++ using Rcpp.
 
 ## R CMD check results
 
