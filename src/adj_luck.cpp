@@ -26,8 +26,8 @@ NumericVector luck_adj_rcpp(NumericVector prevsurv,
       adj = l;
     }
     
-    // Clamp to [1e-5, 0.99999]
-    adj = std::min(std::max(adj, 1e-5), 0.99999);
+    // Clamp to [1e-9, 0.999999999]
+    adj = std::min(std::max(adj, 1e-9), 0.999999999);
     result[i] = adj;
   }
   

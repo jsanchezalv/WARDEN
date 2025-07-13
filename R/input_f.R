@@ -1044,15 +1044,15 @@ luck_adj <- function(prevsurv,cursurv,luck,condq=TRUE){
   #If length is 1, go for faster approach, otherwise use vectorial approach
   if(length(prevsurv)==1){
     if(condq==TRUE){
-      adj_luck <-  max(1e-5, min(0.99999, if(prevsurv != 0){ 1 - ((1 - luck) * (prevsurv/cursurv)) } else{ luck }))
+      adj_luck <-  max(1e-7, min(0.9999999, if(prevsurv != 0){ 1 - ((1 - luck) * (prevsurv/cursurv)) } else{ luck }))
     }else{
-      adj_luck <-  max(1e-5, min(0.99999, if(prevsurv != 0){ 1 - ((1 - luck) * (cursurv/prevsurv)) } else{ luck }))
+      adj_luck <-  max(1e-7, min(0.9999999, if(prevsurv != 0){ 1 - ((1 - luck) * (cursurv/prevsurv)) } else{ luck }))
     }
   } else{
     if(condq==TRUE){
-      adj_luck <-  pmax(1e-5, pmin(0.99999, ifelse(prevsurv != 0, 1 - ((1 - luck) * (prevsurv/cursurv)), luck )))
+      adj_luck <-  pmax(1e-7, pmin(0.9999999, ifelse(prevsurv != 0, 1 - ((1 - luck) * (prevsurv/cursurv)), luck )))
     }else{
-      adj_luck <-   pmax(1e-5, pmin(0.99999, ifelse(prevsurv != 0, 1 - ((1 - luck) * (cursurv/prevsurv)), luck )))
+      adj_luck <-   pmax(1e-7, pmin(0.9999999, ifelse(prevsurv != 0, 1 - ((1 - luck) * (cursurv/prevsurv)), luck )))
     }
   }
   

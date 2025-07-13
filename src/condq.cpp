@@ -4,100 +4,221 @@
 
 using namespace Rcpp;
 
-// [[Rcpp::export]]
-double qcond_exp_cpp(double rnd, double rate) {
-  if (rnd < 0.0 || rnd > 1.0) stop("rnd is <0 or >1");
-  return -std::log(1 - rnd) / rate;
+// Helper to recycle scalar values
+inline NumericVector recycle_or_check(NumericVector x, int n) {
+  if (x.size() == 1) return rep(x[0], n);
+  if (x.size() != n) stop("Input vectors must have length 1 or equal to 'rnd'");
+  return x;
 }
 
 // [[Rcpp::export]]
-double qcond_weibull_cpp(double rnd, double shape, double scale, double lower_bound = 0.0) {
-  if (rnd < 0.0 || rnd > 1.0) stop("rnd is <0 or >1");
-  return std::pow(std::pow(lower_bound / scale, shape) - std::log(1 - rnd), 1.0 / shape) * scale - lower_bound;
+NumericVector qcond_exp_cpp(NumericVector rnd, NumericVector rate) {
+  int n = rnd.size();
+  NumericVector rate_ = recycle_or_check(rate, n);
+  NumericVector out(n);
+  for (int i = 0; i < n; ++i) {
+    if (rnd[i] < 0.0 || rnd[i] > 1.0) {
+      out[i] = NA_REAL;
+    } else {
+      out[i] = -std::log1p(-rnd[i]) / rate_[i];
+    }
+  }
+  return out;
 }
 
 // [[Rcpp::export]]
-double qcond_weibullPH_cpp(double rnd, double shape, double scale, double lower_bound = 0.0) {
-  if (rnd < 0.0 || rnd > 1.0) stop("rnd is <0 or >1");
-  double base = std::pow(lower_bound, shape) - std::log(1 - rnd) / scale;
-  if (base < 0) return NA_REAL;
-  return std::pow(base, 1.0 / shape) - lower_bound;
+NumericVector qcond_weibull_cpp(NumericVector rnd, NumericVector shape, NumericVector scale, NumericVector lower_bound = NumericVector::create(0.0)) {
+  int n = rnd.size();
+  NumericVector shape_ = recycle_or_check(shape, n);
+  NumericVector scale_ = recycle_or_check(scale, n);
+  NumericVector lb_ = recycle_or_check(lower_bound, n);
+  NumericVector out(n);
+  for (int i = 0; i < n; ++i) {
+    if (rnd[i] < 0.0 || rnd[i] > 1.0) {
+      out[i] = NA_REAL;
+    } else {
+      out[i] = std::pow(std::pow(lb_[i] / scale_[i], shape_[i]) - std::log1p(-rnd[i]), 1.0 / shape_[i]) * scale_[i] - lb_[i];
+    }
+  }
+  return out;
 }
 
 // [[Rcpp::export]]
-double qcond_llogis_cpp(double rnd, double shape, double scale, double lower_bound = 0.0) {
-  if (rnd < 0.0 || rnd > 1.0) stop("rnd is <0 or >1");
-  return scale * std::pow((1 / (1 - rnd)) * (rnd + std::pow(lower_bound / scale, shape)), 1.0 / shape) - lower_bound;
+NumericVector qcond_weibullPH_cpp(NumericVector rnd, NumericVector shape, NumericVector scale, NumericVector lower_bound = NumericVector::create(0.0)) {
+  int n = rnd.size();
+  NumericVector shape_ = recycle_or_check(shape, n);
+  NumericVector scale_ = recycle_or_check(scale, n);
+  NumericVector lb_ = recycle_or_check(lower_bound, n);
+  NumericVector out(n);
+  for (int i = 0; i < n; ++i) {
+    if (rnd[i] < 0.0 || rnd[i] > 1.0) {
+      out[i] = NA_REAL;
+    } else {
+      double base = std::pow(lb_[i], shape_[i]) - std::log1p(-rnd[i]) / scale_[i];
+      out[i] = base < 0 ? NA_REAL : std::pow(base, 1.0 / shape_[i]) - lb_[i];
+    }
+  }
+  return out;
 }
 
 // [[Rcpp::export]]
-double qcond_gompertz_cpp(double rnd, double shape, double rate, double lower_bound = 0.0) {
-  if (rnd < 0.0 || rnd > 1.0) stop("rnd is <0 or >1");
-  return (1.0 / shape) * std::log(1 - ((shape / rate) * std::log(1 - rnd) / std::exp(shape * lower_bound)));
+NumericVector qcond_llogis_cpp(NumericVector rnd, NumericVector shape, NumericVector scale, NumericVector lower_bound = NumericVector::create(0.0)) {
+  int n = rnd.size();
+  NumericVector shape_ = recycle_or_check(shape, n);
+  NumericVector scale_ = recycle_or_check(scale, n);
+  NumericVector lb_ = recycle_or_check(lower_bound, n);
+  NumericVector out(n);
+  for (int i = 0; i < n; ++i) {
+    if (rnd[i] < 0.0 || rnd[i] > 1.0) {
+      out[i] = NA_REAL;
+    } else {
+      out[i] = scale_[i] * std::pow((1 / (1 - rnd[i])) * (rnd[i] + std::pow(lb_[i] / scale_[i], shape_[i])), 1.0 / shape_[i]) - lb_[i];
+    }
+  }
+  return out;
 }
 
 // [[Rcpp::export]]
-double qcond_lnorm_cpp(double rnd, double meanlog, double sdlog, double lower_bound, double s_obs) {
-  if (rnd < 0.0 || rnd > 1.0) stop("rnd is <0 or >1");
-  return std::exp(meanlog + sdlog * R::qnorm(1 - s_obs * (1 - rnd), 0.0, 1.0, 1, 0)) - lower_bound;
+NumericVector qcond_gompertz_cpp(NumericVector rnd, NumericVector shape, NumericVector rate, NumericVector lower_bound = NumericVector::create(0.0)) {
+  int n = rnd.size();
+  NumericVector shape_ = recycle_or_check(shape, n);
+  NumericVector rate_ = recycle_or_check(rate, n);
+  NumericVector lb_ = recycle_or_check(lower_bound, n);
+  NumericVector out(n);
+  for (int i = 0; i < n; ++i) {
+    if (rnd[i] < 0.0 || rnd[i] > 1.0) {
+      out[i] = NA_REAL;
+    } else {
+      out[i] = (1.0 / shape_[i]) * std::log1p(-((shape_[i] / rate_[i]) * std::log1p(-rnd[i]) / (std::expm1(shape_[i] * lb_[i]) + 1)));
+    }
+  }
+  return out;
 }
 
 // [[Rcpp::export]]
-double qcond_norm_cpp(double rnd, double mean, double sd, double lower_bound, double s_obs) {
-  if (rnd < 0.0 || rnd > 1.0) stop("rnd is <0 or >1");
-  return R::qnorm(1 - s_obs * (1 - rnd), mean, sd, 1, 0) - lower_bound;
+NumericVector qcond_lnorm_cpp(NumericVector rnd, NumericVector meanlog, NumericVector sdlog, NumericVector lower_bound, NumericVector s_obs) {
+  int n = rnd.size();
+  NumericVector meanlog_ = recycle_or_check(meanlog, n);
+  NumericVector sdlog_ = recycle_or_check(sdlog, n);
+  NumericVector lb_ = recycle_or_check(lower_bound, n);
+  NumericVector s_obs_ = recycle_or_check(s_obs, n);
+  NumericVector out(n);
+  for (int i = 0; i < n; ++i) {
+    if (rnd[i] < 0.0 || rnd[i] > 1.0) {
+      out[i] = NA_REAL;
+    } else {
+      out[i] = std::expm1(meanlog_[i] + sdlog_[i] * R::qnorm(1 - s_obs_[i] * (1 - rnd[i]), 0.0, 1.0, 1, 0)) + 1 - lb_[i];
+    }
+  }
+  return out;
 }
 
 // [[Rcpp::export]]
-double qcond_gamma_cpp(double rnd, double shape, double rate, double lower_bound, double s_obs) {
-  if (rnd < 0.0 || rnd > 1.0) stop("rnd is <0 or >1");
-  return R::qgamma(1 - s_obs * (1 - rnd), shape, 1.0 / rate, 1, 0) - lower_bound;
+NumericVector qcond_norm_cpp(NumericVector rnd, NumericVector mean, NumericVector sd, NumericVector lower_bound, NumericVector s_obs) {
+  int n = rnd.size();
+  NumericVector mean_ = recycle_or_check(mean, n);
+  NumericVector sd_ = recycle_or_check(sd, n);
+  NumericVector lb_ = recycle_or_check(lower_bound, n);
+  NumericVector s_obs_ = recycle_or_check(s_obs, n);
+  NumericVector out(n);
+  for (int i = 0; i < n; ++i) {
+    if (rnd[i] < 0.0 || rnd[i] > 1.0) {
+      out[i] = NA_REAL;
+    } else {
+      out[i] = R::qnorm(1 - s_obs_[i] * (1 - rnd[i]), mean_[i], sd_[i], 1, 0) - lb_[i];
+    }
+  }
+  return out;
+}
+
+// [[Rcpp::export]]
+NumericVector qcond_gamma_cpp(NumericVector rnd, NumericVector shape, NumericVector rate, NumericVector lower_bound, NumericVector s_obs) {
+  int n = rnd.size();
+  NumericVector shape_ = recycle_or_check(shape, n);
+  NumericVector rate_ = recycle_or_check(rate, n);
+  NumericVector lb_ = recycle_or_check(lower_bound, n);
+  NumericVector s_obs_ = recycle_or_check(s_obs, n);
+  NumericVector out(n);
+  for (int i = 0; i < n; ++i) {
+    if (rnd[i] < 0.0 || rnd[i] > 1.0) {
+      out[i] = NA_REAL;
+    } else {
+      out[i] = R::qgamma(1 - s_obs_[i] * (1 - rnd[i]), shape_[i], 1.0 / rate_[i], 1, 0) - lb_[i];
+    }
+  }
+  return out;
 }
 
 
 // --- Survival functions wrappers --- //
 // We'll call R's survival functions via Rcpp::Function
 
+
+// Exponential survival function: S(t) = 1 - F(t)
+// R::pexp parameters: p, rate, lower.tail, log.p
 double sf_exp(double time, double rate) {
-  Function pexp("pexp");
-  return 1.0 - as<double>(pexp(time, Named("rate") = rate));
+  return R::pexp(time, 1/rate, /*lower.tail=*/false, /*log.p=*/false);
 }
 
+// Gamma survival function: S(t) = 1 - F(t)
+// R::pgamma parameters: p, shape, scale, lower.tail, log.p
+// Note: R uses scale = 1/rate, so convert rate -> scale
 double sf_gamma(double time, double shape, double rate) {
-  Function pgamma("pgamma");
-  return 1.0 - as<double>(pgamma(time, Named("shape") = shape, Named("rate") = rate));
+  double scale = 1.0 / rate;
+  return R::pgamma(time, shape, scale, /*lower.tail=*/false, /*log.p=*/false);
 }
 
+// Lognormal survival function: S(t) = 1 - F(t)
+// R::plnorm parameters: q, meanlog, sdlog, lower.tail, log.p
 double sf_lnorm(double time, double meanlog, double sdlog) {
-  Function plnorm("plnorm");
-  return 1.0 - as<double>(plnorm(time, meanlog, sdlog));
+  return R::plnorm(time, meanlog, sdlog, /*lower.tail=*/false, /*log.p=*/false);
 }
 
+// Normal survival function: S(t) = 1 - F(t)
+// R::pnorm parameters: q, mean, sd, lower.tail, log.p
 double sf_norm(double time, double mean, double sd) {
-  Function pnorm("pnorm");
-  return 1.0 - as<double>(pnorm(time, mean, sd));
+  return R::pnorm(time, mean, sd, /*lower.tail=*/false, /*log.p=*/false);
 }
 
+// Weibull survival function: S(t) = 1 - F(t)
+// R::pweibull parameters: q, shape, scale, lower.tail, log.p
 double sf_weibull(double time, double shape, double scale) {
-  Function pweibull("pweibull");
-  return 1.0 - as<double>(pweibull(time, Named("shape") = shape, Named("scale") = scale));
+  return R::pweibull(time, shape, scale, /*lower.tail=*/false, /*log.p=*/false);
 }
 
-// For WeibullPH, Loglogistic and Gompertz, call flexsurv from R via Rcpp
+// For WeibullPH, Loglogistic and Gompertz: call flexsurv via R (no direct C API available)
 
+// Weibull Proportional Hazards survival (flexsurv)
+// S(t) = 1 - F(t), so subtract from 1
 double sf_weibullPH(double time, double shape, double scale) {
-  Function pweibullPH("flexsurv::pweibullPH");
-  return 1.0 - as<double>(pweibullPH(time, shape, scale));
+  if (time < 0) return 1.0;
+  return (std::expm1(- scale * std::pow(time, shape)) +1);
 }
 
+// Loglogistic survival (flexsurv), already returns survival with lower.tail=FALSE
 double sf_llogis(double time, double shape, double scale) {
-  Function pllogis("flexsurv::pllogis");
-  return as<double>(pllogis(time, Named("shape") = shape, Named("scale") = scale, Named("lower.tail") = false));
+  if (time < 0) return 1.0;
+  double ratio = time / scale;
+  return 1.0 / (1.0 + std::pow(ratio, shape));
 }
 
+// Gompertz survival (flexsurv), also survival with lower.tail=FALSE
 double sf_gompertz(double time, double shape, double rate) {
-  Function pgompertz("flexsurv::pgompertz");
-  return as<double>(pgompertz(time, Named("shape") = shape, Named("rate") = rate, Named("lower.tail") = false));
+  Environment flexsurv_env = Environment::namespace_env("flexsurv");
+  
+  // Access the internal pgompertz_work symbol
+  Function pgompertz_work = flexsurv_env["pgompertz_work"];
+  
+  // Arguments: q, shape, rate, lower.tail, log.p
+  NumericVector res = pgompertz_work(
+    NumericVector::create(time),
+    NumericVector::create(shape),
+    NumericVector::create(rate),
+    LogicalVector::create(false),  // lower.tail = FALSE
+    LogicalVector::create(false)   // log.p = FALSE
+  );
+  
+  return res[0];
 }
 
 NumericVector luck_adj_rcpp(NumericVector prevsurv,
@@ -112,7 +233,6 @@ List qtimecov_cpp(double luck,
                   std::string dist = "exp",
                   double dt = 0.1,
                   double max_time = 100,
-                  bool return_luck = false,
                   double start_time = 0) {
   
   if (a_fun.isNULL()) stop("a_fun must be a valid function");
@@ -120,16 +240,18 @@ List qtimecov_cpp(double luck,
   // Define function pointers for survival and conditional quantile, avoiding repeated if-else
   
   typedef double (*SfFun)(double, double, double);
-  typedef double (*QCondFun)(double, double, double, double, double);
-  typedef double (*QCondFunSimple)(double, double); // for simpler qcond functions (like exp)
+  typedef NumericVector (*QCondFun)(NumericVector, NumericVector, NumericVector, NumericVector, NumericVector);
   
   SfFun sf_fun = nullptr;
   QCondFun qcond_fun = nullptr;
-  QCondFunSimple qcond_fun_simple = nullptr;
   
   if (dist == "exp") {
-    sf_fun = [](double t, double a, double b){ return sf_exp(t, a); };
-    qcond_fun_simple = qcond_exp_cpp;
+    sf_fun = [](double t, double rate, double unused) {
+      return sf_exp(t, rate);
+    };
+    qcond_fun = [](NumericVector luck, NumericVector a, NumericVector b, NumericVector t, NumericVector surv_prev) {
+      return qcond_exp_cpp(luck, a);
+    };
   } else if (dist == "gamma") {
     sf_fun = sf_gamma;
     qcond_fun = qcond_gamma_cpp;
@@ -141,22 +263,22 @@ List qtimecov_cpp(double luck,
     qcond_fun = qcond_norm_cpp;
   } else if (dist == "weibull") {
     sf_fun = sf_weibull;
-    qcond_fun = [](double luck, double a, double b, double t, double surv_prev) {
+    qcond_fun = [](NumericVector luck, NumericVector a, NumericVector b, NumericVector t, NumericVector surv_prev) {
       return qcond_weibull_cpp(luck, a, b, t);
     };
   } else if (dist == "weibullPH") {
     sf_fun = sf_weibullPH;
-    qcond_fun = [](double luck, double a, double b, double t, double surv_prev) {
+    qcond_fun = [](NumericVector luck, NumericVector a, NumericVector b, NumericVector t, NumericVector surv_prev) {
       return qcond_weibullPH_cpp(luck, a, b, t);
     };
   } else if (dist == "llogis") {
     sf_fun = sf_llogis;
-    qcond_fun = [](double luck, double a, double b, double t, double surv_prev) {
+    qcond_fun = [](NumericVector luck, NumericVector a, NumericVector b, NumericVector t, NumericVector surv_prev) {
       return qcond_llogis_cpp(luck, a, b, t);
     };
   } else if (dist == "gompertz") {
     sf_fun = sf_gompertz;
-    qcond_fun = [](double luck, double a, double b, double t, double surv_prev) {
+    qcond_fun = [](NumericVector luck, NumericVector a, NumericVector b, NumericVector t, NumericVector surv_prev) {
       return qcond_gompertz_cpp(luck, a, b, t);
     };
   } else {
@@ -184,30 +306,29 @@ List qtimecov_cpp(double luck,
   double surv_prev = sf_fun(time, a_curr, b_curr);
   
   // Compute residual time-to-event based on distribution
-  double residual_tte = 0;
-  if (dist == "exp") {
-    residual_tte = qcond_fun_simple(luck, a_curr);
-  } else {
-    residual_tte = qcond_fun(luck, a_curr, b_curr, time, surv_prev);
-  }
+  double residual_tte = qcond_fun(NumericVector::create(luck),
+                                  NumericVector::create(a_curr),
+                                  NumericVector::create(b_curr),
+                                  NumericVector::create(time),
+                                  NumericVector::create(surv_prev))[0];
+  
   
   if (residual_tte <= dt) {
-    if (return_luck) return List::create(Named("tte") = residual_tte + time, Named("luck") = luck);
-    else return List::create(Named("tte") = residual_tte);
+    return List::create(Named("tte") = residual_tte + time, Named("luck") = luck);
   }
   
   while (true) {
     time += dt;
+    
+    double surv_curr = sf_fun(time, a_curr, b_curr);
+    double surv_prev_dt = sf_fun(time - dt, a_curr, b_curr);
     
     a_curr = as<double>(a_fun(time));
     if (type_b_fun_f) {
       Function b_fun_func(b_fun); // safe conversion now
       b_curr = as<double>(b_fun_func(time));
     }
-    
-    double surv_curr = sf_fun(time, a_curr, b_curr);
-    double surv_prev_dt = sf_fun(time - dt, a_curr, b_curr);
-    
+
     // Update luck with survival adjustment
     luck = luck_adj_rcpp(NumericVector::create(surv_prev_dt),
                          NumericVector::create(surv_curr),
@@ -215,19 +336,20 @@ List qtimecov_cpp(double luck,
                          true)[0];
     
     // Calculate residual time-to-event
-    if (dist == "exp") {
-      residual_tte = qcond_fun_simple(luck, a_curr);
-    } else {
-      residual_tte = qcond_fun(luck, a_curr, b_curr, time - dt, surv_prev_dt);
-    }
+    residual_tte = qcond_fun(NumericVector::create(luck),
+                             NumericVector::create(a_curr),
+                             NumericVector::create(b_curr),
+                             NumericVector::create(time - dt),
+                             NumericVector::create(surv_prev_dt))[0];
+    // Rcout << "time: " << time << ", luck: " << luck << ", residual_tte: " << residual_tte
+    //       << ", surv_prev_dt: " << surv_prev_dt << ", surv_curr: " << surv_curr << std::endl;
     
     double total_tte = time + residual_tte;
     
     if (residual_tte <= dt || total_tte <= time || time >= max_time) {
-      if (return_luck) return List::create(Named("tte") = std::min(total_tte, max_time), Named("luck") = luck);
-      else return List::create(Named("tte") = std::min(total_tte, max_time));
+      return List::create(Named("tte") = std::min(total_tte, max_time), Named("luck") = luck);
     }
   }
   
-  return List::create(Named("tte") = NA_REAL);
+  return NA_REAL;
 }

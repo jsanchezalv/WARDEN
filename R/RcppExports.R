@@ -9,19 +9,19 @@ qcond_exp_cpp <- function(rnd, rate) {
     .Call(`_WARDEN_qcond_exp_cpp`, rnd, rate)
 }
 
-qcond_weibull_cpp <- function(rnd, shape, scale, lower_bound = 0.0) {
+qcond_weibull_cpp <- function(rnd, shape, scale, lower_bound = as.numeric( c(0.0))) {
     .Call(`_WARDEN_qcond_weibull_cpp`, rnd, shape, scale, lower_bound)
 }
 
-qcond_weibullPH_cpp <- function(rnd, shape, scale, lower_bound = 0.0) {
+qcond_weibullPH_cpp <- function(rnd, shape, scale, lower_bound = as.numeric( c(0.0))) {
     .Call(`_WARDEN_qcond_weibullPH_cpp`, rnd, shape, scale, lower_bound)
 }
 
-qcond_llogis_cpp <- function(rnd, shape, scale, lower_bound = 0.0) {
+qcond_llogis_cpp <- function(rnd, shape, scale, lower_bound = as.numeric( c(0.0))) {
     .Call(`_WARDEN_qcond_llogis_cpp`, rnd, shape, scale, lower_bound)
 }
 
-qcond_gompertz_cpp <- function(rnd, shape, rate, lower_bound = 0.0) {
+qcond_gompertz_cpp <- function(rnd, shape, rate, lower_bound = as.numeric( c(0.0))) {
     .Call(`_WARDEN_qcond_gompertz_cpp`, rnd, shape, rate, lower_bound)
 }
 
@@ -37,8 +37,8 @@ qcond_gamma_cpp <- function(rnd, shape, rate, lower_bound, s_obs) {
     .Call(`_WARDEN_qcond_gamma_cpp`, rnd, shape, rate, lower_bound, s_obs)
 }
 
-qtimecov_cpp <- function(luck, a_fun, b_fun = NULL, dist = "exp", dt = 0.1, max_time = 100, return_luck = FALSE, start_time = 0) {
-    .Call(`_WARDEN_qtimecov_cpp`, luck, a_fun, b_fun, dist, dt, max_time, return_luck, start_time)
+qtimecov_cpp <- function(luck, a_fun, b_fun = NULL, dist = "exp", dt = 0.1, max_time = 100, start_time = 0) {
+    .Call(`_WARDEN_qtimecov_cpp`, luck, a_fun, b_fun, dist, dt, max_time, start_time)
 }
 
 disc_cycle_rcpp <- function(lcldr, lclprvtime, cyclelength, lclcurtime, lclval, starttime, max_cycles = NULL) {

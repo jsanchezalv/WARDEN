@@ -22,10 +22,10 @@ NumericVector disc_cycle_rcpp(
     }
   }
   
-  if (lclprvtime.size() == 1) lclprvtime = rep(lclprvtime, n);
-  if (cyclelength.size() == 1) cyclelength = rep(cyclelength, n);
-  if (lclcurtime.size() == 1) lclcurtime = rep(lclcurtime, n);
-  if (starttime.size() == 1) starttime = rep(starttime, n);
+  if (lclprvtime.size() == 1 && n > 1) lclprvtime = rep(lclprvtime, n);
+  if (cyclelength.size() == 1 && n > 1) cyclelength = rep(cyclelength, n);
+  if (lclcurtime.size() == 1 && n > 1) lclcurtime = rep(lclcurtime, n);
+  if (starttime.size() == 1 && n > 1) starttime = rep(starttime, n);
   
   for (int i = 0; i < n; ++i) {
     double prv = lclprvtime[i];
@@ -52,7 +52,7 @@ NumericVector disc_cycle_rcpp(
       max_eff = std::min(n_cycles, rem);
     }
     
-    double s = std::pow(1.0 + lcldr, clen) - 1.0;
+    double s = std::pow(1.0 + lcldr, clen) - 1;
     double d = (prv == 0 ? 0 : prv / clen) - 1;
     
     if (lcldr == 0) {
