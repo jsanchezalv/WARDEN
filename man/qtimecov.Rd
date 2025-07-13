@@ -7,11 +7,10 @@
 qtimecov(
   luck,
   a_fun,
-  b_fun = function(.time) NA,
-  dist,
+  b_fun = NULL,
+  dist = "exp",
   dt = 0.1,
   max_time = 100,
-  return_luck = FALSE,
   start_time = 0
 )
 }

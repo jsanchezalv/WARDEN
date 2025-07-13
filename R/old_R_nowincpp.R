@@ -252,7 +252,6 @@ disc_cycle_v_old <- function(
 #'
 #' @return Estimate(s) from the conditional Gompertz distribution based on given parameters
 #'
-#' @export
 #'
 #' @examples
 #' qcond_gompertz_old(rnd=0.5,shape=0.05,rate=0.01,lower_bound = 50)
@@ -278,7 +277,6 @@ qcond_gompertz_old <- function(rnd=0.5,shape,rate,lower_bound=0){
 #'
 #' @return Estimate(s) from the conditional exponential distribution based on given parameters
 #'
-#' @export
 #'
 #' @examples
 #' qcond_exp_old(rnd = 0.5,rate = 3)
@@ -302,7 +300,6 @@ qcond_exp_old <- function(rnd = 0.5, rate) {
 #'
 #' @return Estimate(s) from the conditional weibull distribution based on given parameters
 #'
-#' @export
 #'
 #' @examples
 #' qcond_weibull_old(rnd = 0.5,shape = 3,scale = 66.66,lower_bound = 50)
@@ -325,7 +322,6 @@ qcond_weibull_old <- function(rnd = 0.5, shape, scale, lower_bound=0) {
 #'
 #' @return Estimate(s) from the conditional weibullPH distribution based on given parameters
 #'
-#' @export
 #'
 #' @examples
 #' qcond_weibullPH_old(rnd = 0.5, shape = 2, scale = 0.01, lower_bound = 5)
@@ -353,7 +349,6 @@ qcond_weibullPH_old <- function(rnd = 0.5, shape, scale, lower_bound = 0) {
 #'
 #' @return Estimate(s) from the conditional loglogistic distribution based on given parameters
 #'
-#' @export
 #'
 #' @examples
 #' qcond_llogis_old(rnd = 0.5,shape = 1,scale = 1,lower_bound = 1)
@@ -380,7 +375,6 @@ qcond_llogis_old <- function(rnd = 0.5, shape, scale, lower_bound=0) {
 #'
 #' @return Estimate(s) from the conditional lognormal distribution based on given parameters
 #'
-#' @export
 #'
 #' @examples
 #' qcond_lnorm_old(rnd = 0.5, meanlog = 1,sdlog = 1,lower_bound = 1, s_obs=0.8)
@@ -408,7 +402,6 @@ qcond_lnorm_old <- function(rnd = 0.5, meanlog, sdlog, lower_bound=0, s_obs) {
 #'
 #' @return Estimate(s) from the conditional normal distribution based on given parameters
 #'
-#' @export
 #'
 #' @examples
 #' qcond_norm_old(rnd = 0.5, mean = 1,sd = 1,lower_bound = 1, s_obs=0.8)
@@ -436,7 +429,6 @@ qcond_norm_old <- function(rnd = 0.5, mean,sd, lower_bound=0, s_obs) {
 #'
 #' @return Estimate(s) from the conditional gamma distribution based on given parameters
 #'
-#' @export
 #'
 #' @examples
 #' qcond_gamma_old(rnd = 0.5, shape = 1.06178, rate = 0.01108,lower_bound = 1, s_obs=0.8)
@@ -475,7 +467,6 @@ qcond_gamma_old <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #' @importFrom flexsurv pllogis pgompertz pweibullPH
 #' @importFrom stats pexp pgamma plnorm pnorm pweibull
 #' 
-#' @export
 #' 
 #' @details The objective of this function is to avoid the user to have cycle events
 #' with the only scope of updating some variables that depend on time and re-evaluate
@@ -608,7 +599,7 @@ qcond_gamma_old <- function(rnd = 0.5, shape,rate, lower_bound=0, s_obs) {
 #'   
 #' @keywords internal
 #' @noRd
-qtimecov <- function(
+qtimecov_old <- function(
     luck,
     a_fun,
     b_fun = function(.time) NA,
