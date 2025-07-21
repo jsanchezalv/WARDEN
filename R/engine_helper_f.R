@@ -917,7 +917,6 @@ compute_outputs <- function(patdata,input_list) {
   npats <- input_list$npats
   psa_bool <- input_list$psa_bool
   
-  patdata_dt <- NULL
   list_patdata <- NULL
   
   #Split the data as to be exported as a data.table, and the extra data the user described
@@ -951,8 +950,29 @@ compute_outputs <- function(patdata,input_list) {
   } else{
     list_patdata2 <- list_patdata
   }
- 
-  patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata2,fill=TRUE)))
+  
+  
+  #If all lists have same length, then we can extract this faster than using rbindlist
+  if(sum(length(list_patdata2[[1]]) != lengths(list_patdata2))==0){
+  col_names <- names(list_patdata2[[1]])
+  tmp_list <- unlist(list_patdata2,recursive=FALSE)
+  names_tmp_list <- names(tmp_list)
+  n_rows <- length(tmp_list)
+  n_cols <- length(col_names)
+  patdata_dt <- data.table(matrix(NA, nrow = n_rows/n_cols, ncol = n_cols))
+  setnames(patdata_dt, col_names)
+  indices <- seq(from = 1, to = n_rows, by = n_cols)
+  for (i in seq_along(col_names)) {
+    col <- col_names[i]
+    set(patdata_dt, j = col, value = unlist(tmp_list[indices], use.names = FALSE))
+    indices <- indices + 1
+  }
+  rm(indices, tmp_list)
+  }else{
+    patdata_dt <- NULL
+    patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata2,fill=TRUE)))
+  }
+  
 
   rm(list_patdata2)
   

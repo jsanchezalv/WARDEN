@@ -705,10 +705,10 @@ test_that("qtimecov returns numeric scalar within bounds", {
   rate_exp <- param_fun_factory(0.1, 0, 0, 0)
   set.seed(1)
   tte <- qtimecov(runif(1), a_fun = rate_exp, dist = "exp")
-  expect_type(tte, "double")
-  expect_length(tte, 1)
-  expect_gt(tte, 0)
-  expect_lt(tte, 100)
+  expect_type(tte$tte, "double")
+  expect_length(tte, 2)
+  expect_gt(tte$tte, 0)
+  expect_lt(tte$tte, 100)
 })
 
 test_that("qtimecov works for all supported distributions", {
@@ -721,87 +721,87 @@ test_that("qtimecov works for all supported distributions", {
   rate_exp <- param_fun_factory(0.1, 0, 0, 0)
   expect_silent(qtimecov(runif(1), a_fun = rate_exp, dist = "exp"))
   expect_equal(qtimecov(luck = 0.5,a_fun = rate_exp,dist = "exp", dt = 0.001
-  ),qexp(0.5,0.1), tolerance = 0.01)
+  )$tte,qexp(0.5,0.1), tolerance = 0.01)
   
   # 2. Gamma
   shape <- param_fun_factory(2, 0, 0, 0)
   rate <- param_fun_factory(0.2, 0, 0, 0)
   expect_silent(qtimecov(runif(1), a_fun = shape, b_fun = rate, dist = "gamma"))
   expect_equal(qtimecov(luck = 0.5,a_fun = shape, b_fun = rate, dist = "gamma", dt = 0.001
-  ),qgamma(0.5,2,0.2), tolerance = 0.01)
+  )$tte,qgamma(0.5,2,0.2), tolerance = 0.01)
   
   # 3. Lognormal
   meanlog <- param_fun_factory(log(10) - 0.5^2 / 2, 0, 0, 0)
   sdlog <- param_fun_factory(0.5, 0, 0, 0)
   expect_silent(qtimecov(runif(1), a_fun = meanlog, b_fun = sdlog, dist = "lnorm"))
-  expect_equal(qtimecov(0.5, a_fun = meanlog, b_fun = sdlog, dist = "lnorm",dt=0.01),
+  expect_equal(qtimecov(0.5, a_fun = meanlog, b_fun = sdlog, dist = "lnorm",dt=0.01)$tte,
                qlnorm(0.5,log(10) - 0.5^2 / 2,0.5), tolerance = 0.01)
   
   # 4. Normal
   mean <- param_fun_factory(10, 0, 0, 0)
   sd <- param_fun_factory(2, 0, 0, 0)
   expect_silent(qtimecov(runif(1), a_fun = mean, b_fun = sd, dist = "norm"))
-  expect_equal(qtimecov(0.5, a_fun = mean, b_fun = sd, dist = "norm",dt=0.01),
+  expect_equal(qtimecov(0.5, a_fun = mean, b_fun = sd, dist = "norm",dt=0.01)$tte,
                qnorm(0.5,10,2), tolerance = 0.01)
   
   # 5. Weibull
   shape <- param_fun_factory(2, 0, 0, 0)
   scale <- param_fun_factory(10, 0, 0, 0)
   expect_silent(qtimecov(runif(1), a_fun = shape, b_fun = scale, dist = "weibull"))
-  expect_equal(qtimecov(0.5, a_fun = shape, b_fun = scale, dist = "weibull",dt=0.01),
+  expect_equal(qtimecov(0.5, a_fun = shape, b_fun = scale, dist = "weibull",dt=0.01)$tte,
                qweibull(0.5,2,10), tolerance = 0.01)
   
   # 5.1 WeibullPH
   shape <- param_fun_factory(2, 0, 0, 0)
   scale <- param_fun_factory(0.01, 0, 0, 0)
   expect_silent(qtimecov(runif(1), a_fun = shape, b_fun = scale, dist = "weibullPH"))
-  expect_equal(qtimecov(0.5, a_fun = shape, b_fun = scale, dist = "weibullPH",dt=0.01),
+  expect_equal(qtimecov(0.5, a_fun = shape, b_fun = scale, dist = "weibullPH",dt=0.01)$tte,
                flexsurv::qweibullPH(0.5,2,0.01), tolerance = 0.01)
   
   # 6. Loglogistic
   shape <- param_fun_factory(2.5, 0, 0, 0)
   scale <- param_fun_factory(7.6, 0, 0, 0)
   expect_silent(qtimecov(runif(1), a_fun = shape, b_fun = scale, dist = "llogis"))
-  expect_equal(qtimecov(0.5, a_fun = shape, b_fun = scale, dist = "llogis",dt=0.01),
+  expect_equal(qtimecov(0.5, a_fun = shape, b_fun = scale, dist = "llogis",dt=0.01)$tte,
                flexsurv::qllogis(0.5,2.5,7.6), tolerance = 0.01)
   
   # 7. Gompertz
   shape <- param_fun_factory(0.01, 0, 0, 0)
   rate <- param_fun_factory(0.091, 0, 0, 0)
   expect_silent(qtimecov(runif(1), a_fun = shape, b_fun = rate, dist = "gompertz"))
-  expect_equal(qtimecov(0.5, a_fun = shape, b_fun = rate, dist = "gompertz",dt=0.01),
+  expect_equal(qtimecov(0.5, a_fun = shape, b_fun = rate, dist = "gompertz",dt=0.01)$tte,
                qgompertz(0.5,0.01,0.091), tolerance = 0.01)
   
   rate_exp <- function(t) 0.1
   init_luck <- 0.95
-  expect_equal(qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001),{
-    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001, return_luck = TRUE,max_time = 10)
+  expect_equal(qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001)$tte,{
+    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001,max_time = 10)
     
-    qtimecov(luck = a$luck,a_fun = rate_exp,dist = "exp", dt = 0.001, start_time=a$tte)},
+    qtimecov(luck = a$luck,a_fun = rate_exp,dist = "exp", dt = 0.001, start_time=a$tte)$tte},
     tolerance = 0.01)
   
   init_luck <- 0.99
-  expect_equal(qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001),{
-    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001, return_luck = TRUE,max_time = 5)
+  expect_equal(qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001)$tte,{
+    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001,max_time = 5)
     
-    qtimecov(luck = a$luck,a_fun = rate_exp,dist = "exp", dt = 0.001, start_time=a$tte)},
+    qtimecov(luck = a$luck,a_fun = rate_exp,dist = "exp", dt = 0.001, start_time=a$tte)$tte},
     tolerance = 0.01)
   
   
   init_luck <- 0.3
-  expect_equal(qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001),{
-    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001, return_luck = TRUE,max_time = 1)
+  expect_equal(qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001)$tte,{
+    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.001,max_time = 1)
     
-    qtimecov(luck = a$luck,a_fun = rate_exp,dist = "exp", dt = 0.001, start_time=a$tte)},
+    qtimecov(luck = a$luck,a_fun = rate_exp,dist = "exp", dt = 0.001, start_time=a$tte)$tte},
     tolerance = 0.01)
   
   
   
   init_luck <- 0.3
-  expect_equal(qtimecov(luck = init_luck,a_fun = rate_exp,b_fun = function(t) 90000 ,dist = "weibull", dt = 0.001),{
-    a <- qtimecov(luck = init_luck,a_fun = rate_exp,b_fun = function(t) 90000,dist = "weibull", dt = 0.001, return_luck = TRUE,max_time = 1)
+  expect_equal(qtimecov(luck = init_luck,a_fun = rate_exp,b_fun = function(t) 90000 ,dist = "weibull", dt = 0.001)$tte,{
+    a <- qtimecov(luck = init_luck,a_fun = rate_exp,b_fun = function(t) 90000,dist = "weibull", dt = 0.001,max_time = 1)
     
-    qtimecov(luck = a$luck,a_fun = rate_exp,b_fun = function(t) 90000,dist = "weibull", dt = 0.001, start_time=a$tte)},
+    qtimecov(luck = a$luck,a_fun = rate_exp,b_fun = function(t) 90000,dist = "weibull", dt = 0.001, start_time=a$tte)$tte},
     tolerance = 0.01)
   
   rate_exp <- function(.time) 0.1
@@ -810,8 +810,8 @@ test_that("qtimecov works for all supported distributions", {
   init_luck <- 0.95
   
   expect_equal({
-    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.005, max_time = time_change, return_luck = TRUE)
-    qtimecov(luck = a$luck,a_fun = rate_exp2,dist = "exp", dt = 0.005, start_time=a$tte)
+    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.005, max_time = time_change)
+    qtimecov(luck = a$luck,a_fun = rate_exp2,dist = "exp", dt = 0.005, start_time=a$tte)$tte
     
   },{
     new_luck <- luck_adj(prevsurv = 1 - pexp(q=time_change,rate_exp(1)),
@@ -831,8 +831,8 @@ test_that("qtimecov works for all supported distributions", {
   init_luck <- 0.95
   
   expect_equal({
-    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.005, max_time = time_change, return_luck = TRUE)
-    qtimecov(luck = a$luck,a_fun = rate_exp2,dist = "exp", dt = 0.005, start_time=a$tte)
+    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 0.005, max_time = time_change)
+    qtimecov(luck = a$luck,a_fun = rate_exp2,dist = "exp", dt = 0.005, start_time=a$tte)$tte
     
   },{# Manually reproduce what qtimecov does from a$tte
     t <- 0
@@ -881,7 +881,7 @@ test_that("qtimecov works for all supported distributions", {
   
   #30x faster 
   expect_equal({
-    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 1)
+    a <- qtimecov(luck = init_luck,a_fun = rate_exp,dist = "exp", dt = 1)$tte
     a
   },{
     time_vec <- 0:100
@@ -935,7 +935,7 @@ test_that("qtimecov works for all supported distributions", {
     luck <- 0.403
     time_cov <- 0.0002271
     t <- 0
-    qtimecov(luck = luck,a_fun = bs_rate_f,dist = "exp", dt = 1)
+    qtimecov(luck = luck,a_fun = bs_rate_f,dist = "exp", dt = 1)$tte
   }, tolerance = 0.01)
   
 })
@@ -954,7 +954,7 @@ test_that("qtimecov respects max_time bound", {
     a_fun = slow_fun,
     dist = "exp",
     max_time = 10
-  )
+  )$tte
   expect_lte(tte, 10)
 })
 

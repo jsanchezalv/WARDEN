@@ -458,3 +458,43 @@ disc_ongoing_v <- function(lcldr, lclprvtime, lclcurtime, lclval) {
     .Call(`_WARDEN_disc_ongoing_v`, lcldr, lclprvtime, lclcurtime, lclval)
 }
 
+queue_create_cpp <- function(priority_order) {
+    .Call(`_WARDEN_queue_create_cpp`, priority_order)
+}
+
+new_event_cpp <- function(ptr, patient_id, events) {
+    invisible(.Call(`_WARDEN_new_event_cpp`, ptr, patient_id, events))
+}
+
+next_event_cpp <- function(ptr, n = 1L) {
+    .Call(`_WARDEN_next_event_cpp`, ptr, n)
+}
+
+pop_event_cpp <- function(ptr) {
+    invisible(.Call(`_WARDEN_pop_event_cpp`, ptr))
+}
+
+pop_and_return_event_cpp <- function(ptr) {
+    .Call(`_WARDEN_pop_and_return_event_cpp`, ptr)
+}
+
+remove_event_cpp <- function(ptr, patient_id, events) {
+    invisible(.Call(`_WARDEN_remove_event_cpp`, ptr, patient_id, events))
+}
+
+modify_event_cpp <- function(ptr, patient_id, events, create_if_missing = FALSE) {
+    invisible(.Call(`_WARDEN_modify_event_cpp`, ptr, patient_id, events, create_if_missing))
+}
+
+queue_empty_cpp <- function(ptr) {
+    .Call(`_WARDEN_queue_empty_cpp`, ptr)
+}
+
+queue_size_cpp <- function(ptr) {
+    .Call(`_WARDEN_queue_size_cpp`, ptr)
+}
+
+has_event_cpp <- function(ptr, patient_id, event_name) {
+    .Call(`_WARDEN_has_event_cpp`, ptr, patient_id, event_name)
+}
+

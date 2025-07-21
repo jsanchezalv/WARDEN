@@ -776,6 +776,132 @@ modify_item_seq <- function(...){
 
 }
 
+
+#' Create a New Event Queue
+#'
+#' Initializes a new event queue with the specified priority order of event names.
+#'
+#' @param priority_order A character vector of event names sorted by decreasing importance.
+#'
+#' @return An external pointer to the new event queue.
+#' @export
+queue_create <- function(priority_order) {
+  queue_create_cpp(priority_order)
+}
+
+#' Add Events to the Queue for a Patient
+#'
+#' Adds one or more events for a given patient to the queue.
+#'
+#' @param events A named numeric vector. Names are event types, values are event times.
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#' @param patient_id The patient ID. Defaults to `i`.
+#'
+#' @return NULL (invisible). Modifies the queue in-place.
+#' @export
+new_event2 <- function(events, ptr = cur_evtlist, patient_id = i) {
+  new_event_cpp(ptr, patient_id, events)
+}
+
+#' Get the Next Event(s) in the Queue
+#'
+#' Retrieves the next `n` events (without removing them).
+#'
+#' @param n Number of events to retrieve. Default is 1.
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#'
+#' @return A list of events, each with `patient_id`, `event_name`, and `event_time`.
+#' @export
+next_event <- function(n = 1, ptr = cur_evtlist) {
+  next_event_cpp(ptr, n)
+}
+
+#' Remove the Next Event from the Queue
+#'
+#' Removes the next scheduled event from the queue.
+#'
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#'
+#' @return NULL (invisible). Modifies the queue in-place.
+#' @export
+pop_event <- function(ptr = cur_evtlist) {
+  pop_event_cpp(ptr)
+}
+
+#' Pop and Return the Next Event
+#'
+#' Removes the next event from the queue and returns its details.
+#'
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#'
+#' @return A named list with `patient_id`, `event_name`, and `event_time`.
+#' @export
+pop_and_return_event <- function(ptr = cur_evtlist) {
+  pop_and_return_event_cpp(ptr)
+}
+
+#' Remove Events for a Patient
+#'
+#' Removes one or more events from the queue for the given patient.
+#'
+#' @param events A character vector of event names to remove.
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#' @param patient_id The patient ID. Defaults to `i`.
+#'
+#' @return NULL (invisible). Modifies the queue in-place.
+#' @export
+remove_event2 <- function(events, ptr = cur_evtlist, patient_id = i) {
+  remove_event_cpp(ptr, patient_id, events)
+}
+
+#' Modify or Add Events for a Patient
+#'
+#' Modifies existing event times, or adds new events if `create_if_missing` is TRUE.
+#'
+#' @param events A named numeric vector with event names and new event times.
+#' @param create_if_missing Logical, whether to create events if they do not exist.
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#' @param patient_id The patient ID. Defaults to `i`.
+#'
+#' @return NULL (invisible). Modifies the queue in-place.
+#' @export
+modify_event2 <- function(events, create_if_missing = FALSE, ptr = cur_evtlist, patient_id = i) {
+  modify_event_cpp(ptr, patient_id, events, create_if_missing)
+}
+
+#' Check if the Event Queue is Empty
+#'
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#'
+#' @return Logical, TRUE if the queue is empty, FALSE otherwise.
+#' @export
+queue_empty <- function(ptr = cur_evtlist) {
+  queue_empty_cpp(ptr)
+}
+
+#' Get the Size of the Event Queue
+#'
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#'
+#' @return An integer indicating the number of events in the queue.
+#' @export
+queue_size <- function(ptr = cur_evtlist) {
+  queue_size_cpp(ptr)
+}
+
+#' Check if a Patient Has a Specific Event
+#'
+#' @param event_name The name of the event.
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#' @param patient_id The patient ID. Defaults to `i`.
+#'
+#' @return Logical, TRUE if the event exists for the patient, FALSE otherwise.
+#' @export
+has_event <- function(event_name, ptr = cur_evtlist, patient_id = i) {
+  has_event_cpp(ptr, patient_id, event_name)
+}
+
+
 # Add_reactevt -------------------------------------------------------------------------------------------------------------------------------------------
 
 #' Define the modifications to other events, costs, utilities, or other items affected by the occurrence of the event

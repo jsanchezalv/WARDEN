@@ -198,6 +198,122 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// queue_create_cpp
+SEXP queue_create_cpp(std::vector<std::string> priority_order);
+RcppExport SEXP _WARDEN_queue_create_cpp(SEXP priority_orderSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type priority_order(priority_orderSEXP);
+    rcpp_result_gen = Rcpp::wrap(queue_create_cpp(priority_order));
+    return rcpp_result_gen;
+END_RCPP
+}
+// new_event_cpp
+void new_event_cpp(SEXP ptr, int patient_id, NumericVector events);
+RcppExport SEXP _WARDEN_new_event_cpp(SEXP ptrSEXP, SEXP patient_idSEXP, SEXP eventsSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type events(eventsSEXP);
+    new_event_cpp(ptr, patient_id, events);
+    return R_NilValue;
+END_RCPP
+}
+// next_event_cpp
+List next_event_cpp(SEXP ptr, int n);
+RcppExport SEXP _WARDEN_next_event_cpp(SEXP ptrSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(next_event_cpp(ptr, n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// pop_event_cpp
+void pop_event_cpp(SEXP ptr);
+RcppExport SEXP _WARDEN_pop_event_cpp(SEXP ptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    pop_event_cpp(ptr);
+    return R_NilValue;
+END_RCPP
+}
+// pop_and_return_event_cpp
+List pop_and_return_event_cpp(SEXP ptr);
+RcppExport SEXP _WARDEN_pop_and_return_event_cpp(SEXP ptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(pop_and_return_event_cpp(ptr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// remove_event_cpp
+void remove_event_cpp(SEXP ptr, int patient_id, SEXP events);
+RcppExport SEXP _WARDEN_remove_event_cpp(SEXP ptrSEXP, SEXP patient_idSEXP, SEXP eventsSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type events(eventsSEXP);
+    remove_event_cpp(ptr, patient_id, events);
+    return R_NilValue;
+END_RCPP
+}
+// modify_event_cpp
+void modify_event_cpp(SEXP ptr, int patient_id, NumericVector events, bool create_if_missing);
+RcppExport SEXP _WARDEN_modify_event_cpp(SEXP ptrSEXP, SEXP patient_idSEXP, SEXP eventsSEXP, SEXP create_if_missingSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type events(eventsSEXP);
+    Rcpp::traits::input_parameter< bool >::type create_if_missing(create_if_missingSEXP);
+    modify_event_cpp(ptr, patient_id, events, create_if_missing);
+    return R_NilValue;
+END_RCPP
+}
+// queue_empty_cpp
+bool queue_empty_cpp(SEXP ptr);
+RcppExport SEXP _WARDEN_queue_empty_cpp(SEXP ptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(queue_empty_cpp(ptr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// queue_size_cpp
+int queue_size_cpp(SEXP ptr);
+RcppExport SEXP _WARDEN_queue_size_cpp(SEXP ptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(queue_size_cpp(ptr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// has_event_cpp
+bool has_event_cpp(SEXP ptr, int patient_id, std::string event_name);
+RcppExport SEXP _WARDEN_has_event_cpp(SEXP ptrSEXP, SEXP patient_idSEXP, SEXP event_nameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    Rcpp::traits::input_parameter< std::string >::type event_name(event_nameSEXP);
+    rcpp_result_gen = Rcpp::wrap(has_event_cpp(ptr, patient_id, event_name));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_luck_adj", (DL_FUNC) &_WARDEN_luck_adj, 4},
@@ -213,6 +329,16 @@ static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_disc_cycle_v", (DL_FUNC) &_WARDEN_disc_cycle_v, 7},
     {"_WARDEN_disc_instant_v", (DL_FUNC) &_WARDEN_disc_instant_v, 3},
     {"_WARDEN_disc_ongoing_v", (DL_FUNC) &_WARDEN_disc_ongoing_v, 4},
+    {"_WARDEN_queue_create_cpp", (DL_FUNC) &_WARDEN_queue_create_cpp, 1},
+    {"_WARDEN_new_event_cpp", (DL_FUNC) &_WARDEN_new_event_cpp, 3},
+    {"_WARDEN_next_event_cpp", (DL_FUNC) &_WARDEN_next_event_cpp, 2},
+    {"_WARDEN_pop_event_cpp", (DL_FUNC) &_WARDEN_pop_event_cpp, 1},
+    {"_WARDEN_pop_and_return_event_cpp", (DL_FUNC) &_WARDEN_pop_and_return_event_cpp, 1},
+    {"_WARDEN_remove_event_cpp", (DL_FUNC) &_WARDEN_remove_event_cpp, 3},
+    {"_WARDEN_modify_event_cpp", (DL_FUNC) &_WARDEN_modify_event_cpp, 4},
+    {"_WARDEN_queue_empty_cpp", (DL_FUNC) &_WARDEN_queue_empty_cpp, 1},
+    {"_WARDEN_queue_size_cpp", (DL_FUNC) &_WARDEN_queue_size_cpp, 1},
+    {"_WARDEN_has_event_cpp", (DL_FUNC) &_WARDEN_has_event_cpp, 3},
     {NULL, NULL, 0}
 };
 
