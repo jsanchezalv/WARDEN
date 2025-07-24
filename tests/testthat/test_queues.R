@@ -1,6 +1,4 @@
 # Run all unit tests for EventQueue
-  cat("Running EventQueue Unit Tests...\n\n")
-  
   test_that("Queue creation works", {
     event_priority <- c("death", "dropout", "visit")
     q <- queue_create(event_priority)
@@ -169,10 +167,10 @@
     expect_equal(next_event(ptr = q)$event_name, "death")
   })
   
-  
-  test_that("Use of cur_evtlist and i", {
-    cur_evtlist <- queue_create(c("death", "dropout", "visit", "lab_test"))
-    i <- 10
+   test_that("Use of cur_evtlist and i", {
+     cur_evtlist <- queue_create(c("death", "dropout", "visit", "lab_test"))
+     i <- 10
+     
     new_event2(c(death = 100, visit = 10))
     new_event2(c(dropout = 50, lab_test = 5))
     
@@ -192,3 +190,73 @@
     expect_equal(next_event()$event_name, "death")
   })
 
+  test_that("get_event returns correct time", {
+    q <- queue_create(c("visit", "death", "dropout"))
+    new_event2(c(visit = 5, death = 10), ptr = q, patient_id = 1)
+    
+    expect_equal(get_event("visit",q, 1), 5)
+    expect_equal(get_event("death",q, 1), 10)
+  })
+  
+  test_that("get_event returns correct time with curevtlist", {
+    cur_evtlist <- queue_create(c("death", "dropout", "visit", "lab_test"))
+    i <- 10
+    
+    new_event2(c(visit = 5, death = 10))
+    
+    expect_equal(get_event("visit"), 5)
+    expect_equal(get_event("death"), 10)
+  })
+  
+  test_that("get_event throws for non-existent event", {
+    q <- queue_create(c("visit", "death"))
+    new_event2(c(visit = 7), ptr = q, patient_id = 2)
+    
+    expect_error(get_event("dropout",q,2), "Event not found")
+    expect_error(get_event( "visit",q, 999), "Event not found")
+  })
+  
+  test_that("next_event_pt returns empty when no events", {
+    evtlist <- queue_create(c("death", "visit", "lab_test"))
+    i <- 1
+    expect_equal(next_event_pt(ptr = evtlist, patient_id = i), 
+                 list(patient_id = integer(0), event_name = character(0), time = numeric(0)))
+  })
+  
+  test_that("next_event_pt returns next event for single patient", {
+    evtlist <- queue_create(c("death", "visit", "lab_test"))
+    i <- 5
+
+    
+    # Add events for patient 5
+    new_event2(c(visit = 10, death = 20), ptr = evtlist, patient_id = i)
+    new_event2(c(visit = 1, death = 5), ptr = evtlist, patient_id = 8)
+    
+    res <- next_event_pt(n = 1, ptr = evtlist, patient_id = i)
+    
+    expect_equal(length(res$time), 1)
+    expect_equal(res$patient_id, i)
+    expect_equal(res$event_name, "visit")
+    expect_equal(res$time, 10)
+    expect_equal(next_event_pt(n = 1, ptr = evtlist, patient_id = 8)$time, 1)
+  })
+  
+  test_that("next_event_pt returns multiple next events for single patient", {
+    evtlist <- queue_create(c("death", "visit", "lab_test"))
+    i <- 7
+    
+    new_event2(c(visit = 5, lab_test = 15, death = 30), ptr = evtlist, patient_id = i)
+    new_event2(c(visit = 6, lab_test = 7, death = 8), ptr = evtlist, patient_id = 5)
+    
+    res <- next_event_pt(n = 2, ptr = evtlist, patient_id = 5)
+    
+    expect_equal(length(res$time), 2)
+    expect_true(all(res$patient_id == 5))
+    expect_true(all(res$event_name %in% c("visit", "lab_test")))
+    expect_equal(res$time[res$event_name == "visit"], 6)
+    expect_equal(res$time[res$event_name == "lab_test"], 7)
+    res <- next_event_pt(n = 2, ptr = evtlist, patient_id = i)
+    expect_equal(res$time[res$event_name == "visit"], 5)
+    expect_equal(res$time[res$event_name == "lab_test"], 15)
+  })
+  

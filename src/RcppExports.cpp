@@ -233,6 +233,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// next_event_pt_cpp
+List next_event_pt_cpp(SEXP ptr, int patient_id, int n);
+RcppExport SEXP _WARDEN_next_event_pt_cpp(SEXP ptrSEXP, SEXP patient_idSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(next_event_pt_cpp(ptr, patient_id, n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // pop_event_cpp
 void pop_event_cpp(SEXP ptr);
 RcppExport SEXP _WARDEN_pop_event_cpp(SEXP ptrSEXP) {
@@ -314,6 +327,205 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// get_event_cpp
+double get_event_cpp(SEXP ptr, int patient_id, std::string event_name);
+RcppExport SEXP _WARDEN_get_event_cpp(SEXP ptrSEXP, SEXP patient_idSEXP, SEXP event_nameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    Rcpp::traits::input_parameter< std::string >::type event_name(event_nameSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_event_cpp(ptr, patient_id, event_name));
+    return rcpp_result_gen;
+END_RCPP
+}
+// create_discrete_resource_cpp
+SEXP create_discrete_resource_cpp(int n);
+RcppExport SEXP _WARDEN_create_discrete_resource_cpp(SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(create_discrete_resource_cpp(n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_size_cpp
+int discrete_resource_size_cpp(SEXP xptr);
+RcppExport SEXP _WARDEN_discrete_resource_size_cpp(SEXP xptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_size_cpp(xptr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_queue_size_cpp
+int discrete_resource_queue_size_cpp(SEXP xptr);
+RcppExport SEXP _WARDEN_discrete_resource_queue_size_cpp(SEXP xptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_queue_size_cpp(xptr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_n_free_cpp
+int discrete_resource_n_free_cpp(SEXP xptr);
+RcppExport SEXP _WARDEN_discrete_resource_n_free_cpp(SEXP xptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_n_free_cpp(xptr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_patients_using_cpp
+IntegerVector discrete_resource_patients_using_cpp(SEXP xptr);
+RcppExport SEXP _WARDEN_discrete_resource_patients_using_cpp(SEXP xptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_patients_using_cpp(xptr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_patients_using_times_cpp
+NumericVector discrete_resource_patients_using_times_cpp(SEXP xptr);
+RcppExport SEXP _WARDEN_discrete_resource_patients_using_times_cpp(SEXP xptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_patients_using_times_cpp(xptr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_is_patient_in_queue_cpp
+bool discrete_resource_is_patient_in_queue_cpp(SEXP xptr, int patient_id);
+RcppExport SEXP _WARDEN_discrete_resource_is_patient_in_queue_cpp(SEXP xptrSEXP, SEXP patient_idSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_is_patient_in_queue_cpp(xptr, patient_id));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_is_patient_using_cpp
+bool discrete_resource_is_patient_using_cpp(SEXP xptr, int patient_id);
+RcppExport SEXP _WARDEN_discrete_resource_is_patient_using_cpp(SEXP xptrSEXP, SEXP patient_idSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_is_patient_using_cpp(xptr, patient_id));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_attempt_block_cpp
+bool discrete_resource_attempt_block_cpp(SEXP xptr, int patient_id, int priority, double start_time);
+RcppExport SEXP _WARDEN_discrete_resource_attempt_block_cpp(SEXP xptrSEXP, SEXP patient_idSEXP, SEXP prioritySEXP, SEXP start_timeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    Rcpp::traits::input_parameter< int >::type priority(prioritySEXP);
+    Rcpp::traits::input_parameter< double >::type start_time(start_timeSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_attempt_block_cpp(xptr, patient_id, priority, start_time));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_attempt_free_cpp
+void discrete_resource_attempt_free_cpp(SEXP xptr, int patient_id, bool remove_all);
+RcppExport SEXP _WARDEN_discrete_resource_attempt_free_cpp(SEXP xptrSEXP, SEXP patient_idSEXP, SEXP remove_allSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    Rcpp::traits::input_parameter< bool >::type remove_all(remove_allSEXP);
+    discrete_resource_attempt_free_cpp(xptr, patient_id, remove_all);
+    return R_NilValue;
+END_RCPP
+}
+// discrete_resource_attempt_free_if_using_cpp
+void discrete_resource_attempt_free_if_using_cpp(SEXP xptr, int patient_id, bool remove_all);
+RcppExport SEXP _WARDEN_discrete_resource_attempt_free_if_using_cpp(SEXP xptrSEXP, SEXP patient_idSEXP, SEXP remove_allSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    Rcpp::traits::input_parameter< bool >::type remove_all(remove_allSEXP);
+    discrete_resource_attempt_free_if_using_cpp(xptr, patient_id, remove_all);
+    return R_NilValue;
+END_RCPP
+}
+// discrete_resource_next_patient_in_line_cpp
+IntegerVector discrete_resource_next_patient_in_line_cpp(SEXP xptr, int n);
+RcppExport SEXP _WARDEN_discrete_resource_next_patient_in_line_cpp(SEXP xptrSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_next_patient_in_line_cpp(xptr, n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_queue_start_times_cpp
+NumericVector discrete_resource_queue_start_times_cpp(SEXP xptr);
+RcppExport SEXP _WARDEN_discrete_resource_queue_start_times_cpp(SEXP xptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_queue_start_times_cpp(xptr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// discrete_resource_modify_priority_cpp
+void discrete_resource_modify_priority_cpp(SEXP xptr, int patient_id, int new_priority);
+RcppExport SEXP _WARDEN_discrete_resource_modify_priority_cpp(SEXP xptrSEXP, SEXP patient_idSEXP, SEXP new_prioritySEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
+    Rcpp::traits::input_parameter< int >::type new_priority(new_prioritySEXP);
+    discrete_resource_modify_priority_cpp(xptr, patient_id, new_priority);
+    return R_NilValue;
+END_RCPP
+}
+// discrete_resource_add_resource_cpp
+void discrete_resource_add_resource_cpp(SEXP xptr, int n_to_add);
+RcppExport SEXP _WARDEN_discrete_resource_add_resource_cpp(SEXP xptrSEXP, SEXP n_to_addSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    Rcpp::traits::input_parameter< int >::type n_to_add(n_to_addSEXP);
+    discrete_resource_add_resource_cpp(xptr, n_to_add);
+    return R_NilValue;
+END_RCPP
+}
+// discrete_resource_remove_resource_cpp
+void discrete_resource_remove_resource_cpp(SEXP xptr, int n_to_remove, double current_time);
+RcppExport SEXP _WARDEN_discrete_resource_remove_resource_cpp(SEXP xptrSEXP, SEXP n_to_removeSEXP, SEXP current_timeSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    Rcpp::traits::input_parameter< int >::type n_to_remove(n_to_removeSEXP);
+    Rcpp::traits::input_parameter< double >::type current_time(current_timeSEXP);
+    discrete_resource_remove_resource_cpp(xptr, n_to_remove, current_time);
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_luck_adj", (DL_FUNC) &_WARDEN_luck_adj, 4},
@@ -332,6 +544,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_queue_create_cpp", (DL_FUNC) &_WARDEN_queue_create_cpp, 1},
     {"_WARDEN_new_event_cpp", (DL_FUNC) &_WARDEN_new_event_cpp, 3},
     {"_WARDEN_next_event_cpp", (DL_FUNC) &_WARDEN_next_event_cpp, 2},
+    {"_WARDEN_next_event_pt_cpp", (DL_FUNC) &_WARDEN_next_event_pt_cpp, 3},
     {"_WARDEN_pop_event_cpp", (DL_FUNC) &_WARDEN_pop_event_cpp, 1},
     {"_WARDEN_pop_and_return_event_cpp", (DL_FUNC) &_WARDEN_pop_and_return_event_cpp, 1},
     {"_WARDEN_remove_event_cpp", (DL_FUNC) &_WARDEN_remove_event_cpp, 3},
@@ -339,6 +552,23 @@ static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_queue_empty_cpp", (DL_FUNC) &_WARDEN_queue_empty_cpp, 1},
     {"_WARDEN_queue_size_cpp", (DL_FUNC) &_WARDEN_queue_size_cpp, 1},
     {"_WARDEN_has_event_cpp", (DL_FUNC) &_WARDEN_has_event_cpp, 3},
+    {"_WARDEN_get_event_cpp", (DL_FUNC) &_WARDEN_get_event_cpp, 3},
+    {"_WARDEN_create_discrete_resource_cpp", (DL_FUNC) &_WARDEN_create_discrete_resource_cpp, 1},
+    {"_WARDEN_discrete_resource_size_cpp", (DL_FUNC) &_WARDEN_discrete_resource_size_cpp, 1},
+    {"_WARDEN_discrete_resource_queue_size_cpp", (DL_FUNC) &_WARDEN_discrete_resource_queue_size_cpp, 1},
+    {"_WARDEN_discrete_resource_n_free_cpp", (DL_FUNC) &_WARDEN_discrete_resource_n_free_cpp, 1},
+    {"_WARDEN_discrete_resource_patients_using_cpp", (DL_FUNC) &_WARDEN_discrete_resource_patients_using_cpp, 1},
+    {"_WARDEN_discrete_resource_patients_using_times_cpp", (DL_FUNC) &_WARDEN_discrete_resource_patients_using_times_cpp, 1},
+    {"_WARDEN_discrete_resource_is_patient_in_queue_cpp", (DL_FUNC) &_WARDEN_discrete_resource_is_patient_in_queue_cpp, 2},
+    {"_WARDEN_discrete_resource_is_patient_using_cpp", (DL_FUNC) &_WARDEN_discrete_resource_is_patient_using_cpp, 2},
+    {"_WARDEN_discrete_resource_attempt_block_cpp", (DL_FUNC) &_WARDEN_discrete_resource_attempt_block_cpp, 4},
+    {"_WARDEN_discrete_resource_attempt_free_cpp", (DL_FUNC) &_WARDEN_discrete_resource_attempt_free_cpp, 3},
+    {"_WARDEN_discrete_resource_attempt_free_if_using_cpp", (DL_FUNC) &_WARDEN_discrete_resource_attempt_free_if_using_cpp, 3},
+    {"_WARDEN_discrete_resource_next_patient_in_line_cpp", (DL_FUNC) &_WARDEN_discrete_resource_next_patient_in_line_cpp, 2},
+    {"_WARDEN_discrete_resource_queue_start_times_cpp", (DL_FUNC) &_WARDEN_discrete_resource_queue_start_times_cpp, 1},
+    {"_WARDEN_discrete_resource_modify_priority_cpp", (DL_FUNC) &_WARDEN_discrete_resource_modify_priority_cpp, 3},
+    {"_WARDEN_discrete_resource_add_resource_cpp", (DL_FUNC) &_WARDEN_discrete_resource_add_resource_cpp, 2},
+    {"_WARDEN_discrete_resource_remove_resource_cpp", (DL_FUNC) &_WARDEN_discrete_resource_remove_resource_cpp, 3},
     {NULL, NULL, 0}
 };
 

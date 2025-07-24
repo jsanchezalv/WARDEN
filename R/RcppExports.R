@@ -470,6 +470,10 @@ next_event_cpp <- function(ptr, n = 1L) {
     .Call(`_WARDEN_next_event_cpp`, ptr, n)
 }
 
+next_event_pt_cpp <- function(ptr, patient_id, n = 1L) {
+    .Call(`_WARDEN_next_event_pt_cpp`, ptr, patient_id, n)
+}
+
 pop_event_cpp <- function(ptr) {
     invisible(.Call(`_WARDEN_pop_event_cpp`, ptr))
 }
@@ -496,5 +500,73 @@ queue_size_cpp <- function(ptr) {
 
 has_event_cpp <- function(ptr, patient_id, event_name) {
     .Call(`_WARDEN_has_event_cpp`, ptr, patient_id, event_name)
+}
+
+get_event_cpp <- function(ptr, patient_id, event_name) {
+    .Call(`_WARDEN_get_event_cpp`, ptr, patient_id, event_name)
+}
+
+create_discrete_resource_cpp <- function(n) {
+    .Call(`_WARDEN_create_discrete_resource_cpp`, n)
+}
+
+discrete_resource_size_cpp <- function(xptr) {
+    .Call(`_WARDEN_discrete_resource_size_cpp`, xptr)
+}
+
+discrete_resource_queue_size_cpp <- function(xptr) {
+    .Call(`_WARDEN_discrete_resource_queue_size_cpp`, xptr)
+}
+
+discrete_resource_n_free_cpp <- function(xptr) {
+    .Call(`_WARDEN_discrete_resource_n_free_cpp`, xptr)
+}
+
+discrete_resource_patients_using_cpp <- function(xptr) {
+    .Call(`_WARDEN_discrete_resource_patients_using_cpp`, xptr)
+}
+
+discrete_resource_patients_using_times_cpp <- function(xptr) {
+    .Call(`_WARDEN_discrete_resource_patients_using_times_cpp`, xptr)
+}
+
+discrete_resource_is_patient_in_queue_cpp <- function(xptr, patient_id) {
+    .Call(`_WARDEN_discrete_resource_is_patient_in_queue_cpp`, xptr, patient_id)
+}
+
+discrete_resource_is_patient_using_cpp <- function(xptr, patient_id) {
+    .Call(`_WARDEN_discrete_resource_is_patient_using_cpp`, xptr, patient_id)
+}
+
+discrete_resource_attempt_block_cpp <- function(xptr, patient_id, priority, start_time) {
+    .Call(`_WARDEN_discrete_resource_attempt_block_cpp`, xptr, patient_id, priority, start_time)
+}
+
+discrete_resource_attempt_free_cpp <- function(xptr, patient_id, remove_all = FALSE) {
+    invisible(.Call(`_WARDEN_discrete_resource_attempt_free_cpp`, xptr, patient_id, remove_all))
+}
+
+discrete_resource_attempt_free_if_using_cpp <- function(xptr, patient_id, remove_all = FALSE) {
+    invisible(.Call(`_WARDEN_discrete_resource_attempt_free_if_using_cpp`, xptr, patient_id, remove_all))
+}
+
+discrete_resource_next_patient_in_line_cpp <- function(xptr, n = 1L) {
+    .Call(`_WARDEN_discrete_resource_next_patient_in_line_cpp`, xptr, n)
+}
+
+discrete_resource_queue_start_times_cpp <- function(xptr) {
+    .Call(`_WARDEN_discrete_resource_queue_start_times_cpp`, xptr)
+}
+
+discrete_resource_modify_priority_cpp <- function(xptr, patient_id, new_priority) {
+    invisible(.Call(`_WARDEN_discrete_resource_modify_priority_cpp`, xptr, patient_id, new_priority))
+}
+
+discrete_resource_add_resource_cpp <- function(xptr, n_to_add) {
+    invisible(.Call(`_WARDEN_discrete_resource_add_resource_cpp`, xptr, n_to_add))
+}
+
+discrete_resource_remove_resource_cpp <- function(xptr, n_to_remove, current_time) {
+    invisible(.Call(`_WARDEN_discrete_resource_remove_resource_cpp`, xptr, n_to_remove, current_time))
 }
 

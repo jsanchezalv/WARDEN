@@ -271,6 +271,23 @@ public:
     
     return result;
   }
+  
+  double get_event_time(int patient_id, const std::string& event_name) const {
+    Key k = {patient_id, event_name};
+    auto it = lookup.find(k);
+    if (it == lookup.end()) {
+      throw std::runtime_error("Event not found for this patient");
+    }
+    return it->second.time;
+  }
+  
+  const std::unordered_map<Key, EventInfo, KeyHash>& get_lookup() const {
+    return lookup;
+  }
+  
+  const std::unordered_map<std::string, int>& get_event_priority() const {
+    return event_priority;
+  }
 };
 
 // Helper function to convert named vector to vectors of names and values
@@ -358,6 +375,73 @@ List next_event_cpp(SEXP ptr, int n = 1) {
     throw Rcpp::exception(e.what());
   }
 }
+
+// [[Rcpp::export]]
+List next_event_pt_cpp(SEXP ptr, int patient_id, int n = 1) {
+  try {
+    EventQueuePtr q(ptr);
+    const auto& lookup = q->get_lookup();               // Use getter
+    const auto& event_priority = q->get_event_priority();  // Use getter
+    
+    if (n <= 0) {
+      return List::create(
+        _["patient_id"] = IntegerVector(),
+        _["event_name"] = CharacterVector(),
+        _["time"] = NumericVector()
+      );
+    }
+    
+    // Gather all events for the patient
+    std::vector<Event> patient_events;
+    for (const auto& pair : lookup) {
+      const Key& k = pair.first;
+      const EventInfo& info = pair.second;
+      if (k.patient_id == patient_id) {
+        auto prio_it = event_priority.find(k.event_name);
+        int prio = (prio_it != event_priority.end()) ? prio_it->second : 0;
+        patient_events.emplace_back(k.patient_id, k.event_name, info.time, prio, info.version);
+      }
+    }
+    
+    // If no events found, return empty
+    if (patient_events.empty()) {
+      return List::create(
+        _["patient_id"] = IntegerVector(),
+        _["event_name"] = CharacterVector(),
+        _["time"] = NumericVector()
+      );
+    }
+    
+    // Sort events by time ascending, then priority ascending, then version ascending
+    std::sort(patient_events.begin(), patient_events.end(), [](const Event& a, const Event& b) {
+      if (a.time != b.time) return a.time < b.time;
+      if (a.priority != b.priority) return a.priority < b.priority;
+      return a.version < b.version;
+    });
+    
+    size_t to_return = std::min(static_cast<size_t>(n), patient_events.size());
+    
+    // Prepare output vectors
+    IntegerVector patient_ids(to_return);
+    CharacterVector event_names(to_return);
+    NumericVector times(to_return);
+    
+    for (size_t i = 0; i < to_return; ++i) {
+      patient_ids[i] = patient_events[i].patient_id;
+      event_names[i] = patient_events[i].event_name;
+      times[i] = patient_events[i].time;
+    }
+    
+    return List::create(
+      _["patient_id"] = patient_ids,
+      _["event_name"] = event_names,
+      _["time"] = times
+    );
+  } catch (const std::exception& e) {
+    throw Rcpp::exception(e.what());
+  }
+}
+
 
 // [[Rcpp::export]]
 void pop_event_cpp(SEXP ptr) {
@@ -451,6 +535,17 @@ bool has_event_cpp(SEXP ptr, int patient_id, std::string event_name) {
   try {
     EventQueuePtr q(ptr);
     return q->has_event(patient_id, event_name);
+  } catch (const std::exception& e) {
+    throw Rcpp::exception(e.what());
+  }
+}
+
+
+// [[Rcpp::export]]
+double get_event_cpp(SEXP ptr, int patient_id, std::string event_name) {
+  try {
+    EventQueuePtr q(ptr);
+    return q->get_event_time(patient_id, event_name);
   } catch (const std::exception& e) {
     throw Rcpp::exception(e.what());
   }

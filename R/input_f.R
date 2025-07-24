@@ -777,6 +777,8 @@ modify_item_seq <- function(...){
 }
 
 
+# event queueing ----------------------------------------------------------
+
 #' Create a New Event Queue
 #'
 #' Initializes a new event queue with the specified priority order of event names.
@@ -799,7 +801,9 @@ queue_create <- function(priority_order) {
 #'
 #' @return NULL (invisible). Modifies the queue in-place.
 #' @export
-new_event2 <- function(events, ptr = cur_evtlist, patient_id = i) {
+new_event2 <- function(events, ptr, patient_id) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+  if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
   new_event_cpp(ptr, patient_id, events)
 }
 
@@ -812,9 +816,28 @@ new_event2 <- function(events, ptr = cur_evtlist, patient_id = i) {
 #'
 #' @return A list of events, each with `patient_id`, `event_name`, and `event_time`.
 #' @export
-next_event <- function(n = 1, ptr = cur_evtlist) {
+next_event <- function(n = 1, ptr) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   next_event_cpp(ptr, n)
 }
+
+#' Get the Next Event(s) in the Queue for a specific patient
+#'
+#' Retrieves the next `n` events (without removing them).
+#'
+#' @param n Number of events to retrieve. Default is 1.
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#' @param patient_id The patient ID. Defaults to `i`.
+#'
+#' @return A list of events, each with `patient_id`, `event_name`, and `event_time`.
+#' @export
+next_event_pt <- function(n = 1, ptr, patient_id) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+  if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+  
+  next_event_pt_cpp(ptr, patient_id, n)
+}
+
 
 #' Remove the Next Event from the Queue
 #'
@@ -824,7 +847,8 @@ next_event <- function(n = 1, ptr = cur_evtlist) {
 #'
 #' @return NULL (invisible). Modifies the queue in-place.
 #' @export
-pop_event <- function(ptr = cur_evtlist) {
+pop_event <- function(ptr) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   pop_event_cpp(ptr)
 }
 
@@ -836,7 +860,8 @@ pop_event <- function(ptr = cur_evtlist) {
 #'
 #' @return A named list with `patient_id`, `event_name`, and `event_time`.
 #' @export
-pop_and_return_event <- function(ptr = cur_evtlist) {
+pop_and_return_event <- function(ptr) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   pop_and_return_event_cpp(ptr)
 }
 
@@ -850,7 +875,9 @@ pop_and_return_event <- function(ptr = cur_evtlist) {
 #'
 #' @return NULL (invisible). Modifies the queue in-place.
 #' @export
-remove_event2 <- function(events, ptr = cur_evtlist, patient_id = i) {
+remove_event2 <- function(events, ptr, patient_id) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+  if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
   remove_event_cpp(ptr, patient_id, events)
 }
 
@@ -865,7 +892,9 @@ remove_event2 <- function(events, ptr = cur_evtlist, patient_id = i) {
 #'
 #' @return NULL (invisible). Modifies the queue in-place.
 #' @export
-modify_event2 <- function(events, create_if_missing = FALSE, ptr = cur_evtlist, patient_id = i) {
+modify_event2 <- function(events, create_if_missing = FALSE, ptr, patient_id) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+  if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
   modify_event_cpp(ptr, patient_id, events, create_if_missing)
 }
 
@@ -875,7 +904,8 @@ modify_event2 <- function(events, create_if_missing = FALSE, ptr = cur_evtlist, 
 #'
 #' @return Logical, TRUE if the queue is empty, FALSE otherwise.
 #' @export
-queue_empty <- function(ptr = cur_evtlist) {
+queue_empty <- function(ptr) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   queue_empty_cpp(ptr)
 }
 
@@ -885,7 +915,8 @@ queue_empty <- function(ptr = cur_evtlist) {
 #'
 #' @return An integer indicating the number of events in the queue.
 #' @export
-queue_size <- function(ptr = cur_evtlist) {
+queue_size <- function(ptr) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   queue_size_cpp(ptr)
 }
 
@@ -897,10 +928,287 @@ queue_size <- function(ptr = cur_evtlist) {
 #'
 #' @return Logical, TRUE if the event exists for the patient, FALSE otherwise.
 #' @export
-has_event <- function(event_name, ptr = cur_evtlist, patient_id = i) {
+has_event <- function(event_name, ptr, patient_id) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+  if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
   has_event_cpp(ptr, patient_id, event_name)
 }
 
+
+#' Get a specific event time
+#'
+#' @param event_name The name of the event.
+#' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#' @param patient_id The patient ID. Defaults to `i`.
+#'
+#' @return Logical, TRUE if the event exists for the patient, FALSE otherwise.
+#' @export
+get_event <- function(event_name, ptr , patient_id ) {
+  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+  if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+  get_event_cpp(ptr, patient_id, event_name)
+}
+
+
+# discrete resource -------------------------------------------------------
+
+#' Create a Discrete Resource
+#' 
+#' Creates a discrete resource management system for discrete event simulations.
+#' This system manages a fixed number of identical resource units that can be
+#' blocked (used) by patients and maintains a priority queue for waiting patients.
+#' 
+#' @param n Integer. The total capacity of the resource (must be >= 1).
+#' 
+#' @return An environment with methods for resource management.
+#' 
+#' @details
+#' The returned environment has the following methods:
+#' \itemize{
+#'   \item \code{size()}: Returns the total capacity
+#'   \item \code{queue_size()}: Returns the number of patients in queue
+#'   \item \code{n_free()}: Returns the number of free resource units
+#'   \item \code{patients_using()}: Vector of patient IDs currently using the resource
+#'   \item \code{patients_using_times()}: Vector of start times for patients using the resource
+#'   \item \code{queue_start_times()}: Vector of queue start times parallel to queue order
+#'   \item \code{is_patient_in_queue(patient_id)}: Check if patient is in queue
+#'   \item \code{is_patient_using(patient_id)}: Check if patient is using resource
+#'   \item \code{attempt_block(patient_id, priority, start_time)}: Attempt to block a resource unit
+#'   \item \code{attempt_free(patient_id, remove_all)}: Free a resource unit
+#'   \item \code{attempt_free_if_using(patient_id, remove_all)}: Free only if patient is using
+#'   \item \code{next_patient_in_line(n)}: Get next n patients in queue
+#'   \item \code{modify_priority(patient_id, new_priority)}: Modify patient priority in queue
+#'   \item \code{add_resource(n)}: Add n resource units to total capacity
+#'   \item \code{remove_resource(n, current_time)}: Remove n resource units from total capacity
+#' }
+#' 
+#' @examples
+#' # Create a resource with 3 units
+#' beds <- resource_discrete(3)
+#' 
+#' # Check initial state
+#' beds$size()      # 3
+#' beds$n_free()    # 3
+#' beds$queue_size() # 0
+#' 
+#' # Block resources
+#' i <- 101; curtime <- 0.0
+#' beds$attempt_block()  # Uses i and curtime from environment
+#' 
+#' # Or explicitly
+#' beds$attempt_block(patient_id = 102, priority = 1, start_time = 1.0)
+#' 
+#' # Check patient status
+#' beds$is_patient_using(101)     # TRUE
+#' beds$is_patient_in_queue(102)  # FALSE
+#' 
+#' @export
+resource_discrete <- function(n) {
+  if (!is.numeric(n) || length(n) != 1 || n < 0 || n != as.integer(n)) {
+    stop("n must be a single integer >= 0")
+  }
+  
+  # Create the environment
+  env <- new.env()
+  
+  # Create the C++ object using XPtr
+  env$.ptr <- create_discrete_resource_cpp(as.integer(n))
+  
+  # Size method
+  env$size <- function() {
+    discrete_resource_size_cpp(env$.ptr)
+  }
+  
+  # Queue size method
+  env$queue_size <- function() {
+    discrete_resource_queue_size_cpp(env$.ptr)
+  }
+  
+  # Number of free resources method
+  env$n_free <- function() {
+    discrete_resource_n_free_cpp(env$.ptr)
+  }
+  
+  # Get patients using resource
+  env$patients_using <- function() {
+    discrete_resource_patients_using_cpp(env$.ptr)
+  }
+  
+  # Get start times of patients using resource
+  env$patients_using_times <- function() {
+    discrete_resource_patients_using_times_cpp(env$.ptr)
+  }
+  
+  # Get queue start times
+  env$queue_start_times <- function() {
+    discrete_resource_queue_start_times_cpp(env$.ptr)
+  }
+  
+  # Check if patient is in queue
+  env$is_patient_in_queue <- function(patient_id) {
+    if (!is.numeric(patient_id) || length(patient_id) != 1) {
+      stop("patient_id must be a single number")
+    }
+    discrete_resource_is_patient_in_queue_cpp(env$.ptr, as.integer(patient_id))
+  }
+  
+  # Check if patient is using resource
+  env$is_patient_using <- function(patient_id) {
+    if (!is.numeric(patient_id) || length(patient_id) != 1) {
+      stop("patient_id must be a single number")
+    }
+    discrete_resource_is_patient_using_cpp(env$.ptr, as.integer(patient_id))
+  }
+  
+  # Attempt to block a resource unit
+  env$attempt_block <- function(patient_id = NULL, priority = 1L, start_time = NULL) {
+    # Get patient_id from parent frame if not provided
+    if (is.null(patient_id)) {
+      patient_id <- tryCatch(
+        get("i", envir = parent.frame(), inherits = TRUE),
+        error = function(e) stop("patient_id not provided and 'i' not found in parent frame")
+      )
+    }
+    
+    # Get start_time from parent frame if not provided
+    if (is.null(start_time)) {
+      start_time <- tryCatch(
+        get("curtime", envir = parent.frame(), inherits = TRUE),
+        error = function(e) stop("start_time not provided and 'curtime' not found in parent frame")
+      )
+    }
+    
+    # Validate inputs
+    if (!is.numeric(patient_id) || length(patient_id) != 1) {
+      stop("patient_id must be a single number")
+    }
+    if (!is.numeric(priority) || length(priority) != 1) {
+      stop("priority must be a single number")
+    }
+    if (!is.numeric(start_time) || length(start_time) != 1) {
+      stop("start_time must be a single number")
+    }
+    
+    discrete_resource_attempt_block_cpp(env$.ptr, as.integer(patient_id), as.integer(priority), as.numeric(start_time))
+  }
+  
+  # Free a resource unit
+  env$attempt_free <- function(patient_id = NULL, remove_all = FALSE) {
+    # Get patient_id from parent frame if not provided
+    if (is.null(patient_id)) {
+      patient_id <- tryCatch(
+        get("i", envir = parent.frame(), inherits = TRUE),
+        error = function(e) stop("patient_id not provided and 'i' not found in parent frame")
+      )
+    }
+    
+    # Validate inputs
+    if (!is.numeric(patient_id) || length(patient_id) != 1) {
+      stop("patient_id must be a single number")
+    }
+    if (!is.logical(remove_all) || length(remove_all) != 1) {
+      stop("remove_all must be a single logical value")
+    }
+    
+    discrete_resource_attempt_free_cpp(env$.ptr, as.integer(patient_id), remove_all)
+    invisible(NULL)
+  }
+  
+  # Free a resource unit only if patient is using it
+  env$attempt_free_if_using <- function(patient_id = NULL, remove_all = FALSE) {
+    # Get patient_id from parent frame if not provided
+    if (is.null(patient_id)) {
+      patient_id <- tryCatch(
+        get("i", envir = parent.frame(), inherits = TRUE),
+        error = function(e) stop("patient_id not provided and 'i' not found in parent frame")
+      )
+    }
+    
+    # Validate inputs
+    if (!is.numeric(patient_id) || length(patient_id) != 1) {
+      stop("patient_id must be a single number")
+    }
+    if (!is.logical(remove_all) || length(remove_all) != 1) {
+      stop("remove_all must be a single logical value")
+    }
+    
+    discrete_resource_attempt_free_if_using_cpp(env$.ptr, as.integer(patient_id), remove_all)
+    invisible(NULL)
+  }
+  
+  # Get next patients in line
+  env$next_patient_in_line <- function(n = 1L) {
+    if (!is.numeric(n) || length(n) != 1 || n < 1) {
+      stop("n must be a single positive integer")
+    }
+    
+    discrete_resource_next_patient_in_line_cpp(env$.ptr, as.integer(n))
+  }
+  
+  # Modify priority of a patient in queue
+  env$modify_priority <- function(patient_id, new_priority) {
+    # Validate inputs
+    if (!is.numeric(patient_id) || length(patient_id) != 1) {
+      stop("patient_id must be a single number")
+    }
+    if (!is.numeric(new_priority) || length(new_priority) != 1) {
+      stop("new_priority must be a single number")
+    }
+    
+    discrete_resource_modify_priority_cpp(env$.ptr, as.integer(patient_id), as.integer(new_priority))
+    invisible(NULL)
+  }
+  
+  # Add resource units
+  env$add_resource <- function(n_to_add) {
+    if (!is.numeric(n_to_add) || length(n_to_add) != 1 || n_to_add < 1) {
+      stop("n_to_add must be a single positive integer")
+    }
+    
+    discrete_resource_add_resource_cpp(env$.ptr, as.integer(n_to_add))
+    invisible(NULL)
+  }
+  
+  # Remove resource units
+  env$remove_resource <- function(n_to_remove, current_time = NULL) {
+    # Get current_time from parent frame if not provided
+    if (is.null(current_time)) {
+      current_time <- tryCatch(
+        get("curtime", envir = parent.frame(), inherits = TRUE),
+        error = function(e) stop("current_time not provided and 'curtime' not found in parent frame")
+      )
+    }
+    
+    if (!is.numeric(n_to_remove) || length(n_to_remove) != 1 || n_to_remove < 1) {
+      stop("n_to_remove must be a single positive integer")
+    }
+    
+    if (!is.numeric(current_time) || length(current_time) != 1) {
+      stop("current_time must be a single number")
+    }
+    
+    discrete_resource_remove_resource_cpp(env$.ptr, as.integer(n_to_remove), as.numeric(current_time))
+    invisible(NULL)
+  }
+  
+  # Set class
+  class(env) <- "resource_discrete"
+  
+  return(env)
+}
+
+#' Print method for resource_discrete
+#' @param x A resource_discrete object
+#' @param ... Additional arguments (ignored)
+#' @export
+print.resource_discrete <- function(x, ...) {
+  cat("Discrete Resource:\n")
+  cat("  Total capacity:", x$size(), "\n")
+  cat("  Free units:", x$n_free(), "\n")
+  cat("  Queue size:", x$queue_size(), "\n")
+  cat("  Patients using:", length(x$patients_using()), "\n")
+  invisible(x)
+}
 
 # Add_reactevt -------------------------------------------------------------------------------------------------------------------------------------------
 
