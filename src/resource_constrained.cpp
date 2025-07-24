@@ -4,20 +4,21 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <algorithm>
+#include <cstdint>
 
 using namespace Rcpp;
 
-// Structure to hold patient information in queue
+// Structure to hold patient information in queue with version tracking
 struct QueuedPatient {
   int patient_id;
   int priority;
   int insertion_order;
   double queue_start_time;
-  bool is_valid;  // For lazy deletion
+  uint64_t version;  // Version number for lazy deletion
   
-  QueuedPatient(int id, int prio, int order, double start_time) : 
+  QueuedPatient(int id, int prio, int order, double start_time, uint64_t ver) : 
     patient_id(id), priority(prio), insertion_order(order), 
-    queue_start_time(start_time), is_valid(true) {}
+    queue_start_time(start_time), version(ver) {}
 };
 
 // Comparator for priority queue (higher priority first, then FIFO for same priority)
@@ -46,21 +47,25 @@ private:
   int total_entries_ever_added;
   int current_valid_entries;
   int operations_since_cleanup;
+  uint64_t next_version;
   
   std::vector<UsingPatient> patients_using;
   std::priority_queue<QueuedPatient, std::vector<QueuedPatient>, QueueComparator> patient_queue;
   
   std::unordered_map<int, int> patient_queue_count;
   std::unordered_map<int, std::vector<double>> patient_queue_start_times;
+  std::unordered_map<int, uint64_t> patient_current_version;
   
   static const int MAX_QUEUE_ENTRIES_PER_PATIENT = 1000;
   static const int CLEANUP_FREQUENCY = 10000;
   
+  bool is_entry_valid(const QueuedPatient& entry) const {
+    auto it = patient_current_version.find(entry.patient_id);
+    return (it != patient_current_version.end()) && (entry.version == it->second);
+  }
+  
   void cleanup_queue_top() {
-    while (!patient_queue.empty() && 
-           (!patient_queue.top().is_valid || 
-           patient_queue_count.find(patient_queue.top().patient_id) == patient_queue_count.end() ||
-           patient_queue_count[patient_queue.top().patient_id] == 0)) {
+    while (!patient_queue.empty() && !is_entry_valid(patient_queue.top())) {
       patient_queue.pop();
     }
   }
@@ -72,9 +77,7 @@ private:
       QueuedPatient patient = patient_queue.top();
       patient_queue.pop();
       
-      if (patient_queue_count.find(patient.patient_id) != patient_queue_count.end() &&
-          patient_queue_count[patient.patient_id] > 0) {
-        patient.is_valid = true;
+      if (is_entry_valid(patient)) {
         valid_patients.push_back(patient);
       }
     }
@@ -107,7 +110,8 @@ public:
   current_max_priority(1),
   total_entries_ever_added(0),
   current_valid_entries(0),
-  operations_since_cleanup(0) {
+  operations_since_cleanup(0),
+  next_version(1) {
     if (n < 0) {
       stop("Resource capacity must be >= 0");
     }
@@ -139,8 +143,7 @@ public:
   }
   
   bool is_patient_in_queue(int patient_id) const {
-    return patient_queue_count.find(patient_id) != patient_queue_count.end() &&
-      patient_queue_count.at(patient_id) > 0;
+    return patient_current_version.find(patient_id) != patient_current_version.end();
   }
   
   bool is_patient_using(int patient_id) const {
@@ -166,9 +169,7 @@ public:
       
       if (!patient_queue.empty()) {
         QueuedPatient next_in_line = patient_queue.top();
-        if (next_in_line.patient_id == patient_id && 
-            patient_queue_count.find(patient_id) != patient_queue_count.end() &&
-            patient_queue_count[patient_id] > 0) {
+        if (next_in_line.patient_id == patient_id && is_entry_valid(next_in_line)) {
           
           patient_queue.pop();
           patients_using.emplace_back(patient_id, start_time);
@@ -177,6 +178,7 @@ public:
           if (patient_queue_count[patient_id] == 0) {
             patient_queue_count.erase(patient_id);
             patient_queue_start_times.erase(patient_id);
+            patient_current_version.erase(patient_id);
           } else {
             patient_queue_start_times[patient_id].erase(patient_queue_start_times[patient_id].begin());
           }
@@ -187,12 +189,17 @@ public:
       }
     }
     
-    patient_queue.emplace(patient_id, priority, next_insertion_order++, start_time);
-    
-    if (patient_queue_count.find(patient_id) == patient_queue_count.end()) {
+    uint64_t patient_version;
+    if (patient_current_version.find(patient_id) == patient_current_version.end()) {
+      patient_version = next_version++;
+      patient_current_version[patient_id] = patient_version;
       patient_queue_count[patient_id] = 0;
       patient_queue_start_times[patient_id].reserve(10);
+    } else {
+      patient_version = patient_current_version[patient_id];
     }
+    
+    patient_queue.emplace(patient_id, priority, next_insertion_order++, start_time, patient_version);
     
     patient_queue_count[patient_id]++;
     patient_queue_start_times[patient_id].push_back(start_time);
@@ -247,6 +254,7 @@ public:
       if (patient_queue_count[patient_id] == 0) {
         patient_queue_count.erase(patient_id);
         patient_queue_start_times.erase(patient_id);
+        patient_current_version.erase(patient_id);
       }
       
       check_and_cleanup();
@@ -276,7 +284,9 @@ public:
     std::vector<int> result;
     std::priority_queue<QueuedPatient, std::vector<QueuedPatient>, QueueComparator> temp_queue;
     
-    int items_to_check = std::min(n * 2, static_cast<int>(patient_queue.size()));
+    int items_to_check = std::min(n * 10, static_cast<int>(patient_queue.size()));
+    if (items_to_check < 50) items_to_check = std::min(50, static_cast<int>(patient_queue.size()));
+    
     std::priority_queue<QueuedPatient, std::vector<QueuedPatient>, QueueComparator> original_queue = patient_queue;
     
     for (int i = 0; i < items_to_check && !original_queue.empty(); ++i) {
@@ -285,13 +295,63 @@ public:
     }
     
     int count = std::min(n, current_valid_entries);
-    while (static_cast<int>(result.size()) < count && !temp_queue.empty()) {
+    int checked = 0;
+    const int max_check = static_cast<int>(patient_queue.size());
+    
+    while (static_cast<int>(result.size()) < count && !temp_queue.empty() && checked < max_check) {
       QueuedPatient patient = temp_queue.top();
       temp_queue.pop();
+      checked++;
       
-      if (patient_queue_count.find(patient.patient_id) != patient_queue_count.end() &&
-          patient_queue_count.at(patient.patient_id) > 0) {
+      if (is_entry_valid(patient)) {
         result.push_back(patient.patient_id);
+      }
+      
+      if (temp_queue.empty() && static_cast<int>(result.size()) < count && !original_queue.empty()) {
+        int additional_items = std::min(50, static_cast<int>(original_queue.size()));
+        for (int i = 0; i < additional_items && !original_queue.empty(); ++i) {
+          temp_queue.push(original_queue.top());
+          original_queue.pop();
+        }
+      }
+    }
+    
+    return result;
+  }
+  
+  std::vector<int> queue_priorities() {
+    std::vector<int> result;
+    std::priority_queue<QueuedPatient, std::vector<QueuedPatient>, QueueComparator> temp_queue;
+    
+    int items_to_check = std::min(current_valid_entries * 10, static_cast<int>(patient_queue.size()));
+    if (items_to_check < 50) items_to_check = std::min(50, static_cast<int>(patient_queue.size()));
+    
+    std::priority_queue<QueuedPatient, std::vector<QueuedPatient>, QueueComparator> original_queue = patient_queue;
+    
+    for (int i = 0; i < items_to_check && !original_queue.empty(); ++i) {
+      temp_queue.push(original_queue.top());
+      original_queue.pop();
+    }
+    
+    int count = std::min(current_valid_entries, current_valid_entries);
+    int checked = 0;
+    const int max_check = static_cast<int>(patient_queue.size());
+    
+    while (static_cast<int>(result.size()) < count && !temp_queue.empty() && checked < max_check) {
+      QueuedPatient patient = temp_queue.top();
+      temp_queue.pop();
+      checked++;
+      
+      if (is_entry_valid(patient)) {
+        result.push_back(patient.priority);
+      }
+      
+      if (temp_queue.empty() && static_cast<int>(result.size()) < count && !original_queue.empty()) {
+        int additional_items = std::min(50, static_cast<int>(original_queue.size()));
+        for (int i = 0; i < additional_items && !original_queue.empty(); ++i) {
+          temp_queue.push(original_queue.top());
+          original_queue.pop();
+        }
       }
     }
     
@@ -300,22 +360,32 @@ public:
   
   std::vector<double> queue_start_times() {
     std::vector<double> result;
-    result.reserve(current_valid_entries);
+    std::priority_queue<QueuedPatient, std::vector<QueuedPatient>, QueueComparator> temp_queue;
+    std::priority_queue<QueuedPatient, std::vector<QueuedPatient>, QueueComparator> original_queue = patient_queue;
     
-    std::vector<int> patient_ids = next_patient_in_line(current_valid_entries);
+    int items_to_check = std::min(current_valid_entries * 2, static_cast<int>(patient_queue.size()));
+    for (int i = 0; i < items_to_check && !original_queue.empty(); ++i) {
+      temp_queue.push(original_queue.top());
+      original_queue.pop();
+    }
     
     std::unordered_map<int, int> patient_index;
     
-    for (int patient_id : patient_ids) {
-      int& index = patient_index[patient_id];
+    while (static_cast<int>(result.size()) < current_valid_entries && !temp_queue.empty()) {
+      QueuedPatient patient = temp_queue.top();
+      temp_queue.pop();
       
-      if (patient_queue_start_times.find(patient_id) != patient_queue_start_times.end() &&
-          index < static_cast<int>(patient_queue_start_times.at(patient_id).size())) {
-        result.push_back(patient_queue_start_times.at(patient_id)[index]);
-      } else {
-        result.push_back(0.0);
+      if (is_entry_valid(patient)) {
+        int& index = patient_index[patient.patient_id];
+        
+        if (patient_queue_start_times.find(patient.patient_id) != patient_queue_start_times.end() &&
+            index < static_cast<int>(patient_queue_start_times.at(patient.patient_id).size())) {
+          result.push_back(patient_queue_start_times.at(patient.patient_id)[index]);
+        } else {
+          result.push_back(patient.queue_start_time);
+        }
+        index++;
       }
-      index++;
     }
     
     return result;
@@ -330,8 +400,11 @@ public:
     int count = patient_queue_count[patient_id];
     std::vector<double> start_times = patient_queue_start_times[patient_id];
     
+    patient_current_version[patient_id] = next_version++;
+    uint64_t new_version = patient_current_version[patient_id];
+    
     for (int i = 0; i < count; ++i) {
-      patient_queue.emplace(patient_id, new_priority, next_insertion_order++, start_times[i]);
+      patient_queue.emplace(patient_id, new_priority, next_insertion_order++, start_times[i], new_version);
       total_entries_ever_added++;
     }
     
@@ -363,12 +436,15 @@ public:
       int new_priority = current_max_priority + 1;
       current_max_priority = new_priority;
       
-      patient_queue.emplace(patient.patient_id, new_priority, next_insertion_order++, current_time);
+      patient_current_version[patient.patient_id] = next_version++;
+      uint64_t patient_version = patient_current_version[patient.patient_id];
       
       if (patient_queue_count.find(patient.patient_id) == patient_queue_count.end()) {
         patient_queue_count[patient.patient_id] = 0;
         patient_queue_start_times[patient.patient_id].reserve(10);
       }
+      
+      patient_queue.emplace(patient.patient_id, new_priority, next_insertion_order++, current_time, patient_version);
       
       patient_queue_count[patient.patient_id]++;
       patient_queue_start_times[patient.patient_id].push_back(current_time);
@@ -473,6 +549,14 @@ IntegerVector discrete_resource_next_patient_in_line_cpp(SEXP xptr, int n = 1) {
   XPtr<DiscreteResource> ptr(xptr);
   std::vector<int> patients = ptr->next_patient_in_line(n);
   return wrap(patients);
+}
+
+// [[Rcpp::export]]
+IntegerVector discrete_resource_queue_priorities_cpp(SEXP xptr) {
+  validate_xptr(xptr);
+  XPtr<DiscreteResource> ptr(xptr);
+  std::vector<int> priorities = ptr->queue_priorities();
+  return wrap(priorities);
 }
 
 // [[Rcpp::export]]

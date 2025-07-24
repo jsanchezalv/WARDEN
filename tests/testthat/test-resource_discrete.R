@@ -10,8 +10,9 @@ test_that("basic functionality works correctly", {
   expect_equal(beds$n_free(), 3)
   expect_equal(beds$queue_size(), 0)
   expect_equal(length(beds$patients_using()), 0)
-})
   # Test Empty Resource (n=0)
+  
+})
   test_that("empty resource (n=0) works correctly", {
     empty_beds <- resource_discrete(0)
     
@@ -336,18 +337,42 @@ test_that("default parameter behavior works correctly", {
 test_that("missing default variables throw appropriate errors", {
   beds <- resource_discrete(2)
   
-  # Remove any existing i or curtime variables
-  if (exists("i")) rm(i)
-  if (exists("curtime")) rm(curtime)
+  # Create helper functions that run in clean environments
+  test_missing_i <- function() {
+    # This function has no 'i' or 'curtime' variables
+    beds$attempt_block()
+  }
   
-  # Should throw error when i is missing
-  expect_error(beds$attempt_block(), "'i' not found in parent frame")
-  expect_error(beds$attempt_free(), "'i' not found in parent frame")
-  expect_error(beds$attempt_free_if_using(), "'i' not found in parent frame")
+  test_missing_curtime <- function() {
+    # This function has 'i' but no 'curtime'
+    i <- 101
+    beds$attempt_block()
+  }
   
-  # Should throw error when curtime is missing
-  expect_error(beds$attempt_block(patient_id = 101), "'curtime' not found in parent frame")
-  expect_error(beds$remove_resource(1), "'curtime' not found in parent frame")
+  test_missing_curtime_remove <- function() {
+    # This function has no 'curtime' for remove_resource
+    beds$remove_resource(1)
+  }
+  
+  # Test when i is missing
+  expect_error(test_missing_i())
+  
+  # Test when curtime is missing (but i exists)
+  expect_error(test_missing_curtime(), "'curtime' not found in parent frame")
+  expect_error(test_missing_curtime_remove(), "'curtime' not found in parent frame")
+  
+  # Test other functions that need 'i'
+  test_missing_i_free <- function() {
+    if(exists("i")){rm(i)}
+    beds$attempt_free()
+  }
+  
+  test_missing_i_free_if_using <- function() {
+    beds$attempt_free_if_using()
+  }
+  
+  expect_error(test_missing_i_free(), "patient_id not provided and 'i' not found in parent frame")
+  expect_error(test_missing_i_free_if_using(), "patient_id not provided and 'i' not found in parent frame")
 })
 
 # Test Lazy Deletion Cleanup

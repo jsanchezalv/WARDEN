@@ -480,6 +480,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// discrete_resource_queue_priorities_cpp
+IntegerVector discrete_resource_queue_priorities_cpp(SEXP xptr);
+RcppExport SEXP _WARDEN_discrete_resource_queue_priorities_cpp(SEXP xptrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xptr(xptrSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_queue_priorities_cpp(xptr));
+    return rcpp_result_gen;
+END_RCPP
+}
 // discrete_resource_queue_start_times_cpp
 NumericVector discrete_resource_queue_start_times_cpp(SEXP xptr);
 RcppExport SEXP _WARDEN_discrete_resource_queue_start_times_cpp(SEXP xptrSEXP) {
@@ -565,6 +576,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_discrete_resource_attempt_free_cpp", (DL_FUNC) &_WARDEN_discrete_resource_attempt_free_cpp, 3},
     {"_WARDEN_discrete_resource_attempt_free_if_using_cpp", (DL_FUNC) &_WARDEN_discrete_resource_attempt_free_if_using_cpp, 3},
     {"_WARDEN_discrete_resource_next_patient_in_line_cpp", (DL_FUNC) &_WARDEN_discrete_resource_next_patient_in_line_cpp, 2},
+    {"_WARDEN_discrete_resource_queue_priorities_cpp", (DL_FUNC) &_WARDEN_discrete_resource_queue_priorities_cpp, 1},
     {"_WARDEN_discrete_resource_queue_start_times_cpp", (DL_FUNC) &_WARDEN_discrete_resource_queue_start_times_cpp, 1},
     {"_WARDEN_discrete_resource_modify_priority_cpp", (DL_FUNC) &_WARDEN_discrete_resource_modify_priority_cpp, 3},
     {"_WARDEN_discrete_resource_add_resource_cpp", (DL_FUNC) &_WARDEN_discrete_resource_add_resource_cpp, 2},

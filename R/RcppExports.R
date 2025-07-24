@@ -554,6 +554,10 @@ discrete_resource_next_patient_in_line_cpp <- function(xptr, n = 1L) {
     .Call(`_WARDEN_discrete_resource_next_patient_in_line_cpp`, xptr, n)
 }
 
+discrete_resource_queue_priorities_cpp <- function(xptr) {
+    .Call(`_WARDEN_discrete_resource_queue_priorities_cpp`, xptr)
+}
+
 discrete_resource_queue_start_times_cpp <- function(xptr) {
     .Call(`_WARDEN_discrete_resource_queue_start_times_cpp`, xptr)
 }

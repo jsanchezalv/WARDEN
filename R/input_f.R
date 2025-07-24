@@ -971,6 +971,8 @@ get_event <- function(event_name, ptr , patient_id ) {
 #'   \item \code{patients_using()}: Vector of patient IDs currently using the resource
 #'   \item \code{patients_using_times()}: Vector of start times for patients using the resource
 #'   \item \code{queue_start_times()}: Vector of queue start times parallel to queue order
+#'   \item \code{queue_priorities()}: Vector of priorities parallel to queue order
+#'   \item \code{queue_info(n)}: Data.frame with patient_id, priority, start_time for queue
 #'   \item \code{is_patient_in_queue(patient_id)}: Check if patient is in queue
 #'   \item \code{is_patient_using(patient_id)}: Check if patient is using resource
 #'   \item \code{attempt_block(patient_id, priority, start_time)}: Attempt to block a resource unit
@@ -1042,6 +1044,28 @@ resource_discrete <- function(n) {
   # Get queue start times
   env$queue_start_times <- function() {
     discrete_resource_queue_start_times_cpp(env$.ptr)
+  }
+  
+  # Get queue priorities
+  env$queue_priorities <- function() {
+    discrete_resource_queue_priorities_cpp(env$.ptr)
+  }
+  
+  # Get full queue information as data.frame
+  env$queue_info <- function(n = NULL) {
+    if (is.null(n)) n <- env$queue_size()
+    if (n <= 0) return(data.frame(patient_id = integer(0), priority = integer(0), start_time = numeric(0)))
+    
+    patient_ids <- env$next_patient_in_line(n)
+    priorities <- env$queue_priorities()[1:length(patient_ids)]
+    start_times <- env$queue_start_times()[1:length(patient_ids)]
+    
+    data.frame(
+      patient_id = patient_ids,
+      priority = priorities,
+      start_time = start_times,
+      stringsAsFactors = FALSE
+    )
   }
   
   # Check if patient is in queue
