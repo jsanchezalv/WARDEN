@@ -15,6 +15,7 @@ if(getRversion() >= "2.15.1") {
 #' @param common_all_inputs A list of inputs common across patients that do not change within a simulation
 #' @param common_pt_inputs A list of inputs that change across patients but are not affected by the intervention
 #' @param unique_pt_inputs A list of inputs that change across each intervention
+#' @param common_arm_inputs A list of inputs that change across arms but are constant within an arm (e.g. constrained resource, only useful if constrained = TRUE)
 #' @param init_event_list A list of initial events and event times. If no initial events are given, a "Start" event at time 0 is created automatically
 #' @param evt_react_list A list of event reactions
 #' @param util_ongoing_list Vector of QALY named variables that are accrued at an ongoing basis (discounted using drq)
@@ -34,6 +35,7 @@ if(getRversion() >= "2.15.1") {
 #' @param ncores The number of cores to use for parallel computing
 #' @param input_out A vector of variables to be returned in the output data frame
 #' @param ipd Integer taking value 0 if no IPD data returned, 1 for full IPD data returned, and 2 IPD data but aggregating events
+#' @param constrained Boolean, FALSE by default, which runs the simulation with patients not interacting with each other, TRUE if resources are shared within an arm (allows constrained resources)
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
 #' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. If TRUE, user must use `modify_item` and `modify_item_seq` or results will be incorrect.
@@ -168,6 +170,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                              common_all_inputs=NULL,
                              common_pt_inputs=NULL,
                              unique_pt_inputs=NULL,
+                             common_arm_inputs=NULL,
                              init_event_list = NULL,
                              evt_react_list = evt_react_list,
                              util_ongoing_list = NULL,
@@ -187,6 +190,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                              ncores=1,
                              input_out = character(),
                              ipd = 1,
+                             constrained = FALSE,
                              timed_freq = NULL,
                              debug = FALSE,
                              accum_backwards = FALSE,
@@ -208,6 +212,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     names(sensitivity_inputs),
     names(common_pt_inputs),
     names(unique_pt_inputs),
+    names(common_arm_inputs),
     names(arm_list),
     names(evt_react_list)
   )
@@ -261,6 +266,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   env_setup_sim <- is.language(common_all_inputs)
   env_setup_pt <- is.language(common_pt_inputs)
   env_setup_arm <- is.language(unique_pt_inputs)
+  env_setup_arm_common <- is.language(common_arm_inputs)
   
   output_sim <- list()
   
@@ -370,7 +376,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        env_setup_sens = env_setup_sens,
                        env_setup_sim = env_setup_sim,
                        env_setup_pt = env_setup_pt,
-                       env_setup_arm = env_setup_arm
+                       env_setup_arm = env_setup_arm,
+                       env_setup_arm_common = env_setup_arm_common
                       )
     
     if(is.null(seed)){
@@ -467,12 +474,24 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       if(is.null(input_list$drq)){input_list$drq <- 0.03}
       
       # Run engine ----------------------------------------------------------
-        final_output <- run_engine(arm_list=arm_list,
-                                        common_pt_inputs=common_pt_inputs,
-                                        unique_pt_inputs=unique_pt_inputs,
-                                        input_list = input_list,
-                                        pb = pb,
-                                        seed = seed)                    
+      final_output <- if(constrained){
+        run_engine_constrained(arm_list=arm_list,
+                               common_pt_inputs=common_pt_inputs,
+                               unique_pt_inputs=unique_pt_inputs,
+                               common_arm_inputs=common_arm_inputs,
+                               input_list = input_list,
+                               pb = pb,
+                               seed = seed)  
+      } else{
+        run_engine(arm_list=arm_list,
+                   common_pt_inputs=common_pt_inputs,
+                   unique_pt_inputs=unique_pt_inputs,
+                   common_arm_inputs = common_arm_inputs,
+                   input_list = input_list,
+                   pb = pb,
+                   seed = seed)   
+      }
+      
       
       if(!is.null(final_output$error_m)){
         if((n_sim > 1 | n_sensitivity > 1) & continue_on_error){

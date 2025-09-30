@@ -120,6 +120,38 @@ public:
     }
   }
   
+  // >>> Explicit deep copy <<<
+  DiscreteResource(const DiscreteResource& o)
+    : total_capacity(o.total_capacity),
+      next_insertion_order(o.next_insertion_order),
+      current_max_priority(o.current_max_priority),
+      total_entries_ever_added(o.total_entries_ever_added),
+      current_valid_entries(o.current_valid_entries),
+      operations_since_cleanup(o.operations_since_cleanup),
+      next_version(o.next_version),
+      patients_using(o.patients_using),
+      patient_queue(o.patient_queue), // std::priority_queue copies its container by value
+      patient_queue_count(o.patient_queue_count),
+      patient_queue_start_times(o.patient_queue_start_times),
+      patient_current_version(o.patient_current_version) {}
+  
+  DiscreteResource& operator=(const DiscreteResource& o) {
+    if (this == &o) return *this;
+    total_capacity = o.total_capacity;
+    next_insertion_order = o.next_insertion_order;
+    current_max_priority = o.current_max_priority;
+    total_entries_ever_added = o.total_entries_ever_added;
+    current_valid_entries = o.current_valid_entries;
+    operations_since_cleanup = o.operations_since_cleanup;
+    next_version = o.next_version;
+    patients_using = o.patients_using;
+    patient_queue = o.patient_queue;
+    patient_queue_count = o.patient_queue_count;
+    patient_queue_start_times = o.patient_queue_start_times;
+    patient_current_version = o.patient_current_version;
+    return *this;
+  }
+  
   int size() const { return total_capacity; }
   int queue_size() const { return current_valid_entries; }
   int n_free() const { return total_capacity - patients_using.size(); }
@@ -469,6 +501,15 @@ void validate_xptr(SEXP xptr) {
   if (TYPEOF(xptr) != EXTPTRSXP) {
     stop("Invalid external pointer");
   }
+}
+
+// [[Rcpp::export]]
+SEXP clone_discrete_resource_cpp(SEXP xp) {
+  if (TYPEOF(xp) != EXTPTRSXP || R_ExternalPtrAddr(xp) == nullptr)
+    Rcpp::stop("Invalid external pointer");
+  Rcpp::XPtr<DiscreteResource> p(xp);
+  Rcpp::XPtr<DiscreteResource> q(new DiscreteResource(*p), true);
+  return q;
 }
 
 // [[Rcpp::export]]

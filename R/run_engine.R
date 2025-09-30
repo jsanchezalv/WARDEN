@@ -21,6 +21,7 @@
 run_engine <- function(arm_list,
                             common_pt_inputs=NULL,
                             unique_pt_inputs=NULL,
+                            common_arm_inputs = NULL,
                             input_list = NULL,
                             pb = pb,
                             seed = seed){
@@ -35,6 +36,7 @@ run_engine <- function(arm_list,
   psa_bool <- input_list$psa_bool
   env_setup_pt <- input_list$env_setup_pt
   env_setup_arm <- input_list$env_setup_arm
+  env_setup_arm_common <- input_list$env_setup_arm_common
   
 
   #1 Loop per patient ----------------------------------------------------------
@@ -90,14 +92,41 @@ run_engine <- function(arm_list,
     
     for (arm in arm_list) {
       
+      #Extract the inputs that are unique for each patient-intervention
+      input_list_arm <- rlang::env_clone(input_list_pt , parent.env(input_list_pt))
+      input_list_arm$arm <- arm
+      
+      #Common arm inputs
+      set.seed((simulation * 1007 + which(arm==arm_list)) * seed)
+      # Load common arm inputs if they exist
+      if (!is.null(common_arm_inputs)) {
+        if (env_setup_arm_common) {
+          load_inputs2(inputs = input_list_arm, list_uneval_inputs = common_arm_inputs)
+        } else {
+          input_list_arm <- as.environment(
+            load_inputs(inputs = as.list(input_list_arm),
+                        list_uneval_inputs = common_arm_inputs)
+          )
+          parent.env(input_list_arm) <- parent.env(input_list_arm)
+        }
+        
+        if (input_list$debug) {
+          dump_info <- debug_inputs(input_list_arm, input_list_arm)
+          names(dump_info) <- paste0("Analysis: ", input_list_arm$sens, " ", input_list_arm$sens_name_used,
+                                     "; Sim: ", input_list_arm$simulation,
+                                     "; Arm: ", input_list_arm$arm,
+                                     "; Initial Arm Conditions")
+          temp_log_pt <- c(temp_log_pt, dump_info)
+        }
+      }
+      
+      #Unique patient-arm inputs
       set.seed(seed*(simulation*1007 + i*53 + which(arm==arm_list)))
       # set.seed(seed*(simulation*1007 + i*191))
       # Initialize values to prevent errors
       output_list <- list(curtime = 0)
       
-      #Extract the inputs that are unique for each patient-intervention
-      input_list_arm <- rlang::env_clone(input_list_pt , parent.env(input_list_pt))
-      input_list_arm$arm <- arm
+
       
       if(!is.null(unique_pt_inputs)){
         

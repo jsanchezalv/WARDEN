@@ -510,6 +510,10 @@ create_discrete_resource_cpp <- function(n) {
     .Call(`_WARDEN_create_discrete_resource_cpp`, n)
 }
 
+clone_discrete_resource_cpp <- function(xp) {
+    .Call(`_WARDEN_clone_discrete_resource_cpp`, xp)
+}
+
 discrete_resource_size_cpp <- function(xptr) {
     .Call(`_WARDEN_discrete_resource_size_cpp`, xptr)
 }

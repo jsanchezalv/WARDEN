@@ -49,27 +49,13 @@
 run_engine_constrained <- function(arm_list,
                                    common_pt_inputs = NULL,
                                    unique_pt_inputs = NULL,
+                                   common_arm_inputs = NULL,
                                    input_list = NULL,
                                    pb = pb,
                                    seed = seed) {
   
   # Helper function for safe value retrieval
   `%||%` <- function(x, y) if (is.null(x)) y else x
-  
-  # Validate inputs
-  if (is.null(arm_list) || length(arm_list) == 0) {
-    stop("arm_list cannot be NULL or empty")
-  }
-  if (is.null(input_list)) {
-    stop("input_list cannot be NULL")
-  }
-  if (is.null(input_list$npats) || input_list$npats <= 0) {
-    stop("npats must be a positive integer")
-  }
-  if (is.null(seed)) {
-    warning("seed is NULL, setting to 1")
-    seed <- 1
-  }
   
   # Initial set-up --------------------------
   arm_list <- arm_list
@@ -82,6 +68,7 @@ run_engine_constrained <- function(arm_list,
   psa_bool <- input_list$psa_bool
   env_setup_pt <- input_list$env_setup_pt
   env_setup_arm <- input_list$env_setup_arm
+  env_setup_arm_common <- input_list$env_setup_arm_common
   
   # Get priority order for event queue (from init_event_list)
   if (!is.null(input_list$init_event_list)) {
@@ -91,28 +78,48 @@ run_engine_constrained <- function(arm_list,
   }
   
   # Storage for patient data per arm
-  patdata <- vector("list", length = length(arm_list))
-  names(patdata) <- arm_list
+  patdata <- vector("list", length=npats) # empty list with npats elements
   
   temp_log_pt <- list()
   
   tryCatch({
-    
+
     # 1 Loop per arm ----------------------------------------------------------
     for (arm in arm_list) {
       
       # Clone simulation environment for this arm
-      input_list_arm_base <- rlang::env_clone(input_list, parent.env(input_list))
+      input_list_arm_base <- rlang::env_clone(input_list, parent.env(input_list)) 
       input_list_arm_base$arm <- arm
       
+      set.seed((simulation * 1007 + which(arm==arm_list)) * seed)
+      # Load common arm inputs if they exist
+      if (!is.null(common_arm_inputs)) {
+        if (env_setup_arm_common) {
+          load_inputs2(inputs = input_list_arm_base, list_uneval_inputs = common_arm_inputs)
+        } else {
+          input_list_arm_base <- as.environment(
+            load_inputs(inputs = as.list(input_list_arm_base),
+                        list_uneval_inputs = common_arm_inputs)
+          )
+          parent.env(input_list_arm_base) <- parent.env(input_list_arm_base)
+        }
+        
+        if (input_list$debug) {
+          dump_info <- debug_inputs(input_list_arm_base, input_list_arm_base)
+          names(dump_info) <- paste0("Analysis: ", input_list_arm_base$sens, " ", input_list_arm_base$sens_name_used,
+                                     "; Sim: ", input_list_arm_base$simulation,
+                                     "; Arm: ", input_list_arm_base$arm,
+                                     "; Initial Arm Conditions")
+          temp_log_pt <- c(temp_log_pt, dump_info)
+        }
+      }
+
       # Create event queue for this arm
       event_queue <- queue_create(priority_order)
       
       # Storage for patient environments and data
-      patient_environments <- vector("list", length = npats)
       patient_arm_environments <- vector("list", length = npats)
-      arm_patdata <- vector("list", length = npats)
-      
+
       # 2 Load all patients for this arm and initialize events ---------------
       for (i in 1:npats) {
         set.seed((simulation * 1007 + i * 53) * seed)
@@ -143,14 +150,15 @@ run_engine_constrained <- function(arm_list,
             dump_info <- debug_inputs(input_list_arm_base, input_list_pt)
             names(dump_info) <- paste0("Analysis: ", input_list_pt$sens, " ", input_list_pt$sens_name_used,
                                        "; Sim: ", input_list_pt$simulation,
+                                       "; Arm: ", input_list_pt$arm,
                                        "; Patient: ", input_list_pt$i,
                                        "; Initial Patient Conditions")
             temp_log_pt <- c(temp_log_pt, dump_info)
           }
         }
         
-        # Store patient environment
-        patient_environments[[i]] <- input_list_pt
+        
+        set.seed(seed*(simulation*1007 + i*53 + which(arm==arm_list)))
         
         # Create patient-arm environment (child of patient environment)
         input_list_arm <- rlang::env_clone(input_list_pt, parent.env(input_list_pt))
@@ -171,14 +179,12 @@ run_engine_constrained <- function(arm_list,
             dump_info <- debug_inputs(input_list_pt, input_list_arm)
             names(dump_info) <- paste0("Analysis: ", input_list_arm$sens, " ", input_list_arm$sens_name_used,
                                        "; Sim: ", input_list_arm$simulation,
+                                       "; Arm: ", input_list_arm$arm,
                                        "; Patient: ", input_list_arm$i,
                                        "; Initial Patient-Arm Conditions")
             temp_log_pt <- c(temp_log_pt, dump_info)
           }
         }
-        
-        # Store patient-arm environment
-        patient_arm_environments[[i]] <- input_list_arm
         
         # Initialize events for this patient-arm
         set.seed(seed * (simulation * 1007 + i * 349))
@@ -220,13 +226,12 @@ run_engine_constrained <- function(arm_list,
         }
         
         # Initialize output list for this patient
-        output_list <- list(curtime = 0)
-        list2env(as.list(output_list), input_list_arm)
+        input_list_arm$curtime <- 0
         
         # Set up accumulators if using backwards accumulation
         if (input_list$accum_backwards) {
           input_list_arm$ongoing_inputs_lu <- paste0(input_list_arm$uc_lists$ongoing_inputs, "_lastupdate", recycle0 = TRUE)
-          input_out_v <- c(input_list_arm$input_out, input_list_arm$ongoing_inputs_lu)
+          inputs_out_v <- c(input_list_arm$input_out, input_list_arm$ongoing_inputs_lu)
           
           # Initialize ongoing_list_temp for backwards accumulation
           if (!is.null(input_list_arm$uc_lists$ongoing_inputs)) {
@@ -236,11 +241,13 @@ run_engine_constrained <- function(arm_list,
             )
           }
         } else {
-          input_out_v <- c(input_list_arm$input_out)
+          inputs_out_v <- c(input_list_arm$input_out)
         }
         
-        # Initialize patient data storage
-        arm_patdata[[i]] <- list(evtlist = NULL)
+        input_list_arm$n_evt <- 0
+        # Store patient-arm environment
+        patient_arm_environments[[i]] <- input_list_arm
+        
       }
       
       # 3 Process all events for this arm in chronological order -------------
@@ -249,6 +256,9 @@ run_engine_constrained <- function(arm_list,
       
       # Process events while queue is not empty
       while (!queue_empty(event_queue)) {
+        if(is.infinite(next_event(1,event_queue)$time)){
+          break
+        }
         # Get next event
         next_evt <- pop_and_return_event(event_queue)
         current_patient_id <- next_evt$patient_id
@@ -257,92 +267,60 @@ run_engine_constrained <- function(arm_list,
         
         # Get the appropriate patient-arm environment
         input_list_arm <- patient_arm_environments[[current_patient_id]]
-        
+
         # Calculate prevtime correctly (current curtime becomes prevtime)
         current_prevtime <- input_list_arm$curtime %||% 0
+        if(is.infinite(current_prevtime)){next}
         
         # Update the event queue reference for new_event2, modify_event2, etc.
+        # Note that we are only assigning the pointer, so any changes to input_list_arm$cur_evtlist
+        # will equally affect event_queue
         assign("cur_evtlist", event_queue, envir = input_list_arm)
         
-        # Set current patient context for functions that need it
-        input_list_arm$i <- current_patient_id
+        input_list_arm$n_evt <- input_list_arm$n_evt + 1
         
-        n_evt <- n_evt + 1
+        input_list_arm <- react_evt(list(evt = current_event,
+                                         curtime = current_prevtime,
+                                         evttime = current_time),
+                                    arm,
+                                    input_list_arm)
         
-        # Execute event using the proper eval_evts function which handles all setup
-        if (!is.null(input_list_arm$evt_react_list) && 
-            current_event %in% names(input_list_arm$evt_react_list)) {
-          # Use eval_evts which handles context setup, resets, and calls eval_reactevt
-          input_list_arm <- eval_evts(
-            curtime = current_time,
-            evt = current_event, 
-            prevtime = current_prevtime,
-            arm = arm,
-            input_list_arm = input_list_arm
-          )
-        } else {
-          # No reaction defined, but still need to update context variables
-          input_list_arm$curtime <- current_time
-          input_list_arm$evt <- current_event
-          input_list_arm$prevtime <- current_prevtime
-          input_list_arm$arm <- arm
+        
+        patient_arm_environments[[current_patient_id]] <-  input_list_arm 
+        
+        
+        #Get extra objects to be exported
+        if(is.null(inputs_out_v)){
+          extra_data <- list()
+        } else{
+          extra_data <-  mget(inputs_out_v, input_list_arm, ifnotfound = list(NA)) 
         }
+        extra_data <- extra_data[!is.na(extra_data)]
         
-        # Store event in patient's event list
-        if (is.null(arm_patdata[[current_patient_id]]$evtlist)) {
-          arm_patdata[[current_patient_id]]$evtlist <- list(
-            list(evttime = current_time, evt = current_event)
-          )
-        } else {
-          arm_patdata[[current_patient_id]]$evtlist <- c(
-            arm_patdata[[current_patient_id]]$evtlist,
-            list(list(evttime = current_time, evt = current_event))
-          )
-        }
+        
+        patdata[[current_patient_id]][[arm]]$evtlist[[input_list_arm$n_evt]] <- c(evtname = current_event ,
+                                                  evttime = current_time,
+                                                  pat_id = current_patient_id,
+                                                  arm = arm,
+                                                  extra_data
+        )
+        
+        temp_log <- c(temp_log,input_list_arm$log_list)
+        
       }
       
-      # 4 Collect outputs for this arm ----------------------------------------
-      for (i in 1:npats) {
-        input_list_arm <- patient_arm_environments[[i]]
-        
-        # Set final time and process final accumulations
-        input_list_arm$curtime <- ifelse(is.null(input_list_arm$Time_limit), 
-                                         input_list_arm$curtime, 
-                                         input_list_arm$Time_limit)
-        
-        # Process ongoing items for final accumulation
-        if (input_list$accum_backwards && exists("ongoing_list_temp", input_list_arm) &&
-            length(input_list_arm$ongoing_list_temp) > 0) {
-          ongoing_update_items <- names(input_list_arm$ongoing_list_temp)
-          if (length(ongoing_update_items) > 0) {
-            temp_update <- setNames(
-              rep(input_list_arm$curtime, length(ongoing_update_items)),
-              paste0(ongoing_update_items, "_lastupdate", recycle0 = TRUE)
-            )
-            list2env(as.list(temp_update), input_list_arm)
-          }
-        }
-        
-        # Collect final outputs
-        final_out_pt <- mget(input_out_v, input_list_arm, ifnotfound = list(NA))
-        final_out_pt <- final_out_pt[!is.na(final_out_pt)]
-        
-        # Store in patient data
-        arm_patdata[[i]] <- c(arm_patdata[[i]], final_out_pt)
-      }
+      temp_log_pt <- c(temp_log_pt,temp_log)
       
-      # Store arm data
-      patdata[[arm]] <- arm_patdata
     }
     
     # Return patdata in the same structure as run_engine
-    final_output <- patdata
+    final_output <- compute_outputs(patdata, input_list)
     
     # Add debugging information if enabled
-    if (input_list$debug) {
-      final_output$log_pt <- temp_log_pt
-      final_output$log <- temp_log
+    if(input_list$debug){
+      final_output$log_list <- input_list$temp_log_pt
     }
+    
     
     return(final_output)
     

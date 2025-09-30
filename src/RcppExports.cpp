@@ -351,6 +351,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// clone_discrete_resource_cpp
+SEXP clone_discrete_resource_cpp(SEXP xp);
+RcppExport SEXP _WARDEN_clone_discrete_resource_cpp(SEXP xpSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type xp(xpSEXP);
+    rcpp_result_gen = Rcpp::wrap(clone_discrete_resource_cpp(xp));
+    return rcpp_result_gen;
+END_RCPP
+}
 // discrete_resource_size_cpp
 int discrete_resource_size_cpp(SEXP xptr);
 RcppExport SEXP _WARDEN_discrete_resource_size_cpp(SEXP xptrSEXP) {
@@ -583,6 +594,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_has_event_cpp", (DL_FUNC) &_WARDEN_has_event_cpp, 3},
     {"_WARDEN_get_event_cpp", (DL_FUNC) &_WARDEN_get_event_cpp, 3},
     {"_WARDEN_create_discrete_resource_cpp", (DL_FUNC) &_WARDEN_create_discrete_resource_cpp, 1},
+    {"_WARDEN_clone_discrete_resource_cpp", (DL_FUNC) &_WARDEN_clone_discrete_resource_cpp, 1},
     {"_WARDEN_discrete_resource_size_cpp", (DL_FUNC) &_WARDEN_discrete_resource_size_cpp, 1},
     {"_WARDEN_discrete_resource_queue_size_cpp", (DL_FUNC) &_WARDEN_discrete_resource_queue_size_cpp, 1},
     {"_WARDEN_discrete_resource_n_free_cpp", (DL_FUNC) &_WARDEN_discrete_resource_n_free_cpp, 1},

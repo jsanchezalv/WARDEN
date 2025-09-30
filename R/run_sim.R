@@ -5,6 +5,7 @@
 #' @param common_all_inputs A list of inputs common across patients that do not change within a simulation
 #' @param common_pt_inputs A list of inputs that change across patients but are not affected by the intervention
 #' @param unique_pt_inputs A list of inputs that change across each intervention
+#' @param common_arm_inputs A list of inputs that change across arms but are constant within an arm (e.g. constrained resource, only useful if constrained = TRUE)
 #' @param init_event_list A list of initial events and event times. If no initial events are given, a "Start" event at time 0 is created automatically
 #' @param evt_react_list A list of event reactions
 #' @param util_ongoing_list Vector of QALY named variables that are accrued at an ongoing basis (discounted using drq)
@@ -154,6 +155,7 @@ run_sim <- function(arm_list=c("int","noint"),
                    common_all_inputs=NULL,
                    common_pt_inputs=NULL,
                    unique_pt_inputs=NULL,
+                   common_arm_inputs=NULL,
                    init_event_list = NULL,
                    evt_react_list = evt_react_list,
                    util_ongoing_list = NULL,
@@ -195,6 +197,7 @@ run_sim <- function(arm_list=c("int","noint"),
     names(sensitivity_inputs),
     names(common_pt_inputs),
     names(unique_pt_inputs),
+    names(common_arm_inputs),
     names(arm_list),
     names(evt_react_list)
   )
@@ -246,6 +249,7 @@ run_sim <- function(arm_list=c("int","noint"),
   env_setup_sim <- is.language(common_all_inputs)
   env_setup_pt <- is.language(common_pt_inputs)
   env_setup_arm <- is.language(unique_pt_inputs)
+  env_setup_arm_common <- is.language(common_arm_inputs)
   
   output_sim <- list()
   
@@ -358,7 +362,8 @@ run_sim <- function(arm_list=c("int","noint"),
                        env_setup_sens = env_setup_sens,
                        env_setup_sim = env_setup_sim,
                        env_setup_pt = env_setup_pt,
-                       env_setup_arm = env_setup_arm
+                       env_setup_arm = env_setup_arm,
+                       env_setup_arm_common = env_setup_arm_common
     )
     
     
@@ -450,6 +455,7 @@ run_sim <- function(arm_list=c("int","noint"),
           run_engine_constrained(arm_list=arm_list,
                      common_pt_inputs=common_pt_inputs,
                      unique_pt_inputs=unique_pt_inputs,
+                     common_arm_inputs=common_arm_inputs,
                      input_list = input_list,
                      pb = pb,
                      seed = seed)  
@@ -457,6 +463,7 @@ run_sim <- function(arm_list=c("int","noint"),
           run_engine(arm_list=arm_list,
                      common_pt_inputs=common_pt_inputs,
                      unique_pt_inputs=unique_pt_inputs,
+                     common_arm_inputs=common_arm_inputs,
                      input_list = input_list,
                      pb = pb,
                      seed = seed)   

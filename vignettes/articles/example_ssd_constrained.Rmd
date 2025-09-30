@@ -1,0 +1,401 @@
+---
+title: 'Example for a Resource Constrained Sick-Sicker-Dead model'
+author: "Javier Sanchez Alvarez"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    embed-resources: true
+    self-contained-math: true
+vignette: >
+  %\VignetteIndexEntry{example_ssd}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE
+)
+```
+
+# Introduction
+This document runs a discrete event simulation model in the context of a late oncology model to show how the functions can be used to generate a model in only a few steps. In this particular case, we document how to run a model with constrained resources.
+
+
+## Main options
+
+```{r setup}
+library(WARDEN)
+
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+library(purrr)
+
+```
+
+```{r main_opt, results='hide', message=FALSE}
+options(scipen = 999)
+options(digits=3)
+options(tibble.print_max = 50)
+```
+
+# General inputs with delayed execution
+Compared to the standard sick-sicker-death model vignette, here nothing changes, except that now we add a resource which will be constrained (in a discrete manner, i.e., it accepts an integer amount of units and the resource can only be used unit-wise, like hospital beds, or doctors).
+
+We should be careful about where we put the constrained resource, as the level at which we set it up will determine its availability to patients. Normally the intention is to have the resource being shared within an arm by patients (and cloned across arms to make sure we compare apples to apples), which means the resource should be allocated in `common_arm_inputs`. In our case, we call the resource `beds`, and we use `resource_discrete()` to set 650 beds to be shared. We also keep track of the number of beds free for the purpose of seeing it in the results.
+
+```{r input_delayed}
+#We don't need to use sensitivity_inputs here, so we don't add that object
+
+#Put objects here that do not change on any patient or intervention loop
+#We use add_item2 and add_item to showcase how the user can implement the inputs (either works, add_item2 is just faster)
+common_all_inputs <-add_item2(input = {
+                      util.sick   <- 0.8
+                      util.sicker <- 0.5
+                      cost.sick   <- 3000
+                      cost.sicker <- 7000
+                      cost.int    <- 1000
+                      coef_noint  <- log(0.2)
+                      HR_int      <- 0.8
+                      drc         <- 0.035 #different values than what's assumed by default
+                      drq         <- 0.035
+                      random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
+})  
+
+#Common within an arm
+common_arm_inputs <- add_item2(input ={
+                      beds <- resource_discrete(650)
+                      beds_free <- beds$n_free()
+})
+
+#Put objects here that do not change as we loop through treatments for a patient
+common_pt_inputs <- add_item(death= max(0.0000001,rnorm(n=1, mean=12, sd=3))) 
+
+#Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
+unique_pt_inputs <- add_item(fl.sick = 1,
+                             q_default = util.sick,
+                             c_default = cost.sick + if(arm=="int"){cost.int}else{0},
+                             success_blocking_bed <- FALSE,
+                             had_to_queue = 0,
+                             time_in_queue = NA,
+                             time_start_queue = NA) 
+
+```
+
+# Events
+## Add Initial Events
+Nothing changes here relative to the standard approach.
+
+```{r model_evts}
+init_event_list <- 
+  add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={
+    sick <- 0
+    sicker <- draw_tte(1,dist="exp", coef1=coef_noint, beta_tx = ifelse(arm=="int",HR_int,1), seed = random_seed_sicker_i[i]) #this way the value would be the same if it wasn't for the HR, effectively "cloning" patients luck
+    
+  })
+
+```
+
+## Add Reaction to Those Events
+We will assume that when the patients enter the sicker event, they attempt to use one of the beds. If they do so, everything goes as normal. If they fail to use one of the beds, the time to death is accelerated as they cannot get the right treatment.
+
+The discrete resources work similarly to R6 objects, i.e., we call functions from themselves (in this case, `beds$attempt_block()` as opposed to what would be a traditional approach `attempt_block(beds)`), and they automatically modify the `beds` object without needing to return anything. An advantage of using R6-like objects is that we can also make them return something to the user (as well as keep modifying themselves!). In this case, `attempt_block` will return `TRUE` or `FALSE` depending on the success or failure of using the resource.
+
+If the patient fails to block the bed, then the time to death is accelerated by a factor of 0.8. Note that if we are using the resource constrained approach, we need to use `modify_event2` instead of `modify_event` (and similarly, we would have `new_event2` instead of `new_event`. In this case, `modify_event2` is automatically sequential (so it works similarly to `modify_event_seq`). Note that because resources are shared, we can 1) know who the next patient in the queue is, and 2) create a new event for that specific patient, even if the current patient being evaluated is another.
+
+Once a patient reaches the sicker state (or dies), the resource is freed (if being used)/ the patient is removed from the queue (using attempt_free()) and we set the event time for the next patient in the queue to use.
+
+We are also tracking a few things just to keep track of them, like free beds count, time in a queue for patients who queued, and also whether the patient had to queue or not.
+
+```{r model_reaction}
+evt_react_list <-
+  add_reactevt(name_evt = "sick",
+               input = {
+                 beds_free <- beds$n_free()
+               }) %>%
+  add_reactevt(name_evt = "sicker",
+               input = {
+                 success_blocking_bed <- beds$attempt_block()
+                 beds_free <- beds$n_free()
+                 if(!success_blocking_bed){
+                   time_start_queue <- curtime
+                   modify_event2(c(death = max(curtime,get_event("death") * 0.8)))
+                   had_to_queue <- 1
+                 }else{
+                   time_in_queue <- ifelse(had_to_queue == 1, curtime - time_start_queue,NA)
+                 }
+                 q_default <- util.sicker
+                 c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
+                 fl.sick   <- 0 
+               }) %>%
+  add_reactevt(name_evt = "death",
+               input = {
+                 beds$attempt_free() #remove from using or from the queue
+                 if(success_blocking_bed & beds$queue_size() > 0){
+                    success_blocking_bed <- FALSE
+                    new_event2(c(sicker = curtime),
+                               cur_evtlist,
+                               patient_id = beds$next_patient_in_line())
+                 }
+                 time_in_queue <- NA
+                 beds_free <- beds$n_free()
+                 q_default <- 0
+                 c_default <- 0
+                 curtime   <- Inf
+               }) 
+
+
+```
+
+
+# Costs and Utilities
+
+
+## Utilities
+
+```{r utilities}
+
+util_ongoing <- "q_default"
+
+```
+## Costs
+
+```{r costs}
+
+cost_ongoing <- "c_default"
+
+```
+
+# Model
+## Model Execution
+The model is executed in exactly the same way as before, but we just need to add `constrained = TRUE` to the arguments of `run_sim`.
+
+```{r model_run}
+#Logic is: per patient, per intervention, per event, react to that event.
+results <- run_sim(  
+  npats=1000,                               # number of patients to be simulated
+  n_sim=1,                                  # number of simulations to run
+  psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
+  arm_list = c("int", "noint"),             # intervention list
+  common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
+  common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
+  unique_pt_inputs = unique_pt_inputs,
+  common_arm_inputs = common_arm_inputs, 
+  init_event_list = init_event_list,        # initial event list
+  evt_react_list = evt_react_list,          # reaction of events
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  constrained = TRUE,
+  ipd = 1,
+  input_out = c("beds_free","had_to_queue","time_in_queue")
+)
+```
+# Post-processing of Model Outputs
+## Summary of Results
+
+Once the model has been run, we can use the results and summarize them using the `summary_results_det` to print the results of the last simulation (if `nsim = 1`, it's the deterministic case), and `summary_results_sim` to show the PSA results (with the confidence intervals). We can also use the individual patient data generated by the simulation, which we collect here to plot in the `psa_ipd` object. 
+
+```{r post-processing_summary}
+
+
+summary_results_det(results[[1]][[1]]) #print first simulation
+
+psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
+
+psa_ipd[1:10,] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+```
+
+We can also check the evolution of the free beds over time per arm. As it can be seen, 650 beds is just enough for the `int` arm to handle all the requests, however in the `noint` arm there are a few patients which must queue for some time. Note that the same thing we do to see the number of free beds could be used to understand the % of patients that were able to use a bed, etc. WARDEN is flexible in that sense, one just needs to keep track of those numbers. For example, below we can see that around 15% of the `noint` patients had to queue at a certain point. We can also track things like queuing time, etc. In this case, for these 15% of patients, the average queuing time was around 9 months. 
+
+```{r post-processing_analysis,echo=FALSE, message=FALSE}
+
+ggplot(psa_ipd,aes(x=evttime,y=beds_free, col = arm)) +
+  geom_line()+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+ggplot(psa_ipd %>% group_by(arm,pat_id) %>% summarise(had_to_queue=factor(max(had_to_queue))),aes(x=arm, fill = had_to_queue)) +
+  geom_bar(position="fill")+
+    scale_y_continuous(labels = scales::percent) +
+  theme_bw()
+
+ggplot(psa_ipd %>% group_by(arm,pat_id) %>% summarise(time_in_queue=mean(time_in_queue,na.rm=TRUE)),
+       aes(x=time_in_queue, fill = arm)) +
+  geom_histogram()+
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+
+
+```
+
+# Sensitivity Analysis
+## Inputs
+```{r dsa_inputs}
+#Load some data
+list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
+                              base_value = list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
+                              DSA_min = list(0.6,0.3,1000,5000,800,log(0.1),0.5),
+                              DSA_max = list(0.9,0.7,5000,9000,2000,log(0.4),0.9),
+                              PSA_dist = list("rnorm","rbeta_mse","rgamma_mse","rgamma_mse","rgamma_mse","rnorm","rlnorm"),
+                              a=list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)),
+                              b=lapply(list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)), function(x) abs(x/5)),
+                              scenario_1=list(0.6,0.3,1000,5000,800,log(0.1),0.5),
+                              scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),0.9)
+                              )
+
+sensitivity_inputs <-add_item(
+            indicators = if(sensitivity_bool){ create_indicators(sens,n_sensitivity*length(sensitivity_names),rep(1,length(list_par[[1]])))}else{
+                                rep(1,length(list_par[[1]]))} #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max, if not sensitivity analysis, then we activate all of them, i.e., in a PSA)
+                              )
+
+common_all_inputs <-add_item() %>% 
+  add_item(
+            pick_val_v(base        = list_par[["base_value"]],
+                       psa         = pick_psa(list_par[["PSA_dist"]],rep(1,length(list_par[["PSA_dist"]])),list_par[["a"]],list_par[["b"]]),
+                       sens        = list_par[[sens_name_used]],
+                       psa_ind     = psa_bool,
+                       sens_ind    = sensitivity_bool,
+                       indicator   = indicators,
+                       names_out   = list_par[["parameter_name"]]
+                       )
+            ) %>%
+  add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE)) #we don't add this variable ot the sensitivity analysis
+
+```
+## Model Execution
+The model is executed as before, just adding the `sensitivity_inputs`, `sensitivity_names`, `sensitivity_bool` and `n_sensitivity` arguments. Note that the total number of sensitivity iterations is given not by n_sensitivity, but by n_sensitivity * length(sensitivity_names), so in this case it will be 2 x n_sensitivity, or 2 x 7 = 14. For two scenario analysis it would be 2 x 1 = 2, with the `indicators` variable defined in the previous section taking value 1 for all the variables altered in the scenario, and 0 otherwise.
+
+```{r run_dsa}
+results <- run_sim(  
+  npats=100,                               # number of patients to be simulated
+  n_sim=1,                                  # number of simulations to run
+  psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
+  arm_list = c("int", "noint"),             # intervention list
+  common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
+  common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
+  unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
+  common_arm_inputs = common_arm_inputs,     
+  init_event_list = init_event_list,        # initial event list
+  evt_react_list = evt_react_list,          # reaction of events
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  sensitivity_inputs = sensitivity_inputs,
+  sensitivity_names = c("DSA_min","DSA_max"),
+  sensitivity_bool = TRUE,
+  constrained = TRUE,
+  n_sensitivity = length(list_par[[1]]),
+  input_out = unlist(list_par[["parameter_name"]])
+)
+
+```
+
+## Check results
+We briefly check below that indeed the engine has been changing the corresponding parameter value.
+```{r dsa_check}
+
+data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
+
+#Check mean value across iterations as PSA is off
+data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
+
+```
+
+## Model Execution, probabilistic DSA
+The model is executed as before, just activating the psa_bool option
+
+```{r run_dsa_psa}
+results <- run_sim(  
+  npats=100,                               
+  n_sim=6,                                  
+  psa_bool = TRUE,                         
+  arm_list = c("int", "noint"),             
+  common_all_inputs = common_all_inputs,    
+  common_pt_inputs = common_pt_inputs,      
+  unique_pt_inputs = unique_pt_inputs,      
+  common_arm_inputs = common_arm_inputs,      
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,          
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  sensitivity_inputs = sensitivity_inputs,
+  sensitivity_names = c("DSA_min","DSA_max"),
+  sensitivity_bool = TRUE,
+  constrained = TRUE,
+  n_sensitivity = length(list_par[[1]]),
+  input_out = c(unlist(list_par[["parameter_name"]]), "beds_free")
+)
+
+```
+
+
+## Check results
+We briefly check below that indeed the engine has been changing the corresponding parameter value. As expected, `beds_free` is only affected by the `HR_int` and `coef_noint`, as those affect efficacy and therefore how beds are allocated.
+```{r dsa_check_psa}
+
+data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
+
+#Check mean value across iterations as PSA is off
+data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int", "beds_free"),mean)
+
+```
+## Model Execution, Simple PSA
+The model is executed as before, just activating the psa_bool option and deactivating the sensitivity_bool and removing sensitivity_names and setting n_sensitivity = 1
+
+```{r run_psa}
+common_arm_inputs <- add_item2(input ={
+                      beds <- resource_discrete(65)
+                      beds_free <- beds$n_free()
+})
+
+
+results <- run_sim(  
+  npats=100,                               
+  n_sim=10,                                  
+  psa_bool = TRUE,                         
+  arm_list = c("int", "noint"),             
+  common_all_inputs = common_all_inputs,    
+  common_pt_inputs = common_pt_inputs,      
+  unique_pt_inputs = unique_pt_inputs,      
+  common_arm_inputs = common_arm_inputs,      
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,          
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  sensitivity_inputs = sensitivity_inputs,
+  sensitivity_bool = FALSE,
+  constrained = TRUE,
+  n_sensitivity = 1,
+  input_out = c(unlist(list_par[["parameter_name"]]), "beds_free")
+)
+
+```
+
+## Check results
+We briefly check below that indeed the engine has been changing the corresponding parameter values, and see how the `free_beds` has been changing over time per simulation.
+```{r check_psa}
+
+data_simulation <- bind_rows(map_depth(results,2, "merged_df"))
+
+#Check mean value across iterations as PSA is off
+data_simulation %>% group_by(simulation) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int", "beds_free"),mean)
+
+ggplot(data_simulation,aes(x=evttime,y=beds_free, col = factor(simulation))) +
+  facet_wrap(arm~.) + 
+  geom_line()+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+```
