@@ -293,9 +293,9 @@ run_engine_constrained <- function(arm_list,
         if(is.null(inputs_out_v)){
           extra_data <- list()
         } else{
-          extra_data <-  mget(inputs_out_v, input_list_arm, ifnotfound = list(NA)) 
+          extra_data <-  mget(inputs_out_v, input_list_arm) 
         }
-        extra_data <- extra_data[!is.na(extra_data)]
+        extra_data <- extra_data[!vapply(extra_data, is.null, TRUE)]
         
         
         patdata[[current_patient_id]][[arm]]$evtlist[[input_list_arm$n_evt]] <- c(evtname = current_event ,
@@ -312,7 +312,6 @@ run_engine_constrained <- function(arm_list,
       temp_log_pt <- c(temp_log_pt,temp_log)
       
     }
-    
     # Return patdata in the same structure as run_engine
     final_output <- compute_outputs(patdata, input_list)
     
