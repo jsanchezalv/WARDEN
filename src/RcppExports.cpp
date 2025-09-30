@@ -537,6 +537,24 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// rpoisgamma_rcpp
+List rpoisgamma_rcpp(int n, double rate, Nullable<double> theta, double obs_time, Nullable<int> t_reps, Nullable<int> seed, bool return_ind_rate, bool return_df);
+RcppExport SEXP _WARDEN_rpoisgamma_rcpp(SEXP nSEXP, SEXP rateSEXP, SEXP thetaSEXP, SEXP obs_timeSEXP, SEXP t_repsSEXP, SEXP seedSEXP, SEXP return_ind_rateSEXP, SEXP return_dfSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
+    Rcpp::traits::input_parameter< Nullable<double> >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< double >::type obs_time(obs_timeSEXP);
+    Rcpp::traits::input_parameter< Nullable<int> >::type t_reps(t_repsSEXP);
+    Rcpp::traits::input_parameter< Nullable<int> >::type seed(seedSEXP);
+    Rcpp::traits::input_parameter< bool >::type return_ind_rate(return_ind_rateSEXP);
+    Rcpp::traits::input_parameter< bool >::type return_df(return_dfSEXP);
+    rcpp_result_gen = Rcpp::wrap(rpoisgamma_rcpp(n, rate, theta, obs_time, t_reps, seed, return_ind_rate, return_df));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_luck_adj", (DL_FUNC) &_WARDEN_luck_adj, 4},
@@ -581,6 +599,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_discrete_resource_modify_priority_cpp", (DL_FUNC) &_WARDEN_discrete_resource_modify_priority_cpp, 3},
     {"_WARDEN_discrete_resource_add_resource_cpp", (DL_FUNC) &_WARDEN_discrete_resource_add_resource_cpp, 2},
     {"_WARDEN_discrete_resource_remove_resource_cpp", (DL_FUNC) &_WARDEN_discrete_resource_remove_resource_cpp, 3},
+    {"_WARDEN_rpoisgamma_rcpp", (DL_FUNC) &_WARDEN_rpoisgamma_rcpp, 8},
     {NULL, NULL, 0}
 };
 

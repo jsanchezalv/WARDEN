@@ -1,3 +1,6 @@
+#The functions here are not worth to convert to C++ based on internal experiments
+#except for rpoisgamma, which was converted as rpoisgamma_rcpp, but given its complexity,
+#the R version is left as well (but it's 5-6x slower)
 
 # Global variables for CRAN check -----------------------------------------
 
@@ -247,20 +250,20 @@ qbeta_mse <- function(q,mean_v,se) {
 #' rgamma_mse(n=1,mean_v=0.8,se=0.2)
 #'
 
-rgamma_mse <- function(n=1,mean_v,se,seed=NULL) {
-  out <- NULL
-
-  if(!is.null(seed)){
-    set.seed(seed)
+rgamma_mse <- function(n=1, mean_v, se, seed=NULL) {
+  if (!is.null(seed)) set.seed(seed)
+  len <- length(mean_v)
+  scale <- se^2 / mean_v
+  shape <- mean_v / scale
+  out <- stats::rgamma(len * n, shape, scale = scale)
+  det <- (se == 0 | mean_v == 0)
+  det[is.na(det)] <- FALSE
+  if (any(det)) {
+    for (i in which(det)) {
+      out[seq.int(i, len * n, by = len)] <- mean_v[i]
+    }
   }
-  
-    bool_se <- se==0 | mean_v==0
-    scale <- se^2 / mean_v
-    shape <- mean_v / scale
-    out <- rgamma(length(mean_v)*n,shape,scale=scale)
-    out[bool_se] <- mean_v[bool_se]
-
-  return(out)
+  out
 }
 
 # Quantile gamma distribution - accepts vectors--------
@@ -281,21 +284,16 @@ rgamma_mse <- function(n=1,mean_v,se,seed=NULL) {
 #' @examples
 #' qgamma_mse(q=0.5,mean_v=0.8,se=0.2)
 #'
-
-qgamma_mse <- function(q=1,mean_v,se,seed=NULL) {
-  out <- NULL
-  
-  if(!is.null(seed)){
-    set.seed(seed)
-  }
-  
-  bool_se <- se==0 | mean_v==0
+qgamma_mse <- function(q=1, mean_v, se, seed=NULL) {
+  if (!is.null(seed)) set.seed(seed)
+  len <- length(mean_v)
   scale <- se^2 / mean_v
   shape <- mean_v / scale
-  out <- qgamma(q,shape,scale=scale)
-  out[bool_se] <- mean_v[bool_se]
-  
-  return(out)
+  out <- stats::qgamma(q, shape, scale = scale)
+  det <- (se == 0 | mean_v == 0)
+  det[is.na(det)] <- FALSE
+  out[det] <- mean_v[det]
+  out
 }
 
 #' Draw from a Conditional Gompertz distribution (lower and upper bound)

@@ -574,3 +574,26 @@ discrete_resource_remove_resource_cpp <- function(xptr, n_to_remove, current_tim
     invisible(.Call(`_WARDEN_discrete_resource_remove_resource_cpp`, xptr, n_to_remove, current_time))
 }
 
+#' Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process using C++
+#' 
+#' @param n The number of observations to be drawn
+#' @param rate rate of the event (events per unit time)
+#' @param obs_time period over which events are observable
+#' @param theta Optional. If provided, Poisson-Gamma (NB). Represents gamma shape.
+#' @param t_reps Optional. Number of TBEs to be generated to capture events within the observation window.
+#' @param seed Optional integer seed for reproducibility.
+#' @param return_ind_rate Logical: include individual rate vector in output when theta provided.
+#' @param return_df Logical: return a data.frame with event-level rows (if TRUE).
+#' 
+#' @return If return_df=TRUE: a data.frame (or NULL if no events). Else: list with tte and optionally ind_rate.
+#' 
+#' @examples
+#' rpoisgamma_rcpp(1, rate = 1, obs_time = 1, theta = 1)
+#' 
+#' 
+#' 
+#' @export
+rpoisgamma_rcpp <- function(n, rate, theta = NULL, obs_time = 1.0, t_reps = NULL, seed = NULL, return_ind_rate = FALSE, return_df = FALSE) {
+    .Call(`_WARDEN_rpoisgamma_rcpp`, n, rate, theta, obs_time, t_reps, seed, return_ind_rate, return_df)
+}
+
