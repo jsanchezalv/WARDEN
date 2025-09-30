@@ -4,10 +4,11 @@
 ## Introduction
 
 `WARDEN` is a user-friendly package that facilitates the use of discrete
-event simulations without resource constraints for cost-effectiveness
+event simulations with or without resource constraints for cost-effectiveness
 analysis. The package supports a flexible, transparent, practical
 approach to discrete event simulation while keeping an acceptable
-performance.
+performance. WARDEN now integrates R and C++ code to allow resource constrained
+DES to be used with valid levels of performance.
 
 The current version supports:
 
@@ -21,6 +22,7 @@ The current version supports:
   of hazard ratios, as well as other functions to facilitate
   transparency
 - Performing cost-effectiveness and uncertainty analysis
+- Resource constrained and unconstrained DES
 
 It is recommended that the user checks the vignettes, first the simple
 [Sick-Sicker-Dead
@@ -36,7 +38,10 @@ run. Structural and parametric uncertainty are explored in the
 vignette](https://jsanchezalv.github.io/WARDEN/articles/example_uncertainty.html).
 The [IPD
 vignette](https://jsanchezalv.github.io/WARDEN/articles/example_ipd.html)
-shows how WARDEN can be used when individual patient data is available.
+shows how WARDEN can be used when individual patient data is available. For
+resource constrained, it's recommended to read its 
+[vignette](https://jsanchezalv.github.io/WARDEN/articles/example_ssd_constrained.html).
+There are some additional vignettes showcasing specific functions or functionalities.
 
 ## Documentation
 

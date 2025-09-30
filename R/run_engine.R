@@ -189,10 +189,7 @@ run_engine <- function(arm_list,
 
 
       # 3 Loop per event --------------------------------------------------------
-      #Main environment of reference is this one
-      # list_env <- list(list_env = environment())
-  
-      # input_list_arm <- c(input_list_arm, list_env)
+
       this_patient[[arm]]$evtlist <- NULL
 
       list2env(as.list(output_list), input_list_arm)

@@ -30,10 +30,8 @@ navbar:
           href: articles/warden_explained.html
         - text: "Example in a Sick-Sicker-Dead Model"
           href: articles/example_ssd.html
-        - text: "How to Use the Automatic Input Selector"
-          href: articles/inputs_selector.html
-        - text: "How to Avoid Using Cycles to Speed Up Model"
-          href: articles/example_avoiding_cycles.html
+        - text: "Example for a Resource Constrained Sick-Sicker-Dead model"
+          href: articles/example_ssd_constrained.html
         - text: "Example in a Sick-Sicker-Dead Model - Random Number Streams & Luck Adjustment"
           href: articles/example_ssd_stream.html
         - text: "Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random"
@@ -42,6 +40,10 @@ navbar:
           href: articles/example_eBC.html
         - text: "Example in a Markov Model"
           href: articles/example_markov.html
+        - text: "How to Use the Automatic Input Selector"
+          href: articles/inputs_selector.html
+        - text: "How to Avoid Using Cycles to Speed Up Model"
+          href: articles/example_avoiding_cycles.html
         - text: "Structural and Parametric Uncertainty"
           href: articles/example_uncertainty.html
         - text: "Example for Individual Patient Data"
@@ -67,6 +69,19 @@ reference:
       - new_event
       - run_sim
       - run_sim_parallel
+      
+  - subtitle: Resource Constrained Specific Functions
+    contents:
+      - resource_discrete
+      - modify_event2
+      - new_event2
+      - next_event
+      - next_event_pt
+      - remove_event2
+      - queue_empty
+      - queue_size
+      - has_event
+      - get_event
 
   - subtitle: Modelling Auxiliary Functions
     contents:
