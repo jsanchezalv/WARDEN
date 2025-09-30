@@ -293,7 +293,7 @@ Finally, note that there could be two different ways of accumulating continuous 
 
 evt_react_list <-
   add_reactevt(name_evt = "start",
-               input = {}) %>%
+               input = { }) %>%
   add_reactevt(name_evt = "ttot",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -333,7 +333,7 @@ evt_react_list <-
                  fl.mbcs.progression.mbc <- 0
                  fl.mbcs_2ndline <- 1 #Flag that patient is progressed and going in 2nd line
                  
-                 new_event(list("2ndline_mbc" = curtime + draw_tte(1,'exp', log(0.08))/12))
+                 new_event2(c("2ndline_mbc" = curtime + draw_tte(1,'exp', log(0.08))/12))
                  
                }) %>%
   add_reactevt(name_evt = "idfs",
@@ -365,7 +365,9 @@ evt_react_list <-
                  n_ae <- rpois(1,lambda=0.25*(curtime -prevtime)) #1 AE every 4 years
                  
                  if (n_ae>0) {
-                   new_event(rep(list("ae" = curtime + 0.0001),n_ae))
+                   for (x in 1:n_ae) {
+                     new_event2(c("ae" = curtime + 0.0001))
+                   }
                  }
                }) %>%
   add_reactevt(name_evt = "remission",
@@ -426,7 +428,9 @@ evt_react_list <-
                  n_ae <- rpois(1,lambda=0.25*(curtime -prevtime)) #1 AE every 4 years
                  
                  if (n_ae>0) {
-                   new_event(rep(list("ae" = curtime + 0.0001),n_ae))
+                   for (x in 1:n_ae) {
+                     new_event2(c("ae" = curtime + 0.0001))
+                   }
                  }
                }) %>%
   add_reactevt(name_evt = "ae",
@@ -442,7 +446,7 @@ evt_react_list <-
                  c_default <- cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline
                  c_ae <- cost.ae
                  
-                 modify_event(list("os" =max(cur_evtlist[["os"]] - 0.125,curtime +0.0001) ))#each AE brings forward death by 1.5 months
+                 modify_event2(c("os" =max(get_event("os") - 0.125,curtime +0.0001) ))#each AE brings forward death by 1.5 months
                }) %>%
   add_reactevt(name_evt = "os",
                input = {

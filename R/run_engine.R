@@ -124,10 +124,7 @@ run_engine <- function(arm_list,
       set.seed(seed*(simulation*1007 + i*53 + which(arm==arm_list)))
       # set.seed(seed*(simulation*1007 + i*191))
       # Initialize values to prevent errors
-      output_list <- list(curtime = 0)
-      
 
-      
       if(!is.null(unique_pt_inputs)){
         
         if(env_setup_arm){
@@ -156,44 +153,90 @@ run_engine <- function(arm_list,
       # Generate event list
       set.seed(seed*(simulation*1007 + i*349))
       
-      #if noeventlist, then just make start at 0
-      if (is.null(input_list_arm$init_event_list)) {
-        evt_list <- list(cur_evtlist = setNames(0,"start"), time_data = NULL)
-      } else{
-        evt_list <- do.call("initiate_evt",list(arm,input_list_arm))
+      #/NEW
+      if (!is.null(input_list_arm$init_event_list)) {
+        priority_order <- input_list_arm$init_event_list[[1]]$evts
+      } else {
+        priority_order <- "start"  # default if no events defined
       }
-
-    if(input_list_pt$debug){ 
-      names_input <- names(evt_list$time_data)
-      prev_value <- setNames(vector("list", length(names_input)), names_input)
-      prev_value[names_input] <- evt_list$time_data[names_input]
-      prev_value["cur_evtlist"] <- list(setNames(rep(Inf,length(input_list_arm$init_event_list[[1]]$evts)), input_list_arm$init_event_list[[1]]$evts))
-      dump_info <- list(
-        list(
-          prev_value = prev_value,
-          cur_value  = c(evt_list[["time_data"]],evt_list["cur_evtlist"])
-        )
-      )
+      event_queue <- queue_create(priority_order)
       
-      names(dump_info) <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                                 "; Sim: ", input_list_arm$simulation,
-                                 "; Patient: ", input_list_arm$i,
-                                 "; Initialize Time to Events for Patient-Arm"
-      )
+      if (is.null(input_list_arm$init_event_list)) {
+        # No events defined, add start event at time 0
+        start_events <- setNames(0, "start")
+        new_event2(start_events, event_queue, i)
+      } else {
+        # Generate initial events
+        evt_list <- do.call("initiate_evt", list(arm, input_list_arm))
+        
+        if (input_list_arm$debug) {
+          names_input <- names(evt_list$time_data)
+          prev_value <- setNames(vector("list", length(names_input)), names_input)
+          prev_value[names_input] <- evt_list$time_data[names_input]
+          prev_value["cur_evtlist"] <- list(setNames(rep(Inf, length(input_list_arm$init_event_list[[1]]$evts)), 
+                                                     input_list_arm$init_event_list[[1]]$evts))
+          dump_info <- list(
+            list(
+              prev_value = prev_value,
+              cur_value = c(evt_list[["time_data"]], evt_list["cur_evtlist"])
+            )
+          )
+          names(dump_info) <- paste0("Analysis: ", input_list_arm$sens, " ", input_list_arm$sens_name_used,
+                                     "; Sim: ", input_list_arm$simulation,
+                                     "; Patient: ", input_list_arm$i,
+                                     "; Initialize Time to Events for Patient-Arm")
+          temp_log <- c(temp_log, dump_info)
+        }
+        
+        # Load time data into patient-arm environment
+        list2env(as.list(evt_list$time_data), input_list_arm)
+        
+        # Add events to the shared event queue
+        if (length(evt_list$cur_evtlist) > 0) {
+          new_event2(evt_list$cur_evtlist, event_queue, i)
+        }
+      }
+      #NEW/
       
-      temp_log <- c(temp_log,dump_info)
-    }
-  
-      list2env(as.list(evt_list$time_data), input_list_arm)
-      list2env(as.list(evt_list["cur_evtlist"]), input_list_arm)
+      
+      # #if noeventlist, then just make start at 0
+      # if (is.null(input_list_arm$init_event_list)) {
+      #   evt_list <- list(cur_evtlist = setNames(0,"start"), time_data = NULL)
+      # } else{
+      #   evt_list <- do.call("initiate_evt",list(arm,input_list_arm))
+      # }
+      # 
+      #       if(input_list_pt$debug){
+      #         names_input <- names(evt_list$time_data)
+      #         prev_value <- setNames(vector("list", length(names_input)), names_input)
+      #         prev_value[names_input] <- evt_list$time_data[names_input]
+      #         prev_value["cur_evtlist"] <- list(setNames(rep(Inf,length(input_list_arm$init_event_list[[1]]$evts)), input_list_arm$init_event_list[[1]]$evts))
+      #         dump_info <- list(
+      #           list(
+      #             prev_value = prev_value,
+      #             cur_value  = c(evt_list[["time_data"]],evt_list["cur_evtlist"])
+      #           )
+      #         )
+      # 
+      #         names(dump_info) <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
+      #                                    "; Sim: ", input_list_arm$simulation,
+      #                                    "; Patient: ", input_list_arm$i,
+      #                                    "; Initialize Time to Events for Patient-Arm"
+      #         )
+      # 
+      #   temp_log <- c(temp_log,dump_info)
+      # }
+      # 
+      # list2env(as.list(evt_list$time_data), input_list_arm)
+      # list2env(as.list(evt_list["cur_evtlist"]), input_list_arm)
 
 
       # 3 Loop per event --------------------------------------------------------
 
       this_patient[[arm]]$evtlist <- NULL
 
-      list2env(as.list(output_list), input_list_arm)
-
+      input_list_arm$curtime <- 0
+      
       if(input_list$accum_backwards){
         input_list_arm$ongoing_inputs_lu <- paste0(input_list_arm$uc_lists$ongoing_inputs,"_lastupdate",recycle0 = TRUE)
         input_out_v <- c(input_list_arm$input_out,
@@ -214,51 +257,56 @@ run_engine <- function(arm_list,
         inputs_out_v <-  input_list_arm$input_out
       }
 
-      while(input_list_arm$curtime < Inf){
-
-        # Get next event, process, repeat
-        output_nxtevt <- get_next_evt(input_list_arm[["cur_evtlist"]])
-        Evt <- output_nxtevt$out
-        input_list_arm[['cur_evtlist']] <- output_nxtevt[["evt_list"]]
-
-        n_evt <- n_evt +1
-
-
-        if (is.null(Evt)==FALSE){  
+      # Update the event queue reference for new_event2, modify_event2, etc.
+      # Note that we are only assigning the pointer, so any changes to input_list_arm$cur_evtlist
+      # will equally affect event_queue
+      assign("cur_evtlist", event_queue, envir = input_list_arm)
+      
+      while (!queue_empty(event_queue)) {
+        if(is.infinite(next_event(1,event_queue)$time)){
+          break
+        }
+        # Get next event
+        next_evt <- pop_and_return_event(event_queue)
+        current_event <- next_evt$event_name
+        current_time <- next_evt$time
+        
+        # Calculate prevtime correctly (current curtime becomes prevtime)
+        current_prevtime <- input_list_arm$curtime
+        if(is.infinite(current_prevtime)){next}
+        
+        n_evt <- n_evt + 1
+        
+        input_list_arm <- react_evt(list(evt = current_event,
+                                         curtime = current_prevtime,
+                                         evttime = current_time),
+                                    arm,
+                                    input_list_arm)
+        
+        #Get extra objects to be exported
+        if(is.null(inputs_out_v)){
+          extra_data <- list()
+        } else{
+          extra_data <-  mget(inputs_out_v, input_list_arm) 
+        }
+        extra_data <- extra_data[!vapply(extra_data, is.null, TRUE)]
           
-          #Evalaute event
-          input_list_arm <- react_evt(Evt, arm, input_list_arm)
-          
-          #Get extra objects to be exported
-          if(is.null(inputs_out_v)){
-            extra_data <- list()
-          } else{
-            extra_data <-  mget(inputs_out_v, input_list_arm) 
-          }
-
-          # extra_data <- extra_data[!sapply(extra_data,is.null)]
-          extra_data <- extra_data[!vapply(extra_data, is.null, TRUE)]
-          
-              this_patient[[arm]]$evtlist[[n_evt]] <- c(evtname = Evt$evt ,
-                                                        evttime = Evt$evttime,
+              this_patient[[arm]]$evtlist[[n_evt]] <- c(evtname = current_event,
+                                                        evttime = current_time,
                                                         pat_id = i,
                                                         arm = arm,
                                                         extra_data
               )
               
 
-        } else {input_list_arm$curtime <- Inf} #if no events, stop
-        
-        
-        
-      }
+        }
+      
       
       temp_log <- c(temp_log,input_list_arm$log_list)
     }
     temp_log_pt <- c(temp_log_pt,temp_log)
 
     patdata[[i]] <- this_patient
-    
   }
   
   input_list$log_list <- lapply(temp_log_pt,transform_debug)

@@ -54,8 +54,6 @@ run_engine_constrained <- function(arm_list,
                                    pb = pb,
                                    seed = seed) {
   
-  # Helper function for safe value retrieval
-  `%||%` <- function(x, y) if (is.null(x)) y else x
   
   # Initial set-up --------------------------
   arm_list <- arm_list
@@ -269,7 +267,7 @@ run_engine_constrained <- function(arm_list,
         input_list_arm <- patient_arm_environments[[current_patient_id]]
 
         # Calculate prevtime correctly (current curtime becomes prevtime)
-        current_prevtime <- input_list_arm$curtime %||% 0
+        current_prevtime <- input_list_arm$curtime
         if(is.infinite(current_prevtime)){next}
         
         # Update the event queue reference for new_event2, modify_event2, etc.
@@ -298,7 +296,7 @@ run_engine_constrained <- function(arm_list,
         extra_data <- extra_data[!vapply(extra_data, is.null, TRUE)]
         
         
-        patdata[[current_patient_id]][[arm]]$evtlist[[input_list_arm$n_evt]] <- c(evtname = current_event ,
+        patdata[[current_patient_id]][[arm]]$evtlist[[input_list_arm$n_evt]] <- c(evtname = current_event,
                                                   evttime = current_time,
                                                   pat_id = current_patient_id,
                                                   arm = arm,

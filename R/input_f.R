@@ -941,7 +941,7 @@ has_event <- function(event_name, ptr, patient_id) {
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #' @param patient_id The patient ID. Defaults to `i`.
 #'
-#' @return Logical, TRUE if the event exists for the patient, FALSE otherwise.
+#' @return Time of event for patient
 #' @export
 get_event <- function(event_name, ptr , patient_id ) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
