@@ -203,7 +203,7 @@ public:
   }
   
   void modify(int patient_id, const std::string& event_name, double new_time, 
-              bool create_if_missing = false) {
+              bool create_if_missing = true) {
     Key k = {patient_id, event_name};
     auto it = lookup.find(k);
     
@@ -216,7 +216,7 @@ public:
   }
   
   void modify_multiple(int patient_id, const std::vector<std::string>& event_names, 
-                       const std::vector<double>& new_times, bool create_if_missing = false) {
+                       const std::vector<double>& new_times, bool create_if_missing = true) {
     if (event_names.size() != new_times.size()) {
       throw std::runtime_error("Event names and times vectors must have same length");
     }

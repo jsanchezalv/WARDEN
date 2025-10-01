@@ -47,7 +47,7 @@ options(tibble.print_max = 50)
 # General inputs with delayed execution
 Compared to the standard sick-sicker-death model vignette, here nothing changes, except that now we add a resource which will be constrained (in a discrete manner, i.e., it accepts an integer amount of units and the resource can only be used unit-wise, like hospital beds, or doctors).
 
-We should be careful about where we put the constrained resource, as the level at which we set it up will determine its availability to patients. Normally the intention is to have the resource being shared within an arm by patients (and cloned across arms to make sure we compare apples to apples), which means the resource should be allocated in `common_arm_inputs`. In our case, we call the resource `beds`, and we use `resource_discrete()` to set 650 beds to be shared. We also keep track of the number of beds free for the purpose of seeing it in the results.
+We should be careful about where we put the constrained resource, as the level at which we set it up will determine its availability to patients. Normally the intention is to have the resource being shared within an arm by patients (and cloned across arms to make sure we compare apples to apples), which means the resource should be allocated in `common_all_inputs` (as those inputs will be cloned per arm, so they will not be shared across arms). In our case, we call the resource `beds`, and we use `resource_discrete()` to set 650 beds to be shared. We also keep track of the number of beds free for the purpose of seeing it in the results.
 
 Because of the way the constrained simulation works, it is very important to pre-define any random numbers that will be used before the simulation executes (normally at the `unique_pt_inputs` level, though depends on the case, see below for an exception and the early breast cancer model for the norm), and not to call the "r" functions (`rexp`, `rpois`...) in the event reactions. This is because the random state of the model will change as it goes over the model, and the nature of the loop makes it so that the random states can be mixed between patients between one simulation and another if an event TTE is altered so its position in the queue changes from one simulation to another. This is also very important if we want to compare outcomes using constrained = FALSE and constrained = TRUE (as in constrained = FALSE the random state is patient specific and can be tracked, but in constrained is much harder to do so or would violate CRAN norms).
 
@@ -105,7 +105,7 @@ We will assume that when the patients enter the sicker event, they attempt to us
 
 The discrete resources work similarly to R6 objects, i.e., we call functions from themselves (in this case, `beds$attempt_block()` as opposed to what would be a traditional approach `attempt_block(beds)`), and they automatically modify the `beds` object without needing to return anything. An advantage of using R6-like objects is that we can also make them return something to the user (as well as keep modifying themselves!). In this case, `attempt_block` will return `TRUE` or `FALSE` depending on the success or failure of using the resource.
 
-If the patient fails to block the bed, then the time to death is accelerated by a factor of 0.8. Note that if we are using the resource constrained approach, we need to use `modify_event2` instead of `modify_event` (and similarly, we would have `new_event2` instead of `new_event`. In this case, `modify_event2` is automatically sequential (so it works similarly to `modify_event_seq`). Note that because resources are shared, we can 1) know who the next patient in the queue is, and 2) create a new event for that specific patient, even if the current patient being evaluated is another.
+If the patient fails to block the bed, then the time to death is accelerated by a factor of 0.8. Note that because resources are shared, we can 1) know who the next patient in the queue is, and 2) create a new event for that specific patient, even if the current patient being evaluated is another.
 
 Once a patient reaches the sicker state (or dies), the resource is freed (if being used)/ the patient is removed from the queue (using attempt_free()) and we set the event time for the next patient in the queue to use.
 
@@ -124,7 +124,7 @@ evt_react_list <-
                  beds_free <- beds$n_free()
                  if(!success_blocking_bed){
                    time_start_queue <- curtime
-                   modify_event2(c(death = max(curtime,get_event("death") * 0.8)))
+                   modify_event(c(death = max(curtime,get_event("death") * 0.8)))
                    had_to_queue <- 1
                  }else{
                    time_in_queue <- ifelse(had_to_queue == 1, curtime - time_start_queue,NA)
@@ -137,11 +137,11 @@ evt_react_list <-
                input = {
                  beds$attempt_free() #remove from using or from the queue
                  if(success_blocking_bed & beds$queue_size() > 0){
-                    success_blocking_bed <- FALSE
-                    new_event2(c(sicker = curtime),
+                    new_event(c(sicker = curtime),
                                cur_evtlist,
                                patient_id = beds$next_patient_in_line())
                  }
+                 success_blocking_bed <- FALSE
                  time_in_queue <- NA
                  beds_free <- beds$n_free()
                  q_default <- 0
@@ -265,10 +265,20 @@ summary_results_det(results[[1]][[1]]) #print first simulation
 ## Run model constrained but unbinding
 If the model is run with constrainted = TRUE but in such a way that the constraint does not bind (e.g., with 1000+ beds) then the results are also equivalent to constrained = FALSE.
 ```{r model_run_con_unbinding}
-common_arm_inputs <- add_item2(input ={
+common_all_inputs <-add_item2(input = {
+                      util.sick   <- 0.8
+                      util.sicker <- 0.5
+                      cost.sick   <- 3000
+                      cost.sicker <- 7000
+                      cost.int    <- 1000
+                      coef_noint  <- log(0.2)
+                      HR_int      <- 0.8
+                      drc         <- 0.035 #different values than what's assumed by default
+                      drq         <- 0.035
+                      random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
                       beds <- resource_discrete(1000)
                       beds_free <- beds$n_free()
-})
+})  
 
 #Logic is: per patient, per intervention, per event, react to that event.
 results <- run_sim(  
@@ -403,10 +413,20 @@ data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.
 The model is executed as before, just activating the psa_bool option and deactivating the sensitivity_bool and removing sensitivity_names and setting n_sensitivity = 1
 
 ```{r run_psa}
-common_arm_inputs <- add_item2(input ={
+common_all_inputs <-add_item2(input = {
+                      util.sick   <- 0.8
+                      util.sicker <- 0.5
+                      cost.sick   <- 3000
+                      cost.sicker <- 7000
+                      cost.int    <- 1000
+                      coef_noint  <- log(0.2)
+                      HR_int      <- 0.8
+                      drc         <- 0.035 #different values than what's assumed by default
+                      drq         <- 0.035
+                      random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
                       beds <- resource_discrete(65)
                       beds_free <- beds$n_free()
-})
+})  
 
 
 results <- run_sim(  

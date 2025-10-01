@@ -7,8 +7,8 @@
 event simulations with or without resource constraints for cost-effectiveness
 analysis. The package supports a flexible, transparent, practical
 approach to discrete event simulation while keeping an acceptable
-performance. WARDEN now integrates R and C++ code to allow resource constrained
-DES to be used with valid levels of performance.
+performance. WARDEN now integrates R and C++ (only in the back-end) code to allow
+resource constrained DES to be used with valid levels of performance.
 
 The current version supports:
 

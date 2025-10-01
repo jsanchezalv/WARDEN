@@ -195,7 +195,6 @@ run_sim <- function(arm_list=c("int","noint"),
     names(sensitivity_inputs),
     names(common_pt_inputs),
     names(unique_pt_inputs),
-    names(common_arm_inputs),
     names(arm_list),
     names(evt_react_list)
   )
@@ -247,8 +246,7 @@ run_sim <- function(arm_list=c("int","noint"),
   env_setup_sim <- is.language(common_all_inputs)
   env_setup_pt <- is.language(common_pt_inputs)
   env_setup_arm <- is.language(unique_pt_inputs)
-  env_setup_arm_common <- is.language(common_arm_inputs)
-  
+
   output_sim <- list()
   
   final_log <- list()
@@ -288,6 +286,7 @@ run_sim <- function(arm_list=c("int","noint"),
     } else{
     sens_name_used <- ""
     }
+    
     
     if(debug){
       for (evt in names(evt_react_list)) {
@@ -360,8 +359,7 @@ run_sim <- function(arm_list=c("int","noint"),
                        env_setup_sens = env_setup_sens,
                        env_setup_sim = env_setup_sim,
                        env_setup_pt = env_setup_pt,
-                       env_setup_arm = env_setup_arm,
-                       env_setup_arm_common = env_setup_arm_common
+                       env_setup_arm = env_setup_arm
     )
     
     
@@ -448,12 +446,11 @@ run_sim <- function(arm_list=c("int","noint"),
       if(is.null(input_list$drq)){input_list$drq <- 0.03}
       
       # Run engine ----------------------------------------------------------
-  
+      
         final_output <- if(constrained){
           run_engine_constrained(arm_list=arm_list,
                      common_pt_inputs=common_pt_inputs,
                      unique_pt_inputs=unique_pt_inputs,
-                     common_arm_inputs=common_arm_inputs,
                      input_list = input_list,
                      pb = pb,
                      seed = seed)  
@@ -461,7 +458,6 @@ run_sim <- function(arm_list=c("int","noint"),
           run_engine(arm_list=arm_list,
                      common_pt_inputs=common_pt_inputs,
                      unique_pt_inputs=unique_pt_inputs,
-                     common_arm_inputs=common_arm_inputs,
                      input_list = input_list,
                      pb = pb,
                      seed = seed)   
@@ -637,7 +633,7 @@ run_sim <- function(arm_list=c("int","noint"),
         final_output$log_list <- c(log_list,final_output$log_list)
         final_log <- final_output$log_list
       }
-    
+      
     export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
     } else{
       message("No data to export.")

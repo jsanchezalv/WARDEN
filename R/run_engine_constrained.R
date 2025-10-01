@@ -49,7 +49,6 @@
 run_engine_constrained <- function(arm_list,
                                    common_pt_inputs = NULL,
                                    unique_pt_inputs = NULL,
-                                   common_arm_inputs = NULL,
                                    input_list = NULL,
                                    pb = pb,
                                    seed = seed) {
@@ -67,7 +66,7 @@ run_engine_constrained <- function(arm_list,
   psa_bool <- input_list$psa_bool
   env_setup_pt <- input_list$env_setup_pt
   env_setup_arm <- input_list$env_setup_arm
-  env_setup_arm_common <- input_list$env_setup_arm_common
+  debug <- input_list$debug
   
   # Get priority order for event queue (from init_event_list)
   if (!is.null(input_list$init_event_list)) {
@@ -76,11 +75,12 @@ run_engine_constrained <- function(arm_list,
     priority_order <- "start"  # default if no events defined
   }
   
+  
   # Storage for patient data per arm
   patdata <- vector("list", length=npats) # empty list with npats elements
   
   temp_log_pt <- list()
-  
+  temp_log <- list()
   
   tryCatch({
     
@@ -104,7 +104,6 @@ run_engine_constrained <- function(arm_list,
     
     # 1 Loop per arm ----------------------------------------------------------
     for (arm in arm_list) {
-      
       # Clone simulation environment for this arm
       input_list_arm_base <- rlang::env_clone(input_list, parent.env(input_list)) 
       input_list_arm_base$arm <- arm
@@ -121,7 +120,8 @@ run_engine_constrained <- function(arm_list,
       
       # Storage for patient environments and data
       patient_arm_environments <- vector("list", length = npats)
-
+      
+      
       # 2 Load all patients for this arm and initialize events ---------------
       for (i in 1:npats) {
         set.seed((simulation * 1007 + i * 53) * seed)
@@ -188,13 +188,14 @@ run_engine_constrained <- function(arm_list,
           }
         }
         
+        
         # Initialize events for this patient-arm
         set.seed(seed * (simulation * 1007 + i * 349))
         
         if (is.null(input_list_arm$init_event_list)) {
           # No events defined, add start event at time 0
           start_events <- setNames(0, "start")
-          new_event2(start_events, event_queue, i)
+          new_event(start_events, event_queue, i)
         } else {
           # Generate initial events
           evt_list <- do.call("initiate_evt", list(arm, input_list_arm))
@@ -214,6 +215,7 @@ run_engine_constrained <- function(arm_list,
             names(dump_info) <- paste0("Analysis: ", input_list_arm$sens, " ", input_list_arm$sens_name_used,
                                        "; Sim: ", input_list_arm$simulation,
                                        "; Patient: ", input_list_arm$i,
+                                       "; Arm: ", arm,
                                        "; Initialize Time to Events for Patient-Arm")
             temp_log_pt <- c(temp_log_pt, dump_info)
           }
@@ -223,7 +225,7 @@ run_engine_constrained <- function(arm_list,
           
           # Add events to the shared event queue
           if (length(evt_list$cur_evtlist) > 0) {
-            new_event2(evt_list$cur_evtlist, event_queue, i)
+            new_event(evt_list$cur_evtlist, event_queue, i)
           }
         }
         
@@ -249,32 +251,34 @@ run_engine_constrained <- function(arm_list,
         input_list_arm$n_evt <- 0
         # Store patient-arm environment
         patient_arm_environments[[i]] <- input_list_arm
-        
       }
       
       # 3 Process all events for this arm in chronological order -------------
-      temp_log <- list()
+      
       n_evt <- 0
       
       # Process events while queue is not empty
       while (!queue_empty(event_queue)) {
+        
         if(is.infinite(next_event(1,event_queue)$time)){
           break
         }
+        
         # Get next event
         next_evt <- pop_and_return_event(event_queue)
         current_patient_id <- next_evt$patient_id
         current_event <- next_evt$event_name
         current_time <- next_evt$time
-        
         # Get the appropriate patient-arm environment
         input_list_arm <- patient_arm_environments[[current_patient_id]]
 
         # Calculate prevtime correctly (current curtime becomes prevtime)
         current_prevtime <- input_list_arm$curtime
-        if(is.infinite(current_prevtime)){next}
+        if(is.infinite(current_prevtime)){
+          if(!queue_empty(event_queue)){next}else{break}
+        }
         
-        # Update the event queue reference for new_event2, modify_event2, etc.
+        # Update the event queue reference for new_event, modify_event, etc.
         # Note that we are only assigning the pointer, so any changes to input_list_arm$cur_evtlist
         # will equally affect event_queue
         assign("cur_evtlist", event_queue, envir = input_list_arm)
@@ -286,8 +290,7 @@ run_engine_constrained <- function(arm_list,
                                          evttime = current_time),
                                     arm,
                                     input_list_arm)
-        
-        
+       
         patient_arm_environments[[current_patient_id]] <-  input_list_arm 
         
         
@@ -306,26 +309,27 @@ run_engine_constrained <- function(arm_list,
                                                   arm = arm,
                                                   extra_data
         )
-        
-        temp_log <- c(temp_log,input_list_arm$log_list)
+       
+        temp_log_pt <- c(temp_log_pt,input_list_arm$log_list)
         
       }
-      
-      temp_log_pt <- c(temp_log_pt,temp_log)
-      
     }
+    
     # Return patdata in the same structure as run_engine
     final_output <- compute_outputs(patdata, input_list)
     
+    input_list$log_list <- lapply(temp_log_pt,transform_debug)
+    
     # Add debugging information if enabled
     if(input_list$debug){
-      final_output$log_list <- input_list$temp_log_pt
+      final_output$log_list <- input_list$log_list 
     }
-    
+   
     
     return(final_output)
     
   }, error = function(e) {
+    
     if (input_list$debug) {
       final_output <- list()
       final_output$error_m <- paste0(e$message, " in ", e$call,

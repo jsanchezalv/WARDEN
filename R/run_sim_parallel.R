@@ -210,7 +210,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     names(sensitivity_inputs),
     names(common_pt_inputs),
     names(unique_pt_inputs),
-    names(common_arm_inputs),
     names(arm_list),
     names(evt_react_list)
   )
@@ -264,8 +263,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   env_setup_sim <- is.language(common_all_inputs)
   env_setup_pt <- is.language(common_pt_inputs)
   env_setup_arm <- is.language(unique_pt_inputs)
-  env_setup_arm_common <- is.language(common_arm_inputs)
-  
+
   output_sim <- list()
   
   final_log <- list()
@@ -374,8 +372,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        env_setup_sens = env_setup_sens,
                        env_setup_sim = env_setup_sim,
                        env_setup_pt = env_setup_pt,
-                       env_setup_arm = env_setup_arm,
-                       env_setup_arm_common = env_setup_arm_common
+                       env_setup_arm = env_setup_arm
                       )
     
     if(is.null(seed)){
@@ -476,7 +473,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
         run_engine_constrained(arm_list=arm_list,
                                common_pt_inputs=common_pt_inputs,
                                unique_pt_inputs=unique_pt_inputs,
-                               common_arm_inputs=common_arm_inputs,
                                input_list = input_list,
                                pb = pb,
                                seed = seed)  
@@ -484,7 +480,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
         run_engine(arm_list=arm_list,
                    common_pt_inputs=common_pt_inputs,
                    unique_pt_inputs=unique_pt_inputs,
-                   common_arm_inputs = common_arm_inputs,
                    input_list = input_list,
                    pb = pb,
                    seed = seed)   

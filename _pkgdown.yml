@@ -73,11 +73,9 @@ reference:
   - subtitle: Resource Constrained Specific Functions
     contents:
       - resource_discrete
-      - modify_event2
-      - new_event2
       - next_event
       - next_event_pt
-      - remove_event2
+      - remove_event
       - queue_empty
       - queue_size
       - has_event

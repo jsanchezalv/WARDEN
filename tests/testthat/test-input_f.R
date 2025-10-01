@@ -548,20 +548,20 @@ test_that("modify_event modifies events correctly", {
   input_list_arm$debug = FALSE
   input_list_arm$cur_evtlist = FALSE
   input_list_arm$accum_backwards = FALSE
-  input_list_arm$cur_evtlist = c(ae = 5, nat.death = 100)
-
+  event_queue <- queue_create(c("ae","new_event","nat.death","nonexistent"))
+  new_event(c(ae=5,nat.death=10),event_queue,1)
 
   # Modify an existing event
-  modify_event(list(ae = 10))
-  expect_equal(input_list_arm$cur_evtlist[["ae"]], 10)
+  modify_event(list(ae = 10), create_if_missing = TRUE, event_queue,1)
+  expect_equal(get_event("ae",event_queue,1),10)
   
   # Create new event if not exists
-  modify_event(list(new_event = 50), create_if_null = TRUE)
-  expect_equal(input_list_arm$cur_evtlist[["new_event"]], 50)
+  modify_event(list(new_event = 50), create_if_missing = TRUE, event_queue,1)
+  expect_equal(get_event("new_event",event_queue,1), 50)
   
   # Ignore non-existent event
-  expect_warning(modify_event(list(nonexistent = 20), create_if_null = FALSE))
-  expect_error(input_list_arm$cur_evtlist[["nonexistent"]])
+  expect_no_condition(modify_event(list(nonexistent = 20), create_if_missing = FALSE, event_queue,1))
+  expect_error(get_event("nonexistent",event_queue,1))
 })
 
 test_that("new_event adds new events correctly", {
@@ -571,12 +571,12 @@ test_that("new_event adds new events correctly", {
   input_list_arm$cur_evtlist = FALSE
   input_list_arm$accum_backwards = FALSE
   input_list_arm$cur_evtlist = c()
+  event_queue <- queue_create(c("ae","not_numeric"))
+  new_event(c(ae=5),event_queue,1)
   
-  new_event(list("ae" = 5))
-  expect_equal(input_list_arm$cur_evtlist[["ae"]], 5)
+  expect_equal(get_event("ae",event_queue,1), 5)
   
-  expect_error(new_event(list("not_numeric" = "five")), 
-               "New event times are not all numeric, please review")
+  expect_error(new_event(c("not_numeric" = "five")))
 })
 
 

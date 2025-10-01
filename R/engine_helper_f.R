@@ -93,10 +93,23 @@ debug_inputs <- function(old_data=NULL,new_data){
   cur_value <- mget(names_new_inputs,new_data)
   
   dif_vals <- !sapply(names_new_inputs, function(x) identical(prev_value[[x]],cur_value[[x]]))
+  
   dump_info <- list(
     list(
-      prev_value = prev_value[dif_vals],
-      cur_value  = cur_value[dif_vals]
+      prev_value = lapply(prev_value[dif_vals],
+                          function(x) if(inherits(x,"resource_discrete")){
+                            x$size()
+                          } else if(inherits(x,"environment")){
+                              "environment"
+                          } else{x}
+                          ),
+      cur_value  = lapply(cur_value[dif_vals],
+                          function(x) if(inherits(x,"resource_discrete")){
+                            x$size()
+                          } else if(inherits(x,"environment")){
+                            "environment"
+                          } else{x}
+                          )
     )
   )
   
@@ -292,7 +305,7 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
   #debug bit (after evaluation)
   if(input_list_arm$debug){
     
-    cur_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm)
+    cur_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm, ifnotfound = Inf)
     
     if(!is.null(input_list_arm$log_list[[loc]])){
       input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value, prev_values)
@@ -307,7 +320,7 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
       )
       names(dump_info) <- loc
       
-      input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
+      input_list_arm$log_list <- dump_info
       
     }
   }
@@ -447,7 +460,7 @@ transform_debug <- function(debug_data) {
 export_log <- function(log_list, log_name, main_byline = FALSE) {
   
   file_conn <- file(log_name)
-  
+ 
   # Precompute the total number of lines for efficiency
   log_size <- sum(sapply(log_list, function(sublist) {
     length(sublist) * 3 + 2  # Each sublist key has 3 lines (key, prev_value, cur_value) + 2 extra lines for header and blank

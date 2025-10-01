@@ -468,157 +468,6 @@ add_item2 <- function(.data=NULL,input){
   return(data_list)
 }
 
-# Add event to list of events ---------------------------------------------
-
-#' Generate new events to be added to existing vector of events
-#'
-#' @param evt Event name and event time
-#'
-#' @return No return value, adds event to `cur_evtlist` and integrates it with the main list for storage
-#'
-#' @importFrom stats setNames
-#' 
-#'
-#' @export
-#'
-#' @details
-#' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
-#' So rather than use two `new_event` with a list of one element, it's better to group them into a single `new_event` with a list of two elements.
-#'
-#' This function is intended to be used only within the `add_reactevt` function in its `input` parameter and should not be run elsewhere or it will return an error.
-#'
-#' @examples
-#' add_reactevt(name_evt = "idfs",input = {new_event(list("ae"=5))})
-
-
-new_event <- function(evt){
-  new_evt_name <- names(evt)
-  new_evt <- setNames(unlist(evt),new_evt_name)
-  if (!is.numeric(new_evt)) {
-    stop("New event times are not all numeric, please review")
-  }
-  
-  input_list_arm <- parent.frame()
-
-  evtlist_temp <- list(cur_evtlist = c(input_list_arm$cur_evtlist,
-                                  new_evt))
-
-  if(input_list_arm$debug){ #only works correctly with create_if_null==TRUE, to be modified in later versions
-    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                  "; Sim: ", input_list_arm$simulation,
-                  "; Patient: ", input_list_arm$i,
-                  "; Arm: ", input_list_arm$arm,
-                  "; Event: ", input_list_arm$evt,
-                  "; Time: ", round(input_list_arm$curtime,3)
-    )
-    if(!is.null(input_list_arm$log_list[[loc]])){
-      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value,setNames(rep(Inf, length(new_evt_name)),new_evt_name))
-      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,new_evt)
-      
-    }else{
-      dump_info <- list(
-        list(prev_value = setNames(rep(Inf, length(new_evt_name)),new_evt_name),
-             cur_value = new_evt
-        )
-      )
-      names(dump_info) <- loc
-      
-      input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
-      
-    }
-  }
-  
-  
-  input_list_arm[["cur_evtlist"]] <- evtlist_temp$cur_evtlist
-
-}
-
-# Modify event in list of events ---------------------------------------------
-
-#' Modify the time of existing events
-#'
-#' @param evt A list of events and their times
-#' @param create_if_null A boolean.
-#'  If TRUE, it will create non-existing events with the chosen time to event.
-#'  If FALSE, it will ignore those.
-#'  
-#' @importFrom utils modifyList
-#' @importFrom stats setNames
-#' 
-#' @return No return value, modifies/adds event to `cur_evtlist` and integrates it with the main list for storage
-#'
-#'
-#' @export
-#'
-#' @details
-#' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
-#' So rather than use two `modify_event` with a list of one element, it's better to group them into a single `modify_event` with a list of two elements.
-#'
-#' This function does not evaluate sequentially.
-#'
-#' This function is intended to be used only within the `add_reactevt` function in its `input` parameter and should not be run elsewhere or it will return an error.
-#'
-#' @examples
-#' add_reactevt(name_evt = "idfs",input = {modify_event(list("os"=5))})
-
-modify_event <- function(evt,create_if_null=TRUE){
-  input_list_arm <- parent.frame()
-  
-  evt_unlist <- unlist(evt)
-  if(!is.numeric(evt_unlist)){
-      stop("Modify event times are not all numeric, please review")
-  }
-  names_evt <- names(evt)
-  
-  if(input_list_arm$debug){ #only works correctly with create_if_null==TRUE, to be modified in later versions
-    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                  "; Sim: ", input_list_arm$simulation,
-                  "; Patient: ", input_list_arm$i,
-                  "; Arm: ", input_list_arm$arm,
-                  "; Event: ", input_list_arm$evt,
-                  "; Time: ", round(input_list_arm$curtime,3)
-                  )
-    temp_cur <- input_list_arm$cur_evtlist[names_evt]
-    isna_evt <- is.na(temp_cur)
-    temp_cur[isna_evt] <- Inf
-    names(temp_cur)[isna_evt] <- names_evt[isna_evt]
-    
-    if(!is.null(input_list_arm$log_list[[loc]])){
-      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value,temp_cur)
-      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,evt_unlist)
-        
-    }else{
-    dump_info <- list(
-      list(prev_value = temp_cur,
-           cur_value = evt_unlist
-           )
-      )
-    names(dump_info) <- loc
-    
-    input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
-    
-    }
-  }
-  
-  if (create_if_null==FALSE) {
-    names_obj_temp <- names(input_list_arm$cur_evtlist)
-    names_found <- names_evt[names_evt %in% names_obj_temp]
-    if (length(names_found)==0) {
-      warning("Some or all event/s in modify_evt within ", paste(names_evt,collapse=", "), " not found. Use new_evt to add new events.")
-    }
-    matched <- which(names_obj_temp %in% names_found)
-    
-    input_list_arm[["cur_evtlist"]][matched] <- evt_unlist[names_obj_temp[names_obj_temp %in% names_found]]
-  } else{
-    input_list_arm[["cur_evtlist"]][names_evt] <- evt_unlist
-  }
-  
-
-}
-
-
-
-
 
 # Modify item in input list -------------------------------------------------------------------------------------------------------------------------------
 
@@ -795,15 +644,59 @@ queue_create <- function(priority_order) {
 #'
 #' Adds one or more events for a given patient to the queue.
 #'
-#' @param events A named numeric vector. Names are event types, values are event times.
+#' @param events A named numeric vector. Names are event types, values are event times. It can also handle lists instead of named vectors (at a small computational cost).
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #' @param patient_id The patient ID. Defaults to `i`.
 #'
 #' @return NULL (invisible). Modifies the queue in-place.
 #' @export
-new_event2 <- function(events, ptr, patient_id) {
+#'
+#' @details
+#' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified,
+#'  it's recommended to group them within one function, as it reduces the computation cost.
+#' So rather than use two `new_event` with a list of one element, it's better to group them into a single `new_event` with a list of two elements.
+#' 
+#' While multiple events can be added, they must be named differently. If the same event is added multiple times at once, only the last occurrence will be kept
+#'  (only one event per event type in the queue of events yet to occur). If an event occurs, then a new one with the same name can be set.
+#'
+#' This function is intended to be used only within the `add_reactevt` function in its `input` parameter and should not be run elsewhere or it will return an error.
+#'
+#' @examples
+#' add_reactevt(name_evt = "idfs",input = {new_event(c("ae"=5))})
+new_event <- function(events, ptr, patient_id) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+  if(is.list(events)){
+    events <- unlist(events)
+  }
+  
+  input_list_arm <- parent.frame()
+  if(input_list_arm$debug){
+    new_evt_name <- names(events)
+    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
+                  "; Sim: ", input_list_arm$simulation,
+                  "; Patient: ", patient_id,
+                  "; Arm: ", input_list_arm$arm,
+                  "; Event: ", input_list_arm$evt,
+                  "; Time: ", round(ifelse(is.null(input_list_arm$curtime),NA,input_list_arm$curtime),3)
+    )
+    if(!is.null(input_list_arm$log_list[[loc]])){
+      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value,setNames(rep(Inf, length(new_evt_name)),new_evt_name))
+      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,events)
+
+    }else{
+      dump_info <- list(
+        list(prev_value = setNames(rep(Inf, length(new_evt_name)),new_evt_name),
+             cur_value = events
+        )
+      )
+      names(dump_info) <- loc
+
+      input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
+
+    }
+  }
+  
   new_event_cpp(ptr, patient_id, events)
 }
 
@@ -869,15 +762,18 @@ pop_and_return_event <- function(ptr) {
 #'
 #' Removes one or more events from the queue for the given patient.
 #'
-#' @param events A character vector of event names to remove.
+#' @param events A character vector of event names to remove. It can also handle lists instead of named vectors (at a small computational cost).
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #' @param patient_id The patient ID. Defaults to `i`.
 #'
 #' @return NULL (invisible). Modifies the queue in-place.
 #' @export
-remove_event2 <- function(events, ptr, patient_id) {
+remove_event <- function(events, ptr, patient_id) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+  if(is.list(events)){
+    events <- unlist(events)
+  }
   remove_event_cpp(ptr, patient_id, events)
 }
 
@@ -885,16 +781,67 @@ remove_event2 <- function(events, ptr, patient_id) {
 #'
 #' Modifies existing event times, or adds new events if `create_if_missing` is TRUE.
 #'
-#' @param events A named numeric vector with event names and new event times.
+#' @param events A named numeric vector with event names and new event times. It can also handle lists instead of named vectors (at a small computational cost).
 #' @param create_if_missing Logical, whether to create events if they do not exist.
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #' @param patient_id The patient ID. Defaults to `i`.
 #'
 #' @return NULL (invisible). Modifies the queue in-place.
 #' @export
-modify_event2 <- function(events, create_if_missing = FALSE, ptr, patient_id) {
+#'
+#' @details
+#' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
+#' So rather than use two `modify_event` with a list of one element, it's better to group them into a single `modify_event` with a list of two elements.
+#'
+#' This function does not evaluate sequentially.
+#' 
+#' While multiple events can be added, they must be named differently. If the same event is added multiple times at once, only the last occurrence will be kept
+#'  (only one event per event type in the queue of events yet to occur). If an event occurs, then a new one with the same name can be set.
+#'
+#' This function is intended to be used only within the `add_reactevt` function in its `input` parameter and should not be run elsewhere or it will return an error.
+#'
+#' @examples
+#' add_reactevt(name_evt = "idfs",input = {modify_event(c("os"=5))})
+modify_event <- function(events, create_if_missing = TRUE, ptr, patient_id) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+  if(is.list(events)){
+    events <- unlist(events)
+  }
+  
+  input_list_arm <- parent.frame()
+  if(input_list_arm$debug){ 
+    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
+                  "; Sim: ", input_list_arm$simulation,
+                  "; Patient: ", patient_id,
+                  "; Arm: ", input_list_arm$arm,
+                  "; Event: ", input_list_arm$evt,
+                  "; Time: ", round(input_list_arm$curtime,3)
+    )
+    
+    temp_cur <- c()
+    for (idx in 1:length(events)) {
+      temp_cur[idx] <- tryCatch(get_event(events[idx],ptr,patient_id), error = function(e) NA)
+    }
+    names(temp_cur) <- names(events)
+    
+    if(!is.null(input_list_arm$log_list[[loc]])){
+      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value,temp_cur)
+      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,events)
+      
+    }else{
+      dump_info <- list(
+        list(prev_value = temp_cur,
+             cur_value = events
+        )
+      )
+      names(dump_info) <- loc
+      
+      input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
+      
+    }
+  }
+  
   modify_event_cpp(ptr, patient_id, events, create_if_missing)
 }
 
@@ -922,7 +869,7 @@ queue_size <- function(ptr) {
 
 #' Check if a Patient Has a Specific Event
 #'
-#' @param event_name The name of the event.
+#' @param event_name Character string, the name of the event.
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #' @param patient_id The patient ID. Defaults to `i`.
 #'
@@ -937,11 +884,11 @@ has_event <- function(event_name, ptr, patient_id) {
 
 #' Get a specific event time
 #'
-#' @param event_name The name of the event.
+#' @param event_name Character string, the name of the event.
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #' @param patient_id The patient ID. Defaults to `i`.
 #'
-#' @return Time of event for patient
+#' @return Numeric, time of event for patient
 #' @export
 get_event <- function(event_name, ptr , patient_id ) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
@@ -1740,8 +1687,22 @@ extract_from_reactions <- function(reactions){
 #' out <- ast_as_list(expr)
 #' 
 ast_as_list <- function(ee) {
-  purrr::map_if(as.list(ee), is.call, ast_as_list)
+  # Keep atoms/symbols as-is
+  if (is.null(ee) || is.atomic(ee) || is.symbol(ee) || is.name(ee)) return(ee)
+  
+  # Recurse into expressions and pairlists
+  if (is.expression(ee) || is.pairlist(ee)) {
+    return(lapply(as.list(ee), ast_as_list))
   }
+  
+  # Calls → convert to lists and recurse over children (incl. function position)
+  if (is.call(ee)) {
+    return(lapply(as.list(ee), ast_as_list))
+  }
+  
+  # Fallback
+  ee
+}
 
 
 #' Extracts items and events by looking into assignments, modify_item, modify_item_seq, modify_event and new_event
@@ -1811,138 +1772,171 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
     stringsAsFactors = FALSE
   )
   
-  if (is.list(node)) {
-    func_name <- if (!is.null(node[[1]])) as.character(node[[1]]) else NULL
+  # Only list-like nodes have interesting structure here
+  if (is.list(node) || is.call(node)) {
+    # If we got an actual call, convert to list-form so downstream is uniform
+    node_list <- if (is.call(node)) lapply(as.list(node), ast_as_list) else node
     
-    # Case 1: modify_* / new_event
-    if (!is.null(func_name) && any(func_name %in% c("modify_item_seq", "modify_item", "modify_event", "new_event"))) {
-      type <- if (any(func_name %in% c("modify_item_seq", "modify_item"))) "item" else "event"
-      list_expr <- node[[2]]
+    func_name <- .node_head_name(node_list)
+    
+    # ----- Case 1: modify_* / new_event -----
+    if (.is_call_named(node_list, c("modify_item_seq", "modify_item", "modify_event", "new_event"))) {
+      type <- if (.is_call_named(node_list, c("modify_item_seq", "modify_item"))) "item" else "event"
+      
+      # Usually the 2nd argument is the list of definitions
+      list_expr <- node_list[[2L]]
       if (is.list(list_expr)) {
-        definition <- unlist(extract_defs(node), recursive = TRUE)
-        definition <- definition[!names(definition) == ""]
-        results_temp <- data.frame(
-          name = names(definition),
-          type = type,
-          conditional_flag = conditional_flag,
-          definition = definition,
-          stringsAsFactors = FALSE
-        )
-        results <- rbind(results, results_temp)
-      }
-    }
-    
-    # Case 2: assignment via <- or =
-    if (!is.null(func_name) && func_name %in% c("<-", "=")) {
-
-      lhs <- node[[2]]
-      rhs <- node[[3]]
-      # Detect and extract from complex LHS expressions
-      if (is.symbol(lhs)) {
-        target_name <- as.character(lhs)
-      } else if (is.list(lhs)) {
-        target_name <- clean_output(expr_from_list(lhs))
-      } else {
-        target_name <- NA
-      }
-
-      if (!is.na(target_name)) {
-        results <- rbind(results, data.frame(
-          name = target_name,
-          type = "item",
-          conditional_flag = conditional_flag,
-          definition = clean_output(expr_from_list(rhs)),
-          stringsAsFactors = FALSE
-        ))
-      }
-    }
-    
-    # Case 3: assignment via assign()
-    if (!is.null(func_name) && func_name == "assign") {
-      if (length(node) >= 3) {
-        varname <- node[[2]]
-        if (is.character(varname)) {
-          varname <- as.character(varname)
-        } else if (is.list(varname)) {
-          varname <- clean_output(expr_from_list(varname))
+        definition <- unlist(extract_defs(list_expr), recursive = TRUE, use.names = TRUE)
+        definition <- definition[!(names(definition) %in% c("", NA))]
+        if (length(definition)) {
+          results <- rbind(
+            results,
+            data.frame(
+              name = names(definition),
+              type = type,
+              conditional_flag = conditional_flag,
+              definition = unname(definition),
+              stringsAsFactors = FALSE
+            )
+          )
         }
-        
-        value_expr <- node[[3]]
-        if (is.character(varname)) {
-          results <- rbind(results, data.frame(
-            name = varname,
+      }
+    }
+    
+    # ----- Case 2: assignment via <- or = (including env/R6 LHS like env$x, x[[k]], x@slot) -----
+    if (.is_call_named(node_list, c("<-", "="))) {
+      # For a <- b, the list is typically: list("<-", LHS, RHS)
+      lhs <- node_list[[2L]]
+      rhs <- node_list[[3L]]
+      
+      target_name <- .lhs_to_name(lhs)
+      if (!is.na(target_name) && nzchar(target_name)) {
+        # Rebuild RHS for readable definition
+        rhs_expr <- expr_from_list(rhs)
+        results <- rbind(
+          results,
+          data.frame(
+            name = target_name,
             type = "item",
             conditional_flag = conditional_flag,
-            definition = clean_output(expr_from_list(value_expr)),
+            definition = clean_output(rhs_expr),
             stringsAsFactors = FALSE
-          ))
-        }
+          )
+        )
       }
     }
     
-    # Case 4: if statement → propagate conditional flag
-    if (!is.null(func_name) && func_name == "if") {
+    # ----- Case 3: assignment via assign("var", value, envir = env) -----
+    if (.is_call_named(node_list, "assign")) {
+      # Positionals: assign(name, value, ...)
+      if (length(node_list) >= 3L) {
+        varname_node <- node_list[[2L]]
+        value_node   <- node_list[[3L]]
+        
+        varname <- if (is.character(varname_node) && length(varname_node) == 1L) {
+          varname_node
+        } else {
+          .lhs_to_name(varname_node)  # allow assign(sym, ...)
+        }
+        
+        if (is.character(varname) && length(varname) == 1L && nzchar(varname)) {
+          results <- rbind(
+            results,
+            data.frame(
+              name = varname,
+              type = "item",
+              conditional_flag = conditional_flag,
+              definition = clean_output(expr_from_list(value_node)),
+              stringsAsFactors = FALSE
+            )
+          )
+        }
+      }
+      # We ignore envir=… for the output schema, but this no longer warns or errors.
+    }
+    
+    # ----- Case 4: if() — mark children as conditional -----
+    if (.is_call_named(node_list, "if")) {
       conditional_flag <- TRUE
     }
-  }
-  
-  # Recursively walk children
-  if (is.list(node)) {
-    for (child in node) {
+    
+    # ----- Recurse into ALL children, including function position -----
+    for (child in node_list) {
       results <- rbind(results, extract_elements_from_list(child, conditional_flag))
     }
   }
   
-  results <- results[!(is.na(results$name) | results$name == "" | is.na(results$definition)), ]
+  # Final tidy
+  results <- results[!(is.na(results$name) | results$name == "" | is.na(results$definition)), , drop = FALSE]
   results
 }
 
 
-#' Loop to extract an expression from a list
-#'
-#' @param lst sublist from the AST as list
-#'
-#' @return Reconstructed expression as a character
-#'
-#' @noRd
-#' 
-expr_from_list <- function(lst) {
-  if(is.null(lst)){
-    return(lst)
-  } else if (is.atomic(lst)) {
-    return(lst)
-  } else if (is.symbol(lst)) {
-    return(as.name(lst))
-  } else if (is.list(lst) && length(lst) == 1) {
-    return(expr_from_list(lst[[1]]))
-  } else {
-    func_name <- deparse(expr_from_list(lst[[1]]))
-    args <- lapply(lst[-1], expr_from_list)
-    
-    # Handle special cases (e.g., operators)
-    return(do.call(call, c(func_name, args),quote = TRUE))
+# Return a single operator/name for the "head" of a node, or NULL.
+# Works for calls, lists produced by ast_as_list(), symbols, etc.
+.node_head_name <- function(node) {
+  if (is.null(node)) return(NULL)
+  
+  # If we still have a language object (call/symbol), handle directly
+  if (is.call(node))       return(.node_head_name(node[[1L]]))
+  if (is.symbol(node))     return(as.character(node))
+  if (is.name(node))       return(as.character(node))
+  
+  # If this is the list-form AST (from ast_as_list)
+  if (is.list(node) && length(node) >= 1L) {
+    return(.node_head_name(node[[1L]]))
   }
+  
+  # Atoms: no head
+  NULL
 }
 
+# Predicate to test if node is a call with a given name (or one of names)
+.is_call_named <- function(node, nm) {
+  fn <- .node_head_name(node)
+  is.character(fn) && length(fn) == 1L && fn %in% nm
+}
 
-#' Clean output from generated expression
-#'
-#' @param called Generated expression from `expr_from_list`
-#'
-#' @return Cleaned character expression 
-#'
-#' @noRd
-#' 
-clean_output <- function(called){
-  gsub("\`","",
-       gsub("    ","",
-            gsub("\"","'",
-            paste0(
-              deparse(called
-              ),collapse="")
-            )
-      )
-  )
+# Rebuild a language object from the list-form AST.
+expr_from_list <- function(lst) {
+  if (is.null(lst)) return(NULL)
+  
+  # Already a language object
+  if (is.symbol(lst) || is.call(lst) || is.name(lst)) return(lst)
+  
+  # Atomic vector → keep as-is
+  if (is.atomic(lst)) return(lst)
+  
+  # Pairlist/expression/lists → rebuild recursively
+  if (is.list(lst)) {
+    if (length(lst) == 0L) return(NULL)
+    head_expr <- expr_from_list(lst[[1L]])
+    args      <- lapply(lst[-1L], expr_from_list)
+    # IMPORTANT: use as.call so the head may itself be a call (e.g., beds$n_free)
+    return(as.call(c(list(head_expr), args)))
+  }
+  
+  # Fallback
+  lst
+}
+
+# Compact deparse + tidy up quotes/backticks/spaces for stable string output
+clean_output <- function(called) {
+  txt <- paste0(deparse(called, width.cutoff = 500L), collapse = "")
+  txt <- gsub("`", "", txt, fixed = TRUE)
+  txt <- gsub("\"", "'", txt, fixed = TRUE)
+  txt <- gsub("    ", "", txt, fixed = TRUE)
+  txt
+}
+
+# Convert a (possibly list-form) LHS node into a printable "target name".
+# For plain symbols: "x"; for complex: "env$x", "x[[k]]", "x@slot", etc.
+.lhs_to_name <- function(lhs) {
+  if (is.null(lhs)) return(NA_character_)
+  if (is.symbol(lhs) || is.call(lhs)) return(clean_output(lhs))
+  if (is.list(lhs))  return(clean_output(expr_from_list(lhs)))
+  if (is.character(lhs) && length(lhs) == 1L) return(lhs)
+  NA_character_
 }
 
 #' Extract relevant definitions from sublist
@@ -2011,48 +2005,94 @@ extract_defs <- function(lst){
 extract_assignment_targets <- function(expr) {
   assigned <- character()
   
-  walk_node <- function(node) {
-    if (is.call(node)) {
-      fname <- as.character(node[[1]])
-      
-      # Handle <- and = assignment
-      if (fname %in% c("<-", "=")) {
-        lhs <- node[[2]]
-        if (is.symbol(lhs)) {
-          assigned <<- c(assigned, as.character(lhs))
-        } else if (is.call(lhs) && lhs[[1]] == as.name("$")) {
-          # x$y <- ...  => get "x"
-          assigned <<- c(assigned, as.character(lhs[[2]]))
-        } else if (is.call(lhs) && lhs[[1]] == as.name("[[")) {
-          # x[["y"]] <- ... => get "x"
-          assigned <<- c(assigned, as.character(lhs[[2]]))
-        } else if (is.call(lhs) && lhs[[1]] == as.name("[")) {
-          assigned <<- c(assigned, as.character(lhs[[2]]))
-        }
-        walk_node(node[[3]])  # Recurse on RHS
-      }
-      
-      # Handle assign("var", value)
-      else if (fname == "assign" && length(node) >= 2) {
-        varname <- node[[2]]
-        if (is.character(varname)) {
-          assigned <<- c(assigned, varname)
-        } else if (is.symbol(varname)) {
-          assigned <<- c(assigned, as.character(varname))
-        }
-        # Recurse on value
-        if (length(node) >= 3) walk_node(node[[3]])
-      }
-      
-      # Recurse into all sub-calls
-      for (arg in as.list(node)[-1]) {
-        walk_node(arg)
-      }
-    } else if (is.expression(node) || is.call(node)) {
-      for (item in as.list(node)) walk_node(item)
+  # Try to extract the base object name on the LHS (e.g., x from x$y, x[[...]], x[i], x@slot, slot(x, "slot"))
+  base_symbol_from_lhs <- function(lhs) {
+    if (is.symbol(lhs)) {
+      return(as.character(lhs))
     }
+    if (!is.call(lhs)) return(NULL)
+    
+    op <- lhs[[1L]]
+    # Operators as symbols?
+    if (is.symbol(op)) {
+      op_chr <- as.character(op)
+      
+      # x$y, x[[...]], x[...], x@slot
+      if (op_chr %in% c("$", "[[", "[", "@")) {
+        base <- lhs[[2L]]
+        if (is.symbol(base)) return(as.character(base))
+        return(NULL)
+      }
+      
+      # slot(x, "foo") <- ...
+      if (op_chr == "slot" && length(lhs) >= 2L) {
+        base <- lhs[[2L]]
+        if (is.symbol(base)) return(as.character(base))
+        return(NULL)
+      }
+      
+      # pkg::name  or pkg:::name  (not assignable in R) → ignore as target but don't error
+      if (op_chr %in% c("::", ":::")) {
+        return(NULL)
+      }
+    }
+    
+    # Function-call LHS of other kinds → we don't treat as assignable base names
+    NULL
   }
   
-  walk_node(expr)
+  walk <- function(node) {
+    if (is.null(node)) return(invisible())
+    
+    # Walk pairlists or expressions
+    if (is.pairlist(node) || is.expression(node)) {
+      lapply(as.list(node), walk)
+      return(invisible())
+    }
+    
+    if (is.call(node)) {
+      fn <- node[[1L]]
+      
+      # <- and =
+      if (is.symbol(fn) && (identical(fn, as.name("<-")) || identical(fn, as.name("=")))) {
+        lhs <- node[[2L]]
+        
+        # Record base symbol if we can determine it
+        nm <- base_symbol_from_lhs(lhs)
+        if (!is.null(nm)) assigned <<- c(assigned, nm)
+        
+        # Recurse both sides to catch nested assignments
+        walk(lhs)
+        if (length(node) >= 3L) walk(node[[3L]])
+      }
+      
+      # assign("var", value)
+      else if (is.symbol(fn) && identical(fn, as.name("assign"))) {
+        if (length(node) >= 2L) {
+          v <- node[[2L]]
+          if (is.character(v) && length(v) == 1L) {
+            assigned <<- c(assigned, v)
+          } else if (is.symbol(v)) {
+            assigned <<- c(assigned, as.character(v))
+          }
+        }
+        if (length(node) >= 3L) walk(node[[3L]])
+      }
+      
+      # If the "function position" itself is a call, walk it (e.g., beds$n_free(), pkg::fun(), pkg:::fun())
+      if (is.call(fn)) walk(fn)
+      
+      # Walk all arguments
+      if (length(node) > 1L) {
+        for (i in 2L:length(node)) walk(node[[i]])
+      }
+      
+      return(invisible())
+    }
+    
+    invisible()
+  }
+  
+  walk(expr)
   unique(assigned)
 }

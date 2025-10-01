@@ -21,7 +21,6 @@
 run_engine <- function(arm_list,
                             common_pt_inputs=NULL,
                             unique_pt_inputs=NULL,
-                            common_arm_inputs = NULL,
                             input_list = NULL,
                             pb = pb,
                             seed = seed){
@@ -37,8 +36,7 @@ run_engine <- function(arm_list,
   psa_bool <- input_list$psa_bool
   env_setup_pt <- input_list$env_setup_pt
   env_setup_arm <- input_list$env_setup_arm
-  env_setup_arm_common <- input_list$env_setup_arm_common
-  
+  debug <- input_list$debug
 
   #1 Loop per patient ----------------------------------------------------------
   patdata <- vector("list", length=npats) # empty list with npats elements
@@ -165,7 +163,7 @@ run_engine <- function(arm_list,
       if (is.null(input_list_arm$init_event_list)) {
         # No events defined, add start event at time 0
         start_events <- setNames(0, "start")
-        new_event2(start_events, event_queue, i)
+        new_event(start_events, event_queue, i)
       } else {
         # Generate initial events
         evt_list <- do.call("initiate_evt", list(arm, input_list_arm))
@@ -194,7 +192,7 @@ run_engine <- function(arm_list,
         
         # Add events to the shared event queue
         if (length(evt_list$cur_evtlist) > 0) {
-          new_event2(evt_list$cur_evtlist, event_queue, i)
+          new_event(evt_list$cur_evtlist, event_queue, i)
         }
       }
 
@@ -224,7 +222,7 @@ run_engine <- function(arm_list,
         inputs_out_v <-  input_list_arm$input_out
       }
 
-      # Update the event queue reference for new_event2, modify_event2, etc.
+      # Update the event queue reference for new_event, modify_event, etc.
       # Note that we are only assigning the pointer, so any changes to input_list_arm$cur_evtlist
       # will equally affect event_queue
       assign("cur_evtlist", event_queue, envir = input_list_arm)
@@ -240,8 +238,9 @@ run_engine <- function(arm_list,
         
         # Calculate prevtime correctly (current curtime becomes prevtime)
         current_prevtime <- input_list_arm$curtime
-        if(is.infinite(current_prevtime)){next}
-        
+        if(is.infinite(current_prevtime)){
+          if(!queue_empty(event_queue)){next}else{break}
+        }        
         n_evt <- n_evt + 1
         
         input_list_arm <- react_evt(list(evt = current_event,
@@ -265,11 +264,9 @@ run_engine <- function(arm_list,
                                                         extra_data
               )
               
-
+              temp_log <- c(temp_log,input_list_arm$log_list)
         }
       
-      
-      temp_log <- c(temp_log,input_list_arm$log_list)
     }
     temp_log_pt <- c(temp_log_pt,temp_log)
 
