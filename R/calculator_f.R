@@ -615,7 +615,13 @@ cond_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
   }
 }
 
-
+#' Creates a discrete resource from an external pointer
+#'
+#' @param xptr external pointer from resource_discrete()$.ptr
+#' 
+#' @return new cloned discrete resource
+#'
+#' 
 .resource_discrete_from_xptr <- function(xptr) {
   env <- new.env(parent = emptyenv())
   env$.ptr <- xptr
@@ -716,8 +722,17 @@ cond_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
   env
 }
 
-# Exported: fast, always returns a list of wrapper envs (even for n = 1)
-discrete_resource_clone_cpp <- function(x, n = 1) {
+#' Clone independent discrete resources
+#'
+#' @param x discrete resource created with resource_discrete()
+#' @param n Number of independent clones to be generated
+#' 
+#' @return List of independent clones of discrete resource envs (even for n = 1)
+#'
+#' @export
+#'
+#' 
+discrete_resource_clone <- function(x, n = 1) {
   if (!is.environment(x) || is.null(x$.ptr)) {
     stop("Expected a resource wrapper environment with field `.ptr`.", call. = FALSE)
   }

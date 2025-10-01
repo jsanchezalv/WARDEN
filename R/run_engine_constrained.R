@@ -98,7 +98,7 @@ run_engine_constrained <- function(arm_list,
       names_disres <- names(list_discrete_resources)
       cloned_resources <- list()
       for (obj in 1:l_disres) {
-        cloned_resources[[obj]] <- discrete_resource_clone_cpp(list_discrete_resources[[obj]], n_arms)
+        cloned_resources[[obj]] <- discrete_resource_clone(list_discrete_resources[[obj]], n_arms)
       }
     }
     
