@@ -351,17 +351,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// clone_discrete_resource_cpp
-SEXP clone_discrete_resource_cpp(SEXP xp);
-RcppExport SEXP _WARDEN_clone_discrete_resource_cpp(SEXP xpSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type xp(xpSEXP);
-    rcpp_result_gen = Rcpp::wrap(clone_discrete_resource_cpp(xp));
-    return rcpp_result_gen;
-END_RCPP
-}
 // discrete_resource_size_cpp
 int discrete_resource_size_cpp(SEXP xptr);
 RcppExport SEXP _WARDEN_discrete_resource_size_cpp(SEXP xptrSEXP) {
@@ -548,6 +537,18 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// discrete_resource_clone_xptrs_cpp
+Rcpp::List discrete_resource_clone_xptrs_cpp(SEXP wrapper_env, int n);
+RcppExport SEXP _WARDEN_discrete_resource_clone_xptrs_cpp(SEXP wrapper_envSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type wrapper_env(wrapper_envSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(discrete_resource_clone_xptrs_cpp(wrapper_env, n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rpoisgamma_rcpp
 List rpoisgamma_rcpp(int n, double rate, Nullable<double> theta, double obs_time, Nullable<int> t_reps, Nullable<int> seed, bool return_ind_rate, bool return_df);
 RcppExport SEXP _WARDEN_rpoisgamma_rcpp(SEXP nSEXP, SEXP rateSEXP, SEXP thetaSEXP, SEXP obs_timeSEXP, SEXP t_repsSEXP, SEXP seedSEXP, SEXP return_ind_rateSEXP, SEXP return_dfSEXP) {
@@ -594,7 +595,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_has_event_cpp", (DL_FUNC) &_WARDEN_has_event_cpp, 3},
     {"_WARDEN_get_event_cpp", (DL_FUNC) &_WARDEN_get_event_cpp, 3},
     {"_WARDEN_create_discrete_resource_cpp", (DL_FUNC) &_WARDEN_create_discrete_resource_cpp, 1},
-    {"_WARDEN_clone_discrete_resource_cpp", (DL_FUNC) &_WARDEN_clone_discrete_resource_cpp, 1},
     {"_WARDEN_discrete_resource_size_cpp", (DL_FUNC) &_WARDEN_discrete_resource_size_cpp, 1},
     {"_WARDEN_discrete_resource_queue_size_cpp", (DL_FUNC) &_WARDEN_discrete_resource_queue_size_cpp, 1},
     {"_WARDEN_discrete_resource_n_free_cpp", (DL_FUNC) &_WARDEN_discrete_resource_n_free_cpp, 1},
@@ -611,6 +611,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_discrete_resource_modify_priority_cpp", (DL_FUNC) &_WARDEN_discrete_resource_modify_priority_cpp, 3},
     {"_WARDEN_discrete_resource_add_resource_cpp", (DL_FUNC) &_WARDEN_discrete_resource_add_resource_cpp, 2},
     {"_WARDEN_discrete_resource_remove_resource_cpp", (DL_FUNC) &_WARDEN_discrete_resource_remove_resource_cpp, 3},
+    {"_WARDEN_discrete_resource_clone_xptrs_cpp", (DL_FUNC) &_WARDEN_discrete_resource_clone_xptrs_cpp, 2},
     {"_WARDEN_rpoisgamma_rcpp", (DL_FUNC) &_WARDEN_rpoisgamma_rcpp, 8},
     {NULL, NULL, 0}
 };

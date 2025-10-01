@@ -510,10 +510,6 @@ create_discrete_resource_cpp <- function(n) {
     .Call(`_WARDEN_create_discrete_resource_cpp`, n)
 }
 
-clone_discrete_resource_cpp <- function(xp) {
-    .Call(`_WARDEN_clone_discrete_resource_cpp`, xp)
-}
-
 discrete_resource_size_cpp <- function(xptr) {
     .Call(`_WARDEN_discrete_resource_size_cpp`, xptr)
 }
@@ -576,6 +572,10 @@ discrete_resource_add_resource_cpp <- function(xptr, n_to_add) {
 
 discrete_resource_remove_resource_cpp <- function(xptr, n_to_remove, current_time) {
     invisible(.Call(`_WARDEN_discrete_resource_remove_resource_cpp`, xptr, n_to_remove, current_time))
+}
+
+discrete_resource_clone_xptrs_cpp <- function(wrapper_env, n = 1L) {
+    .Call(`_WARDEN_discrete_resource_clone_xptrs_cpp`, wrapper_env, n)
 }
 
 #' Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process using C++

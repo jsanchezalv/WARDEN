@@ -32,6 +32,7 @@ run_engine <- function(arm_list,
   n_sensitivity <- input_list$n_sensitivity
   length_sensitivities <- input_list$length_sensitivities
   n_sim <- input_list$n_sim
+  n_arms <- length(arm_list)
   npats <- input_list$npats
   psa_bool <- input_list$psa_bool
   env_setup_pt <- input_list$env_setup_pt
@@ -46,6 +47,24 @@ run_engine <- function(arm_list,
 
     
   tryCatch({
+    
+    list_discrete_resources <- list()
+    for (obj in ls(input_list)) {
+      if(inherits(input_list[[obj]],"resource_discrete")){
+        new_obj <- list(input_list[[obj]])
+        names(new_obj) <- obj
+        list_discrete_resources <- c(list_discrete_resources,new_obj)
+      }
+    }
+    
+    l_disres <- length(list_discrete_resources)
+    if(l_disres>0){
+      names_disres <- names(list_discrete_resources)
+      cloned_resources <- list()
+      for (obj in 1:l_disres) {
+        cloned_resources[[obj]] <- discrete_resource_clone_cpp(list_discrete_resources[[obj]], n_arms)
+      }
+    }
   
   for (i in 1:npats) {
     set.seed((simulation*1007 + i*53) * seed)
@@ -96,27 +115,10 @@ run_engine <- function(arm_list,
       input_list_arm <- rlang::env_clone(input_list_pt , parent.env(input_list_pt))
       input_list_arm$arm <- arm
       
-      #Common arm inputs
-      set.seed((simulation * 1007 + which(arm==arm_list)) * seed)
-      # Load common arm inputs if they exist
-      if (!is.null(common_arm_inputs)) {
-        if (env_setup_arm_common) {
-          load_inputs2(inputs = input_list_arm, list_uneval_inputs = common_arm_inputs)
-        } else {
-          input_list_arm <- as.environment(
-            load_inputs(inputs = as.list(input_list_arm),
-                        list_uneval_inputs = common_arm_inputs)
-          )
-          parent.env(input_list_arm) <- parent.env(input_list_arm)
-        }
-        
-        if (input_list$debug) {
-          dump_info <- debug_inputs(input_list_arm, input_list_arm)
-          names(dump_info) <- paste0("Analysis: ", input_list_arm$sens, " ", input_list_arm$sens_name_used,
-                                     "; Sim: ", input_list_arm$simulation,
-                                     "; Arm: ", input_list_arm$arm,
-                                     "; Initial Arm Conditions")
-          temp_log_pt <- c(temp_log_pt, dump_info)
+      if(l_disres>0){
+        which_arm <- which(arm==arm_list)
+        for (obj in 1:l_disres) {
+          input_list_arm[[names_disres[[obj]]]] <-  cloned_resources[[obj]][[which_arm]]
         }
       }
       
@@ -153,7 +155,6 @@ run_engine <- function(arm_list,
       # Generate event list
       set.seed(seed*(simulation*1007 + i*349))
       
-      #/NEW
       if (!is.null(input_list_arm$init_event_list)) {
         priority_order <- input_list_arm$init_event_list[[1]]$evts
       } else {
@@ -196,40 +197,6 @@ run_engine <- function(arm_list,
           new_event2(evt_list$cur_evtlist, event_queue, i)
         }
       }
-      #NEW/
-      
-      
-      # #if noeventlist, then just make start at 0
-      # if (is.null(input_list_arm$init_event_list)) {
-      #   evt_list <- list(cur_evtlist = setNames(0,"start"), time_data = NULL)
-      # } else{
-      #   evt_list <- do.call("initiate_evt",list(arm,input_list_arm))
-      # }
-      # 
-      #       if(input_list_pt$debug){
-      #         names_input <- names(evt_list$time_data)
-      #         prev_value <- setNames(vector("list", length(names_input)), names_input)
-      #         prev_value[names_input] <- evt_list$time_data[names_input]
-      #         prev_value["cur_evtlist"] <- list(setNames(rep(Inf,length(input_list_arm$init_event_list[[1]]$evts)), input_list_arm$init_event_list[[1]]$evts))
-      #         dump_info <- list(
-      #           list(
-      #             prev_value = prev_value,
-      #             cur_value  = c(evt_list[["time_data"]],evt_list["cur_evtlist"])
-      #           )
-      #         )
-      # 
-      #         names(dump_info) <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-      #                                    "; Sim: ", input_list_arm$simulation,
-      #                                    "; Patient: ", input_list_arm$i,
-      #                                    "; Initialize Time to Events for Patient-Arm"
-      #         )
-      # 
-      #   temp_log <- c(temp_log,dump_info)
-      # }
-      # 
-      # list2env(as.list(evt_list$time_data), input_list_arm)
-      # list2env(as.list(evt_list["cur_evtlist"]), input_list_arm)
-
 
       # 3 Loop per event --------------------------------------------------------
 
@@ -261,7 +228,7 @@ run_engine <- function(arm_list,
       # Note that we are only assigning the pointer, so any changes to input_list_arm$cur_evtlist
       # will equally affect event_queue
       assign("cur_evtlist", event_queue, envir = input_list_arm)
-      
+
       while (!queue_empty(event_queue)) {
         if(is.infinite(next_event(1,event_queue)$time)){
           break

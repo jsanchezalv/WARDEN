@@ -5,7 +5,6 @@
 #' @param common_all_inputs A list of inputs common across patients that do not change within a simulation
 #' @param common_pt_inputs A list of inputs that change across patients but are not affected by the intervention
 #' @param unique_pt_inputs A list of inputs that change across each intervention
-#' @param common_arm_inputs A list of inputs that change across arms but are constant within an arm (e.g. constrained resource, only useful if constrained = TRUE)
 #' @param init_event_list A list of initial events and event times. If no initial events are given, a "Start" event at time 0 is created automatically
 #' @param evt_react_list A list of event reactions
 #' @param util_ongoing_list Vector of QALY named variables that are accrued at an ongoing basis (discounted using drq)
@@ -155,7 +154,6 @@ run_sim <- function(arm_list=c("int","noint"),
                    common_all_inputs=NULL,
                    common_pt_inputs=NULL,
                    unique_pt_inputs=NULL,
-                   common_arm_inputs=NULL,
                    init_event_list = NULL,
                    evt_react_list = evt_react_list,
                    util_ongoing_list = NULL,

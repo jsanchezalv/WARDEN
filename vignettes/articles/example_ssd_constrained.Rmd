@@ -26,7 +26,6 @@ knitr::opts_chunk$set(
 # Introduction
 This document runs a discrete event simulation model in the context of a late oncology model to show how the functions can be used to generate a model in only a few steps. In this particular case, we document how to run a model with constrained resources.
 
-
 ## Main options
 
 ```{r setup}
@@ -50,6 +49,8 @@ Compared to the standard sick-sicker-death model vignette, here nothing changes,
 
 We should be careful about where we put the constrained resource, as the level at which we set it up will determine its availability to patients. Normally the intention is to have the resource being shared within an arm by patients (and cloned across arms to make sure we compare apples to apples), which means the resource should be allocated in `common_arm_inputs`. In our case, we call the resource `beds`, and we use `resource_discrete()` to set 650 beds to be shared. We also keep track of the number of beds free for the purpose of seeing it in the results.
 
+Because of the way the constrained simulation works, it is very important to pre-define any random numbers that will be used before the simulation executes (normally at the `unique_pt_inputs` level, though depends on the case, see below for an exception and the early breast cancer model for the norm), and not to call the "r" functions (`rexp`, `rpois`...) in the event reactions. This is because the random state of the model will change as it goes over the model, and the nature of the loop makes it so that the random states can be mixed between patients between one simulation and another if an event TTE is altered so its position in the queue changes from one simulation to another. This is also very important if we want to compare outcomes using constrained = FALSE and constrained = TRUE (as in constrained = FALSE the random state is patient specific and can be tracked, but in constrained is much harder to do so or would violate CRAN norms).
+
 ```{r input_delayed}
 #We don't need to use sensitivity_inputs here, so we don't add that object
 
@@ -66,13 +67,10 @@ common_all_inputs <-add_item2(input = {
                       drc         <- 0.035 #different values than what's assumed by default
                       drq         <- 0.035
                       random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
-})  
-
-#Common within an arm
-common_arm_inputs <- add_item2(input ={
                       beds <- resource_discrete(650)
                       beds_free <- beds$n_free()
-})
+})  
+
 
 #Put objects here that do not change as we loop through treatments for a patient
 common_pt_inputs <- add_item(death= max(0.0000001,rnorm(n=1, mean=12, sd=3))) 
@@ -187,7 +185,6 @@ results <- run_sim(
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
   common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
   unique_pt_inputs = unique_pt_inputs,
-  common_arm_inputs = common_arm_inputs, 
   init_event_list = init_event_list,        # initial event list
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
@@ -242,6 +239,7 @@ ggplot(psa_ipd %>% group_by(arm,pat_id) %>% summarise(time_in_queue=mean(time_in
 # Sensitivity Analysis
 ## Run model with constrained = FALSE
 It can be seen that with constrained = FALSE, the results are equivalent to the SSD standard vignette. Furthermore, if the model is run with constrainted = TRUE but in such a way that the constraint does not bind (e.g., with 1000+ beds) then the results are also equivalent.
+
 ```{r model_run_unc}
 #Logic is: per patient, per intervention, per event, react to that event.
 results <- run_sim(  
@@ -252,7 +250,6 @@ results <- run_sim(
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
   common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
   unique_pt_inputs = unique_pt_inputs,
-  common_arm_inputs = common_arm_inputs, 
   init_event_list = init_event_list,        # initial event list
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
@@ -282,7 +279,6 @@ results <- run_sim(
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
   common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
   unique_pt_inputs = unique_pt_inputs,
-  common_arm_inputs = common_arm_inputs, 
   init_event_list = init_event_list,        # initial event list
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
@@ -341,7 +337,6 @@ results <- run_sim(
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
   common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
   unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
-  common_arm_inputs = common_arm_inputs,     
   init_event_list = init_event_list,        # initial event list
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
@@ -379,7 +374,6 @@ results <- run_sim(
   common_all_inputs = common_all_inputs,    
   common_pt_inputs = common_pt_inputs,      
   unique_pt_inputs = unique_pt_inputs,      
-  common_arm_inputs = common_arm_inputs,      
   init_event_list = init_event_list,        
   evt_react_list = evt_react_list,          
   util_ongoing_list = util_ongoing,
@@ -423,7 +417,6 @@ results <- run_sim(
   common_all_inputs = common_all_inputs,    
   common_pt_inputs = common_pt_inputs,      
   unique_pt_inputs = unique_pt_inputs,      
-  common_arm_inputs = common_arm_inputs,      
   init_event_list = init_event_list,        
   evt_react_list = evt_react_list,          
   util_ongoing_list = util_ongoing,

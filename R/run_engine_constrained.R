@@ -62,6 +62,7 @@ run_engine_constrained <- function(arm_list,
   n_sensitivity <- input_list$n_sensitivity
   length_sensitivities <- input_list$length_sensitivities
   n_sim <- input_list$n_sim
+  n_arms <- length(arm_list)
   npats <- input_list$npats
   psa_bool <- input_list$psa_bool
   env_setup_pt <- input_list$env_setup_pt
@@ -80,8 +81,27 @@ run_engine_constrained <- function(arm_list,
   
   temp_log_pt <- list()
   
+  
   tryCatch({
-
+    
+    list_discrete_resources <- list()
+    for (obj in ls(input_list)) {
+      if(inherits(input_list[[obj]],"resource_discrete")){
+        new_obj <- list(input_list[[obj]])
+        names(new_obj) <- obj
+        list_discrete_resources <- c(list_discrete_resources,new_obj)
+      }
+    }
+    
+    l_disres <- length(list_discrete_resources)
+    if(l_disres>0){
+      names_disres <- names(list_discrete_resources)
+      cloned_resources <- list()
+      for (obj in 1:l_disres) {
+        cloned_resources[[obj]] <- discrete_resource_clone_cpp(list_discrete_resources[[obj]], n_arms)
+      }
+    }
+    
     # 1 Loop per arm ----------------------------------------------------------
     for (arm in arm_list) {
       
@@ -89,29 +109,13 @@ run_engine_constrained <- function(arm_list,
       input_list_arm_base <- rlang::env_clone(input_list, parent.env(input_list)) 
       input_list_arm_base$arm <- arm
       
-      set.seed((simulation * 1007 + which(arm==arm_list)) * seed)
-      # Load common arm inputs if they exist
-      if (!is.null(common_arm_inputs)) {
-        if (env_setup_arm_common) {
-          load_inputs2(inputs = input_list_arm_base, list_uneval_inputs = common_arm_inputs)
-        } else {
-          input_list_arm_base <- as.environment(
-            load_inputs(inputs = as.list(input_list_arm_base),
-                        list_uneval_inputs = common_arm_inputs)
-          )
-          parent.env(input_list_arm_base) <- parent.env(input_list_arm_base)
-        }
-        
-        if (input_list$debug) {
-          dump_info <- debug_inputs(input_list_arm_base, input_list_arm_base)
-          names(dump_info) <- paste0("Analysis: ", input_list_arm_base$sens, " ", input_list_arm_base$sens_name_used,
-                                     "; Sim: ", input_list_arm_base$simulation,
-                                     "; Arm: ", input_list_arm_base$arm,
-                                     "; Initial Arm Conditions")
-          temp_log_pt <- c(temp_log_pt, dump_info)
+      if(l_disres>0){
+        which_arm <- which(arm==arm_list)
+        for (obj in 1:l_disres) {
+          input_list_arm_base[[names_disres[[obj]]]] <-  cloned_resources[[obj]][[which_arm]]
         }
       }
-
+      
       # Create event queue for this arm
       event_queue <- queue_create(priority_order)
       
@@ -123,8 +127,8 @@ run_engine_constrained <- function(arm_list,
         set.seed((simulation * 1007 + i * 53) * seed)
         
         # Progress update
-        if ((((sens - 1) * n_sim * npats) + ((simulation - 1) * npats) + i) %% 
-            ceiling(npats * n_sim * length_sensitivities / min(npats * length_sensitivities * n_sim, 50)) == 0) {
+        if ((((sens - 1) * n_sim * npats * n_arms) + ((simulation - 1) * npats * n_arms) + i) %% 
+            ceiling(npats * n_arms * n_sim * length_sensitivities / min(npats * n_arms * length_sensitivities * n_sim, 50)) == 0) {
           pb(sprintf("Simulation %g", simulation))
         }
         

@@ -120,38 +120,6 @@ public:
     }
   }
   
-  // >>> Explicit deep copy <<<
-  DiscreteResource(const DiscreteResource& o)
-    : total_capacity(o.total_capacity),
-      next_insertion_order(o.next_insertion_order),
-      current_max_priority(o.current_max_priority),
-      total_entries_ever_added(o.total_entries_ever_added),
-      current_valid_entries(o.current_valid_entries),
-      operations_since_cleanup(o.operations_since_cleanup),
-      next_version(o.next_version),
-      patients_using(o.patients_using),
-      patient_queue(o.patient_queue), // std::priority_queue copies its container by value
-      patient_queue_count(o.patient_queue_count),
-      patient_queue_start_times(o.patient_queue_start_times),
-      patient_current_version(o.patient_current_version) {}
-  
-  DiscreteResource& operator=(const DiscreteResource& o) {
-    if (this == &o) return *this;
-    total_capacity = o.total_capacity;
-    next_insertion_order = o.next_insertion_order;
-    current_max_priority = o.current_max_priority;
-    total_entries_ever_added = o.total_entries_ever_added;
-    current_valid_entries = o.current_valid_entries;
-    operations_since_cleanup = o.operations_since_cleanup;
-    next_version = o.next_version;
-    patients_using = o.patients_using;
-    patient_queue = o.patient_queue;
-    patient_queue_count = o.patient_queue_count;
-    patient_queue_start_times = o.patient_queue_start_times;
-    patient_current_version = o.patient_current_version;
-    return *this;
-  }
-  
   int size() const { return total_capacity; }
   int queue_size() const { return current_valid_entries; }
   int n_free() const { return total_capacity - patients_using.size(); }
@@ -504,15 +472,6 @@ void validate_xptr(SEXP xptr) {
 }
 
 // [[Rcpp::export]]
-SEXP clone_discrete_resource_cpp(SEXP xp) {
-  if (TYPEOF(xp) != EXTPTRSXP || R_ExternalPtrAddr(xp) == nullptr)
-    Rcpp::stop("Invalid external pointer");
-  Rcpp::XPtr<DiscreteResource> p(xp);
-  Rcpp::XPtr<DiscreteResource> q(new DiscreteResource(*p), true);
-  return q;
-}
-
-// [[Rcpp::export]]
 int discrete_resource_size_cpp(SEXP xptr) {
   validate_xptr(xptr);
   XPtr<DiscreteResource> ptr(xptr);
@@ -627,4 +586,42 @@ void discrete_resource_remove_resource_cpp(SEXP xptr, int n_to_remove, double cu
   validate_xptr(xptr);
   XPtr<DiscreteResource> ptr(xptr);
   ptr->remove_resource(n_to_remove, current_time);
+}
+
+// Minimal extractor: your wrapper is an environment with `.ptr`
+static SEXP get_dotptr_from_env(SEXP wrapper_env) {
+  if (!Rf_isEnvironment(wrapper_env)) {
+    Rcpp::stop("Expected a resource wrapper environment.");
+  }
+  SEXP sym = Rf_install(".ptr");
+  SEXP v = Rf_findVarInFrame(wrapper_env, sym);
+  if (v == R_UnboundValue || TYPEOF(v) != EXTPTRSXP) {
+    Rcpp::stop("Wrapper is missing a valid '.ptr' external pointer.");
+  }
+  return v;
+}
+
+// [[Rcpp::export]]
+Rcpp::List discrete_resource_clone_xptrs_cpp(SEXP wrapper_env, int n = 1) {
+  if (n <= 0) Rcpp::stop("n must be >= 1");
+  
+  SEXP xptr = get_dotptr_from_env(wrapper_env);
+  // validate_xptr(xptr); // optional; uncomment if you want the strict check
+  Rcpp::XPtr<DiscreteResource> src(xptr);
+  const int capacity = src->size(); // fresh clone = copy capacity only
+  
+  Rcpp::List out(n);
+  try {
+    for (int i = 0; i < n; ++i) {
+      auto* p = new DiscreteResource(capacity);
+      out[i] = Rcpp::XPtr<DiscreteResource>(p, true); // own & finalize
+    }
+  } catch (const std::bad_alloc&) {
+    Rcpp::stop("Memory allocation failed while cloning resources (n=%d).", n);
+  } catch (const std::exception& e) {
+    Rcpp::stop("Error while cloning resources: %s", e.what());
+  } catch (...) {
+    Rcpp::stop("Unknown error while cloning resources.");
+  }
+  return out;
 }
