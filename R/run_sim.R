@@ -520,7 +520,7 @@ run_sim <- function(arm_list=c("int","noint"),
             }else{
               if(length(log_list)>0){
                 log_list <- lapply(log_list,transform_debug)
-                final_output <- list()
+                # final_output <- list()
                 final_output$log_list <- c(log_list,final_output$log_list)
                 
                 if(exists("output_sim")){
@@ -545,7 +545,7 @@ run_sim <- function(arm_list=c("int","noint"),
                   "; simulation: ",
                   if(exists("simulation")){simulation}else{"None"},
                   ". Error message: ",
-                  e$message," in ", e$call)
+                  e$message)
           }else{
             stop("Error message at analysis ",
                  sens,
@@ -646,7 +646,7 @@ run_sim <- function(arm_list=c("int","noint"),
   #Retore original rng kind
   RNGkind(rng_kind_store)
   
-   }, enable=TRUE)
+   }, enable=TRUE, cleanup = TRUE)
     
   
   return(results)

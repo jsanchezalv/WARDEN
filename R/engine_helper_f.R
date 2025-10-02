@@ -470,6 +470,17 @@ export_log <- function(log_list, log_name, main_byline = FALSE) {
   
   line_index <- 1
   
+  paste_vals <- function(x){ 
+    if (!is.null(names(x)) && any(nzchar(names(x)))) {
+      paste(ifelse(nzchar(names(x)), names(x), seq_along(x)),
+            x,
+            sep = "=",
+            collapse = "; ")
+    } else {
+      paste(x, collapse = "; ")
+    }
+  }
+  
   # Loop through the list and construct the data to be written
   for (main_key in names(log_list)) {
     # Handle the main key header
@@ -488,9 +499,9 @@ export_log <- function(log_list, log_name, main_byline = FALSE) {
       line_index <- line_index + 1
       
       # Add prev_value and cur_value indented under the sub_key
-      output_lines[line_index] <- paste0("     prev_value = ", paste0(sublist[[sub_key]]$prev_value, collapse = "; "))
+      output_lines[line_index] <- paste0("     prev_value = ", paste_vals(sublist[[sub_key]]$prev_value))
       line_index <- line_index + 1
-      output_lines[line_index] <- paste0("     cur_value  = ", paste0(sublist[[sub_key]]$cur_value, collapse = "; "))
+      output_lines[line_index] <- paste0("     cur_value  = ", paste_vals(sublist[[sub_key]]$cur_value))
       line_index <- line_index + 1
     }
     

@@ -206,6 +206,7 @@ run_engine_constrained <- function(arm_list,
             prev_value[names_input] <- evt_list$time_data[names_input]
             prev_value["cur_evtlist"] <- list(setNames(rep(Inf, length(input_list_arm$init_event_list[[1]]$evts)), 
                                                        input_list_arm$init_event_list[[1]]$evts))
+            
             dump_info <- list(
               list(
                 prev_value = prev_value,
@@ -329,29 +330,34 @@ run_engine_constrained <- function(arm_list,
     return(final_output)
     
   }, error = function(e) {
-    
-    if (input_list$debug) {
-      final_output <- list()
-      final_output$error_m <- paste0(e$message, " in ", e$call,
+    if(input_list$debug){
+      
+      final_output <- list()  
+      final_output$log_list <- lapply(temp_log_pt,transform_debug)
+      final_output$error_m <- paste0(e$message, " in ", paste0(e$call,collapse=", "),
                                      paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
                                             "; arm: ", if (exists("arm")) arm,
                                             "; event: ", if (exists("current_event")) current_event,
                                             "; time: ", if (exists("current_time")) current_time))
       return(final_output)
-    } else if (input_list$continue_on_error) {
-      final_output <- list()
-      final_output$error_m <- paste0(e$message, " in ", e$call,
+    }else if(input_list$continue_on_error){
+      final_output <- list()  
+      
+      final_output$error_m <- paste0(e$message, " in ", paste0(e$call,collapse=", "),
                                      paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
                                             "; arm: ", if (exists("arm")) arm,
                                             "; event: ", if (exists("current_event")) current_event,
                                             "; time: ", if (exists("current_time")) current_time))
       return(final_output)
-    } else {
-      stop(paste0(" ", e$message, " in ", e$call,
+      
+    } else{
+      
+      stop(paste0(e$message, " in ", paste0(e$call,collapse=", "),
                   paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
                          "; arm: ", if (exists("arm")) arm,
                          "; event: ", if (exists("current_event")) current_event,
-                         "; time: ", if (exists("current_time")) current_time)))
+                         "; time: ", if (exists("current_time")) current_time))
+      )
     }
-  })
+  } )
 }

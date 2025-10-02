@@ -585,7 +585,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
             
           } else if(!exists("output_sim") & exists("final_output")){
             log_list <- lapply(log_list,transform_debug)
-            final_output <- list()
             final_output$log_list <- c(log_list,final_output$log_list)
             final_log <- final_output$log_list
             

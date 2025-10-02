@@ -105,7 +105,6 @@ run_engine <- function(arm_list,
     }
     
     #2 Loop per treatment ------------------------------------------------------
-    temp_log <- list()
     
     for (arm in arm_list) {
       
@@ -146,7 +145,7 @@ run_engine <- function(arm_list,
                                      "; Initial Patient-Arm Conditions"
           )
           
-          temp_log <- c(temp_log,dump_info)
+          temp_log_pt <- c(temp_log_pt,dump_info)
         }
       }
       
@@ -184,7 +183,7 @@ run_engine <- function(arm_list,
                                      "; Sim: ", input_list_arm$simulation,
                                      "; Patient: ", input_list_arm$i,
                                      "; Initialize Time to Events for Patient-Arm")
-          temp_log <- c(temp_log, dump_info)
+          temp_log_pt <- c(temp_log_pt, dump_info)
         }
         
         # Load time data into patient-arm environment
@@ -264,11 +263,10 @@ run_engine <- function(arm_list,
                                                         extra_data
               )
               
-              temp_log <- c(temp_log,input_list_arm$log_list)
-        }
+              temp_log_pt <- c(temp_log_pt,input_list_arm$log_list)
+      }
       
     }
-    temp_log_pt <- c(temp_log_pt,temp_log)
 
     patdata[[i]] <- this_patient
   }
@@ -291,42 +289,32 @@ run_engine <- function(arm_list,
 
     if(input_list$debug){
       
-      if(!is.null(input_list_arm$log_list)){
-        temp_log <- c(temp_log,input_list_arm$log_list)
-      }
-      
-      if(!is.null(temp_log)){
-        temp_log_pt <- c(temp_log_pt,temp_log)
-      }
-      
       final_output <- list()  
       final_output$log_list <- lapply(temp_log_pt,transform_debug)
-      final_output$error_m <- paste0(e$message," in ", e$call,
-                                     paste0(". Error in patient: ", if(exists("i")){i},
-                                             "; arm: ", if(exists("arm")){arm},
-                                             "; event: ", if(exists("Evt")){Evt$evt},
-                                             "; time: ", if(exists("Evt")){Evt$evttime})
-                                     )
+      final_output$error_m <- paste0(e$message, " in ", paste0(e$call,collapse=", "),
+                                     paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
+                                            "; arm: ", if (exists("arm")) arm,
+                                            "; event: ", if (exists("current_event")) current_event,
+                                            "; time: ", if (exists("current_time")) current_time))
       return(final_output)
     }else if(input_list$continue_on_error){
       final_output <- list()  
       
-      final_output$error_m <- paste0(e$message," in ", e$call,
-                                     paste0(". Error in patient: ", if(exists("i")){i},
-                                             "; arm: ", if(exists("arm")){arm},
-                                             "; event: ", if(exists("Evt")){Evt$evt},
-                                             "; time: ", if(exists("Evt")){Evt$evttime})
-      )
+      final_output$error_m <- paste0(e$message, " in ", paste0(e$call,collapse=", "),
+                                     paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
+                                            "; arm: ", if (exists("arm")) arm,
+                                            "; event: ", if (exists("current_event")) current_event,
+                                            "; time: ", if (exists("current_time")) current_time))
       return(final_output)
       
     } else{
       
-      stop(paste0(" ", e$message," in ", e$call,
-                  paste0(". Error in patient: ", if(exists("i")){i},
-                           "; arm: ", if(exists("arm")){arm},
-                           "; event: ", if(exists("Evt")){Evt$evt},
-                           "; time: ", if(exists("Evt")){Evt$evttime})
-      ))
+      stop(paste0(e$message, " in ", paste0(e$call,collapse=", "),
+                  paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
+                         "; arm: ", if (exists("arm")) arm,
+                         "; event: ", if (exists("current_event")) current_event,
+                         "; time: ", if (exists("current_time")) current_time))
+      )
     }
   } )
 

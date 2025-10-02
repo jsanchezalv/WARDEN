@@ -12,6 +12,7 @@ The package supports a flexible, transparent, practical approach to discrete eve
 The current version supports:
 
 * Discrete event simulation models, Markov/semi-Markov models and hybrid models using parallel and non-parallel engines
+* Constrained and unconstrained models (with or without interactivity between patients)
 * Seamlessly integrating data.frames and other objects into the model
 * Delayed execution of the main inputs to facilitate readability of the model
 * Implementation of structural and parameter uncertainty
