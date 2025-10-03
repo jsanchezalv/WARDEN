@@ -100,9 +100,16 @@ run_engine_constrained <- function(arm_list,
         names(new_obj) <- obj
         list_discrete_resources <- c(list_discrete_resources,new_obj)
       }
+      
+      if(inherits(input_list[[obj]],"shared_input")){
+        new_obj <- list(input_list[[obj]])
+        names(new_obj) <- obj
+        list_shared_inputs <- c(list_shared_inputs,new_obj)
+      }
     }
     
     l_disres <- length(list_discrete_resources)
+    l_sharedi <- length(list_shared_inputs)
     if(l_disres>0){
       names_disres <- names(list_discrete_resources)
       cloned_resources <- list()
@@ -111,6 +118,13 @@ run_engine_constrained <- function(arm_list,
       }
     }
     
+    if(l_sharedi>0){
+      names_sharedi <- names(list_shared_inputs)
+      cloned_resources <- list()
+      for (obj in 1:l_sharedi) {
+        cloned_sharedi[[obj]] <- list_shared_inputs[[obj]]$fork(n_arms)
+      }
+    }
     # 1 Loop per arm ----------------------------------------------------------
     for (arm in arm_list) {
       # Clone simulation environment for this arm
@@ -124,6 +138,12 @@ run_engine_constrained <- function(arm_list,
         which_arm <- which(arm==arm_list)
         for (obj in 1:l_disres) {
           input_list_arm_base[[names_disres[[obj]]]] <-  cloned_resources[[obj]][[which_arm]]
+        }
+      }
+      if(l_sharedi>0){
+        which_arm <- which(arm==arm_list)
+        for (obj in 1:l_sharedi) {
+          input_list_arm_base[[names_sharedi[[obj]]]] <-  list_shared_inputs[[obj]][[which_arm]]
         }
       }
       
