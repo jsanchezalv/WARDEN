@@ -23,7 +23,9 @@ run_engine <- function(arm_list,
                             unique_pt_inputs=NULL,
                             input_list = NULL,
                             pb = pb,
-                            seed = seed){
+                            seed = seed,
+                       .warden_ctx = .warden_ctx) {
+  
   # Initial set-up --------------------------
   arm_list <- arm_list
   simulation <- input_list$simulation
@@ -44,7 +46,6 @@ run_engine <- function(arm_list,
   temp_log_pt <- list()
 
     
-  tryCatch({
     
     list_discrete_resources <- list()
     for (obj in ls(input_list)) {
@@ -69,6 +70,8 @@ run_engine <- function(arm_list,
     if((((sens - 1) * n_sim * npats) + ((simulation - 1) * npats) + i) %% ceiling(npats*n_sim*length_sensitivities / min(npats*length_sensitivities*n_sim,50)) == 0){
       pb(sprintf("Simulation %g", simulation))
       }
+    .set_last_ctx("Error in setup:common_pt_inputs", sens=input_list$sens,
+                  simulation=input_list$simulation, patient_id=i)
     
     #Create empty pat data for each arm
     this_patient <- list()
@@ -101,6 +104,8 @@ run_engine <- function(arm_list,
         )
         
         temp_log_pt <- c(temp_log_pt,dump_info)
+        log_add(dump_info)
+        
       }
     }
     
@@ -121,9 +126,10 @@ run_engine <- function(arm_list,
       
       #Unique patient-arm inputs
       set.seed(seed*(simulation*1007 + i*53 + which(arm==arm_list)))
-      # set.seed(seed*(simulation*1007 + i*191))
       # Initialize values to prevent errors
-
+      .set_last_ctx("Error in setup:unique_pt_inputs", sens=input_list$sens,
+                    simulation=input_list$simulation, patient_id=i, arm=arm)
+      
       if(!is.null(unique_pt_inputs)){
         
         if(env_setup_arm){
@@ -146,11 +152,16 @@ run_engine <- function(arm_list,
           )
           
           temp_log_pt <- c(temp_log_pt,dump_info)
+          log_add(dump_info)
+          
         }
       }
       
       # Generate event list
       set.seed(seed*(simulation*1007 + i*349))
+      
+      .set_last_ctx("Error in setup:initiate_evt", sens=input_list$sens,
+                    simulation=input_list$simulation, patient_id=i, arm=arm)
       
       if (!is.null(input_list_arm$init_event_list)) {
         priority_order <- input_list_arm$init_event_list[[1]]$evts
@@ -184,6 +195,8 @@ run_engine <- function(arm_list,
                                      "; Patient: ", input_list_arm$i,
                                      "; Initialize Time to Events for Patient-Arm")
           temp_log_pt <- c(temp_log_pt, dump_info)
+          log_add(dump_info)
+          
         }
         
         # Load time data into patient-arm environment
@@ -235,6 +248,10 @@ run_engine <- function(arm_list,
         current_event <- next_evt$event_name
         current_time <- next_evt$time
         
+        .set_last_ctx("Error in engine:event reaction", sens=input_list$sens,
+                      simulation=input_list$simulation, patient_id=i,
+                      arm=arm, event=current_event, time=current_time)
+        
         # Calculate prevtime correctly (current curtime becomes prevtime)
         current_prevtime <- input_list_arm$curtime
         if(is.infinite(current_prevtime)){
@@ -263,7 +280,10 @@ run_engine <- function(arm_list,
                                                         extra_data
               )
               
-              temp_log_pt <- c(temp_log_pt,input_list_arm$log_list)
+              if(debug) {
+                if (!is.null(input_list_arm$log_list)) temp_log_pt <- c(temp_log_pt,input_list_arm$log_list)
+                if (!is.null(input_list_arm$log_list)) log_add(input_list_arm$log_list)
+              }
       }
       
     }
@@ -285,37 +305,5 @@ run_engine <- function(arm_list,
   }
     return(final_output)
   
-  }, error = function(e) {
-
-    if(input_list$debug){
-      
-      final_output <- list()  
-      final_output$log_list <- lapply(temp_log_pt,transform_debug)
-      final_output$error_m <- paste0(e$message, " in ", paste0(e$call,collapse=", "),
-                                     paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
-                                            "; arm: ", if (exists("arm")) arm,
-                                            "; event: ", if (exists("current_event")) current_event,
-                                            "; time: ", if (exists("current_time")) current_time))
-      return(final_output)
-    }else if(input_list$continue_on_error){
-      final_output <- list()  
-      
-      final_output$error_m <- paste0(e$message, " in ", paste0(e$call,collapse=", "),
-                                     paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
-                                            "; arm: ", if (exists("arm")) arm,
-                                            "; event: ", if (exists("current_event")) current_event,
-                                            "; time: ", if (exists("current_time")) current_time))
-      return(final_output)
-      
-    } else{
-      
-      stop(paste0(e$message, " in ", paste0(e$call,collapse=", "),
-                  paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
-                         "; arm: ", if (exists("arm")) arm,
-                         "; event: ", if (exists("current_event")) current_event,
-                         "; time: ", if (exists("current_time")) current_time))
-      )
-    }
-  } )
 
 }

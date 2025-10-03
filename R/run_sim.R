@@ -203,7 +203,7 @@ run_sim <- function(arm_list=c("int","noint"),
              ifelse(!is.na(ctx$time),paste0("Time ", ctx$time,"; "),"")
     ))
     
-   if(ctx$stage!="Simulation finalized.") traceback()
+   if(ctx$stage!="Simulation finalized"){message("An error occurred somewhere. Traceback available through traceback()")}
    
   }, add=TRUE)
   
@@ -546,7 +546,7 @@ run_sim <- function(arm_list=c("int","noint"),
   
    }, enable=TRUE, cleanup = TRUE)
     
-    .set_last_ctx(stage="Simulation finalized without errors")
+    .set_last_ctx(stage="Simulation finalized")
     
   return(results)
   
