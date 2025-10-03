@@ -114,7 +114,10 @@ run_engine_constrained <- function(arm_list,
     # 1 Loop per arm ----------------------------------------------------------
     for (arm in arm_list) {
       # Clone simulation environment for this arm
-      input_list_arm_base <- rlang::env_clone(input_list, parent.env(input_list)) 
+      # input_list_arm_base <- rlang::env_clone(input_list, parent.env(input_list)) 
+      input_list_arm_base <- new.env(parent = input_list)
+      list2env(as.list(input_list), input_list_arm_base) 
+      
       input_list_arm_base$arm <- arm
       
       if(l_disres>0){
@@ -142,11 +145,14 @@ run_engine_constrained <- function(arm_list,
         }
         
         # Create patient environment (child of arm base environment)
-        input_list_pt <- rlang::env_clone(input_list_arm_base, parent.env(input_list_arm_base))
+        # input_list_pt <- rlang::env_clone(input_list_arm_base, parent.env(input_list_arm_base))
+        input_list_pt <- new.env(parent = input_list_arm_base)
+        list2env(as.list(input_list_arm_base), input_list_pt) 
+        
         input_list_pt$i <- i
         
         .set_last_ctx("Error in setup:common_pt_inputs", sens=input_list$sens,
-                      simulation=input_list$simulation, patient_id=i, arm=arm)
+                      simulation=input_list$simulation, patient_id=i, arm=arm, .warden_ctx = .warden_ctx)
         
         # Load common patient inputs if they exist
         
@@ -179,10 +185,12 @@ run_engine_constrained <- function(arm_list,
         set.seed(seed*(simulation*1007 + i*53 + which(arm==arm_list)))
         
         # Create patient-arm environment (child of patient environment)
-        input_list_arm <- rlang::env_clone(input_list_pt, parent.env(input_list_pt))
+        # input_list_arm <- rlang::env_clone(input_list_pt, parent.env(input_list_pt))
+        input_list_arm <- new.env(parent = input_list_pt)
+        list2env(as.list(input_list_pt), input_list_arm) 
         
         .set_last_ctx("Error in setup:unique_pt_inputs", sens=input_list$sens,
-                      simulation=input_list$simulation, patient_id=i, arm=arm)
+                      simulation=input_list$simulation, patient_id=i, arm=arm, .warden_ctx = .warden_ctx)
         # Load unique patient-arm inputs
         if (!is.null(unique_pt_inputs)) {
           if (env_setup_arm) {
@@ -213,7 +221,7 @@ run_engine_constrained <- function(arm_list,
         set.seed(seed * (simulation * 1007 + i * 349))
         
         .set_last_ctx("Error in setup:initiate_evt", sens=input_list$sens,
-                      simulation=input_list$simulation, patient_id=i, arm=arm)
+                      simulation=input_list$simulation, patient_id=i, arm=arm, .warden_ctx = .warden_ctx)
         
         if (is.null(input_list_arm$init_event_list)) {
           # No events defined, add start event at time 0
@@ -284,7 +292,7 @@ run_engine_constrained <- function(arm_list,
       n_evt <- 0
       
       .set_last_ctx("Error in start:event processing", sens=input_list$sens,
-                    simulation=input_list$simulation)
+                    simulation=input_list$simulation, .warden_ctx = .warden_ctx)
       # Process events while queue is not empty
       while (!queue_empty(event_queue)) {
         
@@ -300,7 +308,7 @@ run_engine_constrained <- function(arm_list,
         
         .set_last_ctx("Error in engine:event reaction", sens=input_list$sens,
                       simulation=input_list$simulation, patient_id=current_patient_id,
-                      arm=arm, event=current_event, time=current_time)
+                      arm=arm, event=current_event, time=current_time, .warden_ctx = .warden_ctx)
         # Get the appropriate patient-arm environment
         input_list_arm <- patient_arm_environments[[current_patient_id]]
 

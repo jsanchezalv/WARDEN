@@ -156,42 +156,6 @@ initiate_evt <- function(arm_name,input_list_arm){
 
 
 
-# Get next event ------------------------------------------------------------------------------------------------------------------------------------------
-
-#' Identify which event to process next from a list of events
-#'
-#' @param evt_list A list of possible events with event times
-#'
-#' @return Two lists: one containing the name and time of the next event, the other with the remaining events to be processed
-#'
-#' @examples
-#' \donttest{
-#' get_next_evt(evt_list = input_list_arm$cur_evtlist)
-#'}
-#'
-#' @keywords internal
-#' @noRd
-
-get_next_evt <- function(evt_list){                  # This function identifies which event is to be processed next for each patient, depending on intervention
-
-  if (length(evt_list)>0) {
-    
-    # min_evt <- which.min(evt_list) #old method
-
-    #select the position in the vector that has the minimum time, adding the priority times to make sure to select the right one,
-    # 4x slower than old method, but this is required to solve ties
-    
-    min_evt <- which.min(evt_list + parent.frame()$input_list_arm$precision_times[names(evt_list)]) 
-    cur_evtlist <- list(out = list(evt = names(evt_list[min_evt]), evttime = evt_list[[min_evt]]), evt_list = evt_list[-min_evt])
-  } else {
-    cur_evtlist <- NULL
-  }
-
-
-  return(cur_evtlist)
-}
-
-
 
 # Reaction to Event ---------------------------------------------------------------------------------------------------------------------------------------
 
@@ -422,12 +386,25 @@ interval_out <- function(output_sim, element,round_digit=2) {
                           arm        = NA_character_,
                           event      = NA_character_,
                           time       = NA_real_,
-                          seed       = NA_real_) {
-  .warden_ctx <- get0(".warden_ctx",parent.frame(),inherits = TRUE)
+                          seed       = NA_real_,
+                          .warden_ctx = NULL) {
+  # Fast path: use provided env; else fall back to frame lookup once
+  if (is.null(.warden_ctx)) {
+    .warden_ctx <- get(".warden_ctx", parent.frame(), inherits = TRUE)
+  }
+
   
-  .warden_ctx$last <- list(stage=stage, sens=sens, simulation=simulation,
-                           patient_id=patient_id, arm=arm, event=event,
-                           time=time, seed=seed)
+  # Mutate in place (no list alloc)
+  .warden_ctx$last$stage      <- stage
+  .warden_ctx$last$sens       <- sens
+  .warden_ctx$last$simulation <- simulation
+  .warden_ctx$last$patient_id <- patient_id
+  .warden_ctx$last$arm        <- arm
+  .warden_ctx$last$event      <- event
+  .warden_ctx$last$time       <- time
+  .warden_ctx$last$seed       <- seed
+  
+  invisible(NULL)
 }
 
 # ---- Shared log sink (append-only; survives errors) ----

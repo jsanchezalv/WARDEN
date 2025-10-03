@@ -44,8 +44,6 @@ run_engine <- function(arm_list,
   patdata <- vector("list", length=npats) # empty list with npats elements
 
   temp_log_pt <- list()
-
-    
     
     list_discrete_resources <- list()
     for (obj in ls(input_list)) {
@@ -71,11 +69,14 @@ run_engine <- function(arm_list,
       pb(sprintf("Simulation %g", simulation))
       }
     .set_last_ctx("Error in setup:common_pt_inputs", sens=input_list$sens,
-                  simulation=input_list$simulation, patient_id=i)
+                  simulation=input_list$simulation, patient_id=i, .warden_ctx = .warden_ctx)
     
     #Create empty pat data for each arm
     this_patient <- list()
-    input_list_pt <- rlang::env_clone(input_list , parent.env(input_list))
+    # input_list_pt <- rlang::env_clone(input_list , parent.env(input_list))
+    input_list_pt <- new.env(parent = input_list)
+    list2env(as.list(input_list), input_list_pt) 
+    
     input_list_pt$i <- i
     
     #Extract the inputs that are common for each patient across interventions
@@ -114,8 +115,15 @@ run_engine <- function(arm_list,
     for (arm in arm_list) {
       
       #Extract the inputs that are unique for each patient-intervention
-      input_list_arm <- rlang::env_clone(input_list_pt , parent.env(input_list_pt))
+      # input_list_arm <- rlang::env_clone(input_list_pt , parent.env(input_list_pt))
+      
+      input_list_arm <- new.env(parent = input_list_pt)
+      list2env(as.list(input_list_pt), input_list_arm) 
+      
+      
       input_list_arm$arm <- arm
+      
+      
       
       if(l_disres>0){
         which_arm <- which(arm==arm_list)
@@ -128,7 +136,7 @@ run_engine <- function(arm_list,
       set.seed(seed*(simulation*1007 + i*53 + which(arm==arm_list)))
       # Initialize values to prevent errors
       .set_last_ctx("Error in setup:unique_pt_inputs", sens=input_list$sens,
-                    simulation=input_list$simulation, patient_id=i, arm=arm)
+                    simulation=input_list$simulation, patient_id=i, arm=arm, .warden_ctx = .warden_ctx)
       
       if(!is.null(unique_pt_inputs)){
         
@@ -161,7 +169,7 @@ run_engine <- function(arm_list,
       set.seed(seed*(simulation*1007 + i*349))
       
       .set_last_ctx("Error in setup:initiate_evt", sens=input_list$sens,
-                    simulation=input_list$simulation, patient_id=i, arm=arm)
+                    simulation=input_list$simulation, patient_id=i, arm=arm, .warden_ctx = .warden_ctx)
       
       if (!is.null(input_list_arm$init_event_list)) {
         priority_order <- input_list_arm$init_event_list[[1]]$evts
@@ -250,7 +258,7 @@ run_engine <- function(arm_list,
         
         .set_last_ctx("Error in engine:event reaction", sens=input_list$sens,
                       simulation=input_list$simulation, patient_id=i,
-                      arm=arm, event=current_event, time=current_time)
+                      arm=arm, event=current_event, time=current_time, .warden_ctx = .warden_ctx)
         
         # Calculate prevtime correctly (current curtime becomes prevtime)
         current_prevtime <- input_list_arm$curtime

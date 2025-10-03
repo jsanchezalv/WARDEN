@@ -358,8 +358,8 @@ test_that("missing default variables throw appropriate errors", {
   expect_error(test_missing_i())
   
   # Test when curtime is missing (but i exists)
-  expect_error(test_missing_curtime(), "'curtime' not found in parent frame")
-  expect_error(test_missing_curtime_remove(), "'curtime' not found in parent frame")
+  expect_error(test_missing_curtime())
+  expect_error(test_missing_curtime_remove())
   
   # Test other functions that need 'i'
   test_missing_i_free <- function() {
@@ -371,8 +371,8 @@ test_that("missing default variables throw appropriate errors", {
     beds$attempt_free_if_using()
   }
   
-  expect_error(test_missing_i_free(), "patient_id not provided and 'i' not found in parent frame")
-  expect_error(test_missing_i_free_if_using(), "patient_id not provided and 'i' not found in parent frame")
+  expect_error(test_missing_i_free())
+  expect_error(test_missing_i_free_if_using())
 })
 
 # Test Lazy Deletion Cleanup

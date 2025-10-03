@@ -199,7 +199,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   # # ---- Error-context beacon (for clean messages; keeps base traceback) ----
   .warden_ctx <- new.env(parent = emptyenv())
   .warden_ctx$last <- NULL
-  .set_last_ctx(stage="Error in setup:initial code setup")
+  .set_last_ctx(stage="Error in setup:initial code setup", .warden_ctx = .warden_ctx)
   
   log_sink <- new.env(parent = emptyenv())
   log_sink$entries <- list()
@@ -412,7 +412,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     # Draw Common parameters  -------------------------------
     input_list_sens <- as.environment(input_list_sens)
     parent.env(input_list_sens) <- environment()
-    .set_last_ctx(stage="Error in setup:sensitivity_inputs", sens=sens)
+    .set_last_ctx(stage="Error in setup:sensitivity_inputs", sens=sens, .warden_ctx = .warden_ctx)
     
     # Draw Common parameters  -------------------------------
     if(!is.null(sensitivity_inputs)){
@@ -459,7 +459,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                          .options.future = list(packages = .packages()),
                          .options.future = list(globals=structure(TRUE,add = exported_items)),
                          .combine = 'c') %dofuture% {
-      .set_last_ctx(stage="Error in setup:simulation_start", sens=sens, simulation=simulation)
+      .set_last_ctx(stage="Error in setup:simulation_start", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
                            
       RNGkind("L'Ecuyer-CMRG") #repeat this here so parallel::RngStream does not malfunction
                             
@@ -473,7 +473,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       input_list$simulation <- simulation
       
       set.seed(simulation*1007*seed)
-      .set_last_ctx(stage="setup:common_all_inputs", sens=sens, simulation=simulation)
+      .set_last_ctx(stage="setup:common_all_inputs", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
       
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
@@ -511,7 +511,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       if(is.null(input_list$drq)){input_list$drq <- 0.03}
       
       # Run engine ----------------------------------------------------------
-        .set_last_ctx(stage="Error in engine:start", sens=sens, simulation=simulation)
+        .set_last_ctx(stage="Error in engine:start", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
         on_error_check({
           if(constrained){
             final_output <- run_engine_constrained(arm_list=arm_list,
@@ -565,7 +565,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     }
   }, enable=TRUE, cleanup = TRUE) 
   
-  .set_last_ctx(stage="Simulation finalized")
+  .set_last_ctx(stage="Simulation finalized", .warden_ctx = .warden_ctx)
   
   
   return(results)

@@ -47,7 +47,7 @@ options(tibble.print_max = 50)
 # General inputs with delayed execution
 Compared to the standard sick-sicker-death model vignette, here nothing changes, except that now we add a resource which will be constrained (in a discrete manner, i.e., it accepts an integer amount of units and the resource can only be used unit-wise, like hospital beds, or doctors).
 
-We should be careful about where we put the constrained resource, as the level at which we set it up will determine its availability to patients. Normally the intention is to have the resource being shared within an arm by patients (and cloned across arms to make sure we compare apples to apples), which means the resource should be allocated in `common_all_inputs` (as those inputs will be cloned per arm, so they will not be shared across arms). In our case, we call the resource `beds`, and we use `resource_discrete()` to set 650 beds to be shared. We also keep track of the number of beds free for the purpose of seeing it in the results.
+We should be careful about where we put the constrained resource, as the level at which we set it up will determine its availability to patients. Normally the intention is to have the resource being shared within an arm by patients (and cloned across arms to make sure we compare apples to apples), which means the resource should be allocated in `common_all_inputs` (as those inputs will be cloned per arm, so they will not be shared across arms unless explicitly declared so using the specific constrained objects like `resource_discrete` or `shared_input`). In our case, we call the resource `beds`, and we use `resource_discrete()` to set 650 beds to be shared. We also keep track of the number of beds free for the purpose of seeing it in the results.
 
 Because of the way the constrained simulation works, it is very important to pre-define any random numbers that will be used before the simulation executes (normally at the `unique_pt_inputs` level, though depends on the case, see below for an exception and the early breast cancer model for the norm), and not to call the "r" functions (`rexp`, `rpois`...) in the event reactions. This is because the random state of the model will change as it goes over the model, and the nature of the loop makes it so that the random states can be mixed between patients between one simulation and another if an event TTE is altered so its position in the queue changes from one simulation to another. This is also very important if we want to compare outcomes using constrained = FALSE and constrained = TRUE (as in constrained = FALSE the random state is patient specific and can be tracked, but in constrained is much harder to do so or would violate CRAN norms).
 
@@ -69,6 +69,8 @@ common_all_inputs <-add_item2(input = {
                       random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
                       beds <- resource_discrete(650)
                       beds_free <- beds$n_free()
+                      shared_accumulator <- shared_input(0)
+                      value_accum <- 0
 })  
 
 
@@ -115,6 +117,8 @@ We are also tracking a few things just to keep track of them, like free beds cou
 evt_react_list <-
   add_reactevt(name_evt = "sick",
                input = {
+                 shared_accumulator <- shared_accumulator$modify(shared_accumulator$value() + 1)
+                 value_accum <- shared_accumulator$value()
                  beds_free <- beds$n_free()
                  time_in_queue <- NA
                }) %>%
@@ -191,7 +195,7 @@ results <- run_sim(
   cost_ongoing_list = cost_ongoing,
   constrained = TRUE,
   ipd = 1,
-  input_out = c("beds_free","had_to_queue","time_in_queue")
+  input_out = c("beds_free","had_to_queue","time_in_queue","value_accum")
 )
 ```
 # Post-processing of Model Outputs

@@ -670,8 +670,9 @@ new_event <- function(events, ptr, patient_id) {
     events <- unlist(events)
   }
   
-  input_list_arm <- parent.frame()
-  if(input_list_arm$debug){
+  if(parent.frame()$debug){
+    input_list_arm <- parent.frame()
+    
     new_evt_name <- names(events)
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                   "; Sim: ", input_list_arm$simulation,
@@ -1035,18 +1036,12 @@ resource_discrete <- function(n) {
   env$attempt_block <- function(patient_id = NULL, priority = 1L, start_time = NULL) {
     # Get patient_id from parent frame if not provided
     if (is.null(patient_id)) {
-      patient_id <- tryCatch(
-        get("i", envir = parent.frame(), inherits = TRUE),
-        error = function(e) stop("patient_id not provided and 'i' not found in parent frame")
-      )
+      patient_id <-get("i", envir = parent.frame(), inherits = TRUE)
     }
     
     # Get start_time from parent frame if not provided
     if (is.null(start_time)) {
-      start_time <- tryCatch(
-        get("curtime", envir = parent.frame(), inherits = TRUE),
-        error = function(e) stop("start_time not provided and 'curtime' not found in parent frame")
-      )
+      start_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
     }
     
     # Validate inputs
@@ -1067,10 +1062,7 @@ resource_discrete <- function(n) {
   env$attempt_free <- function(patient_id = NULL, remove_all = FALSE) {
     # Get patient_id from parent frame if not provided
     if (is.null(patient_id)) {
-      patient_id <- tryCatch(
-        get("i", envir = parent.frame(), inherits = TRUE),
-        error = function(e) stop("patient_id not provided and 'i' not found in parent frame")
-      )
+      patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
     }
     
     # Validate inputs
@@ -1089,10 +1081,7 @@ resource_discrete <- function(n) {
   env$attempt_free_if_using <- function(patient_id = NULL, remove_all = FALSE) {
     # Get patient_id from parent frame if not provided
     if (is.null(patient_id)) {
-      patient_id <- tryCatch(
-        get("i", envir = parent.frame(), inherits = TRUE),
-        error = function(e) stop("patient_id not provided and 'i' not found in parent frame")
-      )
+      patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
     }
     
     # Validate inputs
@@ -1144,10 +1133,7 @@ resource_discrete <- function(n) {
   env$remove_resource <- function(n_to_remove, current_time = NULL) {
     # Get current_time from parent frame if not provided
     if (is.null(current_time)) {
-      current_time <- tryCatch(
-        get("curtime", envir = parent.frame(), inherits = TRUE),
-        error = function(e) stop("current_time not provided and 'curtime' not found in parent frame")
-      )
+      current_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
     }
     
     if (!is.numeric(n_to_remove) || length(n_to_remove) != 1 || n_to_remove < 1) {
@@ -1179,6 +1165,104 @@ print.resource_discrete <- function(x, ...) {
   cat("  Queue size:", x$queue_size(), "\n")
   cat("  Patients using:", length(x$patients_using()), "\n")
   invisible(x)
+}
+
+
+#' Shared input object
+#'
+#' Constructor for a simple value holder with two modes:
+#' - constrained = FALSE: immutable copy-on-modify (safe in loops, deep-copyable)
+#' - constrained = TRUE: mutable by-reference environment
+#'
+#' @param expr An expression or value to initialize
+#' @param constrained Logical. If TRUE, creates shared environment; else plain value object
+#' @return An object with $value, $modify(), and $clone()
+#' 
+#' @examples
+#' # default FALSE (no constrained in parent)
+#' a <- shared_input(5)
+#' a$value()                 # 5
+#' a2 <- a$modify(a$value() + 7)
+#' a$value()                 # 5
+#' a2$value()                # 12
+#' 
+#' # parent says TRUE -> shared
+#' constrained <- TRUE
+#' b1 <- shared_input(10)
+#' b2 <- b1              # alias
+#' b1$value(); b2$value()            # 10, 10
+#' b1 <- b1$modify(b1$value() + 1)   # update shared state
+#' b1$value(); b2$value()            # 11, 11
+#' b3 <- b1$clone()
+#' b1 <- b1$modify(99)
+#' b1$value(); b3$value()            # 99, 11 (deep copy intact)
+#' @export
+shared_input <- function(expr, constrained = NULL) {
+  # Resolve constrained default from parent env, but only TRUE counts as TRUE
+  if (is.null(constrained)) {
+    constrained_parent <- get0("constrained",
+                               envir = parent.frame(),
+                               inherits = TRUE,
+                               ifnotfound = NA)
+    constrained <- isTRUE(constrained_parent)
+  } else {
+    constrained <- isTRUE(constrained)
+  }
+  
+  val <- expr  # already evaluated before call
+  
+  # ---------- immutable (non-shared) ----------
+  if (!constrained) {
+    make_val <- function(v, init = v) {
+      force(v); force(init)
+      self <- list()
+      self$value  <- local({ vv <- v; function() vv })
+      self$modify <- function(new_v) make_val(new_v, init = init)
+      self$clone  <- function()     make_val(v, init = init)  # deep copy
+      self$reset  <- function()     make_val(init, init = init)
+      self$fork   <- function(n)    replicate(n, self$clone(), simplify = FALSE)
+      class(self) <- c("shared_input_val", "shared_input")
+      self
+    }
+    return(make_val(val, init = val))
+  }
+  
+  # ---------- shared (environment-backed with shared state) ----------
+  # All wrappers to the same object share `state`; clone breaks sharing.
+  make_env <- local({
+    make <- function(state) {
+      self <- new.env(parent = emptyenv())
+      self$`.__state__` <- state
+      self$value  <- function() state$val
+      # Functional modify: updates shared state, returns a fresh wrapper
+      self$modify <- function(new_v) { state$val <- new_v; make(state) }
+      # Deep clone: new independent state
+      self$clone  <- function() {
+        new_state <- new.env(parent = emptyenv())
+        new_state$val  <- state$val
+        new_state$init <- state$init
+        make(new_state)
+      }
+      # Reset to initial (independent fresh state)
+      self$reset  <- function() {
+        new_state <- new.env(parent = emptyenv())
+        new_state$val  <- state$init
+        new_state$init <- state$init
+        make(new_state)
+      }
+      # Make n independent deep clones quickly
+      self$fork   <- function(n) replicate(n, self$clone(), simplify = FALSE)
+      
+      class(self) <- c("shared_input_env", "shared_input")
+      self
+    }
+    make
+  })
+  
+  state <- new.env(parent = emptyenv())
+  state$val  <- val
+  state$init <- val
+  make_env(state)
 }
 
 # Add_reactevt -------------------------------------------------------------------------------------------------------------------------------------------
