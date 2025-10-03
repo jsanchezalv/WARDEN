@@ -49,6 +49,8 @@ Compared to the standard sick-sicker-death model vignette, here nothing changes,
 
 We should be careful about where we put the constrained resource, as the level at which we set it up will determine its availability to patients. Normally the intention is to have the resource being shared within an arm by patients (and cloned across arms to make sure we compare apples to apples), which means the resource should be allocated in `common_all_inputs` (as those inputs will be cloned per arm, so they will not be shared across arms unless explicitly declared so using the specific constrained objects like `resource_discrete` or `shared_input`). In our case, we call the resource `beds`, and we use `resource_discrete()` to set 650 beds to be shared. We also keep track of the number of beds free for the purpose of seeing it in the results.
 
+For the sake of an example, we also create a shared input that we will be updating as a counter of patients as they go through the simulation, to showcase how inputs can be shared. Objects that are not defined in `resource_discrete` or `shared_inputs` will not be shared, and hard copies will be made (unless the user introduces objects which are environments, in which case by their own nature they will be modified by reference, so they will be shared across analyses, simulations, arms, and patients, so their use is not really recommended except for advanced R users).
+
 Because of the way the constrained simulation works, it is very important to pre-define any random numbers that will be used before the simulation executes (normally at the `unique_pt_inputs` level, though depends on the case, see below for an exception and the early breast cancer model for the norm), and not to call the "r" functions (`rexp`, `rpois`...) in the event reactions. This is because the random state of the model will change as it goes over the model, and the nature of the loop makes it so that the random states can be mixed between patients between one simulation and another if an event TTE is altered so its position in the queue changes from one simulation to another. This is also very important if we want to compare outcomes using constrained = FALSE and constrained = TRUE (as in constrained = FALSE the random state is patient specific and can be tracked, but in constrained is much harder to do so or would violate CRAN norms).
 
 ```{r input_delayed}
@@ -242,7 +244,7 @@ ggplot(psa_ipd %>% group_by(arm,pat_id) %>% summarise(time_in_queue=mean(time_in
 
 # Sensitivity Analysis
 ## Run model with constrained = FALSE
-It can be seen that with constrained = FALSE, the results are equivalent to the SSD standard vignette. Furthermore, if the model is run with constrainted = TRUE but in such a way that the constraint does not bind (e.g., with 1000+ beds) then the results are also equivalent.
+It can be seen that with constrained = FALSE, the results are equivalent to the SSD standard vignette. Furthermore, if the model is run with constrained = TRUE but in such a way that the constraint does not bind (e.g., with 1000+ beds) then the results are also equivalent. If the model is run with constrained = FALSE, then shared inputs and resources are no longer shared. This allows to very quickly evaluate how the model outputs change when resources are constrained vs. when they are not.
 
 ```{r model_run_unc}
 #Logic is: per patient, per intervention, per event, react to that event.

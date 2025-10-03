@@ -1,3 +1,16 @@
+# WARDEN 1.3.3
+* Rcpp event based handler has been created using queues for high efficiency. In the new system,
+a unique event per patient is accepted in the queue, so small changes may be needed in codes where
+multiple equally named events were set to accommodate the new system. This is to ensure best practices and clarity
+regarding which events are modified, in the queue, etc.
+* Simulation and engines have been redesigned and simplified to more cleanly handle and report errors, debug mode and continue on error functions.
+* Constrained based engine has been created, which allows to run resource constrained DES, where resource
+and/or inputs can be shared across patients within an arm. This can be activated by using run_sim with constrained = TRUE.
+* Rcpp based discrete resources with their own queuing system have been implemented (only interacted through R,
+working similar to R6 objects). This can be created by using resource_discrete()
+* Shared inputs have been created to be used in constrained DES (works similar to R6 objects). This can be created by using shared_input().
+* New vignette showcasing an example for constrained DES has been created.
+
 # WARDEN 1.3.0
 * Rcpp versions of key functions have been implemented for speed improvements:
 disc_cycle_v, disc_ongoing_v, disc_instant_v, qcond_*, qtimecov, luck_adj

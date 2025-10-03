@@ -93,8 +93,9 @@ run_engine_constrained <- function(arm_list,
   temp_log_pt <- list()
   temp_log <- list()
   
-    list_discrete_resources <- list()
-    for (obj in ls(input_list)) {
+  list_discrete_resources <- list()
+  list_shared_inputs <- list()
+  for (obj in ls(input_list)) {
       if(inherits(input_list[[obj]],"resource_discrete")){
         new_obj <- list(input_list[[obj]])
         names(new_obj) <- obj
@@ -120,7 +121,7 @@ run_engine_constrained <- function(arm_list,
     
     if(l_sharedi>0){
       names_sharedi <- names(list_shared_inputs)
-      cloned_resources <- list()
+      cloned_sharedi <- list()
       for (obj in 1:l_sharedi) {
         cloned_sharedi[[obj]] <- list_shared_inputs[[obj]]$fork(n_arms)
       }
@@ -143,7 +144,7 @@ run_engine_constrained <- function(arm_list,
       if(l_sharedi>0){
         which_arm <- which(arm==arm_list)
         for (obj in 1:l_sharedi) {
-          input_list_arm_base[[names_sharedi[[obj]]]] <-  list_shared_inputs[[obj]][[which_arm]]
+          input_list_arm_base[[names_sharedi[[obj]]]] <-  cloned_sharedi[[obj]][[which_arm]]
         }
       }
       
