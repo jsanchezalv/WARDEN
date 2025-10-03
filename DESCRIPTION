@@ -48,7 +48,6 @@ Imports:
     zoo,
     progressr,
     magrittr,
-    rlang,
     tidyr,
     Rcpp
 VignetteBuilder: knitr

@@ -76,6 +76,8 @@ load_inputs2 <- function(inputs,list_uneval_inputs){
 #' @param new_data New inputs after changes
 #'
 #' @return dump_info list of previous and current values
+#' 
+#' @importFrom stats setNames
 #'
 #' @examples
 #' debug_inputs(input_list_pt,input_list_arm)
@@ -358,6 +360,7 @@ get_input <-  function(x,ifnull=0,type,evt_arm_i =evt_arm, input_list_arm_i=inpu
 #'
 #' @return Mean and 95% CI from the PSA samples
 #' @importFrom purrr map_dbl
+#' @importFrom purrr map
 #' @importFrom stats quantile
 #'
 #' @examples
@@ -927,6 +930,8 @@ compute_outputs_timseq <- function(freq,
 #' @import data.table
 #' @importFrom utils tail
 #' @importFrom zoo na.locf
+#' @importFrom purrr map
+#' @importFrom purrr map_dbl
 #' 
 #' @details
 #' It computes the discounted and undiscounted lys/costs/qalys. 

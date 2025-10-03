@@ -26,6 +26,8 @@
 #'
 #' @return A list containing simulation results with the same structure as run_engine
 #' 
+#' @importFrom stats setNames
+#' 
 #' @details 
 #' The function creates a hierarchical environment structure per arm:
 #' \enumerate{
@@ -40,10 +42,6 @@
 #' Events are processed using a shared event queue per arm, ensuring chronological
 #' ordering across all patients within the arm.
 #'
-#' @importFrom purrr map
-#' @importFrom purrr map_dbl  
-#' @importFrom data.table rbindlist
-#' @importFrom rlang env_clone
 #'
 #' @noRd
 run_engine_constrained <- function(arm_list,

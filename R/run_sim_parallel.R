@@ -50,7 +50,7 @@ if(getRversion() >= "2.15.1") {
 #' @importFrom progressr handlers
 #' @importFrom progressr progressor
 #' @importFrom progressr handler_txtprogressbar
-#' @importFrom rlang env_clone
+#' @importFrom stats setNames
 #'
 #' @export
 #' 
@@ -469,7 +469,9 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       start_time_sim <-  proc.time()
                            
                            
-      input_list <- rlang::env_clone(input_list_sens , parent.env(input_list_sens))
+      # input_list <- rlang::env_clone(input_list_sens , parent.env(input_list_sens))
+      input_list <- new.env(parent = input_list_sens)
+      list2env(as.list(input_list_sens), input_list) 
       input_list$simulation <- simulation
       
       set.seed(simulation*1007*seed)

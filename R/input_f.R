@@ -650,6 +650,8 @@ queue_create <- function(priority_order) {
 #'
 #' @return NULL (invisible). Modifies the queue in-place.
 #' @export
+#' 
+#' @importFrom stats setNames
 #'
 #' @details
 #' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified,
@@ -1863,7 +1865,7 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
     
     func_name <- .node_head_name(node_list)
     
-    # ----- Case 1: modify_* / new_event -----
+    # Case 1: modify_* / new_event 
     if (.is_call_named(node_list, c("modify_item_seq", "modify_item", "modify_event", "new_event"))) {
       type <- if (.is_call_named(node_list, c("modify_item_seq", "modify_item"))) "item" else "event"
       
@@ -1887,7 +1889,7 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
       }
     }
     
-    # ----- Case 2: assignment via <- or = (including env/R6 LHS like env$x, x[[k]], x@slot) -----
+    # Case 2: assignment via <- or = (including env/R6 LHS like env$x, x[[k]], x@slot)
     if (.is_call_named(node_list, c("<-", "="))) {
       # For a <- b, the list is typically: list("<-", LHS, RHS)
       lhs <- node_list[[2L]]
@@ -1910,7 +1912,7 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
       }
     }
     
-    # ----- Case 3: assignment via assign("var", value, envir = env) -----
+    # ----- Case 3: assignment via assign("var", value, envir = env) 
     if (.is_call_named(node_list, "assign")) {
       # Positionals: assign(name, value, ...)
       if (length(node_list) >= 3L) {
@@ -1939,12 +1941,12 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
       # We ignore envir=… for the output schema, but this no longer warns or errors.
     }
     
-    # ----- Case 4: if() — mark children as conditional -----
+    # ----- Case 4: if() — mark children as conditional 
     if (.is_call_named(node_list, "if")) {
       conditional_flag <- TRUE
     }
     
-    # ----- Recurse into ALL children, including function position -----
+    # ----- Recurse into ALL children, including function position
     for (child in node_list) {
       results <- rbind(results, extract_elements_from_list(child, conditional_flag))
     }

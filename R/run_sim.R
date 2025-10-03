@@ -35,7 +35,7 @@
 #' @importFrom progressr handlers
 #' @importFrom progressr handler_txtprogressbar
 #' @importFrom progressr progressor
-#' @importFrom rlang env_clone
+#' @importFrom stats setNames
 #' 
 #' @export
 #' @details This function is slightly different from `run_sim_parallel`.
@@ -445,10 +445,11 @@ run_sim <- function(arm_list=c("int","noint"),
       message(paste0("Simulation number: ",simulation))
       .set_last_ctx(stage="Error in setup:simulation_start", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
       
-      
       start_time_sim <-  proc.time()
       
-      input_list <- rlang::env_clone(input_list_sens , parent.env(input_list_sens))
+      # input_list <- rlang::env_clone(input_list_sens , parent.env(input_list_sens))
+      input_list <- new.env(parent = input_list_sens)
+      list2env(as.list(input_list_sens), input_list) 
       input_list$simulation <- simulation
       
       set.seed(simulation*1007*seed)

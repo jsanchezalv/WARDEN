@@ -10,9 +10,8 @@
 #' @param seed Starting seed to be used for the whole analysis
 #'
 #' @return A data frame with the simulation results
-#' @importFrom purrr map
-#' @importFrom purrr map_dbl
-#' @importFrom data.table rbindlist
+#' 
+#' @importFrom stats setNames
 #'
 #' @noRd
 
