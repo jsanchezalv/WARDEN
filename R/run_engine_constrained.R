@@ -51,7 +51,18 @@ run_engine_constrained <- function(arm_list,
                                    unique_pt_inputs = NULL,
                                    input_list = NULL,
                                    pb = pb,
-                                   seed = seed) {
+                                   seed = seed,
+                                   .warden_ctx = .warden_ctx) {
+  
+  on.exit({
+    # If engine exits abnormally, make sure we don’t lose what was in temp_log_pt
+    if (isTRUE(input_list$debug)) {
+      sink <- get0("log_sink", envir = input_list, inherits = TRUE, ifnotfound = NULL)
+      if (!is.null(sink) && exists("temp_log_pt", inherits = FALSE)) {
+        sink$entries <- c(sink$entries, lapply(temp_log_pt, transform_debug))
+      }
+    }
+  }, add = TRUE)
   
   
   # Initial set-up --------------------------
@@ -82,8 +93,6 @@ run_engine_constrained <- function(arm_list,
   temp_log_pt <- list()
   temp_log <- list()
   
-  tryCatch({
-    
     list_discrete_resources <- list()
     for (obj in ls(input_list)) {
       if(inherits(input_list[[obj]],"resource_discrete")){
@@ -136,8 +145,13 @@ run_engine_constrained <- function(arm_list,
         input_list_pt <- rlang::env_clone(input_list_arm_base, parent.env(input_list_arm_base))
         input_list_pt$i <- i
         
+        .set_last_ctx("Error in setup:common_pt_inputs", sens=input_list$sens,
+                      simulation=input_list$simulation, patient_id=i, arm=arm)
+        
         # Load common patient inputs if they exist
+        
         if (!is.null(common_pt_inputs)) {
+          
           if (env_setup_pt) {
             load_inputs2(inputs = input_list_pt, list_uneval_inputs = common_pt_inputs)
           } else {
@@ -156,6 +170,8 @@ run_engine_constrained <- function(arm_list,
                                        "; Patient: ", input_list_pt$i,
                                        "; Initial Patient Conditions")
             temp_log_pt <- c(temp_log_pt, dump_info)
+            log_add(dump_info)
+            
           }
         }
         
@@ -165,6 +181,8 @@ run_engine_constrained <- function(arm_list,
         # Create patient-arm environment (child of patient environment)
         input_list_arm <- rlang::env_clone(input_list_pt, parent.env(input_list_pt))
         
+        .set_last_ctx("Error in setup:unique_pt_inputs", sens=input_list$sens,
+                      simulation=input_list$simulation, patient_id=i, arm=arm)
         # Load unique patient-arm inputs
         if (!is.null(unique_pt_inputs)) {
           if (env_setup_arm) {
@@ -185,12 +203,17 @@ run_engine_constrained <- function(arm_list,
                                        "; Patient: ", input_list_arm$i,
                                        "; Initial Patient-Arm Conditions")
             temp_log_pt <- c(temp_log_pt, dump_info)
+            log_add(dump_info)
+            
           }
         }
         
         
         # Initialize events for this patient-arm
         set.seed(seed * (simulation * 1007 + i * 349))
+        
+        .set_last_ctx("Error in setup:initiate_evt", sens=input_list$sens,
+                      simulation=input_list$simulation, patient_id=i, arm=arm)
         
         if (is.null(input_list_arm$init_event_list)) {
           # No events defined, add start event at time 0
@@ -219,6 +242,8 @@ run_engine_constrained <- function(arm_list,
                                        "; Arm: ", arm,
                                        "; Initialize Time to Events for Patient-Arm")
             temp_log_pt <- c(temp_log_pt, dump_info)
+            log_add(dump_info)
+            
           }
           
           # Load time data into patient-arm environment
@@ -258,6 +283,8 @@ run_engine_constrained <- function(arm_list,
       
       n_evt <- 0
       
+      .set_last_ctx("Error in start:event processing", sens=input_list$sens,
+                    simulation=input_list$simulation)
       # Process events while queue is not empty
       while (!queue_empty(event_queue)) {
         
@@ -270,6 +297,10 @@ run_engine_constrained <- function(arm_list,
         current_patient_id <- next_evt$patient_id
         current_event <- next_evt$event_name
         current_time <- next_evt$time
+        
+        .set_last_ctx("Error in engine:event reaction", sens=input_list$sens,
+                      simulation=input_list$simulation, patient_id=current_patient_id,
+                      arm=arm, event=current_event, time=current_time)
         # Get the appropriate patient-arm environment
         input_list_arm <- patient_arm_environments[[current_patient_id]]
 
@@ -285,6 +316,8 @@ run_engine_constrained <- function(arm_list,
         assign("cur_evtlist", event_queue, envir = input_list_arm)
         
         input_list_arm$n_evt <- input_list_arm$n_evt + 1
+
+       
         
         input_list_arm <- react_evt(list(evt = current_event,
                                          curtime = current_prevtime,
@@ -311,7 +344,11 @@ run_engine_constrained <- function(arm_list,
                                                   extra_data
         )
        
-        temp_log_pt <- c(temp_log_pt,input_list_arm$log_list)
+        if(debug) {
+          if (!is.null(input_list_arm$log_list)) temp_log_pt <- c(temp_log_pt,input_list_arm$log_list)
+          if (!is.null(input_list_arm$log_list)) log_add(input_list_arm$log_list)
+        }
+
         
       }
     }
@@ -328,36 +365,4 @@ run_engine_constrained <- function(arm_list,
    
     
     return(final_output)
-    
-  }, error = function(e) {
-    if(input_list$debug){
-      
-      final_output <- list()  
-      final_output$log_list <- lapply(temp_log_pt,transform_debug)
-      final_output$error_m <- paste0(e$message, " in ", paste0(e$call,collapse=", "),
-                                     paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
-                                            "; arm: ", if (exists("arm")) arm,
-                                            "; event: ", if (exists("current_event")) current_event,
-                                            "; time: ", if (exists("current_time")) current_time))
-      return(final_output)
-    }else if(input_list$continue_on_error){
-      final_output <- list()  
-      
-      final_output$error_m <- paste0(e$message, " in ", paste0(e$call,collapse=", "),
-                                     paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
-                                            "; arm: ", if (exists("arm")) arm,
-                                            "; event: ", if (exists("current_event")) current_event,
-                                            "; time: ", if (exists("current_time")) current_time))
-      return(final_output)
-      
-    } else{
-      
-      stop(paste0(e$message, " in ", paste0(e$call,collapse=", "),
-                  paste0(". Error in patient: ", if (exists("current_patient_id")) current_patient_id,
-                         "; arm: ", if (exists("arm")) arm,
-                         "; event: ", if (exists("current_event")) current_event,
-                         "; time: ", if (exists("current_time")) current_time))
-      )
-    }
-  } )
 }

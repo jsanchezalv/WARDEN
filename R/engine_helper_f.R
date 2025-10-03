@@ -415,6 +415,44 @@ interval_out <- function(output_sim, element,round_digit=2) {
   return(out)
 }
 
+.set_last_ctx <- function(stage,
+                          sens       = NA_integer_,
+                          simulation = NA_integer_,
+                          patient_id = NA_integer_,
+                          arm        = NA_character_,
+                          event      = NA_character_,
+                          time       = NA_real_,
+                          seed       = NA_real_) {
+  .warden_ctx <- get0(".warden_ctx",parent.frame(),inherits = TRUE)
+  
+  .warden_ctx$last <- list(stage=stage, sens=sens, simulation=simulation,
+                           patient_id=patient_id, arm=arm, event=event,
+                           time=time, seed=seed)
+}
+
+# ---- Shared log sink (append-only; survives errors) ----
+log_add <- function(entry) {
+  sink <- get0("log_sink",parent.frame(), inherits = TRUE, ifnotfound = NULL)
+  if (!is.null(sink)) sink$entries <- c(sink$entries, entry)
+  invisible(NULL)
+}
+
+on_error_check <- function(expr, continue_on_error = NULL){
+  caller <- parent.frame()
+  
+  expr_q <- substitute(expr)
+  if(is.null(continue_on_error)){continue_on_error <- get("continue_on_error", caller, inherits = TRUE)}
+  if (continue_on_error) {
+      tryCatch({
+        eval.parent(expr_q) 
+      }, error = function(e) assign(".skip_to_next",TRUE,envir = caller))
+  } else{
+    eval.parent(expr_q) 
+  }
+  
+}
+
+
 # Helper function to transform the parameters exported in debug -------------------------
 
 #' Helper function to transform the parameters exported in debug for easier readibility

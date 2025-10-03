@@ -180,11 +180,38 @@ run_sim <- function(arm_list=c("int","noint"),
                    seed = NULL){
 
 
-
-# Set-up basics -----------------------------------------------------------
+  # # ---- Error-context beacon (for clean messages; keeps base traceback) ----
+  .warden_ctx <- new.env(parent = emptyenv())
+  .warden_ctx$last <- NULL
+  .set_last_ctx(stage="Error in setup:initial code setup")
   
+  log_sink <- new.env(parent = emptyenv())
+  log_sink$entries <- list()
+  
+  on.exit({
+    do.call(RNGkind, as.list(rng_kind_store))
+    if (debug) export_log(log_sink$entries,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+    ctx <- .warden_ctx$last
+    
+    message(
+      paste0(ctx$stage,"; ",
+             ifelse(!is.na(ctx$sens),paste0("Analysis ", ctx$sens,"; "),""),
+             ifelse(!is.na(ctx$simulation),paste0("Simulation ", ctx$simulation,"; "),""),
+             ifelse(!is.na(ctx$arm),paste0("Arm ", ctx$arm,"; "),""),
+             ifelse(!is.na(ctx$patient_id),paste0("Patient ", ctx$patient_id,"; "),""),
+             ifelse(!is.na(ctx$event),paste0("Event ", ctx$event,"; "),""),
+             ifelse(!is.na(ctx$time),paste0("Time ", ctx$time,"; "),"")
+    ))
+    
+   if(ctx$stage!="Simulation finalized.") traceback()
+   
+  }, add=TRUE)
+  
+  
+# Set-up basics -----------------------------------------------------------
+
   #Store original rng kind and use L'Ecuyer-CMRG 
-  rng_kind_store <- RNGkind()[1]
+  rng_kind_store <- RNGkind()
   RNGkind("L'Ecuyer-CMRG")
   
   #Stop simulation if forbidden objects are used.
@@ -255,6 +282,9 @@ run_sim <- function(arm_list=c("int","noint"),
   flag_noerr_sim <- TRUE
   
   start_time <-  proc.time()
+
+  
+
   
 # Analysis loop ---------------------------------------------------------
 
@@ -266,16 +296,19 @@ run_sim <- function(arm_list=c("int","noint"),
     
     progressr::handlers(progressr::handler_txtprogressbar(width=100))
     
+    options(progressr.interrupts = FALSE)
+    options(progressr.enable = TRUE)
+    
     #Progress is forced here, because otherwise the user could not see this evolve properly.
     progressr::with_progress({
      pb <- progressr::progressor(min(npats*length_sensitivities*n_sim,50)) 
       
   #Need to figure out how to distinguish DSA (as many sensitivities as parameters) and Scenarios (as many sensivities as scenarios)
   for (sens in 1:length_sensitivities) {
+    .skip_to_next <- FALSE
+    
     message(paste0("Analysis number: ",sens))
-    
-    tryCatch({
-    
+
     start_time_analysis <-  proc.time()
 
     output_sim[[sens]] <- list() #initialize sensitivity lists
@@ -359,10 +392,10 @@ run_sim <- function(arm_list=c("int","noint"),
                        env_setup_sens = env_setup_sens,
                        env_setup_sim = env_setup_sim,
                        env_setup_pt = env_setup_pt,
-                       env_setup_arm = env_setup_arm
+                       env_setup_arm = env_setup_arm,
+                       log_sink = log_sink
+                       
     )
-    
-    
     
     if(is.null(seed)){
       seed <- 1
@@ -374,9 +407,11 @@ run_sim <- function(arm_list=c("int","noint"),
   input_list_sens <- as.environment(input_list_sens)
   parent.env(input_list_sens) <- environment()
   
+  .set_last_ctx(stage="Error in setup:sensitivity_inputs", sens=sens)
+  
   # Draw Common parameters  -------------------------------
   if(!is.null(sensitivity_inputs)){
-    
+    on_error_check({
     if(env_setup_sens){
       load_inputs2(inputs = input_list_sens,list_uneval_inputs = sensitivity_inputs)
     } else{
@@ -387,6 +422,9 @@ run_sim <- function(arm_list=c("int","noint"),
       parent.env(input_list_sens) <- environment()
       
     }
+    })
+    if(.skip_to_next){next}
+    
     
     if(input_list_sens$debug){ 
       dump_info <- debug_inputs(NULL,input_list_sens)
@@ -396,6 +434,9 @@ run_sim <- function(arm_list=c("int","noint"),
       )
       
       log_list <- c(log_list,dump_info)
+      
+      log_add(dump_info)
+      
     }
     
   }
@@ -404,10 +445,10 @@ run_sim <- function(arm_list=c("int","noint"),
   
       
     for (simulation in 1:n_sim) {
+      .skip_to_next <- FALSE
       message(paste0("Simulation number: ",simulation))
+      .set_last_ctx(stage="Error in setup:simulation_start", sens=sens, simulation=simulation)
       
-      tryCatch({
-        
       
       start_time_sim <-  proc.time()
       
@@ -416,9 +457,11 @@ run_sim <- function(arm_list=c("int","noint"),
       
       set.seed(simulation*1007*seed)
       
+      .set_last_ctx(stage="setup:common_all_inputs", sens=sens, simulation=simulation)
+      
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
-        
+        on_error_check({
         if(env_setup_sim){
           load_inputs2(inputs = input_list,list_uneval_inputs = common_all_inputs)
         } else{
@@ -428,6 +471,8 @@ run_sim <- function(arm_list=c("int","noint"),
             )
           parent.env(input_list) <- parent.env(input_list_sens)
         }
+        })
+        if(.skip_to_next){next}
         
         if(input_list_sens$debug){ 
           dump_info <- debug_inputs(input_list_sens,input_list)
@@ -439,49 +484,40 @@ run_sim <- function(arm_list=c("int","noint"),
           )
           
           log_list <- c(log_list,dump_info)
+          log_add(dump_info)
+          
         }
       }
+      
       
       if(is.null(input_list$drc)){input_list$drc <- 0.03}
       if(is.null(input_list$drq)){input_list$drq <- 0.03}
       
       # Run engine ----------------------------------------------------------
-      
-        final_output <- if(constrained){
-          run_engine_constrained(arm_list=arm_list,
+      .set_last_ctx(stage="Error in engine:start", sens=sens, simulation=simulation)
+      on_error_check({
+        if(constrained){
+          final_output <- run_engine_constrained(arm_list=arm_list,
+                                 common_pt_inputs=common_pt_inputs,
+                                 unique_pt_inputs=unique_pt_inputs,
+                                 input_list = input_list,
+                                 pb = pb,
+                                 seed = seed,
+                                 .warden_ctx = .warden_ctx)  
+        } else{
+          final_output <- run_engine(arm_list=arm_list,
                      common_pt_inputs=common_pt_inputs,
                      unique_pt_inputs=unique_pt_inputs,
                      input_list = input_list,
                      pb = pb,
-                     seed = seed)  
-        } else{
-          run_engine(arm_list=arm_list,
-                     common_pt_inputs=common_pt_inputs,
-                     unique_pt_inputs=unique_pt_inputs,
-                     input_list = input_list,
-                     pb = pb,
-                     seed = seed)   
+                     seed = seed,
+                     .warden_ctx = .warden_ctx)   
         }
+      })
+      if(.skip_to_next){next}
       
-      
-      if(!is.null(final_output$error_m)){
-        if((n_sim > 1 | n_sensitivity > 1) & continue_on_error){
-          message(if(debug){"Log will be exported. "},
-                  "Continuing on error, error message at analysis ",
-                  sens,
-                  "; simulation: ",
-                  if(exists("simulation")){simulation}else{"None"},
-                  ". Error message: ",final_output$error_m
-                  )
-          if(debug){
-            output_sim[[sens]][[simulation]] <- final_output
-          }
-          
-          next
-        } else{
-        stop(final_output$error_m)
-        }
-      } 
+   
+
       if (input_list$ipd>0) {
         final_output$merged_df$simulation <- simulation
         final_output$merged_df$sensitivity <- sens
@@ -490,165 +526,28 @@ run_sim <- function(arm_list=c("int","noint"),
       final_output <- c(list(sensitivity_name = sens_name_used), final_output)
       
       
-      if(debug){
-        log_list <- lapply(log_list,transform_debug)
-        
-        final_output$log_list <- c(log_list,final_output$log_list)
-      }
+      if (debug) final_output$log_list <- log_sink$entries
       
       output_sim[[sens]][[simulation]] <- final_output
   
       message(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
-      
-      
-      }, error = function(e) {
-        if(continue_on_error){
-          .skip_to_next <<- TRUE
-          message(if(debug){"Log will be exported. "},
-                  "Continuing on error, error message at analysis ",
-                  sens,
-                  "; simulation: ",
-                  if(exists("simulation")){simulation}else{"None"},
-                  ". Error message: ",e$message," in ", e$call)
-        } else{
-          if(debug){
-            flag_noerr_sim <<- FALSE
-            
-            if(!exists("final_output")){
-              export_log(lapply(log_list,transform_debug),paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
-              stop(e$message)
-            }else{
-              if(length(log_list)>0){
-                log_list <- lapply(log_list,transform_debug)
-                # final_output <- list()
-                final_output$log_list <- c(log_list,final_output$log_list)
-                
-                if(exists("output_sim")){
-                  if(!exists("simulation")){
-                    simulation <- 1
-                  }
-                  output_sim[[sens]][[simulation]] <- final_output
-                  final_log <- unlist(
-                    unlist(
-                      lapply(output_sim, function(y) lapply(y, function(x) x$log_list )),
-                      recursive = FALSE),
-                    recursive = FALSE)
-                } else{
-                  final_log <- final_output$log_list
-                }
-                
-                export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
-              }
-            }
-            stop("Log Exported. Error message at analysis ",
-                  sens,
-                  "; simulation: ",
-                  if(exists("simulation")){simulation}else{"None"},
-                  ". Error message: ",
-                  e$message)
-          }else{
-            stop("Error message at analysis ",
-                 sens,
-                 "; simulation: ",
-                 if(exists("simulation")){simulation}else{"None"},
-                 ". Error message: ",
-                 e$message," in ", e$call)
-          }
-        }
-      }
-      )
-      if(.skip_to_next) { next } 
       
     }
     
     message(paste0("Time to run analysis ", sens,": ",  round(proc.time()[3]- start_time_analysis[3] , 2 ), "s"))
     
     
-    }, error = function(e) {
-      if(continue_on_error){
-        .skip_to_next <<- TRUE
-        message(if(debug){"Log will be exported. "},
-                "Continuing on error, error message at analysis ",
-                sens,
-                "; simulation: ",
-                if(exists("simulation")){simulation}else{"None"},
-                ". Error message: ",
-                e$message," in ", e$call)
-        } else{
-        if(debug & flag_noerr_sim){
-          if(length(log_list)>0 | exists("output_sim") | exists("final_output")){
-            if(!exists("final_output")){
-              export_log(lapply(log_list,transform_debug),paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
-              stop(e$message)
-            }else{
-                  if(exists("output_sim")){
-                    final_log <- unlist(
-                      unlist(
-                        lapply(output_sim, function(y) lapply(y, function(x) x$log_list )),
-                        recursive = FALSE),
-                      recursive = FALSE)
-                  } else{
-                    log_list <- lapply(log_list,transform_debug)
-                    final_output <- list()
-                    final_output$log_list <- c(log_list,final_output$log_list)
-                    final_log <- final_output$log_list
-                  }
-                  
-                  export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
-              } 
-          } else{
-            message("No data to export.")
-          }
-          stop("Log will be exported. Error message at analysis ",
-               sens,
-               "; simulation: ",
-               if(exists("simulation")){simulation}else{"None"},
-               ". Error message: ",
-               e$message," in ", e$call)
-        }else{
-          stop(e$message)
-        }
-      }
-    }
-  )
-    if(.skip_to_next) { next } 
-    
     }
     
      message(paste0("Total time to run: ",  round(proc.time()[3]- start_time[3] , 2), "s"))
 
-
-  # Export results ----------------------------------------------------------
-  if(debug){
-    if(length(log_list)>0 | exists("output_sim")){
-      if(exists("output_sim")){
-        final_log <- unlist(
-          unlist(
-            lapply(output_sim, function(y) lapply(y, function(x) x$log_list )),
-            recursive = FALSE),
-          recursive = FALSE)
-      } else{
-        log_list <- lapply(log_list,transform_debug)
-        final_output <- list()
-        final_output$log_list <- c(log_list,final_output$log_list)
-        final_log <- final_output$log_list
-      }
-      
-    export_log(final_log,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
-    } else{
-      message("No data to export.")
-    }
-  }
-  
   
   results <- output_sim
   
-  #Retore original rng kind
-  RNGkind(rng_kind_store)
-  
    }, enable=TRUE, cleanup = TRUE)
     
-  
+    .set_last_ctx(stage="Simulation finalized without errors")
+    
   return(results)
   
 
