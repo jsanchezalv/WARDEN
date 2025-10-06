@@ -238,7 +238,8 @@ pick_psa <- function(f,...){
 #'              indicator=list(1,2),
 #'              indicator_sens_binary = FALSE,
 #'              sens_iterator = 2,
-#'              distributions = list("rnorm","rnorm")
+#'              distributions = list("rnorm","rnorm"),
+#'              deploy_env = FALSE
 #' )
 #' 
 #' pick_val_v(base = list(2,3,c(1,2)),
@@ -257,7 +258,8 @@ pick_psa <- function(f,...){
 #'              indicator_sens_binary = FALSE,
 #'              sens_iterator = 4,
 #'              distributions = list("rnorm","rnorm","mvrnorm"),
-#'              covariances = list(0.1,0.1,matrix(c(1,0.1,0.1,1),2,2))
+#'              covariances = list(0.1,0.1,matrix(c(1,0.1,0.1,1),2,2)),
+#'              deploy_env = FALSE
 #' )
 #'  
 pick_val_v <- function(base,
