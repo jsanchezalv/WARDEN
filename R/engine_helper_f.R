@@ -170,12 +170,12 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
   
   #Reset instantaneous costs/qalys/others
   if(!is.null(input_list_arm$uc_lists$instant_inputs)){
-    
     for (var_name in input_list_arm$uc_lists$instant_inputs) {
       assign(var_name, 0, envir = input_list_arm)
     }
   }
   
+  #Reset accumulator backwards flags
   if(input_list_arm$accum_backwards){
     if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
       for (var_name in input_list_arm$ongoing_inputs_lu) {

@@ -54,6 +54,8 @@ run_engine <- function(arm_list,
 
   temp_log_pt <- list()
     
+  #Get list of discrete resources to be reset
+  #Don't need to do this with shared inputs because it handles it by itself automatically
     list_discrete_resources <- list()
     for (obj in ls(input_list)) {
       if(inherits(input_list[[obj]],"resource_discrete")){
