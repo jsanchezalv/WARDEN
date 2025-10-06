@@ -49,6 +49,7 @@ Imports:
     progressr,
     magrittr,
     tidyr,
+    lifecycle,
     Rcpp
 VignetteBuilder: knitr
 Config/testthat/edition: 3
