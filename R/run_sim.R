@@ -26,7 +26,7 @@
 #' @param constrained Boolean, FALSE by default, which runs the simulation with patients not interacting with each other, TRUE if resources are shared within an arm (allows constrained resources)
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
-#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. If TRUE, user must use `modify_item` and `modify_item_seq` or results will be incorrect.
+#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
 #' @param continue_on_error If TRUE, on error it will attempt to continue by skipping the current simulation 
 #' @param seed Starting seed to be used for the whole analysis. If null, it's set to 1 by default.
 #'
@@ -62,9 +62,7 @@
 #'  so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically 
 #'  look back until event 1). Note that in previous versions of the package backward was the default, and now this has switched to forward.
 #'  
-#'  If using `accum_backwards = TRUE`, then it is mandatory for the user to use `modify_item` and `modify_item_seq` in event reactions,
-#'   as the standard assignment approach (e.g., `a <- 5`) will not calculate the right results, particularly in the presence of
-#'   conditional statements.  
+#'  The requirement to use `modify_item` if using `accum_backwards = TRUE`, is no longer the case thanks to a new method using active bindings, so it can be used normally.
 #'   
 #'  It is important to note that the QALYs and Costs (ongoing or instant or per cycle) used should be of length 1. 
 #'  If they were of length > 1, the model would expand the data,
@@ -80,7 +78,7 @@
 #'  `debug = TRUE` will export a log file with the timestamp up the error in the main working directory. Note that
 #'  using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
 #'  as the AST may not catch all the relevant assignments (e.g., an assigment like assign(paste("x_",i),5)
-#'   in a loop will not be identified, unless using modify_item(_seq)).
+#'   in a loop will not be identified).
 #'  
 #'  `continue_on_error` will skip the current simulation (so it won't continue for the rest of patient-arms) if TRUE.
 #'   Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.
@@ -120,15 +118,15 @@
 #'              input = {}) %>%
 #'   add_reactevt(name_evt = "sicker",
 #'                input = {
-#'                  modify_item(list(q_default = util.sicker,
-#'                                   c_default = cost.sicker + if(arm=="int"){cost.int}else{0},
-#'                                   fl.sick = 0)) 
+#'                  q_default <- util.sicker
+#'                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
+#'                  fl.sick <- 0 
 #'                }) %>%
 #'   add_reactevt(name_evt = "death",
 #'                input = {
-#'                  modify_item(list(q_default = 0,
-#'                                   c_default = 0, 
-#'                                   curtime = Inf)) 
+#'                  q_default <- 0
+#'                  c_default <- 0
+#'                  curtime <- Inf
 #'                }) 
 #'                
 #' util_ongoing <- "q_default"

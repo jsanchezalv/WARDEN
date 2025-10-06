@@ -178,11 +178,9 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
   
   if(input_list_arm$accum_backwards){
     if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
-
       for (var_name in input_list_arm$ongoing_inputs_lu) {
         assign(var_name, 0, envir = input_list_arm)
       }
-
     }
   }
   
@@ -239,7 +237,18 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
   }
   
   #evaluate event
-  eval(react_list[[position]][["react"]], input_list_arm)
+  if(input_list_arm$accum_backwards){
+    if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
+      with_write_flags_lang(
+        react_list[[position]][["react"]],
+        tracked = input_list_arm$uc_lists$ongoing_inputs,
+        env     = input_list_arm,
+        flag_value = 1L
+      )
+    }
+  }else{
+    eval(react_list[[position]][["react"]], input_list_arm)
+  }
   
   #debug bit (after evaluation)
   if(input_list_arm$debug){
@@ -403,6 +412,100 @@ on_error_check <- function(expr, continue_on_error = NULL){
     eval.parent(expr_q) 
   }
   
+}
+
+
+# Backwards binding handler -----------------------------------------------
+
+#' Evaluate a language object with write-tracking via active bindings
+#'
+#' Temporarily installs **active bindings** for a set of variable names in
+#' `env` so that any **write** to those names during the evaluation of
+#' `expr_lang` flips a corresponding `*_lastupdate` flag in `env`.
+#' This flags assignments even when the value is overwritten with the same
+#' value, and does not flag branches that are not executed.
+#'
+#' Typical use: when `accum_backwards = TRUE`, wrap the evaluation of a
+#' reaction/input block so you can later accumulate only inputs that were
+#' actually written in that event.
+#'
+#' @param expr_lang A language object (call or expression) to evaluate.
+#'   For example, `react_list[[i]][["react"]]` returned by `add_reactevt()`.
+#' @param tracked Character vector of **top-level** variable names to track
+#'   (e.g., `c("q_default","c_default","curtime")`). For each name `nm`,
+#'   an active binding is installed at `env[[nm]]`, and writes set
+#'   `env[[paste0(nm, "_lastupdate")]] <- flag_value`.
+#' @param env Environment in which to install the bindings and evaluate
+#'   `expr_lang` (your per-patient/per-arm working environment).
+#' @param flag_value Scalar written into each `*_lastupdate` when a write
+#'   occurs (commonly `1L`; you may use a timestamp like `env$curtime`).
+#'
+#' @details
+#' - The function creates a private backing store for `tracked` names and
+#'   installs active bindings in `env`. Reads return the stored value.
+#'   Writes (via `<-` or `=`) update the store **and** set the corresponding
+#'   `*_lastupdate` flag in `env`.
+#' - It **does not** zero the `*_lastupdate` flags; do that before calling
+#'   this function (typically once per event).
+#' - Only **top-level symbols** are tracked. To track `obj$el <- ...`, track
+#'   `"obj"` (the container) rather than `"obj$el"`.
+#' - Active bindings are removed and plain symbols restored on exit, even if
+#'   an error occurs (via `on.exit()` teardown).
+#'
+#' @return Invisibly returns `NULL`. The function works by side effects
+#'   (mutating `env` and its `*_lastupdate` flags).
+#'
+#' @section Performance:
+#' Active bindings add a tiny overhead per read/write of the tracked names
+#' (a function call). Keep `tracked` small and the binding body minimal.
+#' Install only for the duration of the block and tear down immediately
+#' (handled for you). If your block performs many reads and few writes,
+#' consider a snapshot-and-diff approach instead
+with_write_flags_lang <- function(expr_lang, tracked, env, flag_value = 1L) {
+  store <- new.env(parent = emptyenv())
+  installed <- character(0)
+  
+  # Robust teardown even if we error during setup
+  on.exit({
+    for (nm in installed) {
+      # read through binding (returns stored value), then restore plain symbol
+      val <- tryCatch(get(nm, envir = env), error = function(e) NULL)
+      if (bindingIsActive(nm, env)) rm(list = nm, envir = env)
+      assign(nm, val, envir = env)
+    }
+  }, add = TRUE)
+  
+  # Prepare active bindings for tracked names
+  for (nm in tracked) {
+    # seed backing store with current value (top-level only)
+    if (exists(nm, envir = env, inherits = FALSE)) {
+      assign(nm, get(nm, envir = env, inherits = FALSE), envir = store)
+      # remove regular binding so we can install an active binding
+      if (!bindingIsActive(nm, env)) rm(list = nm, envir = env)
+    } else {
+      assign(nm, NULL, envir = store)
+    }
+    
+    # create active binding (overwrites if one already exists)
+    makeActiveBinding(nm, local({
+      key <- nm; store_ <- store; env_ <- env; fv <- flag_value
+      function(value) {
+        if (!missing(value)) {
+          assign(key, value, envir = store_)                    # write
+          assign(paste0(key, "_lastupdate"), fv, envir = env_)  # flip flag
+          invisible(value)
+        } else {
+          get(key, envir = store_, inherits = FALSE)            # read
+        }
+      }
+    }), env)
+    
+    installed <- c(installed, nm)
+  }
+  
+  # Evaluate the language object in 'env'
+  eval(expr_lang, envir = env)
+  invisible(NULL)
 }
 
 

@@ -109,7 +109,7 @@ init_event_list <-
 ## Add Reaction to Those Events
 Once the initial times of the events have been defined, we also need to declare how events react and affect each other. To do so, we use the `evt_react_list` object and the `add_reactevt` function. This function just needs to state which event is affected, and the actual reaction (usually setting flags to 1 or 0, or creating new/adjusting events).
 
-There are a series of objects that can be used in this context to help with the reactions. Apart from the global objects and flags defined above, we can also use `curtime` for the current event time, `prevtime` for the time of the previous event, `cur_evtlist` for the named vector of events that is yet to happen for that patient, `arm` for the current treatment in the loop, `evt` for the current event being processed, `i` expresses the patient iteration, and `simulation` the specific simulation (relevant when the number of simulations is greater than 1). Furthermore, one can also call any other input/item that has been created before or create new ones. For example, we could even modify a cost/utility item by changing it directly, e.g. through `modify_item(list(cost.idfs.tx=500))`.
+There are a series of objects that can be used in this context to help with the reactions. Apart from the global objects and flags defined above, we can also use `curtime` for the current event time, `prevtime` for the time of the previous event, `cur_evtlist` for the named vector of events that is yet to happen for that patient, `arm` for the current treatment in the loop, `evt` for the current event being processed, `i` expresses the patient iteration, and `simulation` the specific simulation (relevant when the number of simulations is greater than 1). Furthermore, one can also call any other input/item that has been created before or create new ones.
 
 Item | What does it do 
 ------------ | -------------
@@ -124,17 +124,11 @@ Item | What does it do
 
 The functions to add/modify events and inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost. So rather than use two `modify_event` with a list of one element, it's better to group them into a single `modify_event` with a list of two elements. 
 
-To modify/create items, WARDEN now allows to assign them directly in the code, without the need to use `modify_item` and `modify_item_seq`, which allows the code to run faster (~30-35% faster if comparing against `modify_item_seq`, or 15-20% if comparing against `modify_item`). However, these two functions, `modify_item` and `modify_item_seq`, are still available to the user and will keep working, and allow to modify and add items. Elements defined within this function are not evaluated sequentially in `modify_item` (i.e. defining `modify_item(list(fl.new = 1, var1 = fl.new * 5)))` will give an error if `fl.new` was not defined outside this function), while `modify_item_seq` will do it sequentially at a slightly bigger computational cost, so both are left as choices for the user. Note that one can modify costs/utilities by using the construction `type_name_category`, where type is either "qaly" or "cost", name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
-
-`modify_item` and `modify_item_seq`allow to modify and add items. Elements defined within this function are not evaluated sequentially in `modify_item` (i.e. defining `modify_item(list(fl.new = 1, var1 = fl.new * 5)))` will give an error if `fl.new` was not defined outside this function), while `modify_item_seq` will do it sequentially at a slightly bigger computational cost, so both are left as choices for the user. Note that one can modify costs/utilities by using the construction `type_name_category`, where type is either "qaly" or "cost", name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
-
 The list of relevant functions to be used within `add_reactevt` are:
 
 Function | What does it do | How to use it
 ------------ | ------------- | -------------
-`modify_item()` | Adds & Modifies items/flags/variables for future events | `modify_item(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))`
-`modify_item_seq()` | Adds & Modifies items/flags/variables for future events sequentially | `modify_item_seq(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))`
-`new_event()` | Adds events to the vector of events for that patient | `new_event(rep(list("ae"=curtime + 0.001),5))`
+`new_event()` | Adds events to the vector of events for that patient | `new_event(c("ae"=curtime + 0.001))`
 `modify_event()` | Modifies (or creates, with `create_if_null = TRUE`) existing events by changing their time | `modify_event(list("os"=curtime +5, "ttot"=curtime+0.0001))`
 
 The model will run until `curtime` is set to `Inf`, so the event that terminates the model (in this case, `os`), should modify `curtime` and set it to `Inf`.

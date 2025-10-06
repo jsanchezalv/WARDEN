@@ -59,27 +59,27 @@ reference:
   - title: Main Modelling Functions
   - subtitle: Modelling Core Functions
     contents:
+      - run_sim
+      - run_sim_parallel
       - add_item
       - add_reactevt
       - add_tte
-      - modify_event
-      - modify_item
-      - modify_item_seq
       - new_event
-      - run_sim
-      - run_sim_parallel
+      - modify_event
+      - remove_event
+      - get_event
+      - has_event
+      - next_event
+      - next_event_pt
+      - queue_empty
+      - queue_size
+
       
   - subtitle: Resource Constrained Specific Functions
     contents:
       - resource_discrete
       - shared_input
-      - next_event
-      - next_event_pt
-      - remove_event
-      - queue_empty
-      - queue_size
-      - has_event
-      - get_event
+
 
   - subtitle: Modelling Auxiliary Functions
     contents:

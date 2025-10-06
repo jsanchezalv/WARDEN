@@ -394,82 +394,80 @@ test_that("Model Reactions Interactivity summary can be created",{
     
     l <- 9
     
-    modify_item(list(afsa=ifelse(TRUE,"asda",NULL)))
+    afsa=ifelse(TRUE,"asda",NULL)
     
-    modify_item_seq(list(
+
+      o_exn = o_exn + 1
       
-      o_exn = o_exn + 1,
+      a = NULL
       
-      a = NULL,
+      b = if(a){"CZ"}else{"AW"}
       
-      b = if(a){"CZ"}else{"AW"},
+      rnd_prob_exn_sev = runif(1)
       
-      rnd_prob_exn_sev = runif(1),
+      exn_sev = rnd_prob_exn_sev <= p_sev
       
-      exn_sev = rnd_prob_exn_sev <= p_sev,
+      o_exn_mod = o_exn_mod + if(exn_sev) { 0 } else { 1 }
       
-      o_exn_mod = o_exn_mod + if(exn_sev) { 0 } else { 1 },
+      o_exn_sev = o_exn_sev + if(exn_sev) { 1 } else { 0 }
       
-      o_exn_sev = o_exn_sev + if(exn_sev) { 1 } else { 0 },
+      o_rec_time_without_exn = (o_exn == 0) * 1
       
-      o_rec_time_without_exn = (o_exn == 0) * 1,
+      o_rec_time_without_exn_sev = (o_exn_sev == 0) * 1
       
-      o_rec_time_without_exn_sev = (o_exn_sev == 0) * 1,
+      o_c_exn = if(exn_sev) { c_sev } else { c_mod }
+  
+      o_other_c_exn_mod = if(exn_sev) { 0 } else { c_mod }
       
-      o_c_exn = if(exn_sev) { c_sev } else { c_mod },
+      o_other_c_exn_sev = if(exn_sev) { c_sev } else { 0 }
       
-      o_other_c_exn_mod = if(exn_sev) { 0 } else { c_mod },
+      o_qloss_exn = -if(exn_sev) { q_sev } else { q_mod }
       
-      o_other_c_exn_sev = if(exn_sev) { c_sev } else { 0 },
+      o_other_qloss_exn_mod = -if(exn_sev) { 0 } else { q_mod }
+    
+      o_other_qloss_exn_sev = -if(exn_sev) { q_sev } else { 0 }
       
-      o_qloss_exn = -if(exn_sev) { q_sev } else { q_mod },
+      o_qloss_cg_exn = -if(exn_sev) { q_cg_sev } else { q_cg_mod }
+    
+      o_other_qloss_cg_exn_mod = -if(exn_sev) { 0 } else { q_cg_mod }
       
-      o_other_qloss_exn_mod = -if(exn_sev) { 0 } else { q_mod },
+      o_other_qloss_cg_exn_sev = -if(exn_sev) { q_cg_sev } else { 0 }
       
-      o_other_qloss_exn_sev = -if(exn_sev) { q_sev } else { 0 },
+      o_q = utility
       
-      o_qloss_cg_exn = -if(exn_sev) { q_cg_sev } else { q_cg_mod },
+      o_other_q_gold1 = if(gold == 1) { utility } else { 0 }
       
-      o_other_qloss_cg_exn_mod = -if(exn_sev) { 0 } else { q_cg_mod },
+      o_other_q_gold2 = if(gold == 2) { utility } else { 0 }
       
-      o_other_qloss_cg_exn_sev = -if(exn_sev) { q_cg_sev } else { 0 },
+      o_other_q_gold3 = if(gold == 3) { utility } else { 0 }
       
-      o_q = utility,
+      o_other_q_gold4 = if(gold == 4) { utility } else { 0 }
       
-      o_other_q_gold1 = if(gold == 1) { utility } else { 0 },
+      o_other_q_on_dup = if(on_dup) { utility } else { 0 }
+    
+      n_exn = n_exn + 1
       
-      o_other_q_gold2 = if(gold == 2) { utility } else { 0 },
+      n_exn_mod = n_exn_mod + (1 - exn_sev)
       
-      o_other_q_gold3 = if(gold == 3) { utility } else { 0 },
+      n_exn_sev = n_exn_sev + exn_sev
       
-      o_other_q_gold4 = if(gold == 4) { utility } else { 0 },
+      u_adj_exn_lt = u_adj_exn_lt + if(exn_sev) { u_adj_sev_lt } else { u_adj_mod_lt }
       
-      o_other_q_on_dup = if(on_dup) { utility } else { 0 },
+      utility = u_gold - u_adj_exn_lt - u_mace_lt
       
-      n_exn = n_exn + 1,
-      
-      n_exn_mod = n_exn_mod + (1 - exn_sev),
-      
-      n_exn_sev = n_exn_sev + exn_sev,
-      
-      u_adj_exn_lt = u_adj_exn_lt + if(exn_sev) { u_adj_sev_lt } else { u_adj_mod_lt },
-      
-      utility = u_gold - u_adj_exn_lt - u_mace_lt,
-      
-      o_rec_utility = utility,
+      o_rec_utility = utility
       
       rnd_exn = runif(1)
-      
-    ))
+    
     
     if(a==1){
-      modify_item(list(a=list(6+b)))
+      a=list(6+b)
       
       modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
     } else{
       modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
       if(a>6){
-        modify_item(list(a=8))
+        a=8
       }
       
     }
@@ -483,7 +481,7 @@ test_that("Model Reactions Interactivity summary can be created",{
     
   })
   
-  expect_length(ast_as_list(expr),13) 
+  expect_length(ast_as_list(expr),43) 
   
   expect_type(ast_as_list(expr),"list")
   
@@ -496,7 +494,7 @@ test_that("Model Reactions Interactivity summary can be created",{
   a <- add_reactevt(name_evt="example",
                     input={
                       a <- 5
-                      modify_item(list(w=5))
+                      w=5
                     })
   
   
@@ -527,19 +525,6 @@ test_that("add_tte works as expected", {
   
   expect_true("control" %in% names(result))
   expect_equal(result$control$evts, evts)
-})
-
-test_that("modify_item modifies input items correctly", {
-  input_list_arm <- environment()
-  input_list_arm$qaly_default_instant = 100
-  input_list_arm$debug = FALSE
-  input_list_arm$accum_backwards = FALSE
-
-  modify_item(list("qaly_default_instant" = 200))
-  expect_equal(input_list_arm$qaly_default_instant, 200)
-  
-  modify_item(list(new_cost = 300))
-  expect_equal(input_list_arm$new_cost, 300)
 })
 
 test_that("modify_event modifies events correctly", {
@@ -595,27 +580,6 @@ test_that("replicate_profiles works correctly", {
   expect_equal(nrow(result_no_replacement), 10)
   expect_equal(sort(result_no_replacement$id), sort(profiles$id))
   
-})
-
-
-test_that("modify_item_seq works sequentially", {
-  
-  input_list_arm <- environment()
-  input_list_arm$a <- 1
-  input_list_arm$b <- 2
-  input_list_arm$curtime <- 1
-  input_list_arm$accum_backwards <- FALSE
-  input_list_arm$debug <- FALSE
-  
-  # Test sequential modification
-  modify_item_seq(list(a = 3, b = a + 2))
-  expect_equal(input_list_arm$a, 3)
-  expect_equal(input_list_arm$b, 5)
-  
-  input_list_arm$log_list <- list()
-  modify_item_seq(list(a = 4, c = b * 2))
-  expect_equal(input_list_arm$a, 4)
-  expect_equal(input_list_arm$c, 10)
 })
 
 

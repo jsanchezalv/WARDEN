@@ -191,44 +191,43 @@ init_event_list <-
 ## Add Event Reactions
 Reactions for each individual event are defined in the following using the `add_reactevt()` function. Patients in the intervention arm discontinue treatment at progression. Occurrence of the progression-accelerated event results in an earlier progression (if it has not occurred yet). Note the use of the seed argument in the `draw_tte()` function which ensures that the same seed is being used in the original and the updated draw of the time to progression.
 
-As mentioned before, the user can choose whether to use `modify_item`, `modify_item_seq` or just use assignments. We leave this example below using `modify_item` to showcase it.
-
 ```{r model_reaction}
 
 evt_react_list <-
   add_reactevt(name_evt = "Start",
                input = {
-                 modify_item(list(fl.int = ifelse(arm=="int",1,0),
-                                  q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
-                                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref},
-                                  c_default_inst = cost.admin.oral
-                                  ))
+                 fl.int = ifelse(arm=="int",1,0)
+                 q_default = ifelse(fl.prog == 0, util.PFS, util.PPS)
+                 c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}
+                 c_default_inst = cost.admin.oral
+                                  
                }) %>%
   add_reactevt(name_evt = "TxDisc",
                input = {
-                 modify_item(list(q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
-                                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref},
-                                  "fl.ontx"= 0))
+                 q_default = ifelse(fl.prog == 0, util.PFS, util.PPS)
+                 c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}
+                 fl.ontx = 0
                }) %>%
   add_reactevt(name_evt = "Progression",
                input = {
-                 modify_item(list(q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
-                                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref},
-                                  "pfs.time"=curtime,"fl.prog"= 1))
+                 q_default = ifelse(fl.prog == 0, util.PFS, util.PPS)
+                 c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}
+                 pfs.time=curtime
+                 fl.prog= 1
                  if(arm=="int"){modify_event(list("TxDisc" = curtime))} #Trigger treatment discontinuation at progression
                }) %>%
   add_reactevt(name_evt = "Death",
                input = {
-                 modify_item(list(q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
-                                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref},
-                                  "curtime"=Inf)) 
+                 q_default = ifelse(fl.prog == 0, util.PFS, util.PPS)
+                 c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}
+                 curtime = Inf
                }) %>%
   add_reactevt(name_evt = "PAE",
                input = {
-                 modify_item(list("fl.PAE"= 1,
-                                  q_default = ifelse(fl.prog == 0, util.PFS, util.PPS),
-                                  q_default_inst = disutil.PAE,
-                                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}))
+                 fl.PAE = 1
+                 q_default = ifelse(fl.prog == 0, util.PFS, util.PPS)
+                 q_default_inst = disutil.PAE
+                 c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}
                  
                  if(fl.prog == 0){ #Event only accelerates progression if progression has not occurred yet
                  modify_event(list(
