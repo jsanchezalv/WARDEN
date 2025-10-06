@@ -1,11 +1,11 @@
 test_that("Vector discounting equal to non-vector for single-length elements", {
   #Ongoing
   expect_equal(disc_ongoing_v(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500),
-               disc_ongoing(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500))
+               suppressWarnings(disc_ongoing(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)))
   
   #Instant
   expect_equal(disc_instant_v(lcldr=0.035, lclcurtime=3, lclval=2500),
-               disc_instant(lcldr=0.035, lclcurtime=3, lclval=2500))
+               suppressWarnings(disc_instant(lcldr=0.035, lclcurtime=3, lclval=2500)))
 
  })
 
@@ -14,19 +14,19 @@ test_that("Discounting works with no discounting", {
   #Ongoing
   expect_equal(disc_ongoing_v(lcldr=0,lclprvtime=1, lclcurtime=2, lclval=2500),
                2500)
-  expect_equal(disc_ongoing(lcldr=0,lclprvtime=1, lclcurtime=2, lclval=2500),
+  expect_equal(suppressWarnings(disc_ongoing(lcldr=0,lclprvtime=1, lclcurtime=2, lclval=2500)),
                2500)
   
   #Instant
   expect_equal(disc_instant_v(lcldr=0, lclcurtime=2, lclval=2500),
                2500)
-  expect_equal(disc_instant(lcldr=0, lclcurtime=2, lclval=2500),
+  expect_equal(suppressWarnings(disc_instant(lcldr=0, lclcurtime=2, lclval=2500)),
                2500)
   
   #Cycle
   expect_equal(disc_cycle_v(lcldr=0,lclprvtime=1, lclcurtime=2, lclval=2500, cyclelength=1/12, starttime=0),
                12*2500)
-  expect_equal(disc_cycle(lcldr=0,lclprvtime=1, lclcurtime=2, lclval=2500, cyclelength=1/12, starttime=0),
+  expect_equal(suppressWarnings(disc_cycle(lcldr=0,lclprvtime=1, lclcurtime=2, lclval=2500, cyclelength=1/12, starttime=0)),
                12*2500)
 })
 
@@ -36,43 +36,43 @@ test_that("Discounting works with odd numbers", {
   #Ongoing
   expect_equal(disc_ongoing_v(lcldr=0,lclprvtime=0, lclcurtime=Inf, lclval=2500),
                Inf)
-  expect_equal(disc_ongoing(lcldr=0,lclprvtime=0, lclcurtime=Inf, lclval=2500),
+  expect_equal(suppressWarnings(disc_ongoing(lcldr=0,lclprvtime=0, lclcurtime=Inf, lclval=2500)),
                Inf)
   expect_equal(disc_ongoing_v(lcldr=0.035,lclprvtime=0, lclcurtime=0, lclval=2500),
                0)
-  expect_equal(disc_ongoing(lcldr=0.035,lclprvtime=0, lclcurtime=0, lclval=2500),
+  expect_equal(suppressWarnings(disc_ongoing(lcldr=0.035,lclprvtime=0, lclcurtime=0, lclval=2500)),
                0)
   expect_equal(disc_ongoing_v(lcldr=0.035,lclprvtime=5, lclcurtime=5, lclval=2500),
                0)
-  expect_equal(disc_ongoing(lcldr=0.035,lclprvtime=5, lclcurtime=5, lclval=2500),
+  expect_equal(suppressWarnings(disc_ongoing(lcldr=0.035,lclprvtime=5, lclcurtime=5, lclval=2500)),
                0)
   #Inf*0 gives NaN, while the element-wise function just check wehterh prevtime and curtime are equal
   expect_equal(disc_ongoing_v(lcldr=0.035,lclprvtime=5, lclcurtime=5, lclval=Inf),
                NaN)
-  expect_equal(disc_ongoing(lcldr=0.035,lclprvtime=5, lclcurtime=5, lclval=Inf),
+  expect_equal(suppressWarnings(disc_ongoing(lcldr=0.035,lclprvtime=5, lclcurtime=5, lclval=Inf)),
                NaN) 
   
   #Instant
   expect_equal(disc_instant_v(lcldr=0, lclcurtime=Inf, lclval=2500),
                2500)
-  expect_equal(disc_instant(lcldr=0, lclcurtime=Inf, lclval=2500),
+  expect_equal(suppressWarnings(disc_instant(lcldr=0, lclcurtime=Inf, lclval=2500)),
                2500)
   expect_equal(disc_instant_v(lcldr=0.035, lclcurtime=0, lclval=2500),
                2500)
-  expect_equal(disc_instant(lcldr=0.035, lclcurtime=0, lclval=2500),
+  expect_equal(suppressWarnings(disc_instant(lcldr=0.035, lclcurtime=0, lclval=2500)),
                2500)
   expect_equal(disc_instant_v(lcldr=0.035, lclcurtime=5, lclval=2500),
                2104.93292)
-  expect_equal(disc_instant(lcldr=0.035, lclcurtime=5, lclval=2500),
+  expect_equal(suppressWarnings(disc_instant(lcldr=0.035, lclcurtime=5, lclval=2500)),
                2104.93292)
   #Inf*0 gives NaN
   expect_equal(disc_instant_v(lcldr=0.035, lclcurtime=5, lclval=Inf),
                Inf)
-  expect_equal(disc_instant(lcldr=0.035, lclcurtime=5, lclval=Inf),
+  expect_equal(suppressWarnings(disc_instant(lcldr=0.035, lclcurtime=5, lclval=Inf)),
                Inf) 
   expect_equal(disc_instant_v(lcldr=5, lclcurtime=5, lclval=2500),
                0.32150206)
-  expect_equal(disc_instant(lcldr=5, lclcurtime=5, lclval=2500),
+  expect_equal(suppressWarnings(disc_instant(lcldr=5, lclcurtime=5, lclval=2500)),
                0.32150206) 
   
   #Cycle

@@ -411,7 +411,6 @@ on_error_check <- function(expr, continue_on_error = NULL){
   } else{
     eval.parent(expr_q) 
   }
-  
 }
 
 

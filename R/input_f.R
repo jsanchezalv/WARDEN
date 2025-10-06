@@ -272,7 +272,7 @@ pick_val_v <- function(base,
                          sens_iterator = NULL,
                          distributions = NULL,
                          covariances = NULL,
-                         deploy_env = FALSE
+                         deploy_env = TRUE
 ){
   
   output <- list()
@@ -543,6 +543,8 @@ add_item2 <- function(.data=NULL,input){
 #' 
 #' @return No return value, modifies/adds item to the environment and integrates it with the main list for storage
 #'
+#' @importFrom lifecycle deprecate_stop
+#'
 #' @export
 #'
 #' @details
@@ -587,6 +589,8 @@ modify_item <- function(list_item){
 #' @param ... A list of items and their values or expressions. Will be evaluated sequentially (so one could have list(a= 1, b = a +2 ))
 #'
 #' @return No return value, modifies/adds items sequentially and deploys to the environment and with the main list for storage
+#'
+#' @importFrom lifecycle deprecate_stop
 #'
 #' @export
 #'
@@ -1624,6 +1628,8 @@ adj_val <- function(curtime, nexttime, by, expression, discount = NULL) {
 #' @param lclval The value to be discounted
 #'
 #' @return Double based on continuous time discounting
+#' 
+#' @importFrom lifecycle deprecate_warn
 #'
 #' @examples 
 #' disc_ongoing(lcldr=0.035,lclprvtime=0.5, lclcurtime=3, lclval=2500)
@@ -1632,6 +1638,7 @@ adj_val <- function(curtime, nexttime, by, expression, discount = NULL) {
 #' @export
 
 disc_ongoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
+  lifecycle::deprecate_warn("2.0.0","disc_ongoing()","disc_ongoing_v()")
   
   Instantdr <- log(1+lcldr)
   
@@ -1655,6 +1662,8 @@ disc_ongoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
 #' @param lcldr The discount rate
 #' @param lclcurtime The time of the current event in the simulation
 #' @param lclval The value to be discounted
+#' 
+#' @importFrom lifecycle deprecate_warn
 #'
 #' @return Double based on discrete time discounting
 #'
@@ -1665,6 +1674,7 @@ disc_ongoing <- function(lcldr=0.035, lclprvtime, lclcurtime, lclval){
 #' @export
 #' 
 disc_instant <- function(lcldr=0.035, lclcurtime, lclval){
+  lifecycle::deprecate_warn("2.0.0","disc_instant()","disc_instant_v()")
   
   if (is.null(lclval)) {
     addinst <- 0
@@ -1687,6 +1697,8 @@ disc_instant <- function(lcldr=0.035, lclcurtime, lclval){
 #' @param starttime The start time for accrual of cycle costs (if not 0)
 #'
 #' @return Double based on cycle discounting
+#'
+#' @importFrom lifecycle deprecate_warn
 #' 
 #' @details
 #' Note this function counts both extremes of the interval, so the example below
@@ -1700,6 +1712,7 @@ disc_instant <- function(lcldr=0.035, lclcurtime, lclval){
 #' @export
 
 disc_cycle <- function(lcldr=0.035, lclprvtime=0, cyclelength,lclcurtime, lclval,starttime=0){
+  lifecycle::deprecate_warn("2.0.0","disc_cycle()","disc_cycle_v()")
   
   addcycle <- 0
   
