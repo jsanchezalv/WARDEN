@@ -71,7 +71,7 @@ common_all_inputs <-add_item(
 
 
 #Put objects here that do not change as we loop through treatments for a patient
-common_pt_inputs <- add_item2(input = {
+common_pt_inputs <- add_item(input = {
   rnd_stream_a <- random_stream(100) #arbitrary amount of random numbers to be used, should be >= max number of calls that use that random number (e.g., if item/event A requires 5 random numbers due to repeated calls, then at least 5 numbers should be generated )
   rnd_stream_b <- random_stream(100)
   common_luck <- runif(1)
@@ -330,8 +330,7 @@ sensitivity_inputs <-add_item(
             indicators = append(rep(0, length(df_par$parameter_name))[-pos_indicator],1,pos_indicator-1) #vector of indicators, value 0 everywhere except at sens, where it takes value 1
                               )
 
-common_all_inputs <-add_item() %>% 
-  add_item(
+common_all_inputs <-add_item(
             pick_val_v(base        = df_par[["base_value"]],
                        psa         = pick_psa(df_par[["PSA_dist"]],rep(1,length(df_par[["PSA_dist"]])),df_par[["a"]],df_par[["b"]]),
                        sens        = df_par[[sens_name_used]],

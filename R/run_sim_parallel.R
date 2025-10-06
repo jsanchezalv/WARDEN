@@ -163,7 +163,6 @@ if(getRversion() >= "2.15.1") {
 #' ipd = 1,
 #' ncores = 1)
 #' 
-
 run_sim_parallel <- function(arm_list=c("int","noint"),
                              sensitivity_inputs=NULL,
                              common_all_inputs=NULL,
@@ -286,12 +285,6 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       if(!is.null(categories_other_ongoing)){categories_other_ongoing},
       if(!is.null(categories_other_instant)){categories_other_instant}
     ))
-  
-  
-  env_setup_sens <- is.language(sensitivity_inputs)
-  env_setup_sim <- is.language(common_all_inputs)
-  env_setup_pt <- is.language(common_pt_inputs)
-  env_setup_arm <- is.language(unique_pt_inputs)
 
   output_sim <- list()
   
@@ -397,11 +390,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        debug = debug,
                        accum_backwards = accum_backwards,
                        continue_on_error = continue_on_error,
-                       log_list = list(),
-                       env_setup_sens = env_setup_sens,
-                       env_setup_sim = env_setup_sim,
-                       env_setup_pt = env_setup_pt,
-                       env_setup_arm = env_setup_arm
+                       log_list = list()
                       )
     
     if(is.null(seed)){
@@ -418,16 +407,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     if(!is.null(sensitivity_inputs)){
       
       on_error_check({
-        if(env_setup_sens){
-          load_inputs2(inputs = input_list_sens,list_uneval_inputs = sensitivity_inputs)
-        } else{
-          input_list_sens <- as.environment(
-            load_inputs(inputs = as.list(input_list_sens),
-                        list_uneval_inputs = sensitivity_inputs)
-          )
-          parent.env(input_list_sens) <- environment()
-          
-        }
+          load_inputs(inputs = input_list_sens,list_uneval_inputs = sensitivity_inputs)
       })
       if(.skip_to_next){next}
       
@@ -477,21 +457,12 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
       set.seed(simulation*1007*seed)
       .set_last_ctx(stage="setup:common_all_inputs", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
       
+      
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
-        
-        if(env_setup_sim){
-          on_error_check({
-            if(env_setup_sim){
-              load_inputs2(inputs = input_list,list_uneval_inputs = common_all_inputs)
-            } else{
-              input_list <- as.environment(
-                load_inputs(inputs = as.list(input_list),
-                            list_uneval_inputs = common_all_inputs)
-              )
-              parent.env(input_list) <- parent.env(input_list_sens)
-            }
-          })
+        on_error_check({
+              load_inputs(inputs = input_list,list_uneval_inputs = common_all_inputs)
+        })
           if(.skip_to_next){return(NULL)}
         
         if(input_list_sens$debug){ 
@@ -505,9 +476,9 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
           
           log_list <- c(log_list,dump_info)
           log_add(dump_info)
-          
         }
-      }
+        }
+      
   
       if(is.null(input_list$drc)){input_list$drc <- 0.03}
       if(is.null(input_list$drq)){input_list$drq <- 0.03}
@@ -563,8 +534,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   
 
   results <- output_sim
-  
-    }
+    
   }, enable=TRUE, cleanup = TRUE) 
   
   .set_last_ctx(stage="Simulation finalized", .warden_ctx = .warden_ctx)

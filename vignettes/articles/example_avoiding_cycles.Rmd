@@ -61,21 +61,21 @@ Treatment costs are yearly as well, so we add them as an instantaneous cost at e
 ## Inputs
 ```{r cycles}
 
-common_all_inputs <-add_item2(input = {
+common_all_inputs <-add_item(input = {
   u_bs <- 0.8
   u_age <- 1 - seq(from = 0, to = 0.5, by = 0.005)
   bs_rate <- 0.07
   trt_eff <- 0.02
 })  
 
-common_pt_inputs <- add_item2(input={
+common_pt_inputs <- add_item(input={
     bs_age <- rnorm(1,40,5)
     time_cov <- runif(1)/500
     luck <- runif(1)
 }) 
 
 
-unique_pt_inputs <- add_item2(input = {
+unique_pt_inputs <- add_item(input = {
     cost_trt_ins <- ifelse(arm=="int",1000,500)
     bs_rate <- bs_rate - ifelse(arm=="int",trt_eff,0)
     bs_rate_f <- function(.time){bs_rate + (time_cov * floor(.time))}
@@ -176,7 +176,7 @@ Treatment costs are yearly, so we just use the per cycle approach instead of ins
 ## Inputs
 ```{r noncycles}
 
-common_all_inputs <-add_item2(input = {
+common_all_inputs <-add_item(input = {
   u_bs <- 0.8
   u_age <- 1 - seq(from = 0, to = 0.5, by = 0.005)
   bs_rate <- 0.07
@@ -188,14 +188,14 @@ common_all_inputs <-add_item2(input = {
   cost_trt_max_cycles <- 5
 })  
 
-common_pt_inputs <- add_item2(input={
+common_pt_inputs <- add_item(input={
     bs_age <- rnorm(1,40,5)
     time_cov <- runif(1)/500
     luck <- runif(1)
 }) 
 
 
-unique_pt_inputs <- add_item2(input = {
+unique_pt_inputs <- add_item(input = {
     cost_trt <- ifelse(arm=="int",1000,500)
     bs_rate <- bs_rate - ifelse(arm=="int",trt_eff,0)
     #rate is a function of time, with yearly changes

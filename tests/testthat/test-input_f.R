@@ -198,7 +198,7 @@ test_that("Pick values vectorized work correctly",{
                indicator_sens_binary = FALSE,
                sens_iterator = 5,
                distributions = list("rnorm","rnorm","rdirichlet"),
-               covariances = list(0.1,0.1,NULL) ),
+               covariances = list(0.1,0.1,NULL), deploy = FALSE ),
     list(util = 2, util2 = 3, dirichlet_vector = c(0.36, 0.54, 0.1))
     
   )
@@ -210,7 +210,7 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = FALSE,
       sens_ind = FALSE,
-      indicator=c(1,0)
+      indicator=c(1,0), deploy = FALSE
     ),
     list(0,0)
   )
@@ -222,7 +222,7 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = FALSE,
       sens_ind = TRUE,
-      indicator=c(1,0)
+      indicator=c(1,0), deploy = FALSE
     ),
     list(2,0)
   )
@@ -234,7 +234,7 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = FALSE,
       sens_ind = TRUE,
-      indicator=c(0,1)
+      indicator=c(0,1), deploy = FALSE
     ),
     list(0,3)
   )
@@ -246,7 +246,7 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = FALSE,
       sens_ind = TRUE,
-      indicator=c(1,1)
+      indicator=c(1,1), deploy = FALSE
     ),
     list(2,3)
   )
@@ -258,7 +258,7 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = TRUE,
       sens_ind = TRUE,
-      indicator=c(1,1)
+      indicator=c(1,1), deploy = FALSE
     ),
     list(2,3)
   )
@@ -270,7 +270,7 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = TRUE,
       sens_ind = TRUE,
-      indicator=c(1,5)
+      indicator=c(1,5), deploy = FALSE
     )
   )
   
@@ -281,7 +281,7 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = 5,
       sens_ind = TRUE,
-      indicator=c(1,1)
+      indicator=c(1,1), deploy = FALSE
     )
   )
   
@@ -292,7 +292,7 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = TRUE,
       sens_ind = 3,
-      indicator=c(1,1)
+      indicator=c(1,1), deploy = FALSE
     )
   )
   
@@ -303,7 +303,7 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = TRUE,
       sens_ind = TRUE,
-      indicator=c(0,0)
+      indicator=c(0,0), deploy = FALSE
     ),
     {list(draw_tte(1,'norm',0,0.1,seed=1),draw_tte(1,'norm',0,0.1,seed=2))}
   )
@@ -315,7 +315,7 @@ test_that("Pick values vectorized work correctly",{
       sens = c(2,3),
       psa_ind = TRUE,
       sens_ind = TRUE,
-      indicator=c(1,0)
+      indicator=c(1,0), deploy = FALSE
     ),
     {list(2,draw_tte(1,'norm',0,0.1,seed=2))}
   )
@@ -612,13 +612,10 @@ test_that("modify_item_seq works sequentially", {
   expect_equal(input_list_arm$a, 3)
   expect_equal(input_list_arm$b, 5)
   
-  # Test debug mode
-  input_list_arm$debug <- TRUE
   input_list_arm$log_list <- list()
   modify_item_seq(list(a = 4, c = b * 2))
   expect_equal(input_list_arm$a, 4)
   expect_equal(input_list_arm$c, 10)
-  expect_true(length(input_list_arm$log_list) > 0)
 })
 
 
@@ -1034,3 +1031,122 @@ test_that("qcondweibull and qcondweibullPH can give same results",
             qcond_weibullPH(p, shape, scale_PH, lower_bound = t0))
             }
           )
+
+
+
+
+# shared inputs -----------------------------------------------------------
+
+test_that("immutable mode: modify returns new object; originals unaffected", {
+  a <- shared_input(5, constrained = FALSE)
+  expect_s3_class(a, c("shared_input_val", "shared_input"))
+  
+  a2 <- a$modify(a$value() + 7)
+  expect_equal(a$value(), 5)
+  expect_equal(a2$value(), 12)
+  
+  # clone is a deep copy of the wrapper's current value
+  a3 <- a2$clone()
+  a2b <- a2$modify(99)
+  expect_equal(a2$value(), 12)     # old handle unchanged
+  expect_equal(a2b$value(), 99)
+  expect_equal(a3$value(), 12)     # clone still has 12
+})
+
+test_that("immutable mode: reset and fork work", {
+  a <- shared_input(10, constrained = FALSE)
+  
+  # reset goes back to initial and returns a fresh handle
+  a2 <- a$modify(11)
+  a3 <- a2$reset()
+  expect_equal(a2$value(), 11) # old handle unchanged
+  expect_equal(a3$value(), 10) # new handle reset to init
+  
+  # fork returns n independent deep clones (of the wrapper)
+  forks <- a$fork(3)
+  expect_type(forks, "list")
+  expect_length(forks, 3)
+  expect_true(all(vapply(forks, function(x) x$value(), numeric(1)) == 10))
+  
+  forks[[1]] <- forks[[1]]$modify(77)
+  expect_equal(forks[[1]]$value(), 77)
+  expect_equal(forks[[2]]$value(), 10) # independence across forks
+})
+
+test_that("shared mode: aliasing across handles and clone/reset break sharing", {
+  make_shared <- function(val) {
+    constrained <- TRUE  # parent flag consumed by shared_input()
+    shared_input(val)
+  }
+  
+  b1 <- make_shared(10)
+  expect_s3_class(b1, c("shared_input_env", "shared_input"))
+  
+  # alias: same underlying state
+  b2 <- b1
+  expect_equal(b1$value(), 10)
+  expect_equal(b2$value(), 10)
+  
+  # modify returns a fresh wrapper that *shares* the same state
+  b1 <- b1$modify(b1$value() + 1)
+  expect_equal(b1$value(), 11)
+  expect_equal(b2$value(), 11)  # reflects shared state
+  
+  # clone: new independent state
+  b3 <- b1$clone()
+  b1 <- b1$modify(99)
+  expect_equal(b1$value(), 99)
+  expect_equal(b2$value(), 99)  # still sharing with b1
+  expect_equal(b3$value(), 11)  # independent
+  
+  # reset: new independent state set to init
+  b4 <- b1$reset()
+  expect_equal(b4$value(), 10)  # initial value
+  b1 <- b1$modify(123)
+  expect_equal(b4$value(), 10)  # independent from b1/b2
+  
+  b5 <- b3$modify(b3$value() + 1)
+  
+  expect_equal(b5$value(), b3$value())  # same value
+})
+
+test_that("explicit constrained arg overrides parent lookup", {
+  constrained <- TRUE
+  x <- shared_input(1, constrained = FALSE)
+  expect_s3_class(x, "shared_input_val")
+  y <- shared_input(1, constrained = TRUE)
+  expect_s3_class(y, "shared_input_env")
+})
+
+test_that("parent lookup defaults to immutable unless TRUE", {
+  # no 'constrained' in parent -> immutable
+  x <- (function() shared_input(1))()
+  expect_s3_class(x, "shared_input_val")
+  
+  # constrained present but FALSE -> immutable
+  x <- (function() { constrained <- FALSE; shared_input(1) })()
+  expect_s3_class(x, "shared_input_val")
+  
+  # constrained present and TRUE -> shared
+  x <- (function() { constrained <- TRUE; shared_input(1) })()
+  expect_s3_class(x, "shared_input_env")
+})
+
+test_that("works with non-scalar values; note on reference types", {
+  # list value copies fine (but elements can be reference types)
+  a <- shared_input(list(x = 1L), constrained = FALSE)
+  a2 <- a$modify(list(x = 2L))
+  expect_equal(a$value(), list(x = 1L))
+  expect_equal(a2$value(), list(x = 2L))
+  
+  # environment as value: wrapper deep-copies the handle, but *not* the env itself
+  e <- new.env(parent = emptyenv()); e$k <- 1L
+  a <- shared_input(e, constrained = FALSE)
+  a2 <- a$clone()
+  e$k <- 99L
+  # both see 99 because the underlying env is shared by R semantics
+  expect_equal(a$value()$k, 99L)
+  expect_equal(a2$value()$k, 99L)
+})
+
+

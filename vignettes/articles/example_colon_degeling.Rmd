@@ -1348,11 +1348,10 @@ The first way to create the model is by copying the approach taken in the origin
 
 As with any model, we need to load inputs, set initial TTE, event reactions, utilities/costs, etc. We'll first replicate the deterministic analysis, and will then redo the inputs to use the probabilistic analysis, showcasing as well how `pick_val_v` function can be used to have everything done at once.
 
-Thanks to the new `add_item2`, the loading of the inputs is fundamentally the same.
 
 ```{r input_delayed}
 
-common_all_inputs <-add_item2(input = {
+common_all_inputs <-add_item(input = {
                       drc         <- 0.04 
                       drq         <- 0.015
                       p_highrisk  <- 0.6
@@ -1431,7 +1430,7 @@ common_all_inputs <-add_item2(input = {
 
 #Put objects here that do not change as we loop through treatments for a patient
 #We preload the random numbers to clone them across arms for a given patient
-common_pt_inputs <- add_item2(input={
+common_pt_inputs <- add_item(input={
     HighRisk <- as.integer(runif(1) < p_highrisk)
   
     random_adv <- runif(1)
@@ -1440,7 +1439,7 @@ common_pt_inputs <- add_item2(input={
     random_cure2 <- runif(1)
 }) 
 
-unique_pt_inputs <- add_item2(input = {
+unique_pt_inputs <- add_item(input = {
     AdjuvantCycles <- 0
     MonitorCycles <- 0
     Toxicities <- 0
@@ -1647,7 +1646,7 @@ This simplifies the modelling, the number of events, and increases running speed
 
 
 ```{r rethinking_model}
-unique_pt_inputs2 <- add_item2(input = {
+unique_pt_inputs2 <- add_item(input = {
     n_tox <- 0
     q_total <- u_adjuvant
     p_toxicity <- if(arm == "one") {p_tox_1} else {p_tox_2}
@@ -1917,7 +1916,7 @@ l_inputs<- list(parameter_name = list("m_TTR",
                  psa_indicators = list(1,1,1,1,1,1,1,1,1,1)
                  )
 
-common_all_inputs2 <-add_item2(input = {
+common_all_inputs2 <-add_item(input = {
  
                       drc         <- 0.04 
                       drq         <- 0.015

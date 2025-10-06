@@ -219,7 +219,7 @@ pick_psa <- function(f,...){
 #' @param sens_iterator Current iterator number of the DSA/scenario being run, e.g., 5 if it corresponds to the 5th DSA parameter being changed
 #' @param distributions List with length equal to length of base where the distributions are stored
 #' @param covariances List with length equal to length of base where the variance/covariances are stored (only relevant if multivariate normal are being used)
-#' @param deploy_env Boolean, if TRUE will deploy all objects in the environment where the function is called for. Must be active if using add_item2 (and FALSE if using add_item)
+#' @param deploy_env Boolean, if TRUE will deploy all objects in the environment where the function is called for. Must be active if using add_item (and FALSE if a list must be returned)
 #'
 #' @return List used for the inputs
 #' @export
@@ -357,28 +357,35 @@ pick_val_v <- function(base,
 
 # Add item/parameter to list --------------------------------------------------------
 
-#' Define parameters that may be used in model calculations (list)
+#' Define or append model inputs
 #'
-#' @param .data Existing data
-#' @param ... Items to define for the simulation
+#' Build a single `{}` expression that defines inputs for a simulation.
+#' - Named args in `...` become assignments (`name <- expr`), e.g., add_item(a=5)
+#' - Unnamed args are inserted raw/unevaluated. If an unnamed arg is a `{}` block,
+#'   its statements are spliced (flattened). add_item(pick_val_v(...))
+#' - Works with magrittr pipes: a leading `.` (the LHS) is resolved to its value;
+#'   if that value is a `{}` block (or list of expressions), it becomes the
+#'   starting block.
+#' - input argument can be used to handle alternative `add_item2` method,
+#'   e.g. add_item(input = {a <- 5})
 #'
-#' @return A list of items
-#' @export
+#' @param ... Unevaluated arguments. Named → `name <- expr`; unnamed → raw expr.
+#' @param .data Optional named argument: an existing `{}` block (or list of
+#'   expressions) to start from.
+#' @param input Optional unevaluated expression or `{}` block to splice in.
 #'
-#' @details
-#' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
-#' So rather than use two `add_item` with a list of one element, it's better to group them into a single `add_item` with a list of two elements.
-#'
-#' Whenever a function is directly implemented which must be evaluated later and that has no object name attached (e.g., `pick_val_v`), 
-#' it should be implemented after a first `add_item()` (empty or with content) to avoid confusing the `.data` argument, or wrapping the function within `substitute()`
-#'
+#' @return A single `{}` call (language object) ready for `load_inputs()`.
+#' 
 #' @examples
 #' library(magrittr)
 #'
-#' add_item(fl.idfs = 0)
-#' add_item(util_idfs = if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}, util.mbc = 0.6, cost_idfs = 2500)
-#' common_inputs <- add_item() %>%
-#' add_item(pick_val_v(
+#' add_item2(input = {fl.idfs <-  0})
+#' add_item2(input = {
+#'  util_idfs <- if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}
+#'  util.mbc <- 0.6
+#'  cost_idfs <- 2500})
+#' common_inputs <- add_item2(input = {
+#' pick_val_v(
 #'   base      = l_statics[["base"]],
 #'   psa       = pick_psa(
 #'     l_statics[["function"]],
@@ -390,28 +397,84 @@ pick_val_v <- function(base,
 #'   psa_ind   = psa_bool,
 #'   sens_ind  = sensitivity_bool,
 #'   indicator = indicators_statics,
-#'   names_out = l_statics[["parameter_name"]]
+#'   names_out = l_statics[["parameter_name"]],
+#'   deploy_env = TRUE #Note this option must be active if using it at add_item2
 #' )
-#' )
-#'
-
-add_item <- function(.data=NULL,...){
-
-  data_list <- .data
+#' }
+#' ) 
+#' 
+#' @export
+add_item <- function(..., .data = NULL, input) {
+  mc   <- match.call(expand.dots = FALSE)
+  dots <- mc$...
   
-  list_item <- as.list(substitute(...()))
-  
-  if (is.null(data_list)) {
-    data_list <- list_item
-  } else{
-    data_list <- append(data_list,list_item)
+  # Helper: coerce various starters into a { } block list
+  as_block_list <- function(x) {
+    if (is.null(x)) {
+      list(as.name("{"))
+    } else if (is.call(x) && identical(x[[1L]], as.name("{"))) {
+      as.list(x)
+    } else if (is.list(x)) {
+      c(list(as.name("{")), x)
+    } else {
+      c(list(as.name("{")), list(x))
+    }
   }
   
+  # 1) Start from .data if provided
+  block_elems <- as_block_list(.data)
+  built <- list()
   
-  return(data_list)
+  splice_or_keep <- function(expr) {
+    if (is.call(expr) && identical(expr[[1L]], as.name("{"))) {
+      as.list(expr)[-1L]
+    } else {
+      list(expr)
+    }
+  }
+  
+  # 2) If .data is NULL and first unnamed ... is DOT (.) from magrittr, resolve it
+  if (is.null(.data) && !is.null(dots) && length(dots) > 0) {
+    dn <- names(dots)
+    first_is_named <- !is.null(dn) && nzchar(dn[1L])
+    if (!first_is_named) {
+      first_expr <- dots[[1L]]
+      if (is.symbol(first_expr) && identical(first_expr, as.name("."))) {
+        # Evaluate DOT to get LHS value from the calling frame
+        lhs <- eval(first_expr, parent.frame())
+        block_elems <- as_block_list(lhs)
+        dots <- if (length(dots) > 1L) dots[-1L] else NULL
+      } else if (is.call(first_expr) && identical(first_expr[[1L]], as.name("{"))) {
+        # Promote a literal { } block as the starter
+        block_elems <- as.list(first_expr)
+        dots <- if (length(dots) > 1L) dots[-1L] else NULL
+      }
+    }
+  }
+  
+  # 3) Process remaining ... : named -> assignment; unnamed -> raw/splice
+  if (!is.null(dots)) {
+    dn <- names(dots)
+    for (i in seq_along(dots)) {
+      nm   <- if (length(dn)) dn[[i]] else NULL
+      expr <- dots[[i]]
+      if (!is.null(nm) && nzchar(nm)) {
+        built[[length(built) + 1L]] <- call("<-", as.name(nm), expr)
+      } else {
+        built <- c(built, splice_or_keep(expr))
+      }
+    }
+  }
+  
+  # 4) Optional input=
+  if (!missing(input)) {
+    input_sub <- substitute(input)
+    built <- c(built, splice_or_keep(input_sub))
+  }
+  
+  # 5) Return a proper { ... } call
+  as.call(c(block_elems, built))
 }
-
-# Add item/parameter (uses expressions) --------------------------------------------------------
 
 #' Define parameters that may be used in model calculations (uses expressions)
 #'
@@ -419,6 +482,9 @@ add_item <- function(.data=NULL,...){
 #' @param input Items to define for the simulation as an expression (i.e., using {})
 #'
 #' @return A substituted expression to be evaluated by engine 
+#'
+#' @importFrom lifecycle deprecate_warn
+#'
 #' @export
 #'
 #' @details
@@ -454,6 +520,7 @@ add_item <- function(.data=NULL,...){
 #' )
 #'
 add_item2 <- function(.data=NULL,input){
+  lifecycle::deprecate_warn("2.0.0", "add_item2()", "add_item()")
   
   data_list <- .data
   
@@ -467,7 +534,6 @@ add_item2 <- function(.data=NULL,input){
   
   return(data_list)
 }
-
 
 # Modify item in input list -------------------------------------------------------------------------------------------------------------------------------
 
@@ -500,34 +566,7 @@ add_item2 <- function(.data=NULL,input){
 modify_item <- function(list_item){
 
   input_list_arm <- parent.frame()
-  
-  if(input_list_arm$debug){ 
-    
-    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                  "; Sim: ", input_list_arm$simulation,
-                  "; Patient: ", input_list_arm$i,
-                  "; Arm: ", input_list_arm$arm,
-                  "; Event: ", input_list_arm$evt,
-                  "; Time: ", round(input_list_arm$curtime,3)
-    )
-    if(!is.null(input_list_arm$log_list[[loc]])){
-      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value, input_list_arm[names(list_item)])
-      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,list_item)
-      
-    }else{
-    dump_info <- list(
-      list(
-        prev_value = input_list_arm[names(list_item)],
-        cur_value = list_item
-      )
-    )
-    names(dump_info) <- loc
-    
-    input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
-    }
-  }
-  
-  
+
   list2env(lapply(list_item, unname), parent.frame())
   
   if(input_list_arm$accum_backwards){
@@ -575,44 +614,13 @@ modify_item_seq <- function(...){
   input_list_arm <- parent.frame()
   input_list <- as.list(substitute(...))[-1]
   list_out <- list()
-  
-  if(input_list_arm$debug){ 
-    temp_dump <- mget(names(input_list),input_list_arm, ifnotfound = Inf)
-  }
-  
+
   for (inp in 1:length(input_list)) {
     temp_obj <- as.list(eval(input_list[[inp]], input_list_arm))
     names(temp_obj) <- names(input_list[inp])
     list2env(temp_obj, input_list_arm)
   }
   list_out <- mget(names(input_list),input_list_arm)
-  
-  if(input_list_arm$debug){ 
-    
-    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
-                  "; Sim: ", input_list_arm$simulation,
-                  "; Patient: ", input_list_arm$i,
-                  "; Arm: ", input_list_arm$arm,
-                  "; Event: ", input_list_arm$evt,
-                  "; Time: ", round(input_list_arm$curtime,3)
-    )
-    if(!is.null(input_list_arm$log_list[[loc]])){
-      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value, temp_dump)
-      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,list_out)
-      
-    }else{
-    dump_info <- list(
-      list(prev_value = temp_dump,
-           cur_value = list_out
-      )
-    )
-    names(dump_info) <-loc
-    input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
-    }
-  }
-  
-  
-  
   
   # list2env(list_out,envir = parent.frame())
 
@@ -1170,35 +1178,99 @@ print.resource_discrete <- function(x, ...) {
 }
 
 
+# Shared input ------------------------------------------------------------
+
 #' Shared input object
 #'
-#' Constructor for a simple value holder with two modes:
-#' - constrained = FALSE: immutable copy-on-modify (safe in loops, deep-copyable)
-#' - constrained = TRUE: mutable by-reference environment
+#' Constructor for a lightweight "shared or immutable" value holder.
 #'
-#' @param expr An expression or value to initialize
-#' @param constrained Logical. If TRUE, creates shared environment; else plain value object
-#' @return An object with $value, $modify(), and $clone()
-#' 
+#' `shared_input()` produces a simple object that wraps a value with
+#' controlled mutability semantics. It can operate in two distinct modes:
+#'
+#' - **Immutable (non-shared)**: every modification produces a fresh, independent
+#'   copy of the object (safe for parallel or functional code).
+#' - **Shared (constrained)**: the object’s value is stored in a common
+#'   environment shared across all aliases (by-reference semantics). This
+#'   allows coordinated updates across multiple handles.
+#'
+#' The mode is determined either by the explicit argument `constrained`, or
+#' by inheriting the value of a `constrained` variable in the parent frame.
+#'
+#' @param expr A value or expression to initialize the shared input with.
+#'   The expression is evaluated immediately.
+#' @param constrained Logical. If `TRUE`, creates a shared environment-backed
+#'   object. If `FALSE`, creates an immutable copy-on-modify object.
+#'   If `NULL` (default), the function looks up `constrained` in the calling
+#'   environment; only an explicit `TRUE` enables shared mode.
+#'
+#' @return An object of class `shared_input_val` (immutable mode) or
+#'   `shared_input_env` (shared mode), both inheriting from class
+#'   `"shared_input"`. Each instance exposes the following user methods:
+#'
+#' \describe{
+#'   \item{$value()}{Returns the current stored value.}
+#'   \item{$modify(new_v)}{
+#'     In immutable mode: returns a new independent wrapper with updated value.  
+#'     In shared mode: updates the shared value by reference and returns a new
+#'     wrapper pointing to the same shared state.
+#'   }
+#'   \item{$clone()}{Returns a deep copy (independent wrapper and independent
+#'     internal state). Subsequent modifications on clones do not affect the
+#'     original object or its aliases.}
+#'   \item{$reset()}{Returns a new wrapper whose value is restored to the
+#'     original initialization value. In both modes this creates an independent
+#'     fresh state.}
+#'   \item{$fork(n)}{Creates `n` independent deep clones as a list. Useful for
+#'     generating multiple isolated copies quickly.}
+#' }
+#'
+#' @details
+#' - In **immutable mode**, each wrapper stores its value in closures
+#'   (`make_val()`) and is fully copy-on-modify. No references are shared.
+#' - In **shared mode**, all wrappers produced by `$modify()` or direct aliasing
+#'   point to the same underlying environment (`state`). This means updating one
+#'   updates all aliases until a `$clone()` or `$reset()` breaks the link.
+#'
+#' The underlying `state` environments are internal. Users should rely only on
+#' the public methods above.
+#'
+#' Note: if the stored value itself is a reference type (e.g., environment,
+#' external pointer, R6 object), those internal references remain shared
+#' regardless of mode, following normal R semantics.
+#'
 #' @examples
-#' # default FALSE (no constrained in parent)
+#' # --- Immutable (default) mode ---
 #' a <- shared_input(5)
 #' a$value()                 # 5
 #' a2 <- a$modify(a$value() + 7)
 #' a$value()                 # 5
 #' a2$value()                # 12
 #' 
-#' # parent says TRUE -> shared
+#' # Cloning and resetting
+#' a3 <- a2$clone()
+#' a4 <- a2$reset()
+#' a3$value(); a4$value()    # 12, 5
+#' 
+#' # Forking
+#' forks <- a$fork(3)
+#' vapply(forks, function(x) x$value(), numeric(1))
+#'
+#' # --- Shared (constrained) mode ---
 #' constrained <- TRUE
 #' b1 <- shared_input(10)
-#' b2 <- b1              # alias
-#' b1$value(); b2$value()            # 10, 10
-#' b1 <- b1$modify(b1$value() + 1)   # update shared state
-#' b1$value(); b2$value()            # 11, 11
+#' b2 <- b1        # alias (same state)
+#' b1$modify(11)
+#' b1$value(); b2$value()  # both 11
+#'
 #' b3 <- b1$clone()
-#' b1 <- b1$modify(99)
-#' b1$value(); b3$value()            # 99, 11 (deep copy intact)
-#' @export
+#' b1$modify(99)
+#' b1$value(); b3$value()  # 99, 11
+#'
+#' # Reset breaks sharing
+#' b4 <- b1$reset()
+#' b4$value()              # 10
+#' 
+#'@export
 shared_input <- function(expr, constrained = NULL) {
   # Resolve constrained default from parent env, but only TRUE counts as TRUE
   if (is.null(constrained)) {
@@ -1213,7 +1285,7 @@ shared_input <- function(expr, constrained = NULL) {
   
   val <- expr  # already evaluated before call
   
-  # ---------- immutable (non-shared) ----------
+  # ---------- immutable (non-shared)
   if (!constrained) {
     make_val <- function(v, init = v) {
       force(v); force(init)
@@ -1229,7 +1301,7 @@ shared_input <- function(expr, constrained = NULL) {
     return(make_val(val, init = val))
   }
   
-  # ---------- shared (environment-backed with shared state) ----------
+  # ---------- shared (environment-backed with shared state)
   # All wrappers to the same object share `state`; clone breaks sharing.
   make_env <- local({
     make <- function(state) {

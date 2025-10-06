@@ -80,7 +80,7 @@ We also define here the specific utilities and costs that will be used in the mo
 #In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.
 
 #Put objects here that do not change on any patient or intervention loop
-common_all_inputs <- add_item2(input={ 
+common_all_inputs <- add_item(input={ 
   #utilities
         pick_val_v(
             base =  df_util$value,
@@ -105,7 +105,7 @@ common_all_inputs <- add_item2(input={
         )
         })
 #Put objects here that do not change as we loop through interventions for a patient
-common_pt_inputs <- add_item2(input={ 
+common_pt_inputs <- add_item(input={ 
     sex_pt <- ifelse(rbinom(1,1,p=0.01),"male","female")
     nat.os.s <- rcond_gompertz(1,
                                shape=if(sex_pt=="male"){0.102}else{0.115},
@@ -116,7 +116,7 @@ common_pt_inputs <- add_item2(input={
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
 #common across arm but changes per pt could be implemented here (if (arm==)... )
-unique_pt_inputs <- add_item2(input={
+unique_pt_inputs <- add_item(input={
     fl.idfs.ontx              <- 1
     fl.idfs                   <- 1
     fl.mbcs.ontx              <- 1

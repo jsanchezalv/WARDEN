@@ -57,8 +57,8 @@ Because of the way the constrained simulation works, it is very important to pre
 #We don't need to use sensitivity_inputs here, so we don't add that object
 
 #Put objects here that do not change on any patient or intervention loop
-#We use add_item2 and add_item to showcase how the user can implement the inputs (either works, add_item2 is just faster)
-common_all_inputs <-add_item2(input = {
+#We use add_item and add_item to showcase how the user can implement the inputs (either works, add_item is just faster)
+common_all_inputs <-add_item(input = {
                       util.sick   <- 0.8
                       util.sicker <- 0.5
                       cost.sick   <- 3000
@@ -72,7 +72,7 @@ common_all_inputs <-add_item2(input = {
                       beds <- resource_discrete(650)
                       beds_free <- beds$n_free()
                       shared_accumulator <- shared_input(0)
-                      value_accum <- 0
+                      value_accum <- shared_accumulator$value()
 })  
 
 
@@ -83,7 +83,7 @@ common_pt_inputs <- add_item(death= max(0.0000001,rnorm(n=1, mean=12, sd=3)))
 unique_pt_inputs <- add_item(fl.sick = 1,
                              q_default = util.sick,
                              c_default = cost.sick + if(arm=="int"){cost.int}else{0},
-                             success_blocking_bed <- FALSE,
+                             success_blocking_bed = FALSE,
                              had_to_queue = 0,
                              time_in_queue = NA,
                              time_start_queue = NA) 
@@ -271,7 +271,7 @@ summary_results_det(results[[1]][[1]]) #print first simulation
 ## Run model constrained but unbinding
 If the model is run with constrainted = TRUE but in such a way that the constraint does not bind (e.g., with 1000+ beds) then the results are also equivalent to constrained = FALSE.
 ```{r model_run_con_unbinding}
-common_all_inputs <-add_item2(input = {
+common_all_inputs <-add_item(input = {
                       util.sick   <- 0.8
                       util.sicker <- 0.5
                       cost.sick   <- 3000
@@ -327,8 +327,7 @@ sensitivity_inputs <-add_item(
                                 rep(1,length(list_par[[1]]))} #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max, if not sensitivity analysis, then we activate all of them, i.e., in a PSA)
                               )
 
-common_all_inputs <-add_item() %>% 
-  add_item(
+common_all_inputs <- add_item(
             pick_val_v(base        = list_par[["base_value"]],
                        psa         = pick_psa(list_par[["PSA_dist"]],rep(1,length(list_par[["PSA_dist"]])),list_par[["a"]],list_par[["b"]]),
                        sens        = list_par[[sens_name_used]],
@@ -419,7 +418,7 @@ data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.
 The model is executed as before, just activating the psa_bool option and deactivating the sensitivity_bool and removing sensitivity_names and setting n_sensitivity = 1
 
 ```{r run_psa}
-common_all_inputs <-add_item2(input = {
+common_all_inputs <-add_item(input = {
                       util.sick   <- 0.8
                       util.sicker <- 0.5
                       cost.sick   <- 3000

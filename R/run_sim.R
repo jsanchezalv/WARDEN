@@ -268,12 +268,6 @@ run_sim <- function(arm_list=c("int","noint"),
     ))
   categories_for_export <- if(is.null(categories_for_export)){character()}else{categories_for_export}
   
-  
-  env_setup_sens <- is.language(sensitivity_inputs)
-  env_setup_sim <- is.language(common_all_inputs)
-  env_setup_pt <- is.language(common_pt_inputs)
-  env_setup_arm <- is.language(unique_pt_inputs)
-
   output_sim <- list()
   
   final_log <- list()
@@ -385,10 +379,6 @@ run_sim <- function(arm_list=c("int","noint"),
                        accum_backwards = accum_backwards,
                        continue_on_error = continue_on_error,
                        log_list = list(),
-                       env_setup_sens = env_setup_sens,
-                       env_setup_sim = env_setup_sim,
-                       env_setup_pt = env_setup_pt,
-                       env_setup_arm = env_setup_arm,
                        log_sink = log_sink
                        
     )
@@ -408,16 +398,7 @@ run_sim <- function(arm_list=c("int","noint"),
   # Draw Common parameters  -------------------------------
   if(!is.null(sensitivity_inputs)){
     on_error_check({
-    if(env_setup_sens){
-      load_inputs2(inputs = input_list_sens,list_uneval_inputs = sensitivity_inputs)
-    } else{
-      input_list_sens <- as.environment(
-        load_inputs(inputs = as.list(input_list_sens),
-                    list_uneval_inputs = sensitivity_inputs)
-        )
-      parent.env(input_list_sens) <- environment()
-      
-    }
+      load_inputs(inputs = input_list_sens,list_uneval_inputs = sensitivity_inputs)
     })
     if(.skip_to_next){next}
     
@@ -459,15 +440,7 @@ run_sim <- function(arm_list=c("int","noint"),
       # Draw Common parameters  -------------------------------
       if(!is.null(common_all_inputs)){
         on_error_check({
-        if(env_setup_sim){
-          load_inputs2(inputs = input_list,list_uneval_inputs = common_all_inputs)
-        } else{
-          input_list <- as.environment(
-            load_inputs(inputs = as.list(input_list),
-                        list_uneval_inputs = common_all_inputs)
-            )
-          parent.env(input_list) <- parent.env(input_list_sens)
-        }
+          load_inputs(inputs = input_list,list_uneval_inputs = common_all_inputs)
         })
         if(.skip_to_next){next}
         

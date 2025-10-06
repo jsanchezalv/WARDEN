@@ -27,7 +27,7 @@ knitr::opts_chunk$set(
 This document explains the logic behind WARDEN main approach to simulate discrete event simulations, as well as explaining briefly the rationale for certain design decisions.
 
 ## In a Nutshell
-WARDEN main simulation engine at its core is nothing but a nested loop at different levels. However, for this to work we need to delay the execution of the inputs provided by the user, so the relevant inputs provided through `add_tte`, `add_item`/`add_item2` and `add_reactevt` are substituted for delayed execution and stored as lists.
+WARDEN main simulation engine at its core is nothing but a nested loop at different levels. However, for this to work we need to delay the execution of the inputs provided by the user, so the relevant inputs provided through `add_tte`, `add_item` and `add_reactevt` are substituted for delayed execution and stored as lists.
 
 1. **Per Analysis (DSA, scenarios) "sens"**
     1. Load inputs sequentially. If it's an unnamed list, unlist it and assign to the "sens" input list.

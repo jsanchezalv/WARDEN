@@ -26,34 +26,6 @@ if(getRversion() >= "2.15.1") {
 
 # Load Inputs --------------------------------------------------------------------------------------------------------------------------------------
 
-#' Function to load input expressions in a loop
-#'
-#' @param inputs List of existing inputs
-#' @param list_uneval_inputs List of unevaluated inputs (substituted expressions)
-#'
-#' @return Updated list of evaluated inputs
-#'
-#' @examples
-#' load_inputs(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
-#'
-#' @keywords internal
-#' @noRd
-
-load_inputs <- function(inputs,list_uneval_inputs){
-  for (inp in 1:length(list_uneval_inputs)) {
-    list.eval_inputs <- lapply(list_uneval_inputs[inp],function(x) eval(x, inputs))
-    #If using pick_eval_v or other expressions, the lists are not deployed, so this is necessary to do so
-    if(any(is.null(names(list.eval_inputs)), names(list.eval_inputs)=="") & length(list.eval_inputs)==1) {
-      inputs[names(list.eval_inputs[[1]])] <- list.eval_inputs[[1]]
-    } else{
-      inputs[names(list.eval_inputs)] <- list.eval_inputs
-      
-    }
-  }
-  
-  return(inputs)
-}
-
 #' Function to load input expressions
 #'
 #' @param inputs Environment of existing inputs
@@ -62,12 +34,13 @@ load_inputs <- function(inputs,list_uneval_inputs){
 #' @return Nothing (updated inputs environment)
 #'
 #' @examples
-#' load_inputs2(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
+#' load_inputs(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
 #'
 #' @keywords internal
 #' @noRd
-load_inputs2 <- function(inputs,list_uneval_inputs){
+load_inputs <- function(inputs,list_uneval_inputs){
   eval(list_uneval_inputs, inputs)
+  invisible(NULL)
 }
 
 #' Function for debugging export

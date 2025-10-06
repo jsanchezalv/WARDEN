@@ -77,6 +77,21 @@ run_engine_constrained <- function(arm_list,
   env_setup_arm <- input_list$env_setup_arm
   debug <- input_list$debug
   
+  if (input_list$accum_backwards) {
+    input_list$ongoing_inputs_lu <- paste0(input_list$uc_lists$ongoing_inputs, "_lastupdate", recycle0 = TRUE)
+    input_out_v <- c(input_list$input_out, input_list$ongoing_inputs_lu)
+    
+    # Initialize ongoing_list_temp for backwards accumulation
+    if (!is.null(input_list$uc_lists$ongoing_inputs)) {
+      input_list$ongoing_list_temp <- setNames(
+        rep(0, length(input_list$uc_lists$ongoing_inputs)),
+        input_list$uc_lists$ongoing_inputs
+      )
+    }
+  } else {
+    input_out_v <- c(input_list$input_out)
+  }
+  
   # Get priority order for event queue (from init_event_list)
   if (!is.null(input_list$init_event_list)) {
     priority_order <- input_list$init_event_list[[1]]$evts
@@ -177,15 +192,7 @@ run_engine_constrained <- function(arm_list,
         
         if (!is.null(common_pt_inputs)) {
           
-          if (env_setup_pt) {
-            load_inputs2(inputs = input_list_pt, list_uneval_inputs = common_pt_inputs)
-          } else {
-            input_list_pt <- as.environment(
-              load_inputs(inputs = as.list(input_list_pt),
-                          list_uneval_inputs = common_pt_inputs)
-            )
-            parent.env(input_list_pt) <- parent.env(input_list_arm_base)
-          }
+            load_inputs(inputs = input_list_pt, list_uneval_inputs = common_pt_inputs)
           
           if (input_list$debug) {
             dump_info <- debug_inputs(input_list_arm_base, input_list_pt)
@@ -212,15 +219,7 @@ run_engine_constrained <- function(arm_list,
                       simulation=input_list$simulation, patient_id=i, arm=arm, .warden_ctx = .warden_ctx)
         # Load unique patient-arm inputs
         if (!is.null(unique_pt_inputs)) {
-          if (env_setup_arm) {
-            load_inputs2(inputs = input_list_arm, list_uneval_inputs = unique_pt_inputs)
-          } else {
-            input_list_arm <- as.environment(
-              load_inputs(inputs = as.list(input_list_arm),
-                          list_uneval_inputs = unique_pt_inputs)
-            )
-            parent.env(input_list_arm) <- parent.env(input_list_pt)
-          }
+            load_inputs(inputs = input_list_arm, list_uneval_inputs = unique_pt_inputs)
           
           if (input_list_pt$debug) {
             dump_info <- debug_inputs(input_list_pt, input_list_arm)
@@ -287,18 +286,10 @@ run_engine_constrained <- function(arm_list,
         
         # Set up accumulators if using backwards accumulation
         if (input_list$accum_backwards) {
-          input_list_arm$ongoing_inputs_lu <- paste0(input_list_arm$uc_lists$ongoing_inputs, "_lastupdate", recycle0 = TRUE)
-          inputs_out_v <- c(input_list_arm$input_out, input_list_arm$ongoing_inputs_lu)
-          
           # Initialize ongoing_list_temp for backwards accumulation
           if (!is.null(input_list_arm$uc_lists$ongoing_inputs)) {
-            input_list_arm$ongoing_list_temp <- setNames(
-              rep(0, length(input_list_arm$uc_lists$ongoing_inputs)),
-              input_list_arm$uc_lists$ongoing_inputs
-            )
+            input_list_arm$ongoing_list_temp <- input_list$ongoing_list_temp
           }
-        } else {
-          inputs_out_v <- c(input_list_arm$input_out)
         }
         
         input_list_arm$n_evt <- 0
@@ -356,10 +347,10 @@ run_engine_constrained <- function(arm_list,
         
         
         #Get extra objects to be exported
-        if(is.null(inputs_out_v)){
+        if(is.null(input_out_v)){
           extra_data <- list()
         } else{
-          extra_data <-  mget(inputs_out_v, input_list_arm) 
+          extra_data <-  mget(input_out_v, input_list_arm) 
         }
         extra_data <- extra_data[!vapply(extra_data, is.null, TRUE)]
         
