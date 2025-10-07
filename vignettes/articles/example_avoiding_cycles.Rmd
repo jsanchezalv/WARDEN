@@ -58,24 +58,25 @@ This is a very simple model, where we just have a time to death given by an expo
 Additionally, we have a multiplicative utility age adjustment factor, so at every yearly cycle we also adjust for that factor. 
 
 Treatment costs are yearly as well, so we add them as an instantaneous cost at every cycle, including time 0.
+
 ## Inputs
 ```{r cycles}
 
-common_all_inputs <-add_item2(input = {
+common_all_inputs <-add_item(input = {
   u_bs <- 0.8
   u_age <- 1 - seq(from = 0, to = 0.5, by = 0.005)
   bs_rate <- 0.07
   trt_eff <- 0.02
 })  
 
-common_pt_inputs <- add_item2(input={
+common_pt_inputs <- add_item(input={
     bs_age <- rnorm(1,40,5)
     time_cov <- runif(1)/500
     luck <- runif(1)
 }) 
 
 
-unique_pt_inputs <- add_item2(input = {
+unique_pt_inputs <- add_item(input = {
     cost_trt_ins <- ifelse(arm=="int",1000,500)
     bs_rate <- bs_rate - ifelse(arm=="int",trt_eff,0)
     bs_rate_f <- function(.time){bs_rate + (time_cov * floor(.time))}
@@ -105,7 +106,7 @@ evt_react_list <-
                  #   curtime <- Inf
                  # }
               
-              new_event(list(cycle = curtime + 1))
+              new_event(c(cycle = curtime + 1))
                  
               q_default <- u_bs * u_age[min(100,floor(curtime + bs_age))]
               if(curtime<5){
@@ -119,7 +120,7 @@ evt_react_list <-
               
               luck <- luck_adj(prevsurv = prev_surv, cursurv = cur_surv, luck = luck, condq = TRUE)
               ttdeath <- qcond_exp(luck, rate = new_rate) + curtime
-              modify_event(list(death = max(curtime, ttdeath)))
+              modify_event(c(death = max(curtime, ttdeath)))
 
                })%>%
   add_reactevt(name_evt = "death",
@@ -170,13 +171,14 @@ We now avoid to use cycles.
 
 To fix the time to death with time varying covariates, we use `timecov` with yearly updates (`dt = 1`) and passing the parameter as a function of time, so the function automatically iterates over each year to obtain the relevant time to event. This means we can obtain the final time to event in one go at start. While still iterative, it's less time consuming than having events created at every year.
 
-The multiplicative utility age adjustment factor is implemented by `adj_val`, a function that given an expression that changes with time, reweighs the evaluated values by the ongoing discounting factor that would apply so that even if a single value is returned, the discounted outcome will still be the same as in the traditional cycle approach. Note however that undiscounted outcomes will not be correct (in this case we do not care about it, but we could just create another value like `other_q_default` where the `adj_val` is used with 0 discounting, and that value will be correct undiscounted).
+The multiplicative utility age adjustment factor is implemented by `adj_val`, a function that given an expression that changes with time, reweighs the evaluated values by the ongoing discounting factor that would apply so that even if a single value is returned, the discounted outcome will still be the same as in the traditional cycle approach. Note however that undiscounted outcomes will not be correct (in this case we do not care about it, but we could just create another value like `other_q_default` where the `adj_val` is used with 0 discounting, and that value will be correct undiscounted). The very small difference INMB comes from rounding effects.
 
 Treatment costs are yearly, so we just use the per cycle approach instead of instantaneous costs at every year.
+
 ## Inputs
 ```{r noncycles}
 
-common_all_inputs <-add_item2(input = {
+common_all_inputs <-add_item(input = {
   u_bs <- 0.8
   u_age <- 1 - seq(from = 0, to = 0.5, by = 0.005)
   bs_rate <- 0.07
@@ -188,14 +190,14 @@ common_all_inputs <-add_item2(input = {
   cost_trt_max_cycles <- 5
 })  
 
-common_pt_inputs <- add_item2(input={
+common_pt_inputs <- add_item(input={
     bs_age <- rnorm(1,40,5)
     time_cov <- runif(1)/500
     luck <- runif(1)
 }) 
 
 
-unique_pt_inputs <- add_item2(input = {
+unique_pt_inputs <- add_item(input = {
     cost_trt <- ifelse(arm=="int",1000,500)
     bs_rate <- bs_rate - ifelse(arm=="int",trt_eff,0)
     #rate is a function of time, with yearly changes
@@ -208,7 +210,7 @@ init_event_list <-
   add_tte(arm=c("int","noint"), evts = c("start","death") ,input={
     start <- 0
     #we can immediately know what the final TTE will be even with time changing covariates
-    death <- qtimecov(luck = luck,a_fun = bs_rate_f,dist = "exp", dt = 1)
+    death <- qtimecov(luck = luck,a_fun = bs_rate_f,dist = "exp", dt = 1)$tte
   })
 
 
@@ -220,7 +222,7 @@ evt_react_list <-
                  #this is the way to obtain utility adjustment by age as a single value, it reweighs the u_age by their discounting value so final discounted outcomes are correct
                  adj_factor <- adj_val(
                    curtime,
-                   min(cur_evtlist),
+                   next_event()$time,
                    by = 1,
                    u_age[min(100,floor(.time + bs_age))],
                    discount = drq

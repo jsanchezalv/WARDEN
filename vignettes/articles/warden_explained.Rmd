@@ -27,7 +27,7 @@ knitr::opts_chunk$set(
 This document explains the logic behind WARDEN main approach to simulate discrete event simulations, as well as explaining briefly the rationale for certain design decisions.
 
 ## In a Nutshell
-WARDEN main simulation engine at its core is nothing but a nested loop at different levels. However, for this to work we need to delay the execution of the inputs provided by the user, so the relevant inputs provided through `add_tte`, `add_item`/`add_item2` and `add_reactevt` are substituted for delayed execution and stored as lists.
+WARDEN main simulation engine at its core is nothing but a nested loop at different levels. However, for this to work we need to delay the execution of the inputs provided by the user, so the relevant inputs provided through `add_tte`, `add_item` and `add_reactevt` are substituted for delayed execution and stored as lists.
 
 1. **Per Analysis (DSA, scenarios) "sens"**
     1. Load inputs sequentially. If it's an unnamed list, unlist it and assign to the "sens" input list.
@@ -45,50 +45,17 @@ WARDEN main simulation engine at its core is nothing but a nested loop at differ
 
 The debug mode will store in a log the relevant data that is loaded or changed by the event reactions, and will be exported when the simulation stops (also on error). WARDEN allows to continue on error (though not recommended)
 
-WARDEN handles the random numbers automatically, setting the seeds differently at the simulation, patient and arm level. WARDEN makes sure that the starting seed is cloned for a patient across interventions. However, it could be that conditional statements can alter the random state of R if they conditional trigger random expressions (e.g., `if(arm==2){runif(1)}else{5}`) that change per intervention. To keep the random number cloned as intended, it's recommended to pre-draw random numbers for each type of random object used and use those (see the `Example for a Sick-Sicker-Dead model - Random Number Streams & Luck Adjustment` vignette for more information). WARDEN uses L'Ecuyer-CMRG random number generator.
+WARDEN handles the random numbers automatically, setting the seeds differently at the simulation, patient and arm level. WARDEN makes sure that the starting seed is cloned for a patient across interventions. However, it could be that conditional statements can alter the random state of R if they conditional trigger random expressions (e.g., `if(arm==2){runif(1)}else{5}`) that change per intervention. To keep the random number cloned as intended, it's very strongly recommended to pre-draw random numbers for each type of random object used and use those (see the `Example for a Sick-Sicker-Dead model - Random Number Streams & Luck Adjustment` vignette for more information). WARDEN uses L'Ecuyer-CMRG random number generator.
 
-The way WARDEN processes events through e.g., `modify_item` is by looking at what inputs are currently available from the relevant input list, evaluating the passed list (e.g., `modify_item_seq(list(a = 1, b = a + 1))`) and adding the resulting objects (`a` and `b`) to the parent environment as well as to the relevant input list for storage. With the latest update of WARDEN, objects not included in `modify_item` will be stored in the relevant input list and they will be available for evaluation, e.g.,
 
 ```{r example, eval=FALSE, echo=TRUE}
 
-add_reactevt(name_evt = "event_1", input = {
-  z <- 2 #this will be stored in the main input list, and will be available in the next event reaction! 
-  
-  modify_item_seq(list(a = 1, b = z + 1, z = z)) #this will work, because z is available
-  
-  c <- b + 5 
-}
-
-#The above expression is equivalent to writing:
-
-add_reactevt(name_evt = "event_1", input = {
-  z <- 2 
-  a <- 1
-  b <- z + 1
-  modify_item(list(a = a, b = b, z = z)) 
-  
-  c <- b + 5 #b will be available 
-}
-
-
-#As well as
-add_reactevt(name_evt = "event_1", input = {
-  modify_item_seq(list(a = 1, z = 2, b = z + 1))  #modify_item_seq evaluates sequentially, so the value of z will be available for b
-  
-    c <- b + 5 #b will be available 
-}
-
-#And
+#Code can be writing directly as an expression which will be evaluated at the right time
 add_reactevt(name_evt = "event_1", input = {
   a  <- 1
   z  <- 2
   b  <- z + 1 
   c  <- b + 5 #b will be available 
-}
-
-#But note that this will not work!
-add_reactevt(name_evt = "event_1", input = {
-  modify_item(list(a = 1, z = 2, b = z + 1))  #modify_item is faster but does not evaluate sequentially (all at once), so the value of z will NOT be available for b
 }
 
 ```
@@ -98,9 +65,9 @@ Multiple ways of storing inputs and processing events can be thought of. A few o
 
 Data.frames can be slow and memory-intense to manipulate, so they were avoided for this purpose.
 
-Lists and environments can behave quite similar, with environments being modified by reference, which can speed things up, and it could give more freedom for the user to declare how to set their event reactions instead of requiring them to declare `modify_item`. However, using environments and more "natural" R expressions (e.g., `a <- 1; b <- a + 1`instead of `modify_item_seq(list(a = 1, b = a + 1))`) made the debugging mode harder to handle. Some internal experiments showed a 20% to 40% speed increase by switching from lists to environments in the normal mode. [Changed with WARDEN 1.0] With the most recent update, now the user does not need to use `modify_item` or `modify_item_seq`, as the transition to environment has been performed. The limitation with the debugging mode has been handled by extract the abstract syntax tree of the event reactions and looking for any type of assignments. A limitation of this is that "dynamic" assignments (e.g., `assign(paste0("x_",i), 5)` where `i` is created by a loop) are NOT captured by the debugging engine, and therefore will be excluded from the debugging log file. So the user should try to assign variables explicitly whenever possible, e.g., `x_1 <- 5`.
+[Changed with WARDEN 1.0] The limitation with the debugging mode has been handled by extract the abstract syntax tree of the event reactions and looking for any type of assignments. A limitation of this is that "dynamic" assignments (e.g., `assign(paste0("x_",i), 5)` where `i` is created by a loop) are NOT captured by the debugging engine, and therefore will be excluded from the debugging log file. So the user should try to assign variables explicitly whenever possible, e.g., `x_1 <- 5`.
 
-A C++ implementation was avoided as the purpose of WARDEN is to be user-friendly and to give the user as much as freedom as possible on how to define their inputs. While likely much faster, implementation in C++ would require very careful handling of every user input, likely forcing us to restrict it to very specific data types and functions. 
+A C++ implementation was avoided as the purpose of WARDEN is to be user-friendly and to give the user as much as freedom as possible on how to define their inputs. While likely much faster, implementation in C++ would require very careful handling of every user input, likely forcing us to restrict it to very specific data types and functions. [Changed with WARDEN 2.0] In the most recent version of WARDEN, several functions now use a C++ function under the hood for speed improvement. The core engine has been revamped so that events now use a C++ implementation of a queue, but it has been designed so that users can interact as before with the queue using pure, simple R. Furthermore, a resource-constrained engine has been created and a discrete constrained resource object has been created using C++. Again, the user can interact with these objects using clear R functions. Speed-wise, for the unconstrained set-up the user is unlikely to see large speed gains, as there is an implicit cost of setting up each event queue, modifying events, etc. The constrained approach can achieve similar speeds to the unconstrained method.
 
 ## Parallel engine approach
 

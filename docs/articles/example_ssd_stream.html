@@ -6,16 +6,24 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Example for a Sick-Sicker-Dead model - Random Number Streams &amp; Luck Adjustment • WARDEN</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
-<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="icon" sizes="any" href="../favicon.ico">
-<link rel="manifest" href="../site.webmanifest">
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Example for a Sick-Sicker-Dead model - Random Number Streams &amp; Luck Adjustment">
+<!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZEDNGW5QRP"></script><script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZEDNGW5QRP');
+</script><!-- Google tag (gtag.js) -->
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -25,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,15 +47,20 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>Basic Tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd.html">Sick-Sicker-Dead Model (SSD)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_constrained.html">Resource Constrained Sick-Sicker-Dead model</a></li>
     <li><a class="dropdown-item" href="../articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
-    <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
+    <li><a class="dropdown-item" href="../articles/example_eBC.html">Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ipd.html">Using Individual Patient Data</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Tips</h6></li>
+    <li><a class="dropdown-item" href="../articles/example_markov.html">Cohort Markov Model</a></li>
+    <li><a class="dropdown-item" href="../articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul>
 </li>
       </ul>
@@ -69,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">May 23, 2025</h4>
+            <h4 data-toc-skip class="date">octubre 07, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/HEAD/vignettes/articles/example_ssd_stream.Rmd" class="external-link"><code>vignettes/articles/example_ssd_stream.Rmd</code></a></small>
       <div class="d-none name"><code>example_ssd_stream.Rmd</code></div>
@@ -102,7 +115,6 @@ efficient coding can have a substantial impact on performance.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.4.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'kableExtra'</span></span>
@@ -165,16 +177,16 @@ list must be initiated by using <code><a href="../reference/add_item.html">add_i
 <span></span>
 <span></span>
 <span><span class="co">#Put objects here that do not change as we loop through treatments for a patient</span></span>
-<span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>rnd_stream_a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, <span class="co">#arbitrary amount of random numbers to be used, should be &gt;= max number of calls that use that random number (e.g., if item/event A requires 5 random numbers due to repeated calls, then at least 5 numbers should be generated )</span></span>
-<span>                             rnd_stream_b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>,</span>
-<span>                             rnd_a <span class="op">=</span> <span class="va">rnd_stream_a</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, </span>
-<span>                             rnd_b <span class="op">=</span> <span class="va">rnd_stream_b</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span><span class="op">)</span></span>
+<span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
+<span>  <span class="va">rnd_stream_a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/random_stream.html">random_stream</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span> <span class="co">#arbitrary amount of random numbers to be used, should be &gt;= max number of calls that use that random number (e.g., if item/event A requires 5 random numbers due to repeated calls, then at least 5 numbers should be generated )</span></span>
+<span>  <span class="va">rnd_stream_b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/random_stream.html">random_stream</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span>  <span class="va">common_luck</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="va">fl.sick</span>  <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span>  <span class="va">q_default</span>  <span class="op">&lt;-</span> <span class="va">util.sick</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)</span></span>
-<span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>fl.sick <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>                             q_default <span class="op">=</span> <span class="va">util.sick</span>,</span>
-<span>                             c_default <span class="op">=</span> <span class="va">cost.sick</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>c_default <span class="op">=</span> <span class="va">cost.sick</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span><span class="op">)</span> </span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="events">Events<a class="anchor" aria-label="anchor" href="#events"></a>
@@ -219,10 +231,10 @@ results and have a look at the competing risks/semi-competing risks
 literature.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">init_event_list</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="fu"><a href="../reference/add_tte.html">add_tte</a></span><span class="op">(</span>arm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"noint"</span>,<span class="st">"int"</span><span class="op">)</span>, evts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sick"</span>,<span class="st">"sicker"</span>,<span class="st">"death"</span><span class="op">)</span> ,input<span class="op">=</span><span class="op">{</span> <span class="co">#intervention</span></span>
+<span>  <span class="fu"><a href="../reference/add_tte.html">add_tte</a></span><span class="op">(</span>arm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"noint"</span>,<span class="st">"int"</span><span class="op">)</span>, evts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sick"</span>,<span class="st">"sicker"</span>,<span class="st">"death"</span><span class="op">)</span> ,input<span class="op">=</span><span class="op">{</span> </span>
 <span>    <span class="va">sick</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span>    <span class="va">sicker</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">qexp</a></span><span class="op">(</span><span class="va">rnd_a</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">coef_noint</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">HR_int</span><span class="op">)</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="va">death</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fl">0.0000001</span>,<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm</a></span><span class="op">(</span><span class="va">rnd_b</span>, mean<span class="op">=</span><span class="fl">12</span>, sd<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">sicker</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">qexp</a></span><span class="op">(</span><span class="va">rnd_stream_a</span><span class="op">$</span><span class="fu">draw_n</span><span class="op">(</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">coef_noint</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">HR_int</span><span class="op">)</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co">#use draw_n to automatically use the random number and update it in rnd_stream_a</span></span>
+<span>    <span class="va">death</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fl">0.0000001</span>,<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm</a></span><span class="op">(</span><span class="va">rnd_stream_b</span><span class="op">$</span><span class="fu">draw_n</span><span class="op">(</span><span class="op">)</span>, mean<span class="op">=</span><span class="fl">12</span>, sd<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -238,16 +250,13 @@ new/adjusting events).</p>
 help with the reactions. Apart from the global objects and flags defined
 above, we can also use <code>curtime</code> for the current event time,
 <code>prevtime</code> for the time of the previous event,
-<code>cur_evtlist</code> for the named vector of events that is yet to
-happen for that patient, <code>arm</code> for the current treatment in
-the loop, <code>evt</code> for the current event being processed,
-<code>i</code> expresses the patient iteration, and
-<code>simulation</code> the specific simulation (relevant when the
-number of simulations is greater than 1). Furthermore, one can also call
-any other input/item that has been created before or create new ones.
-For example, we could even modify a cost/utility item by changing it
-directly, e.g. through
-<code>modify_item(list(cost.idfs.tx=500))</code>.</p>
+<code>cur_evtlist</code> for the C++ pointer of event queue yet to
+occur, <code>arm</code> for the current treatment in the loop,
+<code>evt</code> for the current event being processed, <code>i</code>
+expresses the patient iteration, and <code>simulation</code> the
+specific simulation (relevant when the number of simulations is greater
+than 1). Furthermore, one can also call any other input/item that has
+been created before or create new ones.</p>
 <table class="table">
 <colgroup>
 <col width="48%">
@@ -268,8 +277,8 @@ directly, e.g. through
 </tr>
 <tr class="odd">
 <td><code>cur_evtlist</code></td>
-<td>Named vector of events that is yet to happen for that patient (named
-numeric vector)</td>
+<td>External pointer of C++ events that is yet to happen for that
+patient</td>
 </tr>
 <tr class="even">
 <td><code>evt</code></td>
@@ -293,77 +302,44 @@ numeric vector)</td>
 </tr>
 </tbody>
 </table>
-<p>The functions to add/modify events and inputs use lists. Whenever
-several inputs/events are added or modified, it’s recommended to group
-them within one function, as it reduces the computation cost. So rather
-than use two <code>modify_item</code> with a list of one element, it’s
-better to group them into a single <code>modify_item</code> with a list
-of two elements.</p>
-<p><code>new_event</code>allows to generate events and add them to the
-vector of events. It accepts more than one event.
-<code>modify_event</code> allows to modify events (e.g. delay death).
-When adding an event, the name of the events and the time of the events
-must be defined. When using <code>modify_event</code>, one must indicate
-which events are affected and what are the new times of the events. If
-the event specified does not exist or has already occurred, it will be
-ignored. <code>modify_event</code> with
-<code>create_if_null = TRUE</code> argument will also generate events if
-they don’t exist. Note that one could potentially omit part of the
-modeling set in <code>init_event_list</code> and actually define new
-events dynamically through the reactions (we do that below for the
-<code>"ae"</code> event). However, this can have an impact in
-computation time, so if possible it’s always better to use
-<code>init_event_list</code>.</p>
-<p><code>modify_item</code> and <code>modify_item_seq</code>allow to
-modify and add items. Elements defined within this function are not
-evaluated sequentially in <code>modify_item</code> (i.e. defining
-<code>modify_item(list(fl.new = 1, var1 = fl.new * 5)))</code> will give
-an error if <code>fl.new</code> was not defined outside this function),
-while <code>modify_item_seq</code> will do it sequentially at a slightly
-bigger computational cost, so both are left as choices for the user.
-Note that one can modify costs/utilities by using the construction
-<code>type_name_category</code>, where type is either “qaly” or “cost”,
-name is the name (e.g., “default”) and category is the category used
-(e.g., “instant”), so one could pass <code>cost_default_instant</code>
-and modify the cost.</p>
+<p>The functions to add/modify events and inputs use named vectors or
+lists. Whenever several inputs/events are added or modified, it’s
+recommended to group them within one function, as it reduces the
+computation cost. So rather than use two <code>modify_event</code> with
+a list of one element, it’s better to group them into a single
+<code>modify_event</code> with a list of two elements.</p>
 <p>The list of relevant functions to be used within
-<code>add_reactevt</code> are:</p>
-<table class="table">
-<colgroup>
-<col width="31%">
-<col width="34%">
-<col width="34%">
-</colgroup>
-<thead><tr class="header">
-<th>Function</th>
-<th>What does it do</th>
-<th>How to use it</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><code><a href="../reference/modify_item.html">modify_item()</a></code></td>
-<td>Adds &amp; Modifies items/flags/variables for future events</td>
-<td><code>modify_item(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))</code></td>
-</tr>
-<tr class="even">
-<td><code><a href="../reference/modify_item_seq.html">modify_item_seq()</a></code></td>
-<td>Adds &amp; Modifies items/flags/variables for future events
-sequentially</td>
-<td><code>modify_item_seq(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))</code></td>
-</tr>
-<tr class="odd">
-<td><code><a href="../reference/new_event.html">new_event()</a></code></td>
-<td>Adds events to the vector of events for that patient</td>
-<td><code>new_event(rep(list("ae"=curtime + 0.001),5))</code></td>
-</tr>
-<tr class="even">
-<td><code><a href="../reference/modify_event.html">modify_event()</a></code></td>
-<td>Modifies (or creates, with <code>create_if_null = TRUE</code>)
-existing events by changing their time</td>
-<td><code>modify_event(list("os"=curtime +5, "ttot"=curtime+0.0001))</code></td>
-</tr>
-</tbody>
-</table>
+<code>add_reactevt</code> are: <code>new_event</code>allows to generate
+events and add them to the vector of events. It accepts more than one
+event but a single event per event type. <code>modify_event</code>
+allows to modify events (e.g. delay death). When adding an event, the
+name of the events and the time of the events must be defined. When
+using <code>modify_event</code>, one must indicate which events are
+affected and what are the new times of the events. If the event
+specified does not exist or has already occurred, it will return an
+error. <code>modify_event</code> with <code>create_if_null = TRUE</code>
+argument will also generate events if they don’t exist.
+<code>remove_event</code> will remove an event from the event queue
+(could also be modified instead and set to <code>Inf</code>).
+<code>get_event</code> will return the TTE of the specified event name.
+<code>has_event</code> will return a TRUE/FALSE flag depending on
+whether the given patient has a specific event in the queue (will return
+TRUE even if time is <code>Inf</code>). <code>next_event</code> will
+return a list with the next event in the queue, with time, patient, and
+event name (<code>patient_id</code>, <code>event_name</code>, and
+<code>event_time</code>). <code>next_event_pt</code> will return a list
+with the next event in the queue for a specific patient, with time,
+patient, and event name (<code>patient_id</code>,
+<code>event_name</code>, and <code>event_time</code>).
+<code>queue_empty</code> will return TRUE if the queue of events is
+empty (no more events to process, but <code>Inf</code> events are
+considered part of the queue) <code>queue_size</code> allows to check
+the size of the queue of events, including <code>Inf</code> events.</p>
+<p>Note that one could potentially omit part of the modeling set in
+<code>init_event_list</code> and actually define new events dynamically
+through the reactions (we do that below for the <code>"ae"</code>
+event). However, this can have an impact in computation time, so if
+possible it’s always better to use <code>init_event_list</code>.</p>
 <p>The model will run until <code>curtime</code> is set to
 <code>Inf</code>, so the event that terminates the model (in this case,
 <code>os</code>), should modify <code>curtime</code> and set it to
@@ -393,29 +369,28 @@ example through the <code>sobol</code> function in the
 <span>               input <span class="op">=</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"sicker"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="va">util.sicker</span>,</span>
-<span>                                  c_default <span class="op">=</span> <span class="va">cost.sicker</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span>,</span>
-<span>                                  fl.sick <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> </span>
-<span>                 </span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="va">util.sicker</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.sicker</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span></span>
+<span>                 <span class="va">fl.sick</span> <span class="op">&lt;-</span> <span class="fl">0</span> </span>
 <span>                 </span>
 <span>                 <span class="co">#We perform a luck adjustment randomly but being slightly more likely in the "noint" arm</span></span>
-<span>                 <span class="kw">if</span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span>, <span class="fl">0.05</span>,<span class="fl">0</span><span class="op">)</span> <span class="op">)</span> <span class="op">&gt;</span><span class="fl">0.8</span><span class="op">)</span><span class="op">{</span></span>
-<span>                   <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>                     rnd_b <span class="op">=</span> <span class="fu"><a href="../reference/luck_adj.html">luck_adj</a></span><span class="op">(</span>prevsurv <span class="op">=</span> <span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span>q<span class="op">=</span><span class="va">curtime</span>,<span class="fl">12</span>,<span class="fl">3</span><span class="op">)</span>, cursurv <span class="op">=</span> <span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span>q<span class="op">=</span><span class="va">curtime</span>,<span class="fl">10</span>,<span class="fl">2</span><span class="op">)</span>, luck <span class="op">=</span> <span class="va">rnd_b</span>, condq <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span>                     <span class="op">)</span><span class="op">)</span></span>
-<span>                   </span>
-<span>                   <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>                     death <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fl">0.0000001</span>,<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm</a></span><span class="op">(</span><span class="va">rnd_b</span>, mean<span class="op">=</span><span class="fl">10</span>, sd<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span>                                     <span class="op">)</span><span class="op">)</span></span>
-<span>                 <span class="op">}</span></span>
+<span>                 <span class="kw">if</span><span class="op">(</span><span class="op">(</span><span class="va">common_luck</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span>, <span class="fl">0.1</span>,<span class="fl">0</span><span class="op">)</span> <span class="op">)</span> <span class="op">&gt;</span><span class="fl">0.7</span><span class="op">)</span><span class="op">{</span></span>
+<span>                    <span class="va">rnd_stream_b</span><span class="op">$</span><span class="va">random_n</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/luck_adj.html">luck_adj</a></span><span class="op">(</span>prevsurv <span class="op">=</span> <span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span>q<span class="op">=</span><span class="va">curtime</span>,<span class="fl">12</span>,<span class="fl">3</span><span class="op">)</span>,</span>
+<span>                                                      cursurv <span class="op">=</span> <span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span>q<span class="op">=</span><span class="va">curtime</span>,<span class="fl">8</span>,<span class="fl">2</span><span class="op">)</span>,</span>
+<span>                                                      luck <span class="op">=</span> <span class="va">rnd_stream_b</span><span class="op">$</span><span class="va">random_n</span>,</span>
+<span>                                                      condq <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>                    <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>                      death <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">curtime</span>,<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm</a></span><span class="op">(</span><span class="va">rnd_stream_b</span><span class="op">$</span><span class="va">random_n</span>, mean<span class="op">=</span><span class="fl">8</span>, sd<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span>                    <span class="op">)</span><span class="op">)</span></span>
+<span>                    <span class="op">}</span></span>
 <span>                 </span>
 <span>                 </span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"death"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>                                  c_default <span class="op">=</span> <span class="fl">0</span>, </span>
-<span>                                  curtime <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">curtime</span> <span class="op">&lt;-</span> <span class="cn">Inf</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> </span></code></pre></div>
 </div>
 </div>
@@ -485,9 +460,10 @@ the <code>run_sim</code> function.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.82s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.82s</span></span>
-<span><span class="co">#&gt; Total time to run: 0.82s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 0.78s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.78s</span></span>
+<span><span class="co">#&gt; Total time to run: 0.78s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -507,119 +483,119 @@ data generated by the simulation, which we collect here to plot in the
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#print first simulation</span></span>
-<span><span class="co">#&gt;                        int     noint</span></span>
-<span><span class="co">#&gt; costs             57614.00  50348.09</span></span>
-<span><span class="co">#&gt; dcosts                0.00   7265.91</span></span>
-<span><span class="co">#&gt; lys                   9.47      9.44</span></span>
-<span><span class="co">#&gt; dlys                  0.00      0.04</span></span>
-<span><span class="co">#&gt; qalys                 6.10      5.90</span></span>
-<span><span class="co">#&gt; dqalys                0.00      0.20</span></span>
-<span><span class="co">#&gt; ICER                    NA 196459.97</span></span>
-<span><span class="co">#&gt; ICUR                    NA  35694.10</span></span>
-<span><span class="co">#&gt; INMB                    NA   2912.12</span></span>
-<span><span class="co">#&gt; costs_undisc      72123.62  63109.76</span></span>
-<span><span class="co">#&gt; dcosts_undisc         0.00   9013.86</span></span>
-<span><span class="co">#&gt; lys_undisc           11.62     11.55</span></span>
-<span><span class="co">#&gt; dlys_undisc           0.00      0.07</span></span>
-<span><span class="co">#&gt; qalys_undisc          7.37      7.11</span></span>
-<span><span class="co">#&gt; dqalys_undisc         0.00      0.26</span></span>
-<span><span class="co">#&gt; ICER_undisc             NA 136880.33</span></span>
-<span><span class="co">#&gt; ICUR_undisc             NA  34273.91</span></span>
-<span><span class="co">#&gt; INMB_undisc             NA   4135.88</span></span>
-<span><span class="co">#&gt; c_default         57614.00  50348.09</span></span>
-<span><span class="co">#&gt; dc_default            0.00   7265.91</span></span>
-<span><span class="co">#&gt; c_default_undisc  72123.62  63109.76</span></span>
-<span><span class="co">#&gt; dc_default_undisc     0.00   9013.86</span></span>
-<span><span class="co">#&gt; q_default             6.10      5.90</span></span>
-<span><span class="co">#&gt; dq_default            0.00      0.20</span></span>
-<span><span class="co">#&gt; q_default_undisc      7.37      7.11</span></span>
-<span><span class="co">#&gt; dq_default_undisc     0.00      0.26</span></span>
+<span><span class="co">#&gt;                        int    noint</span></span>
+<span><span class="co">#&gt; costs             54126.08 45747.63</span></span>
+<span><span class="co">#&gt; dcosts                0.00  8378.44</span></span>
+<span><span class="co">#&gt; lys                   9.04     8.78</span></span>
+<span><span class="co">#&gt; dlys                  0.00     0.26</span></span>
+<span><span class="co">#&gt; qalys                 5.88     5.57</span></span>
+<span><span class="co">#&gt; dqalys                0.00     0.31</span></span>
+<span><span class="co">#&gt; ICER                    NA 32688.17</span></span>
+<span><span class="co">#&gt; ICUR                    NA 26833.80</span></span>
+<span><span class="co">#&gt; INMB                    NA  7233.29</span></span>
+<span><span class="co">#&gt; costs_undisc      67095.76 56588.86</span></span>
+<span><span class="co">#&gt; dcosts_undisc         0.00 10506.90</span></span>
+<span><span class="co">#&gt; lys_undisc           10.99    10.63</span></span>
+<span><span class="co">#&gt; dlys_undisc           0.00     0.37</span></span>
+<span><span class="co">#&gt; qalys_undisc          7.06     6.65</span></span>
+<span><span class="co">#&gt; dqalys_undisc         0.00     0.41</span></span>
+<span><span class="co">#&gt; ICER_undisc             NA 28765.37</span></span>
+<span><span class="co">#&gt; ICUR_undisc             NA 25578.19</span></span>
+<span><span class="co">#&gt; INMB_undisc             NA 10031.89</span></span>
+<span><span class="co">#&gt; c_default         54126.08 45747.63</span></span>
+<span><span class="co">#&gt; dc_default            0.00  8378.44</span></span>
+<span><span class="co">#&gt; c_default_undisc  67095.76 56588.86</span></span>
+<span><span class="co">#&gt; dc_default_undisc     0.00 10506.90</span></span>
+<span><span class="co">#&gt; q_default             5.88     5.57</span></span>
+<span><span class="co">#&gt; dq_default            0.00     0.31</span></span>
+<span><span class="co">#&gt; q_default_undisc      7.06     6.65</span></span>
+<span><span class="co">#&gt; dq_default_undisc     0.00     0.41</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                                       int                      noint</span></span>
-<span><span class="co">#&gt; costs             57,614 (57,614; 57,614)    50,348 (50,348; 50,348)</span></span>
-<span><span class="co">#&gt; dcosts                           0 (0; 0)       7,266 (7,266; 7,266)</span></span>
-<span><span class="co">#&gt; lys                     9.47 (9.47; 9.47)          9.44 (9.44; 9.44)</span></span>
-<span><span class="co">#&gt; dlys                             0 (0; 0)       0.037 (0.037; 0.037)</span></span>
-<span><span class="co">#&gt; qalys                      6.1 (6.1; 6.1)             5.9 (5.9; 5.9)</span></span>
-<span><span class="co">#&gt; dqalys                           0 (0; 0)       0.204 (0.204; 0.204)</span></span>
-<span><span class="co">#&gt; ICER                         NaN (NA; NA) 196,460 (196,460; 196,460)</span></span>
-<span><span class="co">#&gt; ICUR                         NaN (NA; NA)    35,694 (35,694; 35,694)</span></span>
-<span><span class="co">#&gt; INMB                         NaN (NA; NA)       2,912 (2,912; 2,912)</span></span>
-<span><span class="co">#&gt; costs_undisc      72,124 (72,124; 72,124)    63,110 (63,110; 63,110)</span></span>
-<span><span class="co">#&gt; dcosts_undisc                    0 (0; 0)       9,014 (9,014; 9,014)</span></span>
-<span><span class="co">#&gt; lys_undisc              11.6 (11.6; 11.6)          11.6 (11.6; 11.6)</span></span>
-<span><span class="co">#&gt; dlys_undisc                      0 (0; 0)       0.066 (0.066; 0.066)</span></span>
-<span><span class="co">#&gt; qalys_undisc            7.37 (7.37; 7.37)          7.11 (7.11; 7.11)</span></span>
-<span><span class="co">#&gt; dqalys_undisc                    0 (0; 0)       0.263 (0.263; 0.263)</span></span>
-<span><span class="co">#&gt; ICER_undisc                  NaN (NA; NA) 136,880 (136,880; 136,880)</span></span>
-<span><span class="co">#&gt; ICUR_undisc                  NaN (NA; NA)    34,274 (34,274; 34,274)</span></span>
-<span><span class="co">#&gt; INMB_undisc                  NaN (NA; NA)       4,136 (4,136; 4,136)</span></span>
-<span><span class="co">#&gt; c_default         57,614 (57,614; 57,614)    50,348 (50,348; 50,348)</span></span>
-<span><span class="co">#&gt; dc_default                       0 (0; 0)       7,266 (7,266; 7,266)</span></span>
-<span><span class="co">#&gt; c_default_undisc  72,124 (72,124; 72,124)    63,110 (63,110; 63,110)</span></span>
-<span><span class="co">#&gt; dc_default_undisc                0 (0; 0)       9,014 (9,014; 9,014)</span></span>
-<span><span class="co">#&gt; q_default                  6.1 (6.1; 6.1)             5.9 (5.9; 5.9)</span></span>
-<span><span class="co">#&gt; dq_default                       0 (0; 0)       0.204 (0.204; 0.204)</span></span>
-<span><span class="co">#&gt; q_default_undisc        7.37 (7.37; 7.37)          7.11 (7.11; 7.11)</span></span>
-<span><span class="co">#&gt; dq_default_undisc                0 (0; 0)       0.263 (0.263; 0.263)</span></span>
+<span><span class="co">#&gt;                                       int                   noint</span></span>
+<span><span class="co">#&gt; costs             54,126 (54,126; 54,126) 45,748 (45,748; 45,748)</span></span>
+<span><span class="co">#&gt; dcosts                           0 (0; 0)    8,378 (8,378; 8,378)</span></span>
+<span><span class="co">#&gt; lys                     9.04 (9.04; 9.04)       8.78 (8.78; 8.78)</span></span>
+<span><span class="co">#&gt; dlys                             0 (0; 0)    0.256 (0.256; 0.256)</span></span>
+<span><span class="co">#&gt; qalys                   5.88 (5.88; 5.88)       5.57 (5.57; 5.57)</span></span>
+<span><span class="co">#&gt; dqalys                           0 (0; 0)    0.312 (0.312; 0.312)</span></span>
+<span><span class="co">#&gt; ICER                         NaN (NA; NA) 32,688 (32,688; 32,688)</span></span>
+<span><span class="co">#&gt; ICUR                         NaN (NA; NA) 26,834 (26,834; 26,834)</span></span>
+<span><span class="co">#&gt; INMB                         NaN (NA; NA)    7,233 (7,233; 7,233)</span></span>
+<span><span class="co">#&gt; costs_undisc      67,096 (67,096; 67,096) 56,589 (56,589; 56,589)</span></span>
+<span><span class="co">#&gt; dcosts_undisc                    0 (0; 0) 10,507 (10,507; 10,507)</span></span>
+<span><span class="co">#&gt; lys_undisc                    11 (11; 11)       10.6 (10.6; 10.6)</span></span>
+<span><span class="co">#&gt; dlys_undisc                      0 (0; 0)    0.365 (0.365; 0.365)</span></span>
+<span><span class="co">#&gt; qalys_undisc            7.06 (7.06; 7.06)       6.65 (6.65; 6.65)</span></span>
+<span><span class="co">#&gt; dqalys_undisc                    0 (0; 0)    0.411 (0.411; 0.411)</span></span>
+<span><span class="co">#&gt; ICER_undisc                  NaN (NA; NA) 28,765 (28,765; 28,765)</span></span>
+<span><span class="co">#&gt; ICUR_undisc                  NaN (NA; NA) 25,578 (25,578; 25,578)</span></span>
+<span><span class="co">#&gt; INMB_undisc                  NaN (NA; NA) 10,032 (10,032; 10,032)</span></span>
+<span><span class="co">#&gt; c_default         54,126 (54,126; 54,126) 45,748 (45,748; 45,748)</span></span>
+<span><span class="co">#&gt; dc_default                       0 (0; 0)    8,378 (8,378; 8,378)</span></span>
+<span><span class="co">#&gt; c_default_undisc  67,096 (67,096; 67,096) 56,589 (56,589; 56,589)</span></span>
+<span><span class="co">#&gt; dc_default_undisc                0 (0; 0) 10,507 (10,507; 10,507)</span></span>
+<span><span class="co">#&gt; q_default               5.88 (5.88; 5.88)       5.57 (5.57; 5.57)</span></span>
+<span><span class="co">#&gt; dq_default                       0 (0; 0)    0.312 (0.312; 0.312)</span></span>
+<span><span class="co">#&gt; q_default_undisc        7.06 (7.06; 7.06)       6.65 (6.65; 6.65)</span></span>
+<span><span class="co">#&gt; dq_default_undisc                0 (0; 0)    0.411 (0.411; 0.411)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        arm analysis analysis_name          variable                      value</span></span>
-<span><span class="co">#&gt;     &lt;char&gt;    &lt;int&gt;        &lt;char&gt;            &lt;fctr&gt;                     &lt;char&gt;</span></span>
-<span><span class="co">#&gt;  1:    int        1                           costs    57,614 (57,614; 57,614)</span></span>
-<span><span class="co">#&gt;  2:  noint        1                           costs    50,348 (50,348; 50,348)</span></span>
-<span><span class="co">#&gt;  3:    int        1                          dcosts                   0 (0; 0)</span></span>
-<span><span class="co">#&gt;  4:  noint        1                          dcosts       7,266 (7,266; 7,266)</span></span>
-<span><span class="co">#&gt;  5:    int        1                             lys          9.47 (9.47; 9.47)</span></span>
-<span><span class="co">#&gt;  6:  noint        1                             lys          9.44 (9.44; 9.44)</span></span>
-<span><span class="co">#&gt;  7:    int        1                            dlys                   0 (0; 0)</span></span>
-<span><span class="co">#&gt;  8:  noint        1                            dlys       0.037 (0.037; 0.037)</span></span>
-<span><span class="co">#&gt;  9:    int        1                           qalys             6.1 (6.1; 6.1)</span></span>
-<span><span class="co">#&gt; 10:  noint        1                           qalys             5.9 (5.9; 5.9)</span></span>
-<span><span class="co">#&gt; 11:    int        1                          dqalys                   0 (0; 0)</span></span>
-<span><span class="co">#&gt; 12:  noint        1                          dqalys       0.204 (0.204; 0.204)</span></span>
-<span><span class="co">#&gt; 13:    int        1                            ICER               NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; 14:  noint        1                            ICER 196,460 (196,460; 196,460)</span></span>
-<span><span class="co">#&gt; 15:    int        1                            ICUR               NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; 16:  noint        1                            ICUR    35,694 (35,694; 35,694)</span></span>
-<span><span class="co">#&gt; 17:    int        1                            INMB               NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; 18:  noint        1                            INMB       2,912 (2,912; 2,912)</span></span>
-<span><span class="co">#&gt; 19:    int        1                    costs_undisc    72,124 (72,124; 72,124)</span></span>
-<span><span class="co">#&gt; 20:  noint        1                    costs_undisc    63,110 (63,110; 63,110)</span></span>
-<span><span class="co">#&gt; 21:    int        1                   dcosts_undisc                   0 (0; 0)</span></span>
-<span><span class="co">#&gt; 22:  noint        1                   dcosts_undisc       9,014 (9,014; 9,014)</span></span>
-<span><span class="co">#&gt; 23:    int        1                      lys_undisc          11.6 (11.6; 11.6)</span></span>
-<span><span class="co">#&gt; 24:  noint        1                      lys_undisc          11.6 (11.6; 11.6)</span></span>
-<span><span class="co">#&gt; 25:    int        1                     dlys_undisc                   0 (0; 0)</span></span>
-<span><span class="co">#&gt; 26:  noint        1                     dlys_undisc       0.066 (0.066; 0.066)</span></span>
-<span><span class="co">#&gt; 27:    int        1                    qalys_undisc          7.37 (7.37; 7.37)</span></span>
-<span><span class="co">#&gt; 28:  noint        1                    qalys_undisc          7.11 (7.11; 7.11)</span></span>
-<span><span class="co">#&gt; 29:    int        1                   dqalys_undisc                   0 (0; 0)</span></span>
-<span><span class="co">#&gt; 30:  noint        1                   dqalys_undisc       0.263 (0.263; 0.263)</span></span>
-<span><span class="co">#&gt; 31:    int        1                     ICER_undisc               NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; 32:  noint        1                     ICER_undisc 136,880 (136,880; 136,880)</span></span>
-<span><span class="co">#&gt; 33:    int        1                     ICUR_undisc               NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; 34:  noint        1                     ICUR_undisc    34,274 (34,274; 34,274)</span></span>
-<span><span class="co">#&gt; 35:    int        1                     INMB_undisc               NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; 36:  noint        1                     INMB_undisc       4,136 (4,136; 4,136)</span></span>
-<span><span class="co">#&gt; 37:    int        1                       c_default    57,614 (57,614; 57,614)</span></span>
-<span><span class="co">#&gt; 38:  noint        1                       c_default    50,348 (50,348; 50,348)</span></span>
-<span><span class="co">#&gt; 39:    int        1                      dc_default                   0 (0; 0)</span></span>
-<span><span class="co">#&gt; 40:  noint        1                      dc_default       7,266 (7,266; 7,266)</span></span>
-<span><span class="co">#&gt; 41:    int        1                c_default_undisc    72,124 (72,124; 72,124)</span></span>
-<span><span class="co">#&gt; 42:  noint        1                c_default_undisc    63,110 (63,110; 63,110)</span></span>
-<span><span class="co">#&gt; 43:    int        1               dc_default_undisc                   0 (0; 0)</span></span>
-<span><span class="co">#&gt; 44:  noint        1               dc_default_undisc       9,014 (9,014; 9,014)</span></span>
-<span><span class="co">#&gt; 45:    int        1                       q_default             6.1 (6.1; 6.1)</span></span>
-<span><span class="co">#&gt; 46:  noint        1                       q_default             5.9 (5.9; 5.9)</span></span>
-<span><span class="co">#&gt; 47:    int        1                      dq_default                   0 (0; 0)</span></span>
-<span><span class="co">#&gt; 48:  noint        1                      dq_default       0.204 (0.204; 0.204)</span></span>
-<span><span class="co">#&gt; 49:    int        1                q_default_undisc          7.37 (7.37; 7.37)</span></span>
-<span><span class="co">#&gt; 50:  noint        1                q_default_undisc          7.11 (7.11; 7.11)</span></span>
-<span><span class="co">#&gt; 51:    int        1               dq_default_undisc                   0 (0; 0)</span></span>
-<span><span class="co">#&gt; 52:  noint        1               dq_default_undisc       0.263 (0.263; 0.263)</span></span>
-<span><span class="co">#&gt;        arm analysis analysis_name          variable                      value</span></span>
+<span><span class="co">#&gt;        arm analysis analysis_name          variable                   value</span></span>
+<span><span class="co">#&gt;     &lt;char&gt;    &lt;int&gt;        &lt;char&gt;            &lt;fctr&gt;                  &lt;char&gt;</span></span>
+<span><span class="co">#&gt;  1:    int        1                           costs 54,126 (54,126; 54,126)</span></span>
+<span><span class="co">#&gt;  2:  noint        1                           costs 45,748 (45,748; 45,748)</span></span>
+<span><span class="co">#&gt;  3:    int        1                          dcosts                0 (0; 0)</span></span>
+<span><span class="co">#&gt;  4:  noint        1                          dcosts    8,378 (8,378; 8,378)</span></span>
+<span><span class="co">#&gt;  5:    int        1                             lys       9.04 (9.04; 9.04)</span></span>
+<span><span class="co">#&gt;  6:  noint        1                             lys       8.78 (8.78; 8.78)</span></span>
+<span><span class="co">#&gt;  7:    int        1                            dlys                0 (0; 0)</span></span>
+<span><span class="co">#&gt;  8:  noint        1                            dlys    0.256 (0.256; 0.256)</span></span>
+<span><span class="co">#&gt;  9:    int        1                           qalys       5.88 (5.88; 5.88)</span></span>
+<span><span class="co">#&gt; 10:  noint        1                           qalys       5.57 (5.57; 5.57)</span></span>
+<span><span class="co">#&gt; 11:    int        1                          dqalys                0 (0; 0)</span></span>
+<span><span class="co">#&gt; 12:  noint        1                          dqalys    0.312 (0.312; 0.312)</span></span>
+<span><span class="co">#&gt; 13:    int        1                            ICER            NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; 14:  noint        1                            ICER 32,688 (32,688; 32,688)</span></span>
+<span><span class="co">#&gt; 15:    int        1                            ICUR            NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; 16:  noint        1                            ICUR 26,834 (26,834; 26,834)</span></span>
+<span><span class="co">#&gt; 17:    int        1                            INMB            NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; 18:  noint        1                            INMB    7,233 (7,233; 7,233)</span></span>
+<span><span class="co">#&gt; 19:    int        1                    costs_undisc 67,096 (67,096; 67,096)</span></span>
+<span><span class="co">#&gt; 20:  noint        1                    costs_undisc 56,589 (56,589; 56,589)</span></span>
+<span><span class="co">#&gt; 21:    int        1                   dcosts_undisc                0 (0; 0)</span></span>
+<span><span class="co">#&gt; 22:  noint        1                   dcosts_undisc 10,507 (10,507; 10,507)</span></span>
+<span><span class="co">#&gt; 23:    int        1                      lys_undisc             11 (11; 11)</span></span>
+<span><span class="co">#&gt; 24:  noint        1                      lys_undisc       10.6 (10.6; 10.6)</span></span>
+<span><span class="co">#&gt; 25:    int        1                     dlys_undisc                0 (0; 0)</span></span>
+<span><span class="co">#&gt; 26:  noint        1                     dlys_undisc    0.365 (0.365; 0.365)</span></span>
+<span><span class="co">#&gt; 27:    int        1                    qalys_undisc       7.06 (7.06; 7.06)</span></span>
+<span><span class="co">#&gt; 28:  noint        1                    qalys_undisc       6.65 (6.65; 6.65)</span></span>
+<span><span class="co">#&gt; 29:    int        1                   dqalys_undisc                0 (0; 0)</span></span>
+<span><span class="co">#&gt; 30:  noint        1                   dqalys_undisc    0.411 (0.411; 0.411)</span></span>
+<span><span class="co">#&gt; 31:    int        1                     ICER_undisc            NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; 32:  noint        1                     ICER_undisc 28,765 (28,765; 28,765)</span></span>
+<span><span class="co">#&gt; 33:    int        1                     ICUR_undisc            NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; 34:  noint        1                     ICUR_undisc 25,578 (25,578; 25,578)</span></span>
+<span><span class="co">#&gt; 35:    int        1                     INMB_undisc            NaN (NA; NA)</span></span>
+<span><span class="co">#&gt; 36:  noint        1                     INMB_undisc 10,032 (10,032; 10,032)</span></span>
+<span><span class="co">#&gt; 37:    int        1                       c_default 54,126 (54,126; 54,126)</span></span>
+<span><span class="co">#&gt; 38:  noint        1                       c_default 45,748 (45,748; 45,748)</span></span>
+<span><span class="co">#&gt; 39:    int        1                      dc_default                0 (0; 0)</span></span>
+<span><span class="co">#&gt; 40:  noint        1                      dc_default    8,378 (8,378; 8,378)</span></span>
+<span><span class="co">#&gt; 41:    int        1                c_default_undisc 67,096 (67,096; 67,096)</span></span>
+<span><span class="co">#&gt; 42:  noint        1                c_default_undisc 56,589 (56,589; 56,589)</span></span>
+<span><span class="co">#&gt; 43:    int        1               dc_default_undisc                0 (0; 0)</span></span>
+<span><span class="co">#&gt; 44:  noint        1               dc_default_undisc 10,507 (10,507; 10,507)</span></span>
+<span><span class="co">#&gt; 45:    int        1                       q_default       5.88 (5.88; 5.88)</span></span>
+<span><span class="co">#&gt; 46:  noint        1                       q_default       5.57 (5.57; 5.57)</span></span>
+<span><span class="co">#&gt; 47:    int        1                      dq_default                0 (0; 0)</span></span>
+<span><span class="co">#&gt; 48:  noint        1                      dq_default    0.312 (0.312; 0.312)</span></span>
+<span><span class="co">#&gt; 49:    int        1                q_default_undisc       7.06 (7.06; 7.06)</span></span>
+<span><span class="co">#&gt; 50:  noint        1                q_default_undisc       6.65 (6.65; 6.65)</span></span>
+<span><span class="co">#&gt; 51:    int        1               dq_default_undisc                0 (0; 0)</span></span>
+<span><span class="co">#&gt; 52:  noint        1               dq_default_undisc    0.411 (0.411; 0.411)</span></span>
+<span><span class="co">#&gt;        arm analysis analysis_name          variable                   value</span></span>
 <span></span>
 <span><span class="va">psa_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span> </span>
 <span></span>
@@ -719,7 +695,7 @@ sick
 int
 </td>
 <td style="text-align:right;">
-10.25
+10.3
 </td>
 <td style="text-align:right;">
 6.69
@@ -793,7 +769,7 @@ sicker
 int
 </td>
 <td style="text-align:right;">
-10.25
+10.3
 </td>
 <td style="text-align:right;">
 6.69
@@ -867,7 +843,7 @@ death
 int
 </td>
 <td style="text-align:right;">
-10.25
+10.3
 </td>
 <td style="text-align:right;">
 6.69
@@ -941,22 +917,22 @@ sick
 int
 </td>
 <td style="text-align:right;">
-9.20
+10.9
 </td>
 <td style="text-align:right;">
-4.92
+5.75
 </td>
 <td style="text-align:right;">
-69346
+82612
 </td>
 <td style="text-align:right;">
-84169
+104438
 </td>
 <td style="text-align:right;">
-5.86
+7.13
 </td>
 <td style="text-align:right;">
-11.1
+13.6
 </td>
 <td style="text-align:right;">
 1.07
@@ -1015,55 +991,55 @@ sicker
 int
 </td>
 <td style="text-align:right;">
-9.20
+10.9
 </td>
 <td style="text-align:right;">
-4.92
+5.75
 </td>
 <td style="text-align:right;">
-69346
+82612
 </td>
 <td style="text-align:right;">
-84169
+104438
 </td>
 <td style="text-align:right;">
-5.86
+7.13
 </td>
 <td style="text-align:right;">
-11.1
+13.6
 </td>
 <td style="text-align:right;">
-8.13
+9.79
 </td>
 <td style="text-align:right;">
-4.066
+4.895
 </td>
 <td style="text-align:right;">
-65062
+78327
 </td>
 <td style="text-align:right;">
-9.97
+12.51
 </td>
 <td style="text-align:right;">
-4.988
+6.255
 </td>
 <td style="text-align:right;">
-79803
+100073
 </td>
 <td style="text-align:right;">
-65062
+78327
 </td>
 <td style="text-align:right;">
-4.066
+4.895
 </td>
 <td style="text-align:right;">
-79803
+100073
 </td>
 <td style="text-align:right;">
-4.988
+6.255
 </td>
 <td style="text-align:right;">
-11.07
+13.60
 </td>
 <td style="text-align:right;">
 1
@@ -1077,7 +1053,7 @@ int
 death
 </td>
 <td style="text-align:right;">
-11.07
+13.60
 </td>
 <td style="text-align:right;">
 1.09
@@ -1089,31 +1065,22 @@ death
 int
 </td>
 <td style="text-align:right;">
-9.20
+10.9
 </td>
 <td style="text-align:right;">
-4.92
+5.75
 </td>
 <td style="text-align:right;">
-69346
+82612
 </td>
 <td style="text-align:right;">
-84169
+104438
 </td>
 <td style="text-align:right;">
-5.86
+7.13
 </td>
 <td style="text-align:right;">
-11.1
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
+13.6
 </td>
 <td style="text-align:right;">
 0.00
@@ -1125,6 +1092,15 @@ int
 0
 </td>
 <td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
@@ -1137,7 +1113,7 @@ int
 0.000
 </td>
 <td style="text-align:right;">
-11.07
+13.60
 </td>
 <td style="text-align:right;">
 1
@@ -1163,22 +1139,22 @@ sick
 int
 </td>
 <td style="text-align:right;">
-9.67
+11.4
 </td>
 <td style="text-align:right;">
-6.92
+7.79
 </td>
 <td style="text-align:right;">
-49667
+63583
 </td>
 <td style="text-align:right;">
-62430
+84281
 </td>
 <td style="text-align:right;">
-8.26
+9.62
 </td>
 <td style="text-align:right;">
-11.8
+14.5
 </td>
 <td style="text-align:right;">
 6.93
@@ -1237,55 +1213,55 @@ sicker
 int
 </td>
 <td style="text-align:right;">
-9.67
+11.4
 </td>
 <td style="text-align:right;">
-6.92
+7.79
 </td>
 <td style="text-align:right;">
-49667
+63583
 </td>
 <td style="text-align:right;">
-62430
+84281
 </td>
 <td style="text-align:right;">
-8.26
+9.62
 </td>
 <td style="text-align:right;">
-11.8
+14.5
 </td>
 <td style="text-align:right;">
-2.74
+4.48
 </td>
 <td style="text-align:right;">
-1.372
+2.242
 </td>
 <td style="text-align:right;">
-21953
+35869
 </td>
 <td style="text-align:right;">
-3.85
+6.58
 </td>
 <td style="text-align:right;">
-1.923
+3.289
 </td>
 <td style="text-align:right;">
-30772
+52622
 </td>
 <td style="text-align:right;">
-21953
+35869
 </td>
 <td style="text-align:right;">
-1.372
+2.242
 </td>
 <td style="text-align:right;">
-30772
+52622
 </td>
 <td style="text-align:right;">
-1.923
+3.289
 </td>
 <td style="text-align:right;">
-11.76
+14.49
 </td>
 <td style="text-align:right;">
 1
@@ -1299,7 +1275,7 @@ int
 death
 </td>
 <td style="text-align:right;">
-11.76
+14.49
 </td>
 <td style="text-align:right;">
 7.92
@@ -1311,31 +1287,22 @@ death
 int
 </td>
 <td style="text-align:right;">
-9.67
+11.4
 </td>
 <td style="text-align:right;">
-6.92
+7.79
 </td>
 <td style="text-align:right;">
-49667
+63583
 </td>
 <td style="text-align:right;">
-62430
+84281
 </td>
 <td style="text-align:right;">
-8.26
+9.62
 </td>
 <td style="text-align:right;">
-11.8
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
+14.5
 </td>
 <td style="text-align:right;">
 0.00
@@ -1347,6 +1314,15 @@ int
 0
 </td>
 <td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
@@ -1359,7 +1335,7 @@ int
 0.000
 </td>
 <td style="text-align:right;">
-11.76
+14.49
 </td>
 <td style="text-align:right;">
 1
@@ -1385,7 +1361,7 @@ sick
 int
 </td>
 <td style="text-align:right;">
-12.38
+12.4
 </td>
 <td style="text-align:right;">
 6.77
@@ -1522,7 +1498,7 @@ noint
 sicker
 </td>
 <td style="text-align:right;">
-895
+893
 </td>
 </tr>
 </tbody>
@@ -1627,8 +1603,7 @@ distributions.</p>
 <span>            indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">$</span><span class="va">parameter_name</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="va">pos_indicator</span><span class="op">]</span>,<span class="fl">1</span>,<span class="va">pos_indicator</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="co">#vector of indicators, value 0 everywhere except at sens, where it takes value 1</span></span>
 <span>                              <span class="op">)</span></span>
 <span></span>
-<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>            <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span>base        <span class="op">=</span> <span class="va">df_par</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>                       psa         <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,<span class="va">df_par</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,<span class="va">df_par</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>                       sens        <span class="op">=</span> <span class="va">df_par</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -1672,61 +1647,62 @@ variables altered in the scenario, and 0 otherwise.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.3s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.3s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.22s</span></span>
-<span><span class="co">#&gt; Time to run analysis 2: 0.22s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.29s</span></span>
+<span><span class="co">#&gt; Time to run analysis 2: 0.29s</span></span>
 <span><span class="co">#&gt; Analysis number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.2s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.3s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 0.3s</span></span>
 <span><span class="co">#&gt; Analysis number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
-<span><span class="co">#&gt; Time to run analysis 4: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.25s</span></span>
+<span><span class="co">#&gt; Time to run analysis 4: 0.25s</span></span>
 <span><span class="co">#&gt; Analysis number: 5</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 5: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.21s</span></span>
+<span><span class="co">#&gt; Time to run analysis 5: 0.25s</span></span>
 <span><span class="co">#&gt; Analysis number: 6</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.16s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.16s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.22s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 0.22s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
-<span><span class="co">#&gt; Time to run analysis 7: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.5s</span></span>
+<span><span class="co">#&gt; Time to run analysis 7: 0.5s</span></span>
 <span><span class="co">#&gt; Analysis number: 8</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 8: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.22s</span></span>
+<span><span class="co">#&gt; Time to run analysis 8: 0.22s</span></span>
 <span><span class="co">#&gt; Analysis number: 9</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 9: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run analysis 9: 0.2s</span></span>
 <span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.16s</span></span>
-<span><span class="co">#&gt; Time to run analysis 10: 0.16s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run analysis 10: 0.2s</span></span>
 <span><span class="co">#&gt; Analysis number: 11</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 11: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run analysis 11: 0.2s</span></span>
 <span><span class="co">#&gt; Analysis number: 12</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
-<span><span class="co">#&gt; Time to run analysis 12: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.22s</span></span>
+<span><span class="co">#&gt; Time to run analysis 12: 0.22s</span></span>
 <span><span class="co">#&gt; Analysis number: 13</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 13: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.22s</span></span>
+<span><span class="co">#&gt; Time to run analysis 13: 0.22s</span></span>
 <span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 14: 0.17s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.48s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run analysis 14: 0.2s</span></span>
+<span><span class="co">#&gt; Total time to run: 3.59s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="check-results">Check results<a class="anchor" aria-label="anchor" href="#check-results"></a>
@@ -1784,89 +1760,159 @@ option</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.21s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.22s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.2s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.22s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.26s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 1.33s</span></span>
+<span><span class="co">#&gt; Analysis number: 2</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.24s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.23s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.22s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.23s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.19s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.22s</span></span>
+<span><span class="co">#&gt; Time to run analysis 2: 1.33s</span></span>
+<span><span class="co">#&gt; Analysis number: 3</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.22s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.2s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.19s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.25s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.22s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.22s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 1.3s</span></span>
+<span><span class="co">#&gt; Analysis number: 4</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.21s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.25s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.25s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.21s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.22s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.25s</span></span>
+<span><span class="co">#&gt; Time to run analysis 4: 1.39s</span></span>
+<span><span class="co">#&gt; Analysis number: 5</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.27s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.2s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.22s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.2s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.19s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.22s</span></span>
+<span><span class="co">#&gt; Time to run analysis 5: 1.3s</span></span>
+<span><span class="co">#&gt; Analysis number: 6</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.22s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.2s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.22s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 1.07s</span></span>
-<span><span class="co">#&gt; Analysis number: 2</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.16s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.19s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.16s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.15s</span></span>
-<span><span class="co">#&gt; Time to run analysis 2: 1.01s</span></span>
-<span><span class="co">#&gt; Analysis number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 1.22s</span></span>
+<span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.16s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.2s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.19s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.21s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.26s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run analysis 7: 1.26s</span></span>
+<span><span class="co">#&gt; Analysis number: 8</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.21s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.22s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.18s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.2s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 1.05s</span></span>
-<span><span class="co">#&gt; Analysis number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run analysis 8: 1.19s</span></span>
+<span><span class="co">#&gt; Analysis number: 9</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.22s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.2s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.21s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 4: 1.03s</span></span>
-<span><span class="co">#&gt; Analysis number: 5</span></span>
+<span><span class="co">#&gt; Time to run analysis 9: 1.19s</span></span>
+<span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.16s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.2s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.28s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.23s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.16s</span></span>
-<span><span class="co">#&gt; Time to run analysis 5: 1.13s</span></span>
-<span><span class="co">#&gt; Analysis number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.22s</span></span>
+<span><span class="co">#&gt; Time to run analysis 10: 1.22s</span></span>
+<span><span class="co">#&gt; Analysis number: 11</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.22s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.22s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.4s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.16s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.2s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.98s</span></span>
-<span><span class="co">#&gt; Analysis number: 7</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
+<span><span class="co">#&gt; Time to run analysis 11: 1.42s</span></span>
+<span><span class="co">#&gt; Analysis number: 12</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
@@ -1874,111 +1920,42 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.21s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.21s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 7: 1.06s</span></span>
-<span><span class="co">#&gt; Analysis number: 8</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.16s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.18s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.15s</span></span>
-<span><span class="co">#&gt; Time to run analysis 8: 1s</span></span>
-<span><span class="co">#&gt; Analysis number: 9</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.19s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.16s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.19s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.16s</span></span>
-<span><span class="co">#&gt; Time to run analysis 9: 1.02s</span></span>
-<span><span class="co">#&gt; Analysis number: 10</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.18s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.15s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.18s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.16s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.15s</span></span>
-<span><span class="co">#&gt; Time to run analysis 10: 1.01s</span></span>
-<span><span class="co">#&gt; Analysis number: 11</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.18s</span></span>
+<span><span class="co">#&gt; Time to run analysis 12: 1.12s</span></span>
+<span><span class="co">#&gt; Analysis number: 13</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.16s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.19s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.15s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 11: 1.05s</span></span>
-<span><span class="co">#&gt; Analysis number: 12</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.16s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.21s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.22s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.16s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.25s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 12: 1.05s</span></span>
-<span><span class="co">#&gt; Analysis number: 13</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run analysis 13: 1.21s</span></span>
+<span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.21s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.19s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.2s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.17s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.21s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 13: 1.06s</span></span>
-<span><span class="co">#&gt; Analysis number: 14</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.16s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.17s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.19s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 14: 1.03s</span></span>
-<span><span class="co">#&gt; Total time to run: 14.55s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 6: 0.2s</span></span>
+<span><span class="co">#&gt; Time to run analysis 14: 1.2s</span></span>
+<span><span class="co">#&gt; Total time to run: 17.69s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="check-results-1">Check results<a class="anchor" aria-label="anchor" href="#check-results-1"></a>
@@ -1994,20 +1971,20 @@ corresponding parameter value.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 14 × 8</span></span></span>
 <span><span class="co">#&gt;    sensitivity util.sick util.sicker cost.sick cost.sicker cost.int coef_noint</span></span>
 <span><span class="co">#&gt;          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>           1     0.6         0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>           2     0.762       0.3       <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>           3     0.762       0.541     <span style="text-decoration: underline;">1</span>000        <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>           4     0.762       0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">5</span>000     <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>           5     0.762       0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.     800      -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>           1     0.6         0.541     <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>           2     0.762       0.3       <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>           3     0.762       0.541     <span style="text-decoration: underline;">1</span>000        <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>           4     0.762       0.541     <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">5</span>000     <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>           5     0.762       0.541     <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">7</span>509.     800      -<span style="color: #BB0000;">1.61</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>           6     0.762       0.541     <span style="text-decoration: underline;">3</span>066.       <span style="text-decoration: underline;">7</span>506.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">2.30</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>           7     0.761       0.541     <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">7</span>510.    <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>           8     0.9         0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>           9     0.762       0.7       <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>          10     0.762       0.541     <span style="text-decoration: underline;">5</span>000        <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>          11     0.762       0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">9</span>000     <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>          12     0.762       0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">2</span>000      -<span style="color: #BB0000;">1.62</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span>          13     0.762       0.541     <span style="text-decoration: underline;">3</span>066.       <span style="text-decoration: underline;">7</span>507.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">0.916</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span>          14     0.762       0.541     <span style="text-decoration: underline;">3</span>068.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">1.62</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>           7     0.761       0.541     <span style="text-decoration: underline;">3</span>070.       <span style="text-decoration: underline;">7</span>510.    <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>           8     0.9         0.541     <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>           9     0.762       0.7       <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>          10     0.762       0.541     <span style="text-decoration: underline;">5</span>000        <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>          11     0.762       0.541     <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">9</span>000     <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>          12     0.762       0.541     <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">2</span>000      -<span style="color: #BB0000;">1.61</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span>          13     0.762       0.541     <span style="text-decoration: underline;">3</span>066.       <span style="text-decoration: underline;">7</span>506.    <span style="text-decoration: underline;">1</span>036.     -<span style="color: #BB0000;">0.916</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span>          14     0.762       0.541     <span style="text-decoration: underline;">3</span>069.       <span style="text-decoration: underline;">7</span>509.    <span style="text-decoration: underline;">1</span>035.     -<span style="color: #BB0000;">1.62</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: HR_int &lt;dbl&gt;</span></span></span></code></pre></div>
 </div>
 </div>
@@ -2022,7 +1999,7 @@ corresponding parameter value.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

@@ -1,6 +1,6 @@
 Package: WARDEN
 Title: Workflows for Health Technology Assessments in R using Discrete EveNts
-Version: 1.2.4.9000
+Version: 2.0.0
 Authors@R: 
     c(person(given = "Javier",
            family = "Sanchez Alvarez",
@@ -14,11 +14,11 @@ Authors@R:
       family = "Aponte Ribero",
       role = "ctb",
       email = ""))     
-Description: Toolkit to support and perform discrete event simulations without
+Description: Toolkit to support and perform discrete event simulations with and without
     resource constraints in the context of health technology assessments (HTA).
     The package focuses on cost-effectiveness modelling and aims to be submission-ready
     to relevant HTA bodies in alignment with 'NICE TSD 15'
-    <https://www.sheffield.ac.uk/nice-dsu/tsds/patient-level-simulation>.
+    <https://sheffield.ac.uk/nice-dsu/tsds/patient-level-simulation>.
     More details an examples can be found in the package website <https://jsanchezalv.github.io/WARDEN/>.
 License: GPL (>= 3)
 Encoding: UTF-8
@@ -48,10 +48,15 @@ Imports:
     zoo,
     progressr,
     magrittr,
-    rlang,
-    tidyr
+    tidyr,
+    lifecycle,
+    Rcpp
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
 URL: https://jsanchezalv.github.io/WARDEN/
+LinkingTo: 
+    Rcpp
+SystemRequirements: 
+    C++11

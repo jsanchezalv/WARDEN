@@ -2,35 +2,44 @@
 % Please edit documentation in R/input_f.R
 \name{add_item}
 \alias{add_item}
-\title{Define parameters that may be used in model calculations (list)}
+\title{Define or append model inputs}
 \usage{
-add_item(.data = NULL, ...)
+add_item(..., .data = NULL, input)
 }
 \arguments{
-\item{.data}{Existing data}
+\item{...}{Unevaluated arguments. Named → \code{name <- expr}; unnamed → raw expr.}
 
-\item{...}{Items to define for the simulation}
+\item{.data}{Optional named argument: an existing \code{{}} block (or list of
+expressions) to start from.}
+
+\item{input}{Optional unevaluated expression or \code{{}} block to splice in.}
 }
 \value{
-A list of items
+A single \code{{}} call (language object) ready for \code{load_inputs()}.
 }
 \description{
-Define parameters that may be used in model calculations (list)
+Build a single \code{{}} expression that defines inputs for a simulation.
+\itemize{
+\item Named args in \code{...} become assignments (\code{name <- expr}), e.g., add_item(a=5)
+\item Unnamed args are inserted raw/unevaluated. If an unnamed arg is a \code{{}} block,
+its statements are spliced (flattened). add_item(pick_val_v(...))
+\item Works with magrittr pipes: a leading \code{.} (the LHS) is resolved to its value;
+if that value is a \code{{}} block (or list of expressions), it becomes the
+starting block.
+\item input argument can be used to handle alternative \code{add_item2} method,
+e.g. add_item(input = {a <- 5})
 }
-\details{
-The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
-So rather than use two \code{add_item} with a list of one element, it's better to group them into a single \code{add_item} with a list of two elements.
-
-Whenever a function is directly implemented which must be evaluated later and that has no object name attached (e.g., \code{pick_val_v}),
-it should be implemented after a first \code{add_item()} (empty or with content) to avoid confusing the \code{.data} argument, or wrapping the function within \code{substitute()}
 }
 \examples{
 library(magrittr)
 
-add_item(fl.idfs = 0)
-add_item(util_idfs = if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}, util.mbc = 0.6, cost_idfs = 2500)
-common_inputs <- add_item() \%>\%
-add_item(pick_val_v(
+add_item(input = {fl.idfs <-  0})
+add_item(input = {
+ util_idfs <- if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}
+ util.mbc <- 0.6
+ cost_idfs <- 2500})
+common_inputs <- add_item(input = {
+pick_val_v(
   base      = l_statics[["base"]],
   psa       = pick_psa(
     l_statics[["function"]],
@@ -42,8 +51,10 @@ add_item(pick_val_v(
   psa_ind   = psa_bool,
   sens_ind  = sensitivity_bool,
   indicator = indicators_statics,
-  names_out = l_statics[["parameter_name"]]
+  names_out = l_statics[["parameter_name"]],
+  deploy_env = TRUE #Note this option must be active if using it at add_item2
 )
-)
+}
+) 
 
 }

@@ -71,7 +71,7 @@ common_all_inputs <-add_item(
 
 
 #Put objects here that do not change as we loop through treatments for a patient
-common_pt_inputs <- add_item2(input = {
+common_pt_inputs <- add_item(input = {
   rnd_stream_a <- random_stream(100) #arbitrary amount of random numbers to be used, should be >= max number of calls that use that random number (e.g., if item/event A requires 5 random numbers due to repeated calls, then at least 5 numbers should be generated )
   rnd_stream_b <- random_stream(100)
   common_luck <- runif(1)
@@ -109,33 +109,33 @@ init_event_list <-
 ## Add Reaction to Those Events
 Once the initial times of the events have been defined, we also need to declare how events react and affect each other. To do so, we use the `evt_react_list` object and the `add_reactevt` function. This function just needs to state which event is affected, and the actual reaction (usually setting flags to 1 or 0, or creating new/adjusting events).
 
-There are a series of objects that can be used in this context to help with the reactions. Apart from the global objects and flags defined above, we can also use `curtime` for the current event time, `prevtime` for the time of the previous event, `cur_evtlist` for the named vector of events that is yet to happen for that patient, `arm` for the current treatment in the loop, `evt` for the current event being processed, `i` expresses the patient iteration, and `simulation` the specific simulation (relevant when the number of simulations is greater than 1). Furthermore, one can also call any other input/item that has been created before or create new ones. For example, we could even modify a cost/utility item by changing it directly, e.g. through `modify_item(list(cost.idfs.tx=500))`.
+There are a series of objects that can be used in this context to help with the reactions. Apart from the global objects and flags defined above, we can also use `curtime` for the current event time, `prevtime` for the time of the previous event, `cur_evtlist` for the C++ pointer of event queue yet to occur, `arm` for the current treatment in the loop, `evt` for the current event being processed, `i` expresses the patient iteration, and `simulation` the specific simulation (relevant when the number of simulations is greater than 1). Furthermore, one can also call any other input/item that has been created before or create new ones.
 
 Item | What does it do 
 ------------ | -------------
 `curtime` | Current event time (numeric)
 `prevtime` | Time of the previous event (numeric)
-`cur_evtlist` | Named vector of events that is yet to happen for that patient (named numeric vector)
+`cur_evtlist` | External pointer of C++ events that is yet to happen for that patient
 `evt` | Current event being processed (character)
 `i` | Patient being iterated (numeric)
 `arm` | Intervention being iterated (character)
 `simulation` | Simulation being iterated (numeric)
 `sens` | Sensitivity analysis being iterated (numeric)
 
-The functions to add/modify events and inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost. So rather than use two `modify_event` with a list of one element, it's better to group them into a single `modify_event` with a list of two elements. 
-
-To modify/create items, WARDEN now allows to assign them directly in the code, without the need to use `modify_item` and `modify_item_seq`, which allows the code to run faster (~30-35% faster if comparing against `modify_item_seq`, or 15-20% if comparing against `modify_item`). However, these two functions, `modify_item` and `modify_item_seq`, are still available to the user and will keep working, and allow to modify and add items. Elements defined within this function are not evaluated sequentially in `modify_item` (i.e. defining `modify_item(list(fl.new = 1, var1 = fl.new * 5)))` will give an error if `fl.new` was not defined outside this function), while `modify_item_seq` will do it sequentially at a slightly bigger computational cost, so both are left as choices for the user. Note that one can modify costs/utilities by using the construction `type_name_category`, where type is either "qaly" or "cost", name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
-
-`modify_item` and `modify_item_seq`allow to modify and add items. Elements defined within this function are not evaluated sequentially in `modify_item` (i.e. defining `modify_item(list(fl.new = 1, var1 = fl.new * 5)))` will give an error if `fl.new` was not defined outside this function), while `modify_item_seq` will do it sequentially at a slightly bigger computational cost, so both are left as choices for the user. Note that one can modify costs/utilities by using the construction `type_name_category`, where type is either "qaly" or "cost", name is the name (e.g., "default") and category is the category used (e.g., "instant"), so one could pass `cost_default_instant` and modify the cost.
+The functions to add/modify events and inputs use named vectors or lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost. So rather than use two `modify_event` with a list of one element, it's better to group them into a single `modify_event` with a list of two elements. 
 
 The list of relevant functions to be used within `add_reactevt` are:
+`new_event`allows to generate events and add them to the vector of events. It accepts more than one event but a single event per event type. 
+`modify_event` allows to modify events (e.g. delay death). When adding an event, the name of the events and the time of the events must be defined. When using `modify_event`, one must indicate which events are affected and what are the new times of the events. If the event specified does not exist or has already occurred, it will return an error. `modify_event` with `create_if_null = TRUE` argument will also generate events if they don't exist. 
+`remove_event` will remove an event from the event queue (could also be modified instead and set to `Inf`).
+`get_event` will return the TTE of the specified event name.
+`has_event` will return a TRUE/FALSE flag depending on whether the given patient has a specific event in the queue (will return TRUE even if time is `Inf`).
+`next_event` will return a list with the next event in the queue, with time, patient, and event name (`patient_id`, `event_name`, and `event_time`).
+`next_event_pt` will return a list with the next event in the queue for a specific patient, with time, patient, and event name (`patient_id`, `event_name`, and `event_time`).
+`queue_empty` will return TRUE if the queue of events is empty (no more events to process, but `Inf` events are considered part of the queue)
+`queue_size` allows to check the size of the queue of events, including `Inf` events.
 
-Function | What does it do | How to use it
------------- | ------------- | -------------
-`modify_item()` | Adds & Modifies items/flags/variables for future events | `modify_item(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))`
-`modify_item_seq()` | Adds & Modifies items/flags/variables for future events sequentially | `modify_item_seq(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))`
-`new_event()` | Adds events to the vector of events for that patient | `new_event(rep(list("ae"=curtime + 0.001),5))`
-`modify_event()` | Modifies (or creates, with `create_if_null = TRUE`) existing events by changing their time | `modify_event(list("os"=curtime +5, "ttot"=curtime+0.0001))`
+Note that one could potentially omit part of the modeling set in `init_event_list` and actually define new events dynamically through the reactions (we do that below for the `"ae"` event). However, this can have an impact in computation time, so if possible it's always better to use `init_event_list`.
 
 The model will run until `curtime` is set to `Inf`, so the event that terminates the model (in this case, `os`), should modify `curtime` and set it to `Inf`.
 
@@ -159,7 +159,7 @@ evt_react_list <-
                                                       cursurv = 1 - pnorm(q=curtime,8,2),
                                                       luck = rnd_stream_b$random_n,
                                                       condq = FALSE)
-                    modify_event(list(
+                    modify_event(c(
                       death = max(curtime,qnorm(rnd_stream_b$random_n, mean=8, sd=2))
                     ))
                     }
@@ -330,8 +330,7 @@ sensitivity_inputs <-add_item(
             indicators = append(rep(0, length(df_par$parameter_name))[-pos_indicator],1,pos_indicator-1) #vector of indicators, value 0 everywhere except at sens, where it takes value 1
                               )
 
-common_all_inputs <-add_item() %>% 
-  add_item(
+common_all_inputs <-add_item(
             pick_val_v(base        = df_par[["base_value"]],
                        psa         = pick_psa(df_par[["PSA_dist"]],rep(1,length(df_par[["PSA_dist"]])),df_par[["a"]],df_par[["b"]]),
                        sens        = df_par[[sens_name_used]],

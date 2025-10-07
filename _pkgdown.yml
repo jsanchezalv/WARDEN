@@ -26,26 +26,30 @@ navbar:
       href: reference/index.html
     - text: "Articles"
       menu:
+        - text: "Basic Tutorials"
         - text: "Warden Explained"
           href: articles/warden_explained.html
-        - text: "Example in a Sick-Sicker-Dead Model"
+        - text: "Sick-Sicker-Dead Model (SSD)"
           href: articles/example_ssd.html
+        - text: "Resource Constrained Sick-Sicker-Dead model"
+          href: articles/example_ssd_constrained.html
         - text: "How to Use the Automatic Input Selector"
           href: articles/inputs_selector.html
+        - text: "Early Breast Cancer"
+          href: articles/example_eBC.html
+        - text: "Using Individual Patient Data"
+          href: articles/example_ipd.html
+        - text: "Other Tutorials and Tips"
+        - text: "Cohort Markov Model"
+          href: articles/example_markov.html
         - text: "How to Avoid Using Cycles to Speed Up Model"
           href: articles/example_avoiding_cycles.html
-        - text: "Example in a Sick-Sicker-Dead Model - Random Number Streams & Luck Adjustment"
-          href: articles/example_ssd_stream.html
-        - text: "Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random"
-          href: articles/example_ssd_sobol.html
-        - text: "Example in Early Breast Cancer"
-          href: articles/example_eBC.html
-        - text: "Example in a Markov Model"
-          href: articles/example_markov.html
         - text: "Structural and Parametric Uncertainty"
           href: articles/example_uncertainty.html
-        - text: "Example for Individual Patient Data"
-          href: articles/example_ipd.html
+        - text: "Random Number Streams & Luck Adjustment (SSD model)"
+          href: articles/example_ssd_stream.html
+        - text: "Quasi-Random Sobol Sequence vs. Purely Random (SSD model)"
+          href: articles/example_ssd_sobol.html
         - text: "Degeling (2025) using WARDEN instead of simmer"
           href: articles/example_colon_degeling.html
   right:
@@ -57,16 +61,31 @@ reference:
   - title: Main Modelling Functions
   - subtitle: Modelling Core Functions
     contents:
-      - add_item
-      - add_item2
-      - add_reactevt
-      - add_tte
-      - modify_event
-      - modify_item
-      - modify_item_seq
-      - new_event
       - run_sim
       - run_sim_parallel
+      - add_item
+      - add_reactevt
+      - add_tte
+      - new_event
+      - modify_event
+      - remove_event
+      - get_event
+      - has_event
+      - next_event
+      - next_event_pt
+      - queue_empty
+      - queue_size
+      - queue_create
+      - pop_event
+      - pop_and_return_event
+
+      
+  - subtitle: Resource Constrained Specific Functions
+    contents:
+      - resource_discrete
+      - shared_input
+      - discrete_resource_clone
+
 
   - subtitle: Modelling Auxiliary Functions
     contents:
@@ -83,6 +102,7 @@ reference:
       - summary_results_det
       - summary_results_sens
       - summary_results_sim
+      
 
   - title: Statistics Functions
   - subtitle: Statistics Auxiliary Functions
@@ -92,6 +112,7 @@ reference:
       - luck_adj
       - qtimecov
       - adj_val
+      
   - subtitle: Statistics Distributions Functions
     contents:
       - cond_dirichlet
@@ -99,6 +120,7 @@ reference:
       - rgamma_mse
       - qgamma_mse
       - rpoisgamma
+      - rpoisgamma_rcpp
       - qbeta_mse
       - qcond_exp
       - qcond_gamma
@@ -114,17 +136,32 @@ reference:
       - rdirichlet
       - rdirichlet_prob
       - pcond_gompertz
+      
 
   - title: Other Functions and Utilities
     contents:
-      - disc_cycle
       - disc_cycle_v
-      - disc_instant
       - disc_instant_v
-      - disc_ongoing
       - disc_ongoing_v
       - ast_as_list
       - extract_elements_from_list
       - extract_from_reactions
       - extract_psa_result
       - tte.df
+      
+      
+  - title: Deprecated Functions
+    contents:
+      - add_item2
+      - modify_item
+      - modify_item_seq
+      - disc_cycle
+      - disc_instant
+      - disc_ongoing
+      
+      
+  - title: internal
+    contents:
+      - .resource_discrete_from_xptr
+      - print.resource_discrete
+      - with_write_flags_lang

@@ -4,15 +4,17 @@
 ## Introduction
 
 `WARDEN` is a user-friendly package that facilitates the use of discrete
-event simulations without resource constraints for cost-effectiveness
-analysis. The package supports a flexible, transparent, practical
-approach to discrete event simulation while keeping an acceptable
-performance.
+event simulations with or without resource constraints for
+cost-effectiveness analysis. The package supports a flexible,
+transparent, practical approach to discrete event simulation while
+keeping an acceptable performance.
 
 The current version supports:
 
 - Discrete event simulation models, Markov/semi-Markov models and hybrid
   models using parallel and non-parallel engines
+- Constrained and unconstrained models (with or without interactivity
+  between patients)
 - Seamlessly integrating data.frames and other objects into the model
 - Delayed execution of the main inputs to facilitate readability of the
   model
@@ -37,6 +39,8 @@ vignette](https://jsanchezalv.github.io/WARDEN/articles/example_uncertainty.html
 The [IPD
 vignette](https://jsanchezalv.github.io/WARDEN/articles/example_ipd.html)
 shows how WARDEN can be used when individual patient data is available.
+It is also suggested to check the constrained resources DES example on
+the website.
 
 ## Documentation
 

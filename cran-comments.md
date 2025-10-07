@@ -1,8 +1,11 @@
 ## UPDATE
 
-* This is a package fix. In this version I have:
+* This is a major package update. In this version I have:
 
-* Fixed per cycle discounting.
+* Converted several core and auxiliary functions from R to C++ using Rcpp.
+* Simplified functions, code, error management and log management.
+* Added new functions to support new functionality.
+* Added unit tests for the new functions.
 
 ## R CMD check results
 

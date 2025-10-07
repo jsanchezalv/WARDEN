@@ -1,17 +1,20 @@
-pandoc: '3.2'
-pkgdown: 2.1.2
+pandoc: 3.1.1
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
+  articles/example_avoiding_cycles: example_avoiding_cycles.html
+  articles/example_colon_degeling: example_colon_degeling.html
   articles/example_eBC: example_eBC.html
   articles/example_ipd: example_ipd.html
   articles/example_markov: example_markov.html
   example_ssd: example_ssd.html
+  articles/example_ssd_constrained: example_ssd_constrained.html
   articles/example_ssd_sobol: example_ssd_sobol.html
   articles/example_ssd_stream: example_ssd_stream.html
   articles/example_uncertainty: example_uncertainty.html
   articles/inputs_selector: inputs_selector.html
   articles/warden_explained: warden_explained.html
-last_built: 2025-05-23T11:51Z
+last_built: 2025-10-07T09:58Z
 urls:
   reference: https://jsanchezalv.github.io/WARDEN/reference
   article: https://jsanchezalv.github.io/WARDEN/articles

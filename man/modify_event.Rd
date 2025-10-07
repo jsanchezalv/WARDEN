@@ -2,31 +2,36 @@
 % Please edit documentation in R/input_f.R
 \name{modify_event}
 \alias{modify_event}
-\title{Modify the time of existing events}
+\title{Modify or Add Events for a Patient}
 \usage{
-modify_event(evt, create_if_null = TRUE)
+modify_event(events, create_if_missing = TRUE, ptr, patient_id)
 }
 \arguments{
-\item{evt}{A list of events and their times}
+\item{events}{A named numeric vector with event names and new event times. It can also handle lists instead of named vectors (at a small computational cost).}
 
-\item{create_if_null}{A boolean.
-If TRUE, it will create non-existing events with the chosen time to event.
-If FALSE, it will ignore those.}
+\item{create_if_missing}{Logical, whether to create events if they do not exist.}
+
+\item{ptr}{The event queue pointer. Defaults to \code{cur_evtlist}.}
+
+\item{patient_id}{The patient ID. Defaults to \code{i}.}
 }
 \value{
-No return value, modifies/adds event to \code{cur_evtlist} and integrates it with the main list for storage
+NULL (invisible). Modifies the queue in-place.
 }
 \description{
-Modify the time of existing events
+Modifies existing event times, or adds new events if \code{create_if_missing} is TRUE.
 }
 \details{
-The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
+The functions to add/modify events/inputs use named vectors or lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two \code{modify_event} with a list of one element, it's better to group them into a single \code{modify_event} with a list of two elements.
 
 This function does not evaluate sequentially.
 
+While multiple events can be added, they must be named differently. If the same event is added multiple times at once, only the last occurrence will be kept
+(only one event per event type in the queue of events yet to occur). If an event occurs, then a new one with the same name can be set.
+
 This function is intended to be used only within the \code{add_reactevt} function in its \code{input} parameter and should not be run elsewhere or it will return an error.
 }
 \examples{
-add_reactevt(name_evt = "idfs",input = {modify_event(list("os"=5))})
+add_reactevt(name_evt = "idfs",input = {modify_event(c("os"=5))})
 }

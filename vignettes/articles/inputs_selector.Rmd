@@ -42,7 +42,7 @@ options(tibble.print_max = 50)
 # Introduction
 This document explains how to use the set of functions related to automatic input selector, particularly `pick_val_v`, `pick_psa`, and `create_indicators`, so that the model takes care of everything in terms of running a deterministic analysis, DSA, PSA, probabilistic DSA, or scenario analyses.
 
-Note that while we use `add_item` for all the examples below, one could just do the same while using `add_item2`, the only differences are the way the input is added using `input = {...}` and the argument `deploy_env = TRUE` (e.g., `add_item(input = {pick_val_v(..., deploy_env = TRUE)})`).
+We use `add_item` for all the examples below, in previous versions of WARDEN we distinguished between add_item and add_item2, but now the behavior has been integrated into a single function that can handle both approaches of adding inputs.
 
 ## In a Nutshell
 The key function is `pick_val_v`. This function essentially hides a loop, which iterates over each of the inputs and depending on whether the parameter is a vector or single length, and whether the PSA or scenario flags are active, proceeds to select the right value. It also can consider multiple parameters being covaried at the same time in a scenario or DSA analysis.
@@ -91,7 +91,8 @@ We set our base case values, we set the PSA values using the parameters in our d
              sens_ind    = FALSE, #No scenario analysis
              names_out   = l_inputs[["parameter_name"]],
              indicator   = rep(1,7), #This is only relevant for scenario analysis, set to all 1s
-             indicator_psa = l_inputs[["psa_indicators"]] #vector of 4 1s and 3 0s.
+             indicator_psa = l_inputs[["psa_indicators"]],#vector of 4 1s and 3 0s.
+             deploy_env = FALSE 
   ) 
 
 ```
@@ -136,7 +137,8 @@ as.data.frame(
            sens_ind    = sensitivity_bool, #FALSE
            indicator   = indicators, #all 1s, or a vector of 1 1 and the rest 0s.
            names_out   = l_inputs[["parameter_name"]],
-           indicator_psa = l_inputs[["psa_indicators"]] 
+           indicator_psa = l_inputs[["psa_indicators"]],
+           deploy_env = FALSE
            )
 ) 
 ```
@@ -157,7 +159,8 @@ as.data.frame(
            sens_ind    = sensitivity_bool, #FALSE
            indicator   = indicators, #all 1s, or a vector of 1 1 and the rest 0s.
            names_out   = l_inputs[["parameter_name"]],
-           indicator_psa = l_inputs[["psa_indicators"]] 
+           indicator_psa = l_inputs[["psa_indicators"]] ,
+           deploy_env = FALSE
            )
 )
 
@@ -183,7 +186,8 @@ as.data.frame(
            sens_ind    = sensitivity_bool, #FALSE
            indicator   = indicators, #all 1s, or a vector of 1 1 and the rest 0s.
            names_out   = l_inputs[["parameter_name"]],
-           indicator_psa = l_inputs[["psa_indicators"]] 
+           indicator_psa = l_inputs[["psa_indicators"]] ,
+           deploy_env = FALSE
            )
 ) 
 ```

@@ -26,34 +26,6 @@ if(getRversion() >= "2.15.1") {
 
 # Load Inputs --------------------------------------------------------------------------------------------------------------------------------------
 
-#' Function to load input expressions in a loop
-#'
-#' @param inputs List of existing inputs
-#' @param list_uneval_inputs List of unevaluated inputs (substituted expressions)
-#'
-#' @return Updated list of evaluated inputs
-#'
-#' @examples
-#' load_inputs(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
-#'
-#' @keywords internal
-#' @noRd
-
-load_inputs <- function(inputs,list_uneval_inputs){
-  for (inp in 1:length(list_uneval_inputs)) {
-    list.eval_inputs <- lapply(list_uneval_inputs[inp],function(x) eval(x, inputs))
-    #If using pick_eval_v or other expressions, the lists are not deployed, so this is necessary to do so
-    if(any(is.null(names(list.eval_inputs)), names(list.eval_inputs)=="") & length(list.eval_inputs)==1) {
-      inputs[names(list.eval_inputs[[1]])] <- list.eval_inputs[[1]]
-    } else{
-      inputs[names(list.eval_inputs)] <- list.eval_inputs
-      
-    }
-  }
-  
-  return(inputs)
-}
-
 #' Function to load input expressions
 #'
 #' @param inputs Environment of existing inputs
@@ -62,12 +34,13 @@ load_inputs <- function(inputs,list_uneval_inputs){
 #' @return Nothing (updated inputs environment)
 #'
 #' @examples
-#' load_inputs2(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
+#' load_inputs(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
 #'
 #' @keywords internal
 #' @noRd
-load_inputs2 <- function(inputs,list_uneval_inputs){
+load_inputs <- function(inputs,list_uneval_inputs){
   eval(list_uneval_inputs, inputs)
+  invisible(NULL)
 }
 
 #' Function for debugging export
@@ -76,6 +49,8 @@ load_inputs2 <- function(inputs,list_uneval_inputs){
 #' @param new_data New inputs after changes
 #'
 #' @return dump_info list of previous and current values
+#' 
+#' @importFrom stats setNames
 #'
 #' @examples
 #' debug_inputs(input_list_pt,input_list_arm)
@@ -93,10 +68,23 @@ debug_inputs <- function(old_data=NULL,new_data){
   cur_value <- mget(names_new_inputs,new_data)
   
   dif_vals <- !sapply(names_new_inputs, function(x) identical(prev_value[[x]],cur_value[[x]]))
+  
   dump_info <- list(
     list(
-      prev_value = prev_value[dif_vals],
-      cur_value  = cur_value[dif_vals]
+      prev_value = lapply(prev_value[dif_vals],
+                          function(x) if(inherits(x,"resource_discrete")){
+                            x$size()
+                          } else if(inherits(x,"environment")){
+                              "environment"
+                          } else{x}
+                          ),
+      cur_value  = lapply(cur_value[dif_vals],
+                          function(x) if(inherits(x,"resource_discrete")){
+                            x$size()
+                          } else if(inherits(x,"environment")){
+                            "environment"
+                          } else{x}
+                          )
     )
   )
   
@@ -143,42 +131,6 @@ initiate_evt <- function(arm_name,input_list_arm){
 
 
 
-# Get next event ------------------------------------------------------------------------------------------------------------------------------------------
-
-#' Identify which event to process next from a list of events
-#'
-#' @param evt_list A list of possible events with event times
-#'
-#' @return Two lists: one containing the name and time of the next event, the other with the remaining events to be processed
-#'
-#' @examples
-#' \donttest{
-#' get_next_evt(evt_list = input_list_arm$cur_evtlist)
-#'}
-#'
-#' @keywords internal
-#' @noRd
-
-get_next_evt <- function(evt_list){                  # This function identifies which event is to be processed next for each patient, depending on intervention
-
-  if (length(evt_list)>0) {
-    
-    # min_evt <- which.min(evt_list) #old method
-
-    #select the position in the vector that has the minimum time, adding the priority times to make sure to select the right one,
-    # 4x slower than old method, but this is required to solve ties
-    
-    min_evt <- which.min(evt_list + parent.frame()$input_list_arm$precision_times[names(evt_list)]) 
-    cur_evtlist <- list(out = list(evt = names(evt_list[min_evt]), evttime = evt_list[[min_evt]]), evt_list = evt_list[-min_evt])
-  } else {
-    cur_evtlist <- NULL
-  }
-
-
-  return(cur_evtlist)
-}
-
-
 
 # Reaction to Event ---------------------------------------------------------------------------------------------------------------------------------------
 
@@ -218,19 +170,17 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
   
   #Reset instantaneous costs/qalys/others
   if(!is.null(input_list_arm$uc_lists$instant_inputs)){
-    
     for (var_name in input_list_arm$uc_lists$instant_inputs) {
       assign(var_name, 0, envir = input_list_arm)
     }
   }
   
+  #Reset accumulator backwards flags
   if(input_list_arm$accum_backwards){
     if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
-
       for (var_name in input_list_arm$ongoing_inputs_lu) {
         assign(var_name, 0, envir = input_list_arm)
       }
-
     }
   }
   
@@ -287,12 +237,23 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
   }
   
   #evaluate event
-  eval(react_list[[position]][["react"]], input_list_arm)
+  if(input_list_arm$accum_backwards){
+    if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
+      with_write_flags_lang(
+        react_list[[position]][["react"]],
+        tracked = input_list_arm$uc_lists$ongoing_inputs,
+        env     = input_list_arm,
+        flag_value = 1L
+      )
+    }
+  }else{
+    eval(react_list[[position]][["react"]], input_list_arm)
+  }
   
   #debug bit (after evaluation)
   if(input_list_arm$debug){
     
-    cur_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm)
+    cur_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm, ifnotfound = Inf)
     
     if(!is.null(input_list_arm$log_list[[loc]])){
       input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value, prev_values)
@@ -307,7 +268,7 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
       )
       names(dump_info) <- loc
       
-      input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
+      input_list_arm$log_list <- dump_info
       
     }
   }
@@ -381,6 +342,7 @@ get_input <-  function(x,ifnull=0,type,evt_arm_i =evt_arm, input_list_arm_i=inpu
 #'
 #' @return Mean and 95% CI from the PSA samples
 #' @importFrom purrr map_dbl
+#' @importFrom purrr map
 #' @importFrom stats quantile
 #'
 #' @examples
@@ -401,6 +363,153 @@ interval_out <- function(output_sim, element,round_digit=2) {
   )
   return(out)
 }
+
+.set_last_ctx <- function(stage,
+                          sens       = NA_integer_,
+                          simulation = NA_integer_,
+                          patient_id = NA_integer_,
+                          arm        = NA_character_,
+                          event      = NA_character_,
+                          time       = NA_real_,
+                          seed       = NA_real_,
+                          .warden_ctx = NULL) {
+  # Fast path: use provided env; else fall back to frame lookup once
+  if (is.null(.warden_ctx)) {
+    .warden_ctx <- get(".warden_ctx", parent.frame(), inherits = TRUE)
+  }
+
+  
+  # Mutate in place (no list alloc)
+  .warden_ctx$last$stage      <- stage
+  .warden_ctx$last$sens       <- sens
+  .warden_ctx$last$simulation <- simulation
+  .warden_ctx$last$patient_id <- patient_id
+  .warden_ctx$last$arm        <- arm
+  .warden_ctx$last$event      <- event
+  .warden_ctx$last$time       <- time
+  .warden_ctx$last$seed       <- seed
+  
+  invisible(NULL)
+}
+
+# ---- Shared log sink (append-only; survives errors) ----
+log_add <- function(entry) {
+  sink <- get0("log_sink",parent.frame(), inherits = TRUE, ifnotfound = NULL)
+  if (!is.null(sink)) sink$entries <- c(sink$entries, entry)
+  invisible(NULL)
+}
+
+on_error_check <- function(expr, continue_on_error = NULL){
+  caller <- parent.frame()
+  
+  expr_q <- substitute(expr)
+  if(is.null(continue_on_error)){continue_on_error <- get("continue_on_error", caller, inherits = TRUE)}
+  if (continue_on_error) {
+      tryCatch({
+        eval.parent(expr_q) 
+      }, error = function(e) assign(".skip_to_next",TRUE,envir = caller))
+  } else{
+    eval.parent(expr_q) 
+  }
+}
+
+
+# Backwards binding handler -----------------------------------------------
+
+#' Evaluate a language object with write-tracking via active bindings
+#'
+#' Temporarily installs **active bindings** for a set of variable names in
+#' `env` so that any **write** to those names during the evaluation of
+#' `expr_lang` flips a corresponding `*_lastupdate` flag in `env`.
+#' This flags assignments even when the value is overwritten with the same
+#' value, and does not flag branches that are not executed.
+#'
+#' Typical use: when `accum_backwards = TRUE`, wrap the evaluation of a
+#' reaction/input block so you can later accumulate only inputs that were
+#' actually written in that event.
+#'
+#' @param expr_lang A language object (call or expression) to evaluate.
+#'   For example, `react_list[[i]][["react"]]` returned by `add_reactevt()`.
+#' @param tracked Character vector of **top-level** variable names to track
+#'   (e.g., `c("q_default","c_default","curtime")`). For each name `nm`,
+#'   an active binding is installed at `env[[nm]]`, and writes set
+#'   `env[[paste0(nm, "_lastupdate")]] <- flag_value`.
+#' @param env Environment in which to install the bindings and evaluate
+#'   `expr_lang` (your per-patient/per-arm working environment).
+#' @param flag_value Scalar written into each `*_lastupdate` when a write
+#'   occurs (commonly `1L`; you may use a timestamp like `env$curtime`).
+#'
+#' @details
+#' - The function creates a private backing store for `tracked` names and
+#'   installs active bindings in `env`. Reads return the stored value.
+#'   Writes (via `<-` or `=`) update the store **and** set the corresponding
+#'   `*_lastupdate` flag in `env`.
+#' - It **does not** zero the `*_lastupdate` flags; do that before calling
+#'   this function (typically once per event).
+#' - Only **top-level symbols** are tracked. To track `obj$el <- ...`, track
+#'   `"obj"` (the container) rather than `"obj$el"`.
+#' - Active bindings are removed and plain symbols restored on exit, even if
+#'   an error occurs (via `on.exit()` teardown).
+#'
+#' @return Invisibly returns `NULL`. The function works by side effects
+#'   (mutating `env` and its `*_lastupdate` flags).
+#'
+#' @section Performance:
+#' Active bindings add a tiny overhead per read/write of the tracked names
+#' (a function call). Keep `tracked` small and the binding body minimal.
+#' Install only for the duration of the block and tear down immediately
+#' (handled for you). If your block performs many reads and few writes,
+#' consider a snapshot-and-diff approach instead
+#' 
+#' @keywords internal
+#' 
+with_write_flags_lang <- function(expr_lang, tracked, env, flag_value = 1L) {
+  store <- new.env(parent = emptyenv())
+  installed <- character(0)
+  
+  # Robust teardown even if we error during setup
+  on.exit({
+    for (nm in installed) {
+      # read through binding (returns stored value), then restore plain symbol
+      val <- tryCatch(get(nm, envir = env), error = function(e) NULL)
+      if (bindingIsActive(nm, env)) rm(list = nm, envir = env)
+      assign(nm, val, envir = env)
+    }
+  }, add = TRUE)
+  
+  # Prepare active bindings for tracked names
+  for (nm in tracked) {
+    # seed backing store with current value (top-level only)
+    if (exists(nm, envir = env, inherits = FALSE)) {
+      assign(nm, get(nm, envir = env, inherits = FALSE), envir = store)
+      # remove regular binding so we can install an active binding
+      if (!bindingIsActive(nm, env)) rm(list = nm, envir = env)
+    } else {
+      assign(nm, NULL, envir = store)
+    }
+    
+    # create active binding (overwrites if one already exists)
+    makeActiveBinding(nm, local({
+      key <- nm; store_ <- store; env_ <- env; fv <- flag_value
+      function(value) {
+        if (!missing(value)) {
+          assign(key, value, envir = store_)                    # write
+          assign(paste0(key, "_lastupdate"), fv, envir = env_)  # flip flag
+          invisible(value)
+        } else {
+          get(key, envir = store_, inherits = FALSE)            # read
+        }
+      }
+    }), env)
+    
+    installed <- c(installed, nm)
+  }
+  
+  # Evaluate the language object in 'env'
+  eval(expr_lang, envir = env)
+  invisible(NULL)
+}
+
 
 # Helper function to transform the parameters exported in debug -------------------------
 
@@ -447,7 +556,7 @@ transform_debug <- function(debug_data) {
 export_log <- function(log_list, log_name, main_byline = FALSE) {
   
   file_conn <- file(log_name)
-  
+ 
   # Precompute the total number of lines for efficiency
   log_size <- sum(sapply(log_list, function(sublist) {
     length(sublist) * 3 + 2  # Each sublist key has 3 lines (key, prev_value, cur_value) + 2 extra lines for header and blank
@@ -456,6 +565,17 @@ export_log <- function(log_list, log_name, main_byline = FALSE) {
   output_lines <- character(log_size)
   
   line_index <- 1
+  
+  paste_vals <- function(x){ 
+    if (!is.null(names(x)) && any(nzchar(names(x)))) {
+      paste(ifelse(nzchar(names(x)), names(x), seq_along(x)),
+            x,
+            sep = "=",
+            collapse = "; ")
+    } else {
+      paste(x, collapse = "; ")
+    }
+  }
   
   # Loop through the list and construct the data to be written
   for (main_key in names(log_list)) {
@@ -475,9 +595,9 @@ export_log <- function(log_list, log_name, main_byline = FALSE) {
       line_index <- line_index + 1
       
       # Add prev_value and cur_value indented under the sub_key
-      output_lines[line_index] <- paste0("     prev_value = ", paste0(sublist[[sub_key]]$prev_value, collapse = "; "))
+      output_lines[line_index] <- paste0("     prev_value = ", paste_vals(sublist[[sub_key]]$prev_value))
       line_index <- line_index + 1
-      output_lines[line_index] <- paste0("     cur_value  = ", paste0(sublist[[sub_key]]$cur_value, collapse = "; "))
+      output_lines[line_index] <- paste0("     cur_value  = ", paste_vals(sublist[[sub_key]]$cur_value))
       line_index <- line_index + 1
     }
     
@@ -888,6 +1008,8 @@ compute_outputs_timseq <- function(freq,
 #' @import data.table
 #' @importFrom utils tail
 #' @importFrom zoo na.locf
+#' @importFrom purrr map
+#' @importFrom purrr map_dbl
 #' 
 #' @details
 #' It computes the discounted and undiscounted lys/costs/qalys. 
@@ -917,7 +1039,6 @@ compute_outputs <- function(patdata,input_list) {
   npats <- input_list$npats
   psa_bool <- input_list$psa_bool
   
-  patdata_dt <- NULL
   list_patdata <- NULL
   
   #Split the data as to be exported as a data.table, and the extra data the user described
@@ -951,8 +1072,29 @@ compute_outputs <- function(patdata,input_list) {
   } else{
     list_patdata2 <- list_patdata
   }
- 
-  patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata2,fill=TRUE)))
+  
+  
+  #If all lists have same length, then we can extract this faster than using rbindlist
+  if(sum(length(list_patdata2[[1]]) != lengths(list_patdata2))==0){
+  col_names <- names(list_patdata2[[1]])
+  tmp_list <- unlist(list_patdata2,recursive=FALSE)
+  names_tmp_list <- names(tmp_list)
+  n_rows <- length(tmp_list)
+  n_cols <- length(col_names)
+  patdata_dt <- data.table(matrix(NA, nrow = n_rows/n_cols, ncol = n_cols))
+  setnames(patdata_dt, col_names)
+  indices <- seq(from = 1, to = n_rows, by = n_cols)
+  for (i in seq_along(col_names)) {
+    col <- col_names[i]
+    set(patdata_dt, j = col, value = unlist(tmp_list[indices], use.names = FALSE))
+    indices <- indices + 1
+  }
+  rm(indices, tmp_list)
+  }else{
+    patdata_dt <- NULL
+    patdata_dt <- rbindlist(list(patdata_dt,rbindlist(list_patdata2,fill=TRUE)))
+  }
+  
 
   rm(list_patdata2)
   
@@ -1017,7 +1159,6 @@ compute_outputs <- function(patdata,input_list) {
   #Discount and undiscount ongoing
   
   for (cat in input_list$uc_lists$ongoing_inputs) {
-
     patdata_dt[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
                                                                         lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
                                                                         lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},

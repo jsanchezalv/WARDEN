@@ -159,10 +159,7 @@ Alternatively, we could just use the start event and iterate over each cycle, sa
 evt_react_list <-
   add_reactevt(name_evt = "start",
                input = {
-                 for (cycle in 2:max_n_cycles) {
-                   new_event(list("cycle" = curtime + cycle))
-                 }
-                 
+                   new_event(list("cycle" = curtime + 1))
                }) %>%
   add_reactevt(name_evt = "cycle",
                input = {
@@ -179,6 +176,8 @@ evt_react_list <-
                  
                  if (max_n_cycles == cycle_time) {
                    curtime <- Inf #Indicate end of simulation for patient
+                 } else{
+                   new_event(list("cycle" = curtime + 1))
                  }
                }) 
 

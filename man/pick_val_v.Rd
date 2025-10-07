@@ -17,7 +17,7 @@ pick_val_v(
   sens_iterator = NULL,
   distributions = NULL,
   covariances = NULL,
-  deploy_env = FALSE
+  deploy_env = TRUE
 )
 }
 \arguments{
@@ -46,7 +46,7 @@ If NULL, it's assumed to be a vector of 1s of length equal to length(indicator)}
 
 \item{covariances}{List with length equal to length of base where the variance/covariances are stored (only relevant if multivariate normal are being used)}
 
-\item{deploy_env}{Boolean, if TRUE will deploy all objects in the environment where the function is called for. Must be active if using add_item2 (and FALSE if using add_item)}
+\item{deploy_env}{Boolean, if TRUE will deploy all objects in the environment where the function is called for. Must be active if using add_item (and FALSE if a list must be returned)}
 }
 \value{
 List used for the inputs
@@ -68,7 +68,8 @@ pick_val_v(base = list(0,0),
              indicator=list(1,2),
              indicator_sens_binary = FALSE,
              sens_iterator = 2,
-             distributions = list("rnorm","rnorm")
+             distributions = list("rnorm","rnorm"),
+             deploy_env = FALSE
 )
 
 pick_val_v(base = list(2,3,c(1,2)),
@@ -87,7 +88,8 @@ pick_val_v(base = list(2,3,c(1,2)),
              indicator_sens_binary = FALSE,
              sens_iterator = 4,
              distributions = list("rnorm","rnorm","mvrnorm"),
-             covariances = list(0.1,0.1,matrix(c(1,0.1,0.1,1),2,2))
+             covariances = list(0.1,0.1,matrix(c(1,0.1,0.1,1),2,2)),
+             deploy_env = FALSE
 )
  
 }
