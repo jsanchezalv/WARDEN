@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,16 +46,19 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>Basic Tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd.html">Sick-Sicker-Dead Model (SSD)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_constrained.html">Resource Constrained Sick-Sicker-Dead model</a></li>
     <li><a class="dropdown-item" href="../articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
+    <li><a class="dropdown-item" href="../articles/example_eBC.html">Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ipd.html">Using Individual Patient Data</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Tips</h6></li>
+    <li><a class="dropdown-item" href="../articles/example_markov.html">Cohort Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
-    <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul>
 </li>
@@ -78,7 +81,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">July 04, 2025</h4>
+            <h4 data-toc-skip class="date">October 07, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_avoiding_cycles.Rmd" class="external-link"><code>vignettes/articles/example_avoiding_cycles.Rmd</code></a></small>
       <div class="d-none name"><code>example_avoiding_cycles.Rmd</code></div>
@@ -146,24 +149,27 @@ time to event.</p>
 <p>Additionally, we have a multiplicative utility age adjustment factor,
 so at every yearly cycle we also adjust for that factor.</p>
 <p>Treatment costs are yearly as well, so we add them as an
-instantaneous cost at every cycle, including time 0. ## Inputs</p>
+instantaneous cost at every cycle, including time 0.</p>
+<div class="section level3">
+<h3 id="inputs">Inputs<a class="anchor" aria-label="anchor" href="#inputs"></a>
+</h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
+<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
 <span>  <span class="va">u_bs</span> <span class="op">&lt;-</span> <span class="fl">0.8</span></span>
 <span>  <span class="va">u_age</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="fl">0.5</span>, by <span class="op">=</span> <span class="fl">0.005</span><span class="op">)</span></span>
 <span>  <span class="va">bs_rate</span> <span class="op">&lt;-</span> <span class="fl">0.07</span></span>
 <span>  <span class="va">trt_eff</span> <span class="op">&lt;-</span> <span class="fl">0.02</span></span>
 <span><span class="op">}</span><span class="op">)</span>  </span>
 <span></span>
-<span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span></span>
+<span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span></span>
 <span>    <span class="va">bs_age</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">40</span>,<span class="fl">5</span><span class="op">)</span></span>
 <span>    <span class="va">time_cov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="fl">500</span></span>
 <span>    <span class="va">luck</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span> </span>
 <span></span>
 <span></span>
-<span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
+<span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
 <span>    <span class="va">cost_trt_ins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span>,<span class="fl">1000</span>,<span class="fl">500</span><span class="op">)</span></span>
 <span>    <span class="va">bs_rate</span> <span class="op">&lt;-</span> <span class="va">bs_rate</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span>,<span class="va">trt_eff</span>,<span class="fl">0</span><span class="op">)</span></span>
 <span>    <span class="va">bs_rate_f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">.time</span><span class="op">)</span><span class="op">{</span><span class="va">bs_rate</span> <span class="op">+</span> <span class="op">(</span><span class="va">time_cov</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="va">.time</span><span class="op">)</span><span class="op">)</span><span class="op">}</span></span>
@@ -193,7 +199,7 @@ instantaneous cost at every cycle, including time 0. ## Inputs</p>
 <span>                 <span class="co">#   curtime &lt;- Inf</span></span>
 <span>                 <span class="co"># }</span></span>
 <span>              </span>
-<span>              <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cycle <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>              <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>cycle <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span>                 </span>
 <span>              <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="va">u_bs</span> <span class="op">*</span> <span class="va">u_age</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fl">100</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="va">curtime</span> <span class="op">+</span> <span class="va">bs_age</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
 <span>              <span class="kw">if</span><span class="op">(</span><span class="va">curtime</span><span class="op">&lt;</span><span class="fl">5</span><span class="op">)</span><span class="op">{</span></span>
@@ -207,7 +213,7 @@ instantaneous cost at every cycle, including time 0. ## Inputs</p>
 <span>              </span>
 <span>              <span class="va">luck</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/luck_adj.html">luck_adj</a></span><span class="op">(</span>prevsurv <span class="op">=</span> <span class="va">prev_surv</span>, cursurv <span class="op">=</span> <span class="va">cur_surv</span>, luck <span class="op">=</span> <span class="va">luck</span>, condq <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>              <span class="va">ttdeath</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/qcond_exp.html">qcond_exp</a></span><span class="op">(</span><span class="va">luck</span>, rate <span class="op">=</span> <span class="va">new_rate</span><span class="op">)</span> <span class="op">+</span> <span class="va">curtime</span></span>
-<span>              <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>death <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">curtime</span>, <span class="va">ttdeath</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>              <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>death <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">curtime</span>, <span class="va">ttdeath</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span>               <span class="op">}</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"death"</span>,</span>
@@ -236,9 +242,11 @@ instantaneous cost at every cycle, including time 0. ## Inputs</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 13.01s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 13.01s</span></span>
-<span><span class="co">#&gt; Total time to run: 13.02s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 17.13s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 17.14s</span></span>
+<span><span class="co">#&gt; Total time to run: 17.14s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
+</div>
 <div class="section level3">
 <h3 id="summary-of-results">Summary of Results<a class="anchor" aria-label="anchor" href="#summary-of-results"></a>
 </h3>
@@ -250,17 +258,17 @@ instantaneous cost at every cycle, including time 0. ## Inputs</p>
 <span><span class="co">#&gt; qalys                6.87     5.74</span></span>
 <span><span class="co">#&gt; dqalys               0.00     1.13</span></span>
 <span><span class="co">#&gt; ICER                   NA  1131.35</span></span>
-<span><span class="co">#&gt; ICUR                   NA  1967.28</span></span>
-<span><span class="co">#&gt; INMB                   NA 54342.95</span></span>
+<span><span class="co">#&gt; ICUR                   NA  1967.29</span></span>
+<span><span class="co">#&gt; INMB                   NA 54342.84</span></span>
 <span><span class="co">#&gt; costs_undisc      4543.20  2188.30</span></span>
 <span><span class="co">#&gt; dcosts_undisc        0.00  2354.90</span></span>
 <span><span class="co">#&gt; lys_undisc          16.26    12.60</span></span>
 <span><span class="co">#&gt; dlys_undisc          0.00     3.65</span></span>
 <span><span class="co">#&gt; qalys_undisc         9.61     7.59</span></span>
 <span><span class="co">#&gt; dqalys_undisc        0.00     2.02</span></span>
-<span><span class="co">#&gt; ICER_undisc            NA   644.35</span></span>
-<span><span class="co">#&gt; ICUR_undisc            NA  1165.15</span></span>
-<span><span class="co">#&gt; INMB_undisc            NA 98700.85</span></span>
+<span><span class="co">#&gt; ICER_undisc            NA   644.34</span></span>
+<span><span class="co">#&gt; ICUR_undisc            NA  1165.14</span></span>
+<span><span class="co">#&gt; INMB_undisc            NA 98701.76</span></span>
 <span><span class="co">#&gt; cost_trt          4298.77  2073.04</span></span>
 <span><span class="co">#&gt; dcost_trt            0.00  2225.73</span></span>
 <span><span class="co">#&gt; cost_trt_undisc   4543.20  2188.30</span></span>
@@ -915,12 +923,16 @@ approach. Note however that undiscounted outcomes will not be correct
 (in this case we do not care about it, but we could just create another
 value like <code>other_q_default</code> where the <code>adj_val</code>
 is used with 0 discounting, and that value will be correct
-undiscounted).</p>
+undiscounted). The very small difference INMB comes from rounding
+effects.</p>
 <p>Treatment costs are yearly, so we just use the per cycle approach
-instead of instantaneous costs at every year. ## Inputs</p>
+instead of instantaneous costs at every year.</p>
+<div class="section level3">
+<h3 id="inputs-1">Inputs<a class="anchor" aria-label="anchor" href="#inputs-1"></a>
+</h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
+<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
 <span>  <span class="va">u_bs</span> <span class="op">&lt;-</span> <span class="fl">0.8</span></span>
 <span>  <span class="va">u_age</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="fl">0.5</span>, by <span class="op">=</span> <span class="fl">0.005</span><span class="op">)</span></span>
 <span>  <span class="va">bs_rate</span> <span class="op">&lt;-</span> <span class="fl">0.07</span></span>
@@ -932,14 +944,14 @@ instead of instantaneous costs at every year. ## Inputs</p>
 <span>  <span class="va">cost_trt_max_cycles</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
 <span><span class="op">}</span><span class="op">)</span>  </span>
 <span></span>
-<span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span></span>
+<span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span></span>
 <span>    <span class="va">bs_age</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">40</span>,<span class="fl">5</span><span class="op">)</span></span>
 <span>    <span class="va">time_cov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="fl">500</span></span>
 <span>    <span class="va">luck</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span> </span>
 <span></span>
 <span></span>
-<span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
+<span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
 <span>    <span class="va">cost_trt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span>,<span class="fl">1000</span>,<span class="fl">500</span><span class="op">)</span></span>
 <span>    <span class="va">bs_rate</span> <span class="op">&lt;-</span> <span class="va">bs_rate</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span>,<span class="va">trt_eff</span>,<span class="fl">0</span><span class="op">)</span></span>
 <span>    <span class="co">#rate is a function of time, with yearly changes</span></span>
@@ -952,7 +964,7 @@ instead of instantaneous costs at every year. ## Inputs</p>
 <span>  <span class="fu"><a href="../reference/add_tte.html">add_tte</a></span><span class="op">(</span>arm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>,<span class="st">"noint"</span><span class="op">)</span>, evts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"start"</span>,<span class="st">"death"</span><span class="op">)</span> ,input<span class="op">=</span><span class="op">{</span></span>
 <span>    <span class="va">start</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>    <span class="co">#we can immediately know what the final TTE will be even with time changing covariates</span></span>
-<span>    <span class="va">death</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/qtimecov.html">qtimecov</a></span><span class="op">(</span>luck <span class="op">=</span> <span class="va">luck</span>,a_fun <span class="op">=</span> <span class="va">bs_rate_f</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>    <span class="va">death</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/qtimecov.html">qtimecov</a></span><span class="op">(</span>luck <span class="op">=</span> <span class="va">luck</span>,a_fun <span class="op">=</span> <span class="va">bs_rate_f</span>,dist <span class="op">=</span> <span class="st">"exp"</span>, dt <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">$</span><span class="va">tte</span></span>
 <span>  <span class="op">}</span><span class="op">)</span></span>
 <span></span>
 <span></span>
@@ -964,7 +976,7 @@ instead of instantaneous costs at every year. ## Inputs</p>
 <span>                 <span class="co">#this is the way to obtain utility adjustment by age as a single value, it reweighs the u_age by their discounting value so final discounted outcomes are correct</span></span>
 <span>                 <span class="va">adj_factor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/adj_val.html">adj_val</a></span><span class="op">(</span></span>
 <span>                   <span class="va">curtime</span>,</span>
-<span>                   <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">cur_evtlist</span><span class="op">)</span>,</span>
+<span>                   <span class="fu"><a href="../reference/next_event.html">next_event</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">time</span>,</span>
 <span>                   by <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                   <span class="va">u_age</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fl">100</span>,<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="va">.time</span> <span class="op">+</span> <span class="va">bs_age</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>                   discount <span class="op">=</span> <span class="va">drq</span></span>
@@ -997,9 +1009,11 @@ instead of instantaneous costs at every year. ## Inputs</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 5.1s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 5.1s</span></span>
-<span><span class="co">#&gt; Total time to run: 5.1s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 4.6s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 4.6s</span></span>
+<span><span class="co">#&gt; Total time to run: 4.6s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
+</div>
 <div class="section level3">
 <h3 id="summary-of-results-1">Summary of Results<a class="anchor" aria-label="anchor" href="#summary-of-results-1"></a>
 </h3>
@@ -1011,17 +1025,17 @@ instead of instantaneous costs at every year. ## Inputs</p>
 <span><span class="co">#&gt; qalys                        6.87      5.74</span></span>
 <span><span class="co">#&gt; dqalys                       0.00      1.13</span></span>
 <span><span class="co">#&gt; ICER                           NA   1131.41</span></span>
-<span><span class="co">#&gt; ICUR                           NA   1967.36</span></span>
-<span><span class="co">#&gt; INMB                           NA  54340.61</span></span>
+<span><span class="co">#&gt; ICUR                           NA   1967.37</span></span>
+<span><span class="co">#&gt; INMB                           NA  54340.53</span></span>
 <span><span class="co">#&gt; costs_undisc              4543.20   2188.30</span></span>
 <span><span class="co">#&gt; dcosts_undisc                0.00   2354.90</span></span>
 <span><span class="co">#&gt; lys_undisc                  16.26     12.60</span></span>
 <span><span class="co">#&gt; dlys_undisc                  0.00      3.65</span></span>
 <span><span class="co">#&gt; qalys_undisc                 9.78      7.68</span></span>
 <span><span class="co">#&gt; dqalys_undisc                0.00      2.10</span></span>
-<span><span class="co">#&gt; ICER_undisc                    NA    644.82</span></span>
-<span><span class="co">#&gt; ICUR_undisc                    NA   1120.59</span></span>
-<span><span class="co">#&gt; INMB_undisc                    NA 102719.09</span></span>
+<span><span class="co">#&gt; ICER_undisc                    NA    644.83</span></span>
+<span><span class="co">#&gt; ICUR_undisc                    NA   1120.61</span></span>
+<span><span class="co">#&gt; INMB_undisc                    NA 102717.14</span></span>
 <span><span class="co">#&gt; cost_trt                  4298.77   2073.04</span></span>
 <span><span class="co">#&gt; dcost_trt                    0.00   2225.73</span></span>
 <span><span class="co">#&gt; cost_trt_cycle_l             2.00      2.00</span></span>

@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,16 +25,19 @@
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Basic Tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd.html">Sick-Sicker-Dead Model (SSD)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_constrained.html">Resource Constrained Sick-Sicker-Dead model</a></li>
     <li><a class="dropdown-item" href="../articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
+    <li><a class="dropdown-item" href="../articles/example_eBC.html">Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ipd.html">Using Individual Patient Data</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Tips</h6></li>
+    <li><a class="dropdown-item" href="../articles/example_markov.html">Cohort Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
-    <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jsanchezalv/WARDEN" aria-label="View on Github"><span class="fa fa-github"></span></a></li>
@@ -97,10 +100,10 @@ This feature is convenient when mixing distributions with different number of ar
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">pick_psa</span><span class="op">(</span><span class="va">params</span><span class="op">[[</span><span class="st">"dist"</span><span class="op">]</span><span class="op">]</span>,<span class="va">params</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>,<span class="va">params</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,<span class="va">params</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  2.329082  8.427780  8.204675 36.813719</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  1.675586 10.981649 49.775128 34.175660</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4334892</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.43065</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#It works with functions that require different number of parameters</span></span></span>
@@ -117,13 +120,13 @@ This feature is convenient when mixing distributions with different number of ar
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">pick_psa</span><span class="op">(</span><span class="va">params</span><span class="op">[[</span><span class="st">"dist"</span><span class="op">]</span><span class="op">]</span>,<span class="va">params</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>,<span class="va">params</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,<span class="va">params</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span>,<span class="va">params</span><span class="op">[[</span><span class="st">"c"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  3.260323  6.404853 26.019196 51.859890</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  3.709214  2.529025 25.594074 43.656966</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5129652</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.273049</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[3]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.282665</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.151862</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#Can be combined with multiple type of functions and distributions if parameters are well located</span></span></span>

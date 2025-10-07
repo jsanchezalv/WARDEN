@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,16 +46,19 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>Basic Tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd.html">Sick-Sicker-Dead Model (SSD)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_constrained.html">Resource Constrained Sick-Sicker-Dead model</a></li>
     <li><a class="dropdown-item" href="../articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
+    <li><a class="dropdown-item" href="../articles/example_eBC.html">Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ipd.html">Using Individual Patient Data</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Tips</h6></li>
+    <li><a class="dropdown-item" href="../articles/example_markov.html">Cohort Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
-    <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul>
 </li>
@@ -78,7 +81,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">July 04, 2025</h4>
+            <h4 data-toc-skip class="date">October 07, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_colon_degeling.Rmd" class="external-link"><code>vignettes/articles/example_colon_degeling.Rmd</code></a></small>
       <div class="d-none name"><code>example_colon_degeling.Rmd</code></div>
@@ -94,10 +97,11 @@ et al. (2025)</a> which use simmer in their original approach, to
 showcase how the same model would be written with WARDEN instead of
 using simmer, reflecting on the advantages and disadvantages of each
 approach.</p>
-<p>Note that the model used is not resource constrained, which implies
-WARDEN can be used to replicate the model. We will then see an
-alternative approach that could have been taken in the model design to
-simplify the code and reduce the number of events defined.</p>
+<p>Note that the model used is not resource constrained, so in WARDEN we
+would use with the <code>constrained = FALSE</code> argument (which is
+FALSE by default). We will then see an alternative approach that could
+have been taken in the model design to simplify the code and reduce the
+number of events defined.</p>
 <p>In this document I have made a few modifications to ensure the random
 numbers used are cloned for a patient across arms, that way we should be
 able to reduce the number of simulations needed to achieve
@@ -223,11 +227,9 @@ reactions, utilities/costs, etc. We’ll first replicate the deterministic
 analysis, and will then redo the inputs to use the probabilistic
 analysis, showcasing as well how <code>pick_val_v</code> function can be
 used to have everything done at once.</p>
-<p>Thanks to the new <code>add_item2</code>, the loading of the inputs
-is fundamentally the same.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
+<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
 <span>                      <span class="va">drc</span>         <span class="op">&lt;-</span> <span class="fl">0.04</span> </span>
 <span>                      <span class="va">drq</span>         <span class="op">&lt;-</span> <span class="fl">0.015</span></span>
 <span>                      <span class="va">p_highrisk</span>  <span class="op">&lt;-</span> <span class="fl">0.6</span></span>
@@ -306,7 +308,7 @@ is fundamentally the same.</p>
 <span></span>
 <span><span class="co">#Put objects here that do not change as we loop through treatments for a patient</span></span>
 <span><span class="co">#We preload the random numbers to clone them across arms for a given patient</span></span>
-<span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span></span>
+<span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span></span>
 <span>    <span class="va">HighRisk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">&lt;</span> <span class="va">p_highrisk</span><span class="op">)</span></span>
 <span>  </span>
 <span>    <span class="va">random_adv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
@@ -315,7 +317,7 @@ is fundamentally the same.</p>
 <span>    <span class="va">random_cure2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span> </span>
 <span></span>
-<span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
+<span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
 <span>    <span class="va">AdjuvantCycles</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>    <span class="va">MonitorCycles</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>    <span class="va">Toxicities</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
@@ -399,9 +401,9 @@ that interpretation here.</p>
 <span>  </span>
 <span>                   <span class="co">#we create new treatment cycle if possible, if not we call monitoring at end of cycle</span></span>
 <span>                   <span class="kw">if</span><span class="op">(</span><span class="va">AdjuvantCycles</span><span class="op">&lt;</span><span class="va">n_max_adjuvant_cycles</span><span class="op">)</span><span class="op">{</span></span>
-<span>                     <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>trt_cycle <span class="op">=</span> <span class="va">t_adjuvant_cycle</span> <span class="op">+</span> <span class="va">curtime</span><span class="op">)</span><span class="op">)</span></span>
+<span>                     <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>trt_cycle <span class="op">=</span> <span class="va">t_adjuvant_cycle</span> <span class="op">+</span> <span class="va">curtime</span><span class="op">)</span><span class="op">)</span></span>
 <span>                   <span class="op">}</span> <span class="kw">else</span><span class="op">{</span></span>
-<span>                     <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>monitor_cycle <span class="op">=</span> <span class="va">t_adjuvant_cycle</span> <span class="op">+</span> <span class="va">curtime</span><span class="op">)</span><span class="op">)</span></span>
+<span>                     <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>monitor_cycle <span class="op">=</span> <span class="va">t_adjuvant_cycle</span> <span class="op">+</span> <span class="va">curtime</span><span class="op">)</span><span class="op">)</span></span>
 <span>                   <span class="op">}</span></span>
 <span>                   </span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -412,12 +414,12 @@ that interpretation here.</p>
 <span>                 <span class="va">q_total</span> <span class="op">&lt;-</span> <span class="va">u_diseasefree</span></span>
 <span>                 </span>
 <span>                 <span class="kw">if</span><span class="op">(</span><span class="va">MonitorCycles</span><span class="op">&lt;</span><span class="va">n_max_monitor_cycles</span><span class="op">)</span><span class="op">{</span></span>
-<span>                  <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>monitor_cycle <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="va">t_monitor_cycle</span><span class="op">)</span><span class="op">)</span></span>
+<span>                  <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>monitor_cycle <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="va">t_monitor_cycle</span><span class="op">)</span><span class="op">)</span></span>
 <span>                 <span class="op">}</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"advanced"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>trt_cycle <span class="op">=</span> <span class="cn">Inf</span>, monitor_cycle <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> <span class="co">#remove the trt_cycle and monitor_cycle event</span></span>
+<span>                 <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>trt_cycle <span class="op">=</span> <span class="cn">Inf</span>, monitor_cycle <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> <span class="co">#remove the trt_cycle and monitor_cycle event</span></span>
 <span>                 </span>
 <span>                 <span class="co"># Sample TTD based on arm</span></span>
 <span>                <span class="kw">if</span><span class="op">(</span><span class="va">arm</span> <span class="op">==</span> <span class="st">"one"</span><span class="op">)</span> <span class="op">{</span></span>
@@ -433,8 +435,8 @@ that interpretation here.</p>
 <span>                <span class="op">}</span></span>
 <span>                <span class="va">final_TTD</span> <span class="op">&lt;-</span> <span class="va">TTD</span><span class="op">+</span><span class="va">curtime</span></span>
 <span>                <span class="co"># Check whether TTD is lower than BS, if not correct to BS.</span></span>
-<span>                 <span class="kw">if</span><span class="op">(</span><span class="va">cur_evtlist</span><span class="op">[[</span><span class="st">"death"</span><span class="op">]</span><span class="op">]</span> <span class="op">&gt;</span> <span class="va">final_TTD</span><span class="op">)</span><span class="op">{</span></span>
-<span>                   <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>death <span class="op">=</span> <span class="va">final_TTD</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                 <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="../reference/get_event.html">get_event</a></span><span class="op">(</span><span class="st">"death"</span><span class="op">)</span> <span class="op">&gt;</span> <span class="va">final_TTD</span><span class="op">)</span><span class="op">{</span></span>
+<span>                   <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>death <span class="op">=</span> <span class="va">final_TTD</span><span class="op">)</span><span class="op">)</span> </span>
 <span>                 <span class="op">}</span></span>
 <span>                <span class="va">q_total</span> <span class="op">&lt;-</span> <span class="va">u_advanced</span></span>
 <span>                <span class="va">cost_advanced</span> <span class="op">&lt;-</span> <span class="va">c_advanced</span></span>
@@ -482,9 +484,10 @@ results.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 11.55s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 11.55s</span></span>
-<span><span class="co">#&gt; Total time to run: 11.55s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 14.86s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 14.86s</span></span>
+<span><span class="co">#&gt; Total time to run: 14.87s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -1212,7 +1215,7 @@ through each of the cycles.</p>
 running speed (roughly twice as fast) while providing the same model
 structure.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">unique_pt_inputs2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">unique_pt_inputs2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
 <span>    <span class="va">n_tox</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>    <span class="va">q_total</span> <span class="op">&lt;-</span> <span class="va">u_adjuvant</span></span>
 <span>    <span class="va">p_toxicity</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span> <span class="op">==</span> <span class="st">"one"</span><span class="op">)</span> <span class="op">{</span><span class="va">p_tox_1</span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span><span class="va">p_tox_2</span><span class="op">}</span></span>
@@ -1284,7 +1287,7 @@ structure.</p>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"start"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
 <span>                  <span class="co">#how many toxic events will we have?</span></span>
-<span>                   <span class="va">n_cycles_tobedone</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">cur_evtlist</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%/%</a></span> <span class="va">t_adjuvant_cycle</span><span class="op">)</span></span>
+<span>                   <span class="va">n_cycles_tobedone</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fu"><a href="../reference/next_event.html">next_event</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">event_time</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%/%</a></span> <span class="va">t_adjuvant_cycle</span><span class="op">)</span></span>
 <span>                   <span class="va">n_tox</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">n_cycles_tobedone</span> <span class="op">==</span><span class="fl">0</span>, <span class="fl">0</span>,<span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">random_tox</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n_cycles_tobedone</span><span class="op">]</span> <span class="op">&lt;</span> <span class="va">p_toxicity</span><span class="op">)</span><span class="op">)</span></span>
 <span>                   <span class="co">#calculate the proportion out of maximum possible</span></span>
 <span>                   <span class="va">prop_tox</span> <span class="op">&lt;-</span> <span class="va">n_tox</span><span class="op">/</span><span class="op">(</span><span class="va">n_cycles_tobedone</span><span class="op">)</span></span>
@@ -1328,8 +1331,8 @@ structure.</p>
 <span>                <span class="op">}</span></span>
 <span>                <span class="va">final_TTD</span> <span class="op">&lt;-</span> <span class="va">TTD</span><span class="op">+</span><span class="va">curtime</span></span>
 <span>                <span class="co"># Check whether TTD is lower than BS, if not correct to BS.</span></span>
-<span>                 <span class="kw">if</span><span class="op">(</span><span class="va">cur_evtlist</span><span class="op">[[</span><span class="st">"death"</span><span class="op">]</span><span class="op">]</span> <span class="op">&gt;</span> <span class="va">final_TTD</span><span class="op">)</span><span class="op">{</span></span>
-<span>                   <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>death <span class="op">=</span> <span class="va">final_TTD</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                 <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="../reference/get_event.html">get_event</a></span><span class="op">(</span><span class="st">"death"</span><span class="op">)</span> <span class="op">&gt;</span> <span class="va">final_TTD</span><span class="op">)</span><span class="op">{</span></span>
+<span>                   <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>death <span class="op">=</span> <span class="va">final_TTD</span><span class="op">)</span><span class="op">)</span> </span>
 <span>                 <span class="op">}</span></span>
 <span>                 </span>
 <span>                 <span class="va">cost_advanced</span> <span class="op">&lt;-</span> <span class="va">c_advanced</span></span>
@@ -1365,9 +1368,10 @@ structure.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 5.85s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 5.85s</span></span>
-<span><span class="co">#&gt; Total time to run: 5.85s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 6.52s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 6.52s</span></span>
+<span><span class="co">#&gt; Total time to run: 6.52s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="summary-of-results">Summary of Results<a class="anchor" aria-label="anchor" href="#summary-of-results"></a>
 </h3>
@@ -1385,31 +1389,31 @@ differences between simulations seem relatively large, in reality with
 the cloning random numbers approach it can be seen that the ICER remains
 within 2% of the final value already after 10,000 simulations.</p>
 <p>The running times with the original WARDEN approach are comparable to
-those of simmer shown by the paper, even if simmer uses a C++
+those of simmer shown by the paper, even if simmer uses a complex C++
 implementation in the back-end. By using the reworked approach, WARDEN
 is able to cut running time by half. In my computer simmer took between
 220 and 300 seconds to run 100,000 simulations. With WARDEN, the “one to
 one” approach took around 200 seconds. The reworked approach took 100
 seconds.</p>
 <pre><code><span><span class="co">#&gt;                                    one       two</span></span>
-<span><span class="co">#&gt; costs                         76967.45 170607.42</span></span>
-<span><span class="co">#&gt; dcosts                        93639.97      0.00</span></span>
+<span><span class="co">#&gt; costs                         76971.21 170610.19</span></span>
+<span><span class="co">#&gt; dcosts                        93638.98      0.00</span></span>
 <span><span class="co">#&gt; lys                               8.41     10.74</span></span>
 <span><span class="co">#&gt; dlys                              2.33      0.00</span></span>
 <span><span class="co">#&gt; qalys                             6.41      8.35</span></span>
 <span><span class="co">#&gt; dqalys                            1.94      0.00</span></span>
-<span><span class="co">#&gt; ICER                          40207.79        NA</span></span>
-<span><span class="co">#&gt; ICUR                          48324.01        NA</span></span>
-<span><span class="co">#&gt; INMB                           3247.65        NA</span></span>
-<span><span class="co">#&gt; costs_undisc                  79128.05 173593.84</span></span>
-<span><span class="co">#&gt; dcosts_undisc                 94465.79      0.00</span></span>
+<span><span class="co">#&gt; ICER                          40207.36        NA</span></span>
+<span><span class="co">#&gt; ICUR                          48323.43        NA</span></span>
+<span><span class="co">#&gt; INMB                           3248.79        NA</span></span>
+<span><span class="co">#&gt; costs_undisc                  79131.80 173596.60</span></span>
+<span><span class="co">#&gt; dcosts_undisc                 94464.80      0.00</span></span>
 <span><span class="co">#&gt; lys_undisc                        9.86     12.78</span></span>
 <span><span class="co">#&gt; dlys_undisc                       2.92      0.00</span></span>
 <span><span class="co">#&gt; qalys_undisc                      7.55      9.97</span></span>
 <span><span class="co">#&gt; dqalys_undisc                     2.42      0.00</span></span>
-<span><span class="co">#&gt; ICER_undisc                   32355.01        NA</span></span>
-<span><span class="co">#&gt; ICUR_undisc                   39076.12        NA</span></span>
-<span><span class="co">#&gt; INMB_undisc                   26408.28        NA</span></span>
+<span><span class="co">#&gt; ICER_undisc                   32354.67        NA</span></span>
+<span><span class="co">#&gt; ICUR_undisc                   39075.66        NA</span></span>
+<span><span class="co">#&gt; INMB_undisc                   26409.41        NA</span></span>
 <span><span class="co">#&gt; cost_adj                      45641.06 140680.89</span></span>
 <span><span class="co">#&gt; dcost_adj                     95039.83      0.00</span></span>
 <span><span class="co">#&gt; cost_adj_cycle_l                  0.20      0.19</span></span>
@@ -1434,18 +1438,18 @@ seconds.</p>
 <span><span class="co">#&gt; dcost_monitor_max_cycles         -0.38      0.00</span></span>
 <span><span class="co">#&gt; cost_monitor_undisc            2387.80   3017.60</span></span>
 <span><span class="co">#&gt; dcost_monitor_undisc            629.80      0.00</span></span>
-<span><span class="co">#&gt; cost_tox                       3673.27   7520.52</span></span>
-<span><span class="co">#&gt; dcost_tox                      3847.25      0.00</span></span>
+<span><span class="co">#&gt; cost_tox                       3677.03   7523.29</span></span>
+<span><span class="co">#&gt; dcost_tox                      3846.26      0.00</span></span>
 <span><span class="co">#&gt; cost_tox_cycle_l                  0.20      0.19</span></span>
 <span><span class="co">#&gt; dcost_tox_cycle_l                 0.00      0.00</span></span>
 <span><span class="co">#&gt; cost_tox_cycle_starttime          0.00      0.00</span></span>
 <span><span class="co">#&gt; dcost_tox_cycle_starttime         0.00      0.00</span></span>
 <span><span class="co">#&gt; cost_tox_max_cycles              34.36     33.60</span></span>
 <span><span class="co">#&gt; dcost_tox_max_cycles             -0.76      0.00</span></span>
-<span><span class="co">#&gt; cost_tox_undisc                3709.25   7595.24</span></span>
-<span><span class="co">#&gt; dcost_tox_undisc               3885.99      0.00</span></span>
-<span><span class="co">#&gt; n_tox                             1.81      3.74</span></span>
-<span><span class="co">#&gt; dn_tox                            1.93      0.00</span></span>
+<span><span class="co">#&gt; cost_tox_undisc                3713.00   7598.00</span></span>
+<span><span class="co">#&gt; dcost_tox_undisc               3885.00      0.00</span></span>
+<span><span class="co">#&gt; n_tox                             2.01      4.01</span></span>
+<span><span class="co">#&gt; dn_tox                            2.00      0.00</span></span>
 <span><span class="co">#&gt; q_total                           6.41      8.35</span></span>
 <span><span class="co">#&gt; dq_total                          1.94      0.00</span></span>
 <span><span class="co">#&gt; q_total_undisc                    7.55      9.97</span></span>
@@ -2580,7 +2584,7 @@ this, and will not run it for the sake of saving computation time.</p>
 <span>                 psa_indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span></span>
 <span>                 <span class="op">)</span></span>
 <span></span>
-<span><span class="va">common_all_inputs2</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item2.html">add_item2</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
+<span><span class="va">common_all_inputs2</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
 <span> </span>
 <span>                      <span class="va">drc</span>         <span class="op">&lt;-</span> <span class="fl">0.04</span> </span>
 <span>                      <span class="va">drq</span>         <span class="op">&lt;-</span> <span class="fl">0.015</span></span>
@@ -2666,41 +2670,36 @@ this, and will not run it for the sake of saving computation time.</p>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span> <span class="co">#for github pages to work, could be set to min(future::availableCores(omit=1),4)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
-<span><span class="co">#&gt; Loading required package: foreach</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'foreach'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:purrr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     accumulate, when</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Data aggregated across events and patients by selecting the last value for input_out numeric items and then averaging across patients. Only last value of non-numeric and length &gt; 1 items in simulation is displayed.</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 7.05s</span></span>
-<span><span class="co">#&gt; Total time to run: 7.05s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 7.48s</span></span>
+<span><span class="co">#&gt; Total time to run: 7.48s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span>
 <span>  </span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results_psa</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, arm <span class="op">=</span><span class="st">"two"</span><span class="op">)</span> </span>
 <span><span class="co">#&gt;                                                    one</span></span>
-<span><span class="co">#&gt; costs                          75,130 (72,426; 76,654)</span></span>
-<span><span class="co">#&gt; dcosts                         91,914 (88,231; 94,069)</span></span>
+<span><span class="co">#&gt; costs                          75,121 (72,414; 76,651)</span></span>
+<span><span class="co">#&gt; dcosts                         91,912 (88,244; 94,067)</span></span>
 <span><span class="co">#&gt; lys                                  8.48 (7.56; 9.24)</span></span>
 <span><span class="co">#&gt; dlys                                 2.21 (1.22; 3.71)</span></span>
 <span><span class="co">#&gt; qalys                                6.53 (5.69; 7.19)</span></span>
 <span><span class="co">#&gt; dqalys                               1.83 (1.02; 2.99)</span></span>
-<span><span class="co">#&gt; ICER                           47,480 (23,797; 76,117)</span></span>
-<span><span class="co">#&gt; ICUR                           57,359 (29,515; 91,430)</span></span>
-<span><span class="co">#&gt; INMB                            -628 (-42,129; 61,235)</span></span>
-<span><span class="co">#&gt; costs_undisc                   77,315 (74,305; 79,047)</span></span>
-<span><span class="co">#&gt; dcosts_undisc                  92,708 (88,590; 95,131)</span></span>
+<span><span class="co">#&gt; ICER                           47,479 (23,800; 76,118)</span></span>
+<span><span class="co">#&gt; ICUR                           57,357 (29,520; 91,432)</span></span>
+<span><span class="co">#&gt; INMB                            -627 (-42,131; 61,219)</span></span>
+<span><span class="co">#&gt; costs_undisc                   77,307 (74,294; 79,044)</span></span>
+<span><span class="co">#&gt; dcosts_undisc                  92,706 (88,603; 95,129)</span></span>
 <span><span class="co">#&gt; lys_undisc                            9.95 (8.8; 10.9)</span></span>
 <span><span class="co">#&gt; dlys_undisc                          2.78 (1.54; 4.67)</span></span>
 <span><span class="co">#&gt; qalys_undisc                         7.69 (6.65; 8.52)</span></span>
 <span><span class="co">#&gt; dqalys_undisc                        2.28 (1.27; 3.75)</span></span>
-<span><span class="co">#&gt; ICER_undisc                    38,238 (18,990; 60,959)</span></span>
-<span><span class="co">#&gt; ICUR_undisc                    46,395 (23,637; 73,645)</span></span>
-<span><span class="co">#&gt; INMB_undisc                   21,248 (-30,157; 98,810)</span></span>
+<span><span class="co">#&gt; ICER_undisc                    38,237 (18,992; 60,960)</span></span>
+<span><span class="co">#&gt; ICUR_undisc                    46,393 (23,640; 73,647)</span></span>
+<span><span class="co">#&gt; INMB_undisc                   21,250 (-30,159; 98,795)</span></span>
 <span><span class="co">#&gt; cost_adj                       46,079 (45,526; 46,724)</span></span>
 <span><span class="co">#&gt; dcost_adj                      95,023 (93,947; 96,982)</span></span>
 <span><span class="co">#&gt; cost_adj_cycle_l                       0.2 (0.19; 0.2)</span></span>
@@ -2725,22 +2724,22 @@ this, and will not run it for the sake of saving computation time.</p>
 <span><span class="co">#&gt; dcost_monitor_max_cycles        -0.389 (-0.915; -0.13)</span></span>
 <span><span class="co">#&gt; cost_monitor_undisc               2,475 (2,337; 2,588)</span></span>
 <span><span class="co">#&gt; dcost_monitor_undisc                    556 (360; 801)</span></span>
-<span><span class="co">#&gt; cost_tox                          2,020 (1,766; 2,273)</span></span>
-<span><span class="co">#&gt; dcost_tox                         1,686 (1,405; 1,999)</span></span>
+<span><span class="co">#&gt; cost_tox                          2,012 (1,764; 2,252)</span></span>
+<span><span class="co">#&gt; dcost_tox                         1,685 (1,406; 2,013)</span></span>
 <span><span class="co">#&gt; cost_tox_cycle_l                       0.2 (0.19; 0.2)</span></span>
 <span><span class="co">#&gt; dcost_tox_cycle_l              -0.004 (-0.011; -0.001)</span></span>
 <span><span class="co">#&gt; cost_tox_cycle_starttime                      0 (0; 0)</span></span>
 <span><span class="co">#&gt; dcost_tox_cycle_starttime                     0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_tox_max_cycles                  34.4 (33.6; 34.9)</span></span>
 <span><span class="co">#&gt; dcost_tox_max_cycles             -0.778 (-1.83; -0.26)</span></span>
-<span><span class="co">#&gt; cost_tox_undisc                   2,040 (1,784; 2,295)</span></span>
-<span><span class="co">#&gt; dcost_tox_undisc                  1,703 (1,419; 2,019)</span></span>
+<span><span class="co">#&gt; cost_tox_undisc                   2,032 (1,782; 2,274)</span></span>
+<span><span class="co">#&gt; dcost_tox_undisc                  1,702 (1,420; 2,033)</span></span>
 <span><span class="co">#&gt; q_total                              6.53 (5.69; 7.19)</span></span>
 <span><span class="co">#&gt; dq_total                             1.83 (1.02; 2.99)</span></span>
 <span><span class="co">#&gt; q_total_undisc                       7.69 (6.65; 8.52)</span></span>
 <span><span class="co">#&gt; dq_total_undisc                      2.28 (1.27; 3.75)</span></span>
 <span><span class="co">#&gt;                                                      two</span></span>
-<span><span class="co">#&gt; costs                         167,043 (164,884; 169,759)</span></span>
+<span><span class="co">#&gt; costs                         167,033 (164,895; 169,735)</span></span>
 <span><span class="co">#&gt; dcosts                                          0 (0; 0)</span></span>
 <span><span class="co">#&gt; lys                                    10.7 (10.1; 11.3)</span></span>
 <span><span class="co">#&gt; dlys                                            0 (0; 0)</span></span>
@@ -2749,7 +2748,7 @@ this, and will not run it for the sake of saving computation time.</p>
 <span><span class="co">#&gt; ICER                                        NaN (NA; NA)</span></span>
 <span><span class="co">#&gt; ICUR                                        NaN (NA; NA)</span></span>
 <span><span class="co">#&gt; INMB                                        NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; costs_undisc                  170,023 (167,637; 172,942)</span></span>
+<span><span class="co">#&gt; costs_undisc                  170,013 (167,647; 172,918)</span></span>
 <span><span class="co">#&gt; dcosts_undisc                                   0 (0; 0)</span></span>
 <span><span class="co">#&gt; lys_undisc                             12.7 (11.9; 13.5)</span></span>
 <span><span class="co">#&gt; dlys_undisc                                     0 (0; 0)</span></span>
@@ -2782,7 +2781,7 @@ this, and will not run it for the sake of saving computation time.</p>
 <span><span class="co">#&gt; dcost_monitor_max_cycles                        0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_monitor_undisc                 3,030 (2,937; 3,141)</span></span>
 <span><span class="co">#&gt; dcost_monitor_undisc                            0 (0; 0)</span></span>
-<span><span class="co">#&gt; cost_tox                            3,706 (3,605; 4,003)</span></span>
+<span><span class="co">#&gt; cost_tox                            3,697 (3,582; 4,013)</span></span>
 <span><span class="co">#&gt; dcost_tox                                       0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_tox_cycle_l                        0.19 (0.19; 0.2)</span></span>
 <span><span class="co">#&gt; dcost_tox_cycle_l                               0 (0; 0)</span></span>
@@ -2790,7 +2789,7 @@ this, and will not run it for the sake of saving computation time.</p>
 <span><span class="co">#&gt; dcost_tox_cycle_starttime                       0 (0; 0)</span></span>
 <span><span class="co">#&gt; cost_tox_max_cycles                      33.6 (33; 34.2)</span></span>
 <span><span class="co">#&gt; dcost_tox_max_cycles                            0 (0; 0)</span></span>
-<span><span class="co">#&gt; cost_tox_undisc                     3,743 (3,641; 4,042)</span></span>
+<span><span class="co">#&gt; cost_tox_undisc                     3,733 (3,618; 4,053)</span></span>
 <span><span class="co">#&gt; dcost_tox_undisc                                0 (0; 0)</span></span>
 <span><span class="co">#&gt; q_total                                8.35 (7.96; 8.74)</span></span>
 <span><span class="co">#&gt; dq_total                                        0 (0; 0)</span></span>

@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,16 +46,19 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>Basic Tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd.html">Sick-Sicker-Dead Model (SSD)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_constrained.html">Resource Constrained Sick-Sicker-Dead model</a></li>
     <li><a class="dropdown-item" href="../articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
+    <li><a class="dropdown-item" href="../articles/example_eBC.html">Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ipd.html">Using Individual Patient Data</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Tips</h6></li>
+    <li><a class="dropdown-item" href="../articles/example_markov.html">Cohort Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
-    <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul>
 </li>
@@ -78,7 +81,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">July 04, 2025</h4>
+            <h4 data-toc-skip class="date">October 07, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_markov.Rmd" class="external-link"><code>vignettes/articles/example_markov.Rmd</code></a></small>
       <div class="d-none name"><code>example_markov.Rmd</code></div>
@@ -278,10 +281,7 @@ post-processing to be adequate).</p>
 <span><span class="va">evt_react_list</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"start"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="kw">for</span> <span class="op">(</span><span class="va">cycle</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="va">max_n_cycles</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                   <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"cycle"</span> <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="va">cycle</span><span class="op">)</span><span class="op">)</span></span>
-<span>                 <span class="op">}</span></span>
-<span>                 </span>
+<span>                   <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"cycle"</span> <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"cycle"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
@@ -298,6 +298,8 @@ post-processing to be adequate).</p>
 <span>                 </span>
 <span>                 <span class="kw">if</span> <span class="op">(</span><span class="va">max_n_cycles</span> <span class="op">==</span> <span class="va">cycle_time</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                   <span class="va">curtime</span> <span class="op">&lt;-</span> <span class="cn">Inf</span> <span class="co">#Indicate end of simulation for patient</span></span>
+<span>                 <span class="op">}</span> <span class="kw">else</span><span class="op">{</span></span>
+<span>                   <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"cycle"</span> <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span>                 <span class="op">}</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> </span></code></pre></div>
 </div>
@@ -367,9 +369,10 @@ to indicate <code>npats = 1</code>.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.06s</span></span>
-<span><span class="co">#&gt; Total time to run: 0.06s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.07s</span></span>
+<span><span class="co">#&gt; Total time to run: 0.08s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

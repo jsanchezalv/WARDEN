@@ -7,13 +7,14 @@ articles:
   articles/example_eBC: example_eBC.html
   articles/example_ipd: example_ipd.html
   articles/example_markov: example_markov.html
+  articles/example_ssd_constrained: example_ssd_constrained.html
   articles/example_ssd_sobol: example_ssd_sobol.html
   articles/example_ssd_stream: example_ssd_stream.html
   example_ssd: example_ssd.html
   articles/example_uncertainty: example_uncertainty.html
   articles/inputs_selector: inputs_selector.html
   articles/warden_explained: warden_explained.html
-last_built: 2025-07-04T15:28Z
+last_built: 2025-10-07T14:14Z
 urls:
   reference: https://jsanchezalv.github.io/WARDEN/reference
   article: https://jsanchezalv.github.io/WARDEN/articles

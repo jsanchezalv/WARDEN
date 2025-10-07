@@ -16,8 +16,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Workflows for Health Technology Assessments in R using Discrete EveNts">
-<meta name="description" content="Toolkit to support and perform discrete event simulations without resource constraints in the context of health technology assessments (HTA). The package focuses on cost-effectiveness modelling and aims to be submission-ready to relevant HTA bodies in alignment with NICE TSD 15 &lt;https://www.sheffield.ac.uk/nice-dsu/tsds/patient-level-simulation&gt;. More details an examples can be found in the package website &lt;https://jsanchezalv.github.io/WARDEN/&gt;.">
-<meta property="og:description" content="Toolkit to support and perform discrete event simulations without resource constraints in the context of health technology assessments (HTA). The package focuses on cost-effectiveness modelling and aims to be submission-ready to relevant HTA bodies in alignment with NICE TSD 15 &lt;https://www.sheffield.ac.uk/nice-dsu/tsds/patient-level-simulation&gt;. More details an examples can be found in the package website &lt;https://jsanchezalv.github.io/WARDEN/&gt;.">
+<meta name="description" content="Toolkit to support and perform discrete event simulations with and without resource constraints in the context of health technology assessments (HTA). The package focuses on cost-effectiveness modelling and aims to be submission-ready to relevant HTA bodies in alignment with NICE TSD 15 &lt;https://sheffield.ac.uk/nice-dsu/tsds/patient-level-simulation&gt;. More details an examples can be found in the package website &lt;https://jsanchezalv.github.io/WARDEN/&gt;.">
+<meta property="og:description" content="Toolkit to support and perform discrete event simulations with and without resource constraints in the context of health technology assessments (HTA). The package focuses on cost-effectiveness modelling and aims to be submission-ready to relevant HTA bodies in alignment with NICE TSD 15 &lt;https://sheffield.ac.uk/nice-dsu/tsds/patient-level-simulation&gt;. More details an examples can be found in the package website &lt;https://jsanchezalv.github.io/WARDEN/&gt;.">
 <meta property="og:image" content="https://jsanchezalv.github.io/WARDEN/logo.png">
 <!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZEDNGW5QRP"></script><script>
   window.dataLayer = window.dataLayer || [];
@@ -35,7 +35,7 @@
 
     <a class="navbar-brand me-2" href="index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,16 +49,19 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/warden_explained.html">Warden Explained</a></li>
-    <li><a class="dropdown-item" href="articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>Basic Tutorials</h6></li>
+    <li><a class="dropdown-item" href="articles/warden_explained.html">Warden Explained</a></li>
+    <li><a class="dropdown-item" href="articles/example_ssd.html">Sick-Sicker-Dead Model (SSD)</a></li>
+    <li><a class="dropdown-item" href="articles/example_ssd_constrained.html">Resource Constrained Sick-Sicker-Dead model</a></li>
     <li><a class="dropdown-item" href="articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
+    <li><a class="dropdown-item" href="articles/example_eBC.html">Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="articles/example_ipd.html">Using Individual Patient Data</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Tips</h6></li>
+    <li><a class="dropdown-item" href="articles/example_markov.html">Cohort Markov Model</a></li>
     <li><a class="dropdown-item" href="articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
-    <li><a class="dropdown-item" href="articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
-    <li><a class="dropdown-item" href="articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
-    <li><a class="dropdown-item" href="articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="articles/example_markov.html">Example in a Markov Model</a></li>
     <li><a class="dropdown-item" href="articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
-    <li><a class="dropdown-item" href="articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
+    <li><a class="dropdown-item" href="articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
     <li><a class="dropdown-item" href="articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul>
 </li>
@@ -80,17 +83,18 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><code>WARDEN</code> is a user-friendly package that facilitates the use of discrete event simulations without resource constraints for cost-effectiveness analysis. The package supports a flexible, transparent, practical approach to discrete event simulation while keeping an acceptable performance.</p>
+<p><code>WARDEN</code> is a user-friendly package that facilitates the use of discrete event simulations with or without resource constraints for cost-effectiveness analysis. The package supports a flexible, transparent, practical approach to discrete event simulation while keeping an acceptable performance.</p>
 <p>The current version supports:</p>
 <ul>
 <li>Discrete event simulation models, Markov/semi-Markov models and hybrid models using parallel and non-parallel engines</li>
+<li>Constrained and unconstrained models (with or without interactivity between patients)</li>
 <li>Seamlessly integrating data.frames and other objects into the model</li>
 <li>Delayed execution of the main inputs to facilitate readability of the model</li>
 <li>Implementation of structural and parameter uncertainty</li>
 <li>Helper functions to facilitate drawing of time to events and the use of hazard ratios, as well as other functions to facilitate transparency</li>
 <li>Performing cost-effectiveness and uncertainty analysis</li>
 </ul>
-<p>It is recommended that the user checks the vignettes, first the simple <a href="https://jsanchezalv.github.io/WARDEN/articles/example_ssd.html">Sick-Sicker-Dead model</a> and then the more complex model for <a href="https://jsanchezalv.github.io/WARDEN/articles/example_eBC.html">early breast cancer</a>. The <a href="https://jsanchezalv.github.io/WARDEN/articles/example_markov.html">markov</a> example shows how to run a cohort Markov model while using the same modeling framework. Similarly, a simulation based Markov model could be run. Structural and parametric uncertainty are explored in the <a href="https://jsanchezalv.github.io/WARDEN/articles/example_uncertainty.html">corresponding vignette</a>. The <a href="https://jsanchezalv.github.io/WARDEN/articles/example_ipd.html">IPD vignette</a> shows how WARDEN can be used when individual patient data is available.</p>
+<p>It is recommended that the user checks the vignettes, first the simple <a href="https://jsanchezalv.github.io/WARDEN/articles/example_ssd.html">Sick-Sicker-Dead model</a> and then the more complex model for <a href="https://jsanchezalv.github.io/WARDEN/articles/example_eBC.html">early breast cancer</a>. The <a href="https://jsanchezalv.github.io/WARDEN/articles/example_markov.html">markov</a> example shows how to run a cohort Markov model while using the same modeling framework. Similarly, a simulation based Markov model could be run. Structural and parametric uncertainty are explored in the <a href="https://jsanchezalv.github.io/WARDEN/articles/example_uncertainty.html">corresponding vignette</a>. The <a href="https://jsanchezalv.github.io/WARDEN/articles/example_ipd.html">IPD vignette</a> shows how WARDEN can be used when individual patient data is available. It is also suggested to check the constrained resources DES example on the website.</p>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>

@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,16 +46,19 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>Basic Tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd.html">Sick-Sicker-Dead Model (SSD)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_constrained.html">Resource Constrained Sick-Sicker-Dead model</a></li>
     <li><a class="dropdown-item" href="../articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
+    <li><a class="dropdown-item" href="../articles/example_eBC.html">Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ipd.html">Using Individual Patient Data</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Tips</h6></li>
+    <li><a class="dropdown-item" href="../articles/example_markov.html">Cohort Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
-    <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul>
 </li>
@@ -78,7 +81,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">July 04, 2025</h4>
+            <h4 data-toc-skip class="date">October 07, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/warden_explained.Rmd" class="external-link"><code>vignettes/articles/warden_explained.Rmd</code></a></small>
       <div class="d-none name"><code>warden_explained.Rmd</code></div>
@@ -98,8 +101,7 @@ rationale for certain design decisions.</p>
 <p>WARDEN main simulation engine at its core is nothing but a nested
 loop at different levels. However, for this to work we need to delay the
 execution of the inputs provided by the user, so the relevant inputs
-provided through <code>add_tte</code>,
-<code>add_item</code>/<code>add_item2</code> and
+provided through <code>add_tte</code>, <code>add_item</code> and
 <code>add_reactevt</code> are substituted for delayed execution and
 stored as lists.</p>
 <ol style="list-style-type: decimal">
@@ -163,61 +165,20 @@ that the starting seed is cloned for a patient across interventions.
 However, it could be that conditional statements can alter the random
 state of R if they conditional trigger random expressions (e.g.,
 <code>if(arm==2){runif(1)}else{5}</code>) that change per intervention.
-To keep the random number cloned as intended, it’s recommended to
-pre-draw random numbers for each type of random object used and use
-those (see the
+To keep the random number cloned as intended, it’s very strongly
+recommended to pre-draw random numbers for each type of random object
+used and use those (see the
 <code>Example for a Sick-Sicker-Dead model - Random Number Streams &amp; Luck Adjustment</code>
 vignette for more information). WARDEN uses L’Ecuyer-CMRG random number
 generator.</p>
-<p>The way WARDEN processes events through e.g.,
-<code>modify_item</code> is by looking at what inputs are currently
-available from the relevant input list, evaluating the passed list
-(e.g., <code>modify_item_seq(list(a = 1, b = a + 1))</code>) and adding
-the resulting objects (<code>a</code> and <code>b</code>) to the parent
-environment as well as to the relevant input list for storage. With the
-latest update of WARDEN, objects not included in
-<code>modify_item</code> will be stored in the relevant input list and
-they will be available for evaluation, e.g.,</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">add_reactevt</span>(<span class="at">name_evt =</span> <span class="st">"event_1"</span>, <span class="at">input =</span> {</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  z <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="co">#this will be stored in the main input list, and will be available in the next event reaction! </span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  </span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  <span class="fu">modify_item_seq</span>(<span class="fu">list</span>(<span class="at">a =</span> <span class="dv">1</span>, <span class="at">b =</span> z <span class="sc">+</span> <span class="dv">1</span>, <span class="at">z =</span> z)) <span class="co">#this will work, because z is available</span></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  </span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  c <span class="ot">&lt;-</span> b <span class="sc">+</span> <span class="dv">5</span> </span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>}</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#The above expression is equivalent to writing:</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="fu">add_reactevt</span>(<span class="at">name_evt =</span> <span class="st">"event_1"</span>, <span class="at">input =</span> {</span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>  z <span class="ot">&lt;-</span> <span class="dv">2</span> </span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>  a <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>  b <span class="ot">&lt;-</span> z <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>  <span class="fu">modify_item</span>(<span class="fu">list</span>(<span class="at">a =</span> a, <span class="at">b =</span> b, <span class="at">z =</span> z)) </span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>  </span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>  c <span class="ot">&lt;-</span> b <span class="sc">+</span> <span class="dv">5</span> <span class="co">#b will be available </span></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>}</span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#As well as</span></span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="fu">add_reactevt</span>(<span class="at">name_evt =</span> <span class="st">"event_1"</span>, <span class="at">input =</span> {</span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>  <span class="fu">modify_item_seq</span>(<span class="fu">list</span>(<span class="at">a =</span> <span class="dv">1</span>, <span class="at">z =</span> <span class="dv">2</span>, <span class="at">b =</span> z <span class="sc">+</span> <span class="dv">1</span>))  <span class="co">#modify_item_seq evaluates sequentially, so the value of z will be available for b</span></span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>  </span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>    c <span class="ot">&lt;-</span> b <span class="sc">+</span> <span class="dv">5</span> <span class="co">#b will be available </span></span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>}</span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co">#And</span></span>
-<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="fu">add_reactevt</span>(<span class="at">name_evt =</span> <span class="st">"event_1"</span>, <span class="at">input =</span> {</span>
-<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a>  a  <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a>  z  <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a>  b  <span class="ot">&lt;-</span> z <span class="sc">+</span> <span class="dv">1</span> </span>
-<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a>  c  <span class="ot">&lt;-</span> b <span class="sc">+</span> <span class="dv">5</span> <span class="co">#b will be available </span></span>
-<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a>}</span>
-<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="co">#But note that this will not work!</span></span>
-<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="fu">add_reactevt</span>(<span class="at">name_evt =</span> <span class="st">"event_1"</span>, <span class="at">input =</span> {</span>
-<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a>  <span class="fu">modify_item</span>(<span class="fu">list</span>(<span class="at">a =</span> <span class="dv">1</span>, <span class="at">z =</span> <span class="dv">2</span>, <span class="at">b =</span> z <span class="sc">+</span> <span class="dv">1</span>))  <span class="co">#modify_item is faster but does not evaluate sequentially (all at once), so the value of z will NOT be available for b</span></span>
-<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#Code can be writing directly as an expression which will be evaluated at the right time</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">add_reactevt</span>(<span class="at">name_evt =</span> <span class="st">"event_1"</span>, <span class="at">input =</span> {</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  a  <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  z  <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  b  <span class="ot">&lt;-</span> z <span class="sc">+</span> <span class="dv">1</span> </span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  c  <span class="ot">&lt;-</span> b <span class="sc">+</span> <span class="dv">5</span> <span class="co">#b will be available </span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="storing-inputs-making-it-faster">Storing Inputs, Making it Faster<a class="anchor" aria-label="anchor" href="#storing-inputs-making-it-faster"></a>
@@ -228,31 +189,30 @@ or 4) utilize a C++ implementation (among others). WARDEN uses lists to
 store inputs and to process events.</p>
 <p>Data.frames can be slow and memory-intense to manipulate, so they
 were avoided for this purpose.</p>
-<p>Lists and environments can behave quite similar, with environments
-being modified by reference, which can speed things up, and it could
-give more freedom for the user to declare how to set their event
-reactions instead of requiring them to declare <code>modify_item</code>.
-However, using environments and more “natural” R expressions (e.g.,
-<code>a &lt;- 1; b &lt;- a + 1</code>instead of
-<code>modify_item_seq(list(a = 1, b = a + 1))</code>) made the debugging
-mode harder to handle. Some internal experiments showed a 20% to 40%
-speed increase by switching from lists to environments in the normal
-mode. [Changed with WARDEN 1.0] With the most recent update, now the
-user does not need to use <code>modify_item</code> or
-<code>modify_item_seq</code>, as the transition to environment has been
-performed. The limitation with the debugging mode has been handled by
-extract the abstract syntax tree of the event reactions and looking for
-any type of assignments. A limitation of this is that “dynamic”
-assignments (e.g., <code>assign(paste0("x_",i), 5)</code> where
-<code>i</code> is created by a loop) are NOT captured by the debugging
-engine, and therefore will be excluded from the debugging log file. So
-the user should try to assign variables explicitly whenever possible,
-e.g., <code>x_1 &lt;- 5</code>.</p>
+<p>[Changed with WARDEN 1.0] The limitation with the debugging mode has
+been handled by extract the abstract syntax tree of the event reactions
+and looking for any type of assignments. A limitation of this is that
+“dynamic” assignments (e.g., <code>assign(paste0("x_",i), 5)</code>
+where <code>i</code> is created by a loop) are NOT captured by the
+debugging engine, and therefore will be excluded from the debugging log
+file. So the user should try to assign variables explicitly whenever
+possible, e.g., <code>x_1 &lt;- 5</code>.</p>
 <p>A C++ implementation was avoided as the purpose of WARDEN is to be
 user-friendly and to give the user as much as freedom as possible on how
 to define their inputs. While likely much faster, implementation in C++
 would require very careful handling of every user input, likely forcing
-us to restrict it to very specific data types and functions.</p>
+us to restrict it to very specific data types and functions. [Changed
+with WARDEN 2.0] In the most recent version of WARDEN, several functions
+now use a C++ function under the hood for speed improvement. The core
+engine has been revamped so that events now use a C++ implementation of
+a queue, but it has been designed so that users can interact as before
+with the queue using pure, simple R. Furthermore, a resource-constrained
+engine has been created and a discrete constrained resource object has
+been created using C++. Again, the user can interact with these objects
+using clear R functions. Speed-wise, for the unconstrained set-up the
+user is unlikely to see large speed gains, as there is an implicit cost
+of setting up each event queue, modifying events, etc. The constrained
+approach can achieve similar speeds to the unconstrained method.</p>
 </div>
 <div class="section level3">
 <h3 id="parallel-engine-approach">Parallel engine approach<a class="anchor" aria-label="anchor" href="#parallel-engine-approach"></a>
