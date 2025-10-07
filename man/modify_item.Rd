@@ -16,7 +16,7 @@ No return value, modifies/adds item to the environment and integrates it with th
 Modify the value of existing items
 }
 \details{
-The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
+DEPRECATED (old description): The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two \code{modify_item} with a list of one element, it's better to group them into a single \code{modify_item} with a list of two elements.
 
 Note that \code{modify_item} nor \code{modify_item_seq} can work on subelements (e.g.,

@@ -6,16 +6,24 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Example in Early Breast Cancer • WARDEN</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
-<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="icon" sizes="any" href="../favicon.ico">
-<link rel="manifest" href="../site.webmanifest">
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Example in Early Breast Cancer">
+<!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZEDNGW5QRP"></script><script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZEDNGW5QRP');
+</script><!-- Google tag (gtag.js) -->
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -25,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,15 +47,20 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>Basic Tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd.html">Sick-Sicker-Dead Model (SSD)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_constrained.html">Resource Constrained Sick-Sicker-Dead model</a></li>
     <li><a class="dropdown-item" href="../articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
-    <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
+    <li><a class="dropdown-item" href="../articles/example_eBC.html">Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ipd.html">Using Individual Patient Data</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Tips</h6></li>
+    <li><a class="dropdown-item" href="../articles/example_markov.html">Cohort Markov Model</a></li>
+    <li><a class="dropdown-item" href="../articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul>
 </li>
       </ul>
@@ -69,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">May 23, 2025</h4>
+            <h4 data-toc-skip class="date">octubre 07, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/HEAD/vignettes/articles/example_eBC.Rmd" class="external-link"><code>vignettes/articles/example_eBC.Rmd</code></a></small>
       <div class="d-none name"><code>example_eBC.Rmd</code></div>
@@ -103,7 +116,6 @@ efficient coding can have a substantial impact on performance.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.4.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'kableExtra'</span></span>
@@ -167,79 +179,82 @@ that this could also be modeled differently by using a time to remission
 and time to early metastatic BC, comparing these and choosing the
 pathway depending on which one is smaller.</p>
 <p>We also define here the specific utilities and costs that will be
-used in the model. We create a named vector that identifies the costs
-and utilities, and then we assign them to each specific item. Note that
-while <code>util_v</code> or <code>cost_v</code> is a named vector, the
-specific items that will be used by the model
-(e.g. <code>util.remission</code>) are unnamed. It is strongly
-recommended to assign unnamed objects if they are going to be processed
-in the model. In this case, we’re only using <code>util_v</code> and
-<code>cost_v</code> as an intermediate input and these objects will not
-be processed (we just use them to make the code more readable), so it’s
-fine if we name them. However, naming the value of
-<code>util.remission</code> (e.g. using one bracket instead of two in
-<code>util_v[["util.remission"]]</code>) may cause the outputs from the
-model to change names, depending on use. This is because of how R works:
-it would correspond to a named list with a named vector/element, which R
-concatenates, so in this case it would end up generating
+used in the model. It is strongly recommended to assign unnamed objects
+if they are going to be processed in the model. In this case, this is
+not affected. However, keeping the name when extracting a value
+e.g. <code>util.remission</code> (e.g. using one bracket instead of two
+in <code>util_v[["util.remission"]]</code>) may cause the outputs from
+the model to change names, depending on use. This is because of how R
+works: it would correspond to a named list with a named vector/element,
+which R concatenates, so in this case it could end up generating
 <code>qaly.util.remission</code> as an output of the model instead of
-just <code>qaly</code>).</p>
+just <code>qaly</code>). However this is unlikely to occur most of the
+times, and if the inputs are intermediary (i.e., not utilities/costs
+that appear in <code>ongoing_inputs</code> and such), it would cause no
+trouble.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Each patient is identified through "i"</span></span>
 <span><span class="co">#Items used in the model should be unnamed numeric/vectors! otherwise if they are processed by model it can lead to strangely named outcomes</span></span>
 <span><span class="co">#In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.</span></span>
 <span></span>
 <span><span class="co">#Put objects here that do not change on any patient or intervention loop</span></span>
-<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#utilities</span></span>
-<span>  <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
-<span>    base <span class="op">=</span>  <span class="va">df_util</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>    psa <span class="op">=</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">df_util</span><span class="op">$</span><span class="va">value</span>,<span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">df_util</span><span class="op">$</span><span class="va">se</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    sens <span class="op">=</span> <span class="va">df_util</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>    psa_ind <span class="op">=</span> <span class="va">psa_bool</span>,</span>
-<span>    sens_ind <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
-<span>    indicator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_util</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    names_out <span class="op">=</span><span class="va">df_util</span><span class="op">$</span><span class="va">name</span></span>
-<span>  <span class="op">)</span>,<span class="co">#costs</span></span>
-<span>  <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
-<span>    base <span class="op">=</span>  <span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>    psa <span class="op">=</span> <span class="fu"><a href="../reference/rgamma_mse.html">rgamma_mse</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>,<span class="va">df_cost</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,</span>
-<span>    sens <span class="op">=</span> <span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>    psa_ind <span class="op">=</span> <span class="va">psa_bool</span>,</span>
-<span>    sens_ind <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
-<span>    indicator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_cost</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    names_out <span class="op">=</span><span class="va">df_cost</span><span class="op">$</span><span class="va">name</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
+<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span> </span>
+<span>  <span class="co">#utilities</span></span>
+<span>        <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
+<span>            base <span class="op">=</span>  <span class="va">df_util</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>            psa <span class="op">=</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">df_util</span><span class="op">$</span><span class="va">value</span>,<span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">df_util</span><span class="op">$</span><span class="va">se</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>            sens <span class="op">=</span> <span class="va">df_util</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>            psa_ind <span class="op">=</span> <span class="va">psa_bool</span>,</span>
+<span>            sens_ind <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
+<span>            indicator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_util</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>            names_out <span class="op">=</span><span class="va">df_util</span><span class="op">$</span><span class="va">name</span>,</span>
+<span>            deploy_env<span class="op">=</span><span class="cn">TRUE</span></span>
+<span>        <span class="op">)</span></span>
+<span>  <span class="co">#costs</span></span>
+<span>        <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
+<span>            base <span class="op">=</span>  <span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>            psa <span class="op">=</span> <span class="fu"><a href="../reference/rgamma_mse.html">rgamma_mse</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>,<span class="va">df_cost</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,</span>
+<span>            sens <span class="op">=</span> <span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>            psa_ind <span class="op">=</span> <span class="va">psa_bool</span>,</span>
+<span>            sens_ind <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
+<span>            indicator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_cost</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>            names_out <span class="op">=</span><span class="va">df_cost</span><span class="op">$</span><span class="va">name</span>,</span>
+<span>            deploy_env<span class="op">=</span><span class="cn">TRUE</span></span>
+<span>        <span class="op">)</span></span>
+<span>        <span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#Put objects here that do not change as we loop through interventions for a patient</span></span>
-<span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>sex_pt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,p<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span>,<span class="st">"male"</span>,<span class="st">"female"</span><span class="op">)</span>,</span>
-<span>                             nat.os.s <span class="op">=</span> <span class="fu"><a href="../reference/rcond_gompertz.html">rcond_gompertz</a></span><span class="op">(</span><span class="fl">1</span>,</span>
-<span>                                                     shape<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">sex_pt</span><span class="op">==</span><span class="st">"male"</span><span class="op">)</span><span class="op">{</span><span class="fl">0.102</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.115</span><span class="op">}</span>,</span>
-<span>                                                     rate<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">sex_pt</span><span class="op">==</span><span class="st">"male"</span><span class="op">)</span><span class="op">{</span><span class="fl">0.000016</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.0000041</span><span class="op">}</span>,</span>
-<span>                                                     lower_bound <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">)</span> <span class="co">#in years, for a patient who is 50yo</span></span>
+<span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span> </span>
+<span>    <span class="va">sex_pt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,p<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span>,<span class="st">"male"</span>,<span class="st">"female"</span><span class="op">)</span></span>
+<span>    <span class="va">nat.os.s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rcond_gompertz.html">rcond_gompertz</a></span><span class="op">(</span><span class="fl">1</span>,</span>
+<span>                               shape<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">sex_pt</span><span class="op">==</span><span class="st">"male"</span><span class="op">)</span><span class="op">{</span><span class="fl">0.102</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.115</span><span class="op">}</span>,</span>
+<span>                               rate<span class="op">=</span><span class="kw">if</span><span class="op">(</span><span class="va">sex_pt</span><span class="op">==</span><span class="st">"male"</span><span class="op">)</span><span class="op">{</span><span class="fl">0.000016</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0.0000041</span><span class="op">}</span>,</span>
+<span>                               lower_bound <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>   <span class="co">#in years, for a patient who is 50yo</span></span>
+<span>    <span class="va">fl.remission</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">0.8</span><span class="op">)</span> <span class="co">#80% probability of going into remission</span></span>
+<span>    <span class="op">}</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)</span></span>
 <span><span class="co">#common across arm but changes per pt could be implemented here (if (arm==)... )</span></span>
-<span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>  fl.idfs.ontx             <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  fl.idfs                  <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  fl.mbcs.ontx             <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  fl.mbcs.progression.mbc  <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  fl.tx.beva               <span class="op">=</span> <span class="fl">1</span>,  </span>
-<span>  fl.mbcs                  <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  fl.mbcs_2ndline          <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  fl.recurrence            <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  fl.remission             <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">0.8</span><span class="op">)</span>, <span class="co">#80% probability of going into remission</span></span>
-<span>  q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
-<span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
-<span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>  c_default <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.idfs.txnoint</span><span class="op">*</span> <span class="va">fl.idfs.ontx</span>  <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="op">(</span><span class="va">cost.idfs.tx</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="va">cost.tx.beva</span> <span class="op">*</span> <span class="va">fl.tx.beva</span> <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span>,</span>
-<span>  c_ae <span class="op">=</span> <span class="fl">0</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">unique_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span></span>
+<span>    <span class="va">fl.idfs.ontx</span>              <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span>    <span class="va">fl.idfs</span>                   <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span>    <span class="va">fl.mbcs.ontx</span>              <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span>    <span class="va">fl.mbcs.progression.mbc</span>   <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span>    <span class="va">fl.tx.beva</span>                <span class="op">&lt;-</span> <span class="fl">1</span>  </span>
+<span>    <span class="va">fl.mbcs</span>                   <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>    <span class="va">fl.mbcs_2ndline</span>           <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>    <span class="va">fl.recurrence</span>             <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>    <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
+<span>    <span class="op">}</span></span>
+<span>    <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.idfs.txnoint</span><span class="op">*</span> <span class="va">fl.idfs.ontx</span>  <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="op">(</span><span class="va">cost.idfs.tx</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="va">cost.tx.beva</span> <span class="op">*</span> <span class="va">fl.tx.beva</span> <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span></span>
+<span>    <span class="va">c_ae</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>    <span class="va">rnd_stream_ae</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/random_stream.html">random_stream</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span>    <span class="va">rnd_stream_mbc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/random_stream.html">random_stream</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="events">Events<a class="anchor" aria-label="anchor" href="#events"></a>
@@ -387,16 +402,16 @@ new/adjusting events).</p>
 help with the reactions. Apart from the global objects and flags defined
 above, we can also use <code>curtime</code> for the current event time,
 <code>prevtime</code> for the time of the previous event,
-<code>cur_evtlist</code> for the named vector of events that is yet to
-happen for that patient, <code>arm</code> for the current treatment in
-the loop, <code>evt</code> for the current event being processed,
-<code>i</code> expresses the patient iteration, and
-<code>simulation</code> the specific simulation (relevant when the
-number of simulations is greater than 1). Furthermore, one can also call
-any other input/item that has been created before or create new ones.
-For example, we could even modify a cost/utility item by changing it
-directly, e.g. through
-<code>modify_item(list(cost.idfs.tx=500))</code>.</p>
+<code>cur_evtlist</code> is the C++ external pointer which can be
+interacted with using the event functions that is yet to happen for that
+patient, <code>arm</code> for the current treatment in the loop,
+<code>evt</code> for the current event being processed, <code>i</code>
+expresses the patient iteration, and <code>simulation</code> the
+specific simulation (relevant when the number of simulations is greater
+than 1). Furthermore, one can also call any other input/item that has
+been created before or create new ones. For example, we could even
+modify a cost/utility item by changing it directly, e.g. through
+<code>cost.idfs.tx &lt;- 500)</code>.</p>
 <table class="table">
 <colgroup>
 <col width="48%">
@@ -417,8 +432,8 @@ directly, e.g. through
 </tr>
 <tr class="odd">
 <td><code>cur_evtlist</code></td>
-<td>Named vector of events that is yet to happen for that patient (named
-numeric vector)</td>
+<td>External pointer of C++ events that is yet to happen for that
+patient</td>
 </tr>
 <tr class="even">
 <td><code>evt</code></td>
@@ -442,77 +457,44 @@ numeric vector)</td>
 </tr>
 </tbody>
 </table>
-<p>The functions to add/modify events and inputs use lists. Whenever
-several inputs/events are added or modified, it’s recommended to group
-them within one function, as it reduces the computation cost. So rather
-than use two <code>modify_item</code> with a list of one element, it’s
-better to group them into a single <code>modify_item</code> with a list
-of two elements.</p>
-<p><code>new_event</code>allows to generate events and add them to the
-vector of events. It accepts more than one event.
-<code>modify_event</code> allows to modify events (e.g. delay death).
-When adding an event, the name of the events and the time of the events
-must be defined. When using <code>modify_event</code>, one must indicate
-which events are affected and what are the new times of the events. If
-the event specified does not exist or has already occurred, it will be
-ignored. <code>modify_event</code> with
-<code>create_if_null = TRUE</code> argument will also generate events if
-they don’t exist. Note that one could potentially omit part of the
-modeling set in <code>init_event_list</code> and actually define new
-events dynamically through the reactions (we do that below for the
-<code>"ae"</code> event). However, this can have an impact in
-computation time, so if possible it’s always better to use
-<code>init_event_list</code>.</p>
-<p><code>modify_item</code> and <code>modify_item_seq</code>allow to
-modify and add items. Elements defined within this function are not
-evaluated sequentially in <code>modify_item</code> (i.e. defining
-<code>modify_item(list(fl.new = 1, var1 = fl.new * 5)))</code> will give
-an error if <code>fl.new</code> was not defined outside this function),
-while <code>modify_item_seq</code> will do it sequentially at a slightly
-bigger computational cost, so both are left as choices for the user.
-Note that one can modify costs/utilities by using the construction
-<code>type_name_category</code>, where type is either “qaly” or “cost”,
-name is the name (e.g., “default”) and category is the category used
-(e.g., “instant”), so one could pass <code>cost_default_instant</code>
-and modify the cost.</p>
+<p>The functions to add/modify events and inputs use named vectors or
+lists. Whenever several inputs/events are added or modified, it’s
+recommended to group them within one function, as it reduces the
+computation cost. So rather than use two <code>modify_event</code> with
+a list of one element, it’s better to group them into a single
+<code>modify_event</code> with a list of two elements.</p>
 <p>The list of relevant functions to be used within
-<code>add_reactevt</code> are:</p>
-<table class="table">
-<colgroup>
-<col width="31%">
-<col width="34%">
-<col width="34%">
-</colgroup>
-<thead><tr class="header">
-<th>Function</th>
-<th>What does it do</th>
-<th>How to use it</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><code><a href="../reference/modify_item.html">modify_item()</a></code></td>
-<td>Adds &amp; Modifies items/flags/variables for future events</td>
-<td><code>modify_item(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))</code></td>
-</tr>
-<tr class="even">
-<td><code><a href="../reference/modify_item_seq.html">modify_item_seq()</a></code></td>
-<td>Adds &amp; Modifies items/flags/variables for future events
-sequentially</td>
-<td><code>modify_item_seq(list("fl.idfs.ontx"=0,"fl.tx.beva"=0))</code></td>
-</tr>
-<tr class="odd">
-<td><code><a href="../reference/new_event.html">new_event()</a></code></td>
-<td>Adds events to the vector of events for that patient</td>
-<td><code>new_event(rep(list("ae"=curtime + 0.001),5))</code></td>
-</tr>
-<tr class="even">
-<td><code><a href="../reference/modify_event.html">modify_event()</a></code></td>
-<td>Modifies (or creates, with <code>create_if_null = TRUE</code>)
-existing events by changing their time</td>
-<td><code>modify_event(list("os"=curtime +5, "ttot"=curtime+0.0001))</code></td>
-</tr>
-</tbody>
-</table>
+<code>add_reactevt</code> are: <code>new_event</code>allows to generate
+events and add them to the vector of events. It accepts more than one
+event but a single event per event type. <code>modify_event</code>
+allows to modify events (e.g. delay death). When adding an event, the
+name of the events and the time of the events must be defined. When
+using <code>modify_event</code>, one must indicate which events are
+affected and what are the new times of the events. If the event
+specified does not exist or has already occurred, it will return an
+error. <code>modify_event</code> with <code>create_if_null = TRUE</code>
+argument will also generate events if they don’t exist.
+<code>remove_event</code> will remove an event from the event queue
+(could also be modified instead and set to <code>Inf</code>).
+<code>get_event</code> will return the TTE of the specified event name.
+<code>has_event</code> will return a TRUE/FALSE flag depending on
+whether the given patient has a specific event in the queue (will return
+TRUE even if time is <code>Inf</code>). <code>next_event</code> will
+return a list with the next event in the queue, with time, patient, and
+event name (<code>patient_id</code>, <code>event_name</code>, and
+<code>event_time</code>). <code>next_event_pt</code> will return a list
+with the next event in the queue for a specific patient, with time,
+patient, and event name (<code>patient_id</code>,
+<code>event_name</code>, and <code>event_time</code>).
+<code>queue_empty</code> will return TRUE if the queue of events is
+empty (no more events to process, but <code>Inf</code> events are
+considered part of the queue) <code>queue_size</code> allows to check
+the size of the queue of events, including <code>Inf</code> events.</p>
+<p>Note that one could potentially omit part of the modeling set in
+<code>init_event_list</code> and actually define new events dynamically
+through the reactions (we do that below for the <code>"ae"</code>
+event). However, this can have an impact in computation time, so if
+possible it’s always better to use <code>init_event_list</code>.</p>
 <p>The model will run until <code>curtime</code> is set to
 <code>Inf</code>, so the event that terminates the model (in this case,
 <code>os</code>), should modify <code>curtime</code> and set it to
@@ -528,162 +510,178 @@ forwards by default.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="va">evt_react_list</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"start"</span>,</span>
-<span>               input <span class="op">=</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>               input <span class="op">=</span> <span class="op">{</span> <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"ttot"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span>,</span>
-<span>                              <span class="st">"fl.mbcs.ontx"</span><span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="co">#Flag that patient is now off-treatment</span></span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span></span>
+<span>                 <span class="va">fl.mbcs.ontx</span> <span class="op">&lt;-</span>  <span class="fl">0</span> <span class="co">#Flag that patient is now off-treatment</span></span>
 <span>                 </span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"ttot.beva"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span><span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span>,</span>
-<span>                              <span class="st">"fl.tx.beva"</span><span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="co">#Flag that patient is now off-treatment</span></span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span></span>
+<span>                <span class="va">fl.tx.beva</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co">#Flag that patient is now off-treatment</span></span>
 <span>                 </span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"progression.mbc"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span>,</span>
-<span>                              <span class="st">"fl.mbcs.progression.mbc"</span><span class="op">=</span><span class="fl">0</span>,<span class="st">"fl.mbcs_2ndline"</span><span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co">#Flag that patient is progressed and going in 2nd line</span></span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span></span>
+<span>                 <span class="va">fl.mbcs.progression.mbc</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">fl.mbcs_2ndline</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co">#Flag that patient is progressed and going in 2nd line</span></span>
 <span>                 </span>
-<span>                 <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"2ndline_mbc"</span> <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="fu"><a href="../reference/draw_tte.html">draw_tte</a></span><span class="op">(</span><span class="fl">1</span>,<span class="st">'exp'</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.08</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span></span>
+<span>                 <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2ndline_mbc"</span> <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">qexp</a></span><span class="op">(</span><span class="va">rnd_stream_mbc</span><span class="op">$</span><span class="fu">draw_n</span><span class="op">(</span><span class="op">)</span>, <span class="fl">0.08</span><span class="op">)</span><span class="op">/</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span></span>
 <span>                 </span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"idfs"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.idfs.txnoint</span><span class="op">*</span> <span class="va">fl.idfs.ontx</span>  <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="op">(</span><span class="va">cost.idfs.tx</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="va">cost.tx.beva</span> <span class="op">*</span> <span class="va">fl.tx.beva</span> <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span>,</span>
-<span>                              <span class="st">"fl.idfs"</span><span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.idfs.txnoint</span><span class="op">*</span> <span class="va">fl.idfs.ontx</span>  <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="op">(</span><span class="va">cost.idfs.tx</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="va">cost.tx.beva</span> <span class="op">*</span> <span class="va">fl.tx.beva</span> <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span></span>
+<span>                 <span class="va">fl.idfs</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>                 </span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"ttot.early"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.idfs.txnoint</span><span class="op">*</span> <span class="va">fl.idfs.ontx</span>  <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="op">(</span><span class="va">cost.idfs.tx</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="va">cost.tx.beva</span> <span class="op">*</span> <span class="va">fl.tx.beva</span> <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span>,</span>
-<span>                              <span class="st">"fl.idfs.ontx"</span><span class="op">=</span><span class="fl">0</span>,<span class="st">"fl.tx.beva"</span><span class="op">=</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="co">#Flag that patient is now off-treatment</span></span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"noint"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.idfs.txnoint</span><span class="op">*</span> <span class="va">fl.idfs.ontx</span>  <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="op">(</span><span class="va">cost.idfs.tx</span><span class="op">)</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="va">cost.tx.beva</span> <span class="op">*</span> <span class="va">fl.tx.beva</span> <span class="op">+</span> <span class="va">cost.idfs</span><span class="op">}</span></span>
+<span>                 <span class="va">fl.idfs.ontx</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">fl.tx.beva</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co">#Flag that patient is now off-treatment</span></span>
 <span>                 </span>
-<span>                 <span class="va">n_ae</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">1</span>,lambda<span class="op">=</span><span class="fl">0.25</span><span class="op">*</span><span class="op">(</span><span class="va">curtime</span> <span class="op">-</span><span class="va">prevtime</span><span class="op">)</span><span class="op">)</span> <span class="co">#1 AE every 4 years</span></span>
+<span>                 <span class="va">n_ae</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">qpois</a></span><span class="op">(</span><span class="va">rnd_stream_ae</span><span class="op">$</span><span class="fu">draw_n</span><span class="op">(</span><span class="op">)</span>,lambda<span class="op">=</span><span class="fl">0.25</span><span class="op">*</span><span class="op">(</span><span class="va">curtime</span> <span class="op">-</span><span class="va">prevtime</span><span class="op">)</span><span class="op">)</span> <span class="co">#1 AE every 4 years</span></span>
 <span>                 </span>
 <span>                 <span class="kw">if</span> <span class="op">(</span><span class="va">n_ae</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                   <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"ae"</span> <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="fl">0.0001</span><span class="op">)</span>,<span class="va">n_ae</span><span class="op">)</span><span class="op">)</span></span>
+<span>                     <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ae"</span> <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="fl">0.0001</span><span class="op">)</span><span class="op">)</span></span>
+<span>                     <span class="va">n_ae</span> <span class="op">&lt;-</span> <span class="va">n_ae</span> <span class="op">-</span> <span class="fl">1</span></span>
 <span>                 <span class="op">}</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"remission"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span> <span class="va">cost.recurrence</span> <span class="op">*</span> <span class="va">fl.recurrence</span>,</span>
-<span>                              <span class="st">"fl.remission"</span><span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.recurrence</span> <span class="op">*</span> <span class="va">fl.recurrence</span></span>
+<span>                 <span class="va">fl.remission</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span>                 </span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"recurrence"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span> <span class="va">cost.recurrence</span> <span class="op">*</span> <span class="va">fl.recurrence</span>,</span>
-<span>                              <span class="st">"fl.recurrence"</span><span class="op">=</span><span class="fl">1</span>,<span class="st">"fl.remission"</span><span class="op">=</span><span class="fl">0</span>,<span class="st">"fl.mbcs"</span><span class="op">=</span><span class="fl">1</span>,<span class="st">"fl.mbcs.progression.mbc"</span><span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co">#ad-hoc for plot</span></span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.recurrence</span> <span class="op">*</span> <span class="va">fl.recurrence</span></span>
+<span>                 <span class="va">fl.recurrence</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span>                 <span class="va">fl.remission</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">fl.mbcs</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span>                 <span class="va">fl.mbcs.progression.mbc</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co">#ad-hoc for plot</span></span>
 <span>                 </span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"start.early.mbc"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span> <span class="va">cost.recurrence</span> <span class="op">*</span> <span class="va">fl.recurrence</span>,</span>
-<span>                              <span class="st">"fl.mbcs"</span><span class="op">=</span><span class="fl">1</span>,<span class="st">"fl.mbcs.progression.mbc"</span><span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.recurrence</span> <span class="op">*</span> <span class="va">fl.recurrence</span></span>
+<span>                 <span class="va">fl.mbcs</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span>                 <span class="va">fl.mbcs.progression.mbc</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span>                 </span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"2ndline_mbc"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span>,</span>
-<span>                              <span class="st">"fl.mbcs_2ndline"</span><span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span></span>
+<span>                 <span class="va">fl.mbcs_2ndline</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>                 </span>
-<span>                 <span class="va">n_ae</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">1</span>,lambda<span class="op">=</span><span class="fl">0.25</span><span class="op">*</span><span class="op">(</span><span class="va">curtime</span> <span class="op">-</span><span class="va">prevtime</span><span class="op">)</span><span class="op">)</span> <span class="co">#1 AE every 4 years</span></span>
-<span>                 </span>
+<span>                 <span class="va">n_ae</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">qpois</a></span><span class="op">(</span><span class="va">rnd_stream_ae</span><span class="op">$</span><span class="fu">draw_n</span><span class="op">(</span><span class="op">)</span>,lambda<span class="op">=</span><span class="fl">0.25</span><span class="op">*</span><span class="op">(</span><span class="va">curtime</span> <span class="op">-</span><span class="va">prevtime</span><span class="op">)</span><span class="op">)</span> <span class="co">#1 AE every 4 years</span></span>
+<span></span>
 <span>                 <span class="kw">if</span> <span class="op">(</span><span class="va">n_ae</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                   <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"ae"</span> <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="fl">0.0001</span><span class="op">)</span>,<span class="va">n_ae</span><span class="op">)</span><span class="op">)</span></span>
+<span>                     <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ae"</span> <span class="op">=</span> <span class="va">curtime</span> <span class="op">+</span> <span class="fl">0.0001</span><span class="op">)</span><span class="op">)</span></span>
+<span>                     <span class="va">n_ae</span> <span class="op">&lt;-</span> <span class="va">n_ae</span> <span class="op">-</span> <span class="fl">1</span></span>
 <span>                 <span class="op">}</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"ae"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                                  </span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="kw">if</span> <span class="op">(</span><span class="va">n_ae</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                     <span class="fu"><a href="../reference/new_event.html">new_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ae"</span> <span class="op">=</span> <span class="va">curtime</span><span class="op">)</span><span class="op">)</span></span>
+<span>                     <span class="va">n_ae</span> <span class="op">&lt;-</span> <span class="va">n_ae</span> <span class="op">-</span> <span class="fl">1</span></span>
+<span>                 <span class="op">}</span></span>
+<span>                 </span>
+<span>                 <span class="va">q_default</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span>,</span>
-<span>                              c_ae <span class="op">=</span> <span class="va">cost.ae</span><span class="op">)</span><span class="op">)</span></span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span></span>
+<span>                 <span class="va">c_ae</span> <span class="op">&lt;-</span> <span class="va">cost.ae</span></span>
 <span>                 </span>
-<span>                 <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"os"</span> <span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">cur_evtlist</span><span class="op">[[</span><span class="st">"os"</span><span class="op">]</span><span class="op">]</span> <span class="op">-</span> <span class="fl">0.125</span>,<span class="va">curtime</span> <span class="op">+</span><span class="fl">0.0001</span><span class="op">)</span> <span class="op">)</span><span class="op">)</span><span class="co">#each AE brings forward death by 1.5 months</span></span>
+<span>                 <span class="fu"><a href="../reference/modify_event.html">modify_event</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"os"</span> <span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_event.html">get_event</a></span><span class="op">(</span><span class="st">"os"</span><span class="op">)</span> <span class="op">-</span> <span class="fl">0.125</span>,<span class="va">curtime</span> <span class="op">+</span><span class="fl">0.0001</span><span class="op">)</span> <span class="op">)</span><span class="op">)</span><span class="co">#each AE brings forward death by 1.5 months</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"os"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.idfs.ontx</span> <span class="op">*</span> <span class="va">fl.idfs.ontx</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.idfs.ontx</span><span class="op">)</span> </span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.idfs</span><span class="op">==</span><span class="fl">0</span> <span class="op">&amp;</span> <span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.remission</span> <span class="op">*</span> <span class="va">fl.remission</span> <span class="op">+</span> <span class="va">fl.recurrence</span><span class="op">*</span><span class="va">util.recurrence</span></span>
 <span>                              <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fl.mbcs</span><span class="op">==</span><span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>                                <span class="va">util.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span><span class="op">*</span><span class="va">util.mbc.pps</span></span>
-<span>                              <span class="op">}</span>,</span>
-<span>                              c_default <span class="op">=</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span>,</span>
-<span>                              <span class="st">"fl.tx.beva"</span><span class="op">=</span><span class="fl">0</span>,<span class="st">"fl.mbcs.ontx"</span><span class="op">=</span><span class="fl">0</span>,<span class="st">"fl.idfs"</span><span class="op">=</span><span class="fl">0</span>,<span class="st">"fl.mbcs"</span><span class="op">=</span><span class="fl">0</span>,<span class="st">"curtime"</span><span class="op">=</span><span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                              <span class="op">}</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.mbc.tx</span>  <span class="op">*</span> <span class="va">fl.mbcs.ontx</span> <span class="op">+</span> <span class="va">cost.mbc.progression.mbc</span> <span class="op">*</span> <span class="va">fl.mbcs.progression.mbc</span> <span class="op">+</span> <span class="va">cost.mbc.pps</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">fl.mbcs.progression.mbc</span><span class="op">)</span> <span class="op">+</span> <span class="va">cost.2ndline</span><span class="op">*</span><span class="va">fl.mbcs_2ndline</span></span>
+<span>                 <span class="va">fl.tx.beva</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">fl.mbcs.ontx</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">fl.idfs</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">fl.mbcs</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">curtime</span> <span class="op">&lt;-</span> <span class="cn">Inf</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> </span></code></pre></div>
 </div>
 </div>
@@ -756,9 +754,10 @@ time of the model.</p>
 <span>          <span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 4.59s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 4.59s</span></span>
-<span><span class="co">#&gt; Total time to run: 4.59s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 1: 3.66s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 3.66s</span></span>
+<span><span class="co">#&gt; Total time to run: 3.67s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -777,120 +776,120 @@ generated by the simulation, which we collect here to plot in the
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="co">#will print the last simulation!</span></span>
+<span><span class="fu"><a href="../reference/summary_results_det.html">summary_results_det</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> </span>
 <span><span class="co">#&gt;                         int      noint</span></span>
-<span><span class="co">#&gt; costs             424345.16  240913.67</span></span>
-<span><span class="co">#&gt; dcosts                 0.00  183431.49</span></span>
-<span><span class="co">#&gt; lys                   13.62      12.26</span></span>
-<span><span class="co">#&gt; dlys                   0.00       1.35</span></span>
-<span><span class="co">#&gt; qalys                 10.87       9.78</span></span>
-<span><span class="co">#&gt; dqalys                 0.00       1.09</span></span>
-<span><span class="co">#&gt; ICER                     NA  135404.15</span></span>
-<span><span class="co">#&gt; ICUR                     NA  167771.93</span></span>
-<span><span class="co">#&gt; INMB                     NA -128764.57</span></span>
-<span><span class="co">#&gt; costs_undisc      485672.92  268770.13</span></span>
-<span><span class="co">#&gt; dcosts_undisc          0.00  216902.79</span></span>
-<span><span class="co">#&gt; lys_undisc            17.75      15.43</span></span>
-<span><span class="co">#&gt; dlys_undisc            0.00       2.32</span></span>
-<span><span class="co">#&gt; qalys_undisc          14.32      12.40</span></span>
-<span><span class="co">#&gt; dqalys_undisc          0.00       1.92</span></span>
-<span><span class="co">#&gt; ICER_undisc              NA   93472.78</span></span>
-<span><span class="co">#&gt; ICUR_undisc              NA  112871.89</span></span>
-<span><span class="co">#&gt; INMB_undisc              NA -120819.17</span></span>
-<span><span class="co">#&gt; c_ae                 468.19     578.50</span></span>
-<span><span class="co">#&gt; dc_ae                  0.00    -110.30</span></span>
-<span><span class="co">#&gt; c_ae_undisc          571.00     687.00</span></span>
-<span><span class="co">#&gt; dc_ae_undisc           0.00    -116.00</span></span>
-<span><span class="co">#&gt; c_default         423876.96  240335.17</span></span>
-<span><span class="co">#&gt; dc_default             0.00  183541.79</span></span>
-<span><span class="co">#&gt; c_default_undisc  485101.92  268083.13</span></span>
-<span><span class="co">#&gt; dc_default_undisc      0.00  217018.79</span></span>
+<span><span class="co">#&gt; costs             425039.19  239900.74</span></span>
+<span><span class="co">#&gt; dcosts                 0.00  185138.44</span></span>
+<span><span class="co">#&gt; lys                   13.60      12.18</span></span>
+<span><span class="co">#&gt; dlys                   0.00       1.42</span></span>
+<span><span class="co">#&gt; qalys                 10.87       9.72</span></span>
+<span><span class="co">#&gt; dqalys                 0.00       1.15</span></span>
+<span><span class="co">#&gt; ICER                     NA  130507.30</span></span>
+<span><span class="co">#&gt; ICUR                     NA  160592.84</span></span>
+<span><span class="co">#&gt; INMB                     NA -127496.26</span></span>
+<span><span class="co">#&gt; costs_undisc      486746.96  267302.14</span></span>
+<span><span class="co">#&gt; dcosts_undisc          0.00  219444.82</span></span>
+<span><span class="co">#&gt; lys_undisc            17.71      15.30</span></span>
+<span><span class="co">#&gt; dlys_undisc            0.00       2.41</span></span>
+<span><span class="co">#&gt; qalys_undisc          14.31      12.31</span></span>
+<span><span class="co">#&gt; dqalys_undisc          0.00       2.01</span></span>
+<span><span class="co">#&gt; ICER_undisc              NA   90922.02</span></span>
+<span><span class="co">#&gt; ICUR_undisc              NA  109343.68</span></span>
+<span><span class="co">#&gt; INMB_undisc              NA -119098.45</span></span>
+<span><span class="co">#&gt; c_ae                 466.29     567.66</span></span>
+<span><span class="co">#&gt; dc_ae                  0.00    -101.37</span></span>
+<span><span class="co">#&gt; c_ae_undisc          569.00     673.50</span></span>
+<span><span class="co">#&gt; dc_ae_undisc           0.00    -104.50</span></span>
+<span><span class="co">#&gt; c_default         424572.90  239333.08</span></span>
+<span><span class="co">#&gt; dc_default             0.00  185239.82</span></span>
+<span><span class="co">#&gt; c_default_undisc  486177.96  266628.64</span></span>
+<span><span class="co">#&gt; dc_default_undisc      0.00  219549.32</span></span>
 <span><span class="co">#&gt; nat.os.s              34.45      34.45</span></span>
 <span><span class="co">#&gt; dnat.os.s              0.00       0.00</span></span>
-<span><span class="co">#&gt; os.early              20.51      17.08</span></span>
-<span><span class="co">#&gt; dos.early              0.00       3.43</span></span>
-<span><span class="co">#&gt; os.mbc                21.81      19.54</span></span>
-<span><span class="co">#&gt; dos.mbc                0.00       2.27</span></span>
-<span><span class="co">#&gt; q_default             10.87       9.78</span></span>
-<span><span class="co">#&gt; dq_default             0.00       1.09</span></span>
-<span><span class="co">#&gt; q_default_undisc      14.32      12.40</span></span>
-<span><span class="co">#&gt; dq_default_undisc      0.00       1.92</span></span>
+<span><span class="co">#&gt; os.early              20.40      16.95</span></span>
+<span><span class="co">#&gt; dos.early              0.00       3.45</span></span>
+<span><span class="co">#&gt; os.mbc                21.73      19.41</span></span>
+<span><span class="co">#&gt; dos.mbc                0.00       2.33</span></span>
+<span><span class="co">#&gt; q_default             10.87       9.72</span></span>
+<span><span class="co">#&gt; dq_default             0.00       1.15</span></span>
+<span><span class="co">#&gt; q_default_undisc      14.31      12.31</span></span>
+<span><span class="co">#&gt; dq_default_undisc      0.00       2.01</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                                int</span></span>
-<span><span class="co">#&gt; costs                   424,345 (424,345; 424,345)</span></span>
+<span><span class="co">#&gt; costs                   425,039 (425,039; 425,039)</span></span>
 <span><span class="co">#&gt; dcosts                                    0 (0; 0)</span></span>
-<span><span class="co">#&gt; lys                           13.62 (13.62; 13.62)</span></span>
+<span><span class="co">#&gt; lys                              13.6 (13.6; 13.6)</span></span>
 <span><span class="co">#&gt; dlys                                      0 (0; 0)</span></span>
 <span><span class="co">#&gt; qalys                         10.87 (10.87; 10.87)</span></span>
 <span><span class="co">#&gt; dqalys                                    0 (0; 0)</span></span>
 <span><span class="co">#&gt; ICER                                  NaN (NA; NA)</span></span>
 <span><span class="co">#&gt; ICUR                                  NaN (NA; NA)</span></span>
 <span><span class="co">#&gt; INMB                                  NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; costs_undisc            485,673 (485,673; 485,673)</span></span>
+<span><span class="co">#&gt; costs_undisc            486,747 (486,747; 486,747)</span></span>
 <span><span class="co">#&gt; dcosts_undisc                             0 (0; 0)</span></span>
-<span><span class="co">#&gt; lys_undisc                    17.75 (17.75; 17.75)</span></span>
+<span><span class="co">#&gt; lys_undisc                    17.71 (17.71; 17.71)</span></span>
 <span><span class="co">#&gt; dlys_undisc                               0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys_undisc                  14.32 (14.32; 14.32)</span></span>
+<span><span class="co">#&gt; qalys_undisc                  14.31 (14.31; 14.31)</span></span>
 <span><span class="co">#&gt; dqalys_undisc                             0 (0; 0)</span></span>
 <span><span class="co">#&gt; ICER_undisc                           NaN (NA; NA)</span></span>
 <span><span class="co">#&gt; ICUR_undisc                           NaN (NA; NA)</span></span>
 <span><span class="co">#&gt; INMB_undisc                           NaN (NA; NA)</span></span>
-<span><span class="co">#&gt; c_ae                       468.19 (468.19; 468.19)</span></span>
+<span><span class="co">#&gt; c_ae                       466.29 (466.29; 466.29)</span></span>
 <span><span class="co">#&gt; dc_ae                                     0 (0; 0)</span></span>
-<span><span class="co">#&gt; c_ae_undisc                         571 (571; 571)</span></span>
+<span><span class="co">#&gt; c_ae_undisc                         569 (569; 569)</span></span>
 <span><span class="co">#&gt; dc_ae_undisc                              0 (0; 0)</span></span>
-<span><span class="co">#&gt; c_default               423,877 (423,877; 423,877)</span></span>
+<span><span class="co">#&gt; c_default         424,572.9 (424,572.9; 424,572.9)</span></span>
 <span><span class="co">#&gt; dc_default                                0 (0; 0)</span></span>
-<span><span class="co">#&gt; c_default_undisc  485,101.9 (485,101.9; 485,101.9)</span></span>
+<span><span class="co">#&gt; c_default_undisc        486,178 (486,178; 486,178)</span></span>
 <span><span class="co">#&gt; dc_default_undisc                         0 (0; 0)</span></span>
 <span><span class="co">#&gt; nat.os.s                      34.45 (34.45; 34.45)</span></span>
 <span><span class="co">#&gt; dnat.os.s                                 0 (0; 0)</span></span>
-<span><span class="co">#&gt; os.early                      20.51 (20.51; 20.51)</span></span>
+<span><span class="co">#&gt; os.early                         20.4 (20.4; 20.4)</span></span>
 <span><span class="co">#&gt; dos.early                                 0 (0; 0)</span></span>
-<span><span class="co">#&gt; os.mbc                        21.81 (21.81; 21.81)</span></span>
+<span><span class="co">#&gt; os.mbc                        21.73 (21.73; 21.73)</span></span>
 <span><span class="co">#&gt; dos.mbc                                   0 (0; 0)</span></span>
 <span><span class="co">#&gt; q_default                     10.87 (10.87; 10.87)</span></span>
 <span><span class="co">#&gt; dq_default                                0 (0; 0)</span></span>
-<span><span class="co">#&gt; q_default_undisc              14.32 (14.32; 14.32)</span></span>
+<span><span class="co">#&gt; q_default_undisc              14.31 (14.31; 14.31)</span></span>
 <span><span class="co">#&gt; dq_default_undisc                         0 (0; 0)</span></span>
 <span><span class="co">#&gt;                                              noint</span></span>
-<span><span class="co">#&gt; costs                   240,914 (240,914; 240,914)</span></span>
-<span><span class="co">#&gt; dcosts                  183,431 (183,431; 183,431)</span></span>
-<span><span class="co">#&gt; lys                           12.26 (12.26; 12.26)</span></span>
-<span><span class="co">#&gt; dlys                          1.355 (1.355; 1.355)</span></span>
-<span><span class="co">#&gt; qalys                            9.78 (9.78; 9.78)</span></span>
-<span><span class="co">#&gt; dqalys                        1.093 (1.093; 1.093)</span></span>
-<span><span class="co">#&gt; ICER                    135,404 (135,404; 135,404)</span></span>
-<span><span class="co">#&gt; ICUR                    167,772 (167,772; 167,772)</span></span>
-<span><span class="co">#&gt; INMB                 -128,765 (-128,765; -128,765)</span></span>
-<span><span class="co">#&gt; costs_undisc            268,770 (268,770; 268,770)</span></span>
-<span><span class="co">#&gt; dcosts_undisc           216,903 (216,903; 216,903)</span></span>
-<span><span class="co">#&gt; lys_undisc                    15.43 (15.43; 15.43)</span></span>
-<span><span class="co">#&gt; dlys_undisc                      2.32 (2.32; 2.32)</span></span>
-<span><span class="co">#&gt; qalys_undisc                     12.4 (12.4; 12.4)</span></span>
-<span><span class="co">#&gt; dqalys_undisc                 1.922 (1.922; 1.922)</span></span>
-<span><span class="co">#&gt; ICER_undisc                93,473 (93,473; 93,473)</span></span>
-<span><span class="co">#&gt; ICUR_undisc             112,872 (112,872; 112,872)</span></span>
-<span><span class="co">#&gt; INMB_undisc          -120,819 (-120,819; -120,819)</span></span>
-<span><span class="co">#&gt; c_ae                          578.5 (578.5; 578.5)</span></span>
-<span><span class="co">#&gt; dc_ae                -110.302 (-110.302; -110.302)</span></span>
-<span><span class="co">#&gt; c_ae_undisc                         687 (687; 687)</span></span>
-<span><span class="co">#&gt; dc_ae_undisc                     -116 (-116; -116)</span></span>
-<span><span class="co">#&gt; c_default         240,335.2 (240,335.2; 240,335.2)</span></span>
-<span><span class="co">#&gt; dc_default        183,541.8 (183,541.8; 183,541.8)</span></span>
-<span><span class="co">#&gt; c_default_undisc  268,083.1 (268,083.1; 268,083.1)</span></span>
-<span><span class="co">#&gt; dc_default_undisc 217,018.8 (217,018.8; 217,018.8)</span></span>
+<span><span class="co">#&gt; costs                   239,901 (239,901; 239,901)</span></span>
+<span><span class="co">#&gt; dcosts                  185,138 (185,138; 185,138)</span></span>
+<span><span class="co">#&gt; lys                           12.18 (12.18; 12.18)</span></span>
+<span><span class="co">#&gt; dlys                          1.419 (1.419; 1.419)</span></span>
+<span><span class="co">#&gt; qalys                            9.72 (9.72; 9.72)</span></span>
+<span><span class="co">#&gt; dqalys                        1.153 (1.153; 1.153)</span></span>
+<span><span class="co">#&gt; ICER                    130,507 (130,507; 130,507)</span></span>
+<span><span class="co">#&gt; ICUR                    160,593 (160,593; 160,593)</span></span>
+<span><span class="co">#&gt; INMB                 -127,496 (-127,496; -127,496)</span></span>
+<span><span class="co">#&gt; costs_undisc            267,302 (267,302; 267,302)</span></span>
+<span><span class="co">#&gt; dcosts_undisc           219,445 (219,445; 219,445)</span></span>
+<span><span class="co">#&gt; lys_undisc                       15.3 (15.3; 15.3)</span></span>
+<span><span class="co">#&gt; dlys_undisc                   2.414 (2.414; 2.414)</span></span>
+<span><span class="co">#&gt; qalys_undisc                  12.31 (12.31; 12.31)</span></span>
+<span><span class="co">#&gt; dqalys_undisc                 2.007 (2.007; 2.007)</span></span>
+<span><span class="co">#&gt; ICER_undisc                90,922 (90,922; 90,922)</span></span>
+<span><span class="co">#&gt; ICUR_undisc             109,344 (109,344; 109,344)</span></span>
+<span><span class="co">#&gt; INMB_undisc          -119,098 (-119,098; -119,098)</span></span>
+<span><span class="co">#&gt; c_ae                       567.66 (567.66; 567.66)</span></span>
+<span><span class="co">#&gt; dc_ae                -101.371 (-101.371; -101.371)</span></span>
+<span><span class="co">#&gt; c_ae_undisc                   673.5 (673.5; 673.5)</span></span>
+<span><span class="co">#&gt; dc_ae_undisc               -104.5 (-104.5; -104.5)</span></span>
+<span><span class="co">#&gt; c_default         239,333.1 (239,333.1; 239,333.1)</span></span>
+<span><span class="co">#&gt; dc_default        185,239.8 (185,239.8; 185,239.8)</span></span>
+<span><span class="co">#&gt; c_default_undisc  266,628.6 (266,628.6; 266,628.6)</span></span>
+<span><span class="co">#&gt; dc_default_undisc 219,549.3 (219,549.3; 219,549.3)</span></span>
 <span><span class="co">#&gt; nat.os.s                      34.45 (34.45; 34.45)</span></span>
 <span><span class="co">#&gt; dnat.os.s                                 0 (0; 0)</span></span>
-<span><span class="co">#&gt; os.early                      17.08 (17.08; 17.08)</span></span>
-<span><span class="co">#&gt; dos.early                     3.432 (3.432; 3.432)</span></span>
-<span><span class="co">#&gt; os.mbc                        19.54 (19.54; 19.54)</span></span>
-<span><span class="co">#&gt; dos.mbc                       2.272 (2.272; 2.272)</span></span>
-<span><span class="co">#&gt; q_default                        9.78 (9.78; 9.78)</span></span>
-<span><span class="co">#&gt; dq_default                    1.093 (1.093; 1.093)</span></span>
-<span><span class="co">#&gt; q_default_undisc                 12.4 (12.4; 12.4)</span></span>
-<span><span class="co">#&gt; dq_default_undisc             1.922 (1.922; 1.922)</span></span>
+<span><span class="co">#&gt; os.early                      16.95 (16.95; 16.95)</span></span>
+<span><span class="co">#&gt; dos.early                     3.453 (3.453; 3.453)</span></span>
+<span><span class="co">#&gt; os.mbc                        19.41 (19.41; 19.41)</span></span>
+<span><span class="co">#&gt; dos.mbc                       2.325 (2.325; 2.325)</span></span>
+<span><span class="co">#&gt; q_default                        9.72 (9.72; 9.72)</span></span>
+<span><span class="co">#&gt; dq_default                    1.153 (1.153; 1.153)</span></span>
+<span><span class="co">#&gt; q_default_undisc              12.31 (12.31; 12.31)</span></span>
+<span><span class="co">#&gt; dq_default_undisc             2.007 (2.007; 2.007)</span></span>
 <span></span>
 <span><span class="va">psa_ipd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span> </span>
 <span></span>
@@ -1008,138 +1007,46 @@ start
 int
 </td>
 <td style="text-align:right;">
-15.11508
+14.14495
 </td>
 <td style="text-align:right;">
-12.687682
+12.15104
 </td>
 <td style="text-align:right;">
-340323.8
+403257.6
 </td>
 <td style="text-align:right;">
-373875.5
+474554.5
 </td>
 <td style="text-align:right;">
-17.016184
+15.87365
 </td>
 <td style="text-align:right;">
-20.02809
+18.31841
 </td>
 <td style="text-align:right;">
-4.8556602
+4.4250507
 </td>
 <td style="text-align:right;">
-3.6417451
+3.3187880
 </td>
 <td style="text-align:right;">
-2.913396e+05
+2.655030e+05
 </td>
 <td style="text-align:right;">
-5.2415205
+4.7424489
 </td>
 <td style="text-align:right;">
-3.9311404
+3.5568366
 </td>
 <td style="text-align:right;">
-314491.23
+284546.93
 </td>
 <td style="text-align:right;">
-20.15309
+18.44341
 </td>
 <td style="text-align:right;">
-24.14705
-</td>
-<td style="text-align:right;">
-41.31053
-</td>
-<td style="text-align:left;">
-female
-</td>
-<td style="text-align:right;">
-2.913396e+05
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-<td style="text-align:right;">
-3.6417451
-</td>
-<td style="text-align:right;">
-314491.23
-</td>
-<td style="text-align:right;">
-3.9311404
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-5.241521
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-ttot.beva
-</td>
-<td style="text-align:right;">
-5.241521
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-int
-</td>
-<td style="text-align:right;">
-15.11508
-</td>
-<td style="text-align:right;">
-12.687682
-</td>
-<td style="text-align:right;">
-340323.8
-</td>
-<td style="text-align:right;">
-373875.5
-</td>
-<td style="text-align:right;">
-17.016184
-</td>
-<td style="text-align:right;">
-20.02809
-</td>
-<td style="text-align:right;">
-1.5878803
-</td>
-<td style="text-align:right;">
-1.1909102
-</td>
-<td style="text-align:right;">
-3.652125e+04
-</td>
-<td style="text-align:right;">
-1.9067130
-</td>
-<td style="text-align:right;">
-1.4300347
-</td>
-<td style="text-align:right;">
-43854.40
-</td>
-<td style="text-align:right;">
-20.15309
-</td>
-<td style="text-align:right;">
-24.14705
+23.56778
 </td>
 <td style="text-align:right;">
 41.31053
@@ -1148,25 +1055,25 @@ int
 female
 </td>
 <td style="text-align:right;">
-3.652125e+04
+2.655030e+05
 </td>
 <td style="text-align:right;">
 0.0000
 </td>
 <td style="text-align:right;">
-1.1909102
+3.3187880
 </td>
 <td style="text-align:right;">
-43854.40
+284546.93
 </td>
 <td style="text-align:right;">
-1.4300347
+3.5568366
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-7.148233
+4.742449
 </td>
 <td style="text-align:right;">
 1
@@ -1180,10 +1087,10 @@ female
 ttot.early
 </td>
 <td style="text-align:right;">
-7.148233
+4.742449
 </td>
 <td style="text-align:right;">
-5.241521
+0.000000
 </td>
 <td style="text-align:right;">
 1
@@ -1192,31 +1099,31 @@ ttot.early
 int
 </td>
 <td style="text-align:right;">
-15.11508
+14.14495
 </td>
 <td style="text-align:right;">
-12.687682
+12.15104
 </td>
 <td style="text-align:right;">
-340323.8
+403257.6
 </td>
 <td style="text-align:right;">
-373875.5
+474554.5
 </td>
 <td style="text-align:right;">
-17.016184
+15.87365
 </td>
 <td style="text-align:right;">
-20.02809
+18.31841
 </td>
 <td style="text-align:right;">
-0.0000810
+0.0000869
 </td>
 <td style="text-align:right;">
-0.0000607
+0.0000652
 </td>
 <td style="text-align:right;">
-4.047677e+00
+5.215197e+00
 </td>
 <td style="text-align:right;">
 0.0001000
@@ -1225,13 +1132,13 @@ int
 0.0000750
 </td>
 <td style="text-align:right;">
-5.00
+6.00
 </td>
 <td style="text-align:right;">
-20.15309
+18.44341
 </td>
 <td style="text-align:right;">
-24.14705
+23.56778
 </td>
 <td style="text-align:right;">
 41.31053
@@ -1240,16 +1147,16 @@ int
 female
 </td>
 <td style="text-align:right;">
-4.047677e+00
+5.215197e+00
 </td>
 <td style="text-align:right;">
 0.0000
 </td>
 <td style="text-align:right;">
-0.0000607
+0.0000652
 </td>
 <td style="text-align:right;">
-5.00
+6.00
 </td>
 <td style="text-align:right;">
 0.0000750
@@ -1258,7 +1165,7 @@ female
 0
 </td>
 <td style="text-align:right;">
-7.148333
+4.742549
 </td>
 <td style="text-align:right;">
 1
@@ -1272,10 +1179,10 @@ female
 ae
 </td>
 <td style="text-align:right;">
-7.148333
+4.742549
 </td>
 <td style="text-align:right;">
-7.148233
+4.742449
 </td>
 <td style="text-align:right;">
 1
@@ -1284,46 +1191,46 @@ ae
 int
 </td>
 <td style="text-align:right;">
-15.11508
+14.14495
 </td>
 <td style="text-align:right;">
-12.687682
+12.15104
 </td>
 <td style="text-align:right;">
-340323.8
+403257.6
 </td>
 <td style="text-align:right;">
-373875.5
+474554.5
 </td>
 <td style="text-align:right;">
-17.016184
+15.87365
 </td>
 <td style="text-align:right;">
-20.02809
+18.31841
 </td>
 <td style="text-align:right;">
-0.5064936
+0.8435090
 </td>
 <td style="text-align:right;">
-0.5064936
+0.8435090
 </td>
 <td style="text-align:right;">
-1.245889e+04
+2.026991e+04
 </td>
 <td style="text-align:right;">
-0.6315183
+0.9846357
 </td>
 <td style="text-align:right;">
-0.6315183
+0.9846357
 </td>
 <td style="text-align:right;">
-15524.92
+23646.62
 </td>
 <td style="text-align:right;">
-20.15309
+18.44341
 </td>
 <td style="text-align:right;">
-24.14705
+23.56778
 </td>
 <td style="text-align:right;">
 41.31053
@@ -1332,25 +1239,25 @@ int
 female
 </td>
 <td style="text-align:right;">
-1.164935e+04
+1.940071e+04
 </td>
 <td style="text-align:right;">
-809.5343
+869.1982
 </td>
 <td style="text-align:right;">
-0.5064936
+0.8435090
 </td>
 <td style="text-align:right;">
-14524.92
+22646.62
 </td>
 <td style="text-align:right;">
-0.6315183
+0.9846357
 </td>
 <td style="text-align:right;">
 1000
 </td>
 <td style="text-align:right;">
-7.779852
+5.727184
 </td>
 <td style="text-align:right;">
 1
@@ -1364,10 +1271,10 @@ female
 idfs
 </td>
 <td style="text-align:right;">
-7.779852
+5.727184
 </td>
 <td style="text-align:right;">
-7.148333
+4.742549
 </td>
 <td style="text-align:right;">
 1
@@ -1376,22 +1283,22 @@ idfs
 int
 </td>
 <td style="text-align:right;">
-15.11508
+14.14495
 </td>
 <td style="text-align:right;">
-12.687682
+12.15104
 </td>
 <td style="text-align:right;">
-340323.8
+403257.6
 </td>
 <td style="text-align:right;">
-373875.5
+474554.5
 </td>
 <td style="text-align:right;">
-17.016184
+15.87365
 </td>
 <td style="text-align:right;">
-20.02809
+18.31841
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1412,10 +1319,10 @@ int
 0.00
 </td>
 <td style="text-align:right;">
-20.15309
+18.44341
 </td>
 <td style="text-align:right;">
-24.14705
+23.56778
 </td>
 <td style="text-align:right;">
 41.31053
@@ -1442,7 +1349,7 @@ female
 0
 </td>
 <td style="text-align:right;">
-7.779852
+5.727184
 </td>
 <td style="text-align:right;">
 1
@@ -1456,10 +1363,10 @@ female
 remission
 </td>
 <td style="text-align:right;">
-7.779852
+5.727184
 </td>
 <td style="text-align:right;">
-7.779852
+5.727184
 </td>
 <td style="text-align:right;">
 1
@@ -1468,46 +1375,46 @@ remission
 int
 </td>
 <td style="text-align:right;">
-15.11508
+14.14495
 </td>
 <td style="text-align:right;">
-12.687682
+12.15104
 </td>
 <td style="text-align:right;">
-340323.8
+403257.6
 </td>
 <td style="text-align:right;">
-373875.5
+474554.5
 </td>
 <td style="text-align:right;">
-17.016184
+15.87365
 </td>
 <td style="text-align:right;">
-20.02809
+18.31841
 </td>
 <td style="text-align:right;">
-4.5301637
+2.0261310
 </td>
 <td style="text-align:right;">
-4.0771473
+1.8235179
 </td>
 <td style="text-align:right;">
 0.000000e+00
 </td>
 <td style="text-align:right;">
-6.2437518
+2.4892484
 </td>
 <td style="text-align:right;">
-5.6193766
+2.2403236
 </td>
 <td style="text-align:right;">
 0.00
 </td>
 <td style="text-align:right;">
-20.15309
+18.44341
 </td>
 <td style="text-align:right;">
-24.14705
+23.56778
 </td>
 <td style="text-align:right;">
 41.31053
@@ -1522,19 +1429,111 @@ female
 0.0000
 </td>
 <td style="text-align:right;">
-4.0771473
+1.8235179
 </td>
 <td style="text-align:right;">
 0.00
 </td>
 <td style="text-align:right;">
-5.6193766
+2.2403236
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-14.023604
+8.216433
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ttot.beva
+</td>
+<td style="text-align:right;">
+8.216433
+</td>
+<td style="text-align:right;">
+5.727184
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+int
+</td>
+<td style="text-align:right;">
+14.14495
+</td>
+<td style="text-align:right;">
+12.15104
+</td>
+<td style="text-align:right;">
+403257.6
+</td>
+<td style="text-align:right;">
+474554.5
+</td>
+<td style="text-align:right;">
+15.87365
+</td>
+<td style="text-align:right;">
+18.31841
+</td>
+<td style="text-align:right;">
+5.1077998
+</td>
+<td style="text-align:right;">
+4.5970198
+</td>
+<td style="text-align:right;">
+1.174794e+05
+</td>
+<td style="text-align:right;">
+7.2328252
+</td>
+<td style="text-align:right;">
+6.5095426
+</td>
+<td style="text-align:right;">
+166354.98
+</td>
+<td style="text-align:right;">
+18.44341
+</td>
+<td style="text-align:right;">
+23.56778
+</td>
+<td style="text-align:right;">
+41.31053
+</td>
+<td style="text-align:left;">
+female
+</td>
+<td style="text-align:right;">
+1.174794e+05
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+4.5970198
+</td>
+<td style="text-align:right;">
+166354.98
+</td>
+<td style="text-align:right;">
+6.5095426
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+15.449258
 </td>
 <td style="text-align:right;">
 1
@@ -1548,10 +1547,10 @@ female
 recurrence
 </td>
 <td style="text-align:right;">
-14.023604
+15.449258
 </td>
 <td style="text-align:right;">
-7.779852
+8.216433
 </td>
 <td style="text-align:right;">
 1
@@ -1560,46 +1559,46 @@ recurrence
 int
 </td>
 <td style="text-align:right;">
-15.11508
+14.14495
 </td>
 <td style="text-align:right;">
-12.687682
+12.15104
 </td>
 <td style="text-align:right;">
-340323.8
+403257.6
 </td>
 <td style="text-align:right;">
-373875.5
+474554.5
 </td>
 <td style="text-align:right;">
-17.016184
+15.87365
 </td>
 <td style="text-align:right;">
-20.02809
+18.31841
 </td>
 <td style="text-align:right;">
-3.6348056
+1.7423769
 </td>
 <td style="text-align:right;">
-3.2713250
+1.5681392
 </td>
 <td style="text-align:right;">
 0.000000e+00
 </td>
 <td style="text-align:right;">
-6.0044873
+2.8691519
 </td>
 <td style="text-align:right;">
-5.4040385
+2.5822367
 </td>
 <td style="text-align:right;">
 0.00
 </td>
 <td style="text-align:right;">
-20.15309
+18.44341
 </td>
 <td style="text-align:right;">
-24.14705
+23.56778
 </td>
 <td style="text-align:right;">
 41.31053
@@ -1614,19 +1613,19 @@ female
 0.0000
 </td>
 <td style="text-align:right;">
-3.2713250
+1.5681392
 </td>
 <td style="text-align:right;">
 0.00
 </td>
 <td style="text-align:right;">
-5.4040385
+2.5822367
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-20.028091
+18.318410
 </td>
 <td style="text-align:right;">
 1
@@ -1640,10 +1639,10 @@ female
 os
 </td>
 <td style="text-align:right;">
-20.028091
+18.318410
 </td>
 <td style="text-align:right;">
-14.023604
+15.449258
 </td>
 <td style="text-align:right;">
 1
@@ -1652,22 +1651,22 @@ os
 int
 </td>
 <td style="text-align:right;">
-15.11508
+14.14495
 </td>
 <td style="text-align:right;">
-12.687682
+12.15104
 </td>
 <td style="text-align:right;">
-340323.8
+403257.6
 </td>
 <td style="text-align:right;">
-373875.5
+474554.5
 </td>
 <td style="text-align:right;">
-17.016184
+15.87365
 </td>
 <td style="text-align:right;">
-20.02809
+18.31841
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -1688,10 +1687,10 @@ int
 0.00
 </td>
 <td style="text-align:right;">
-20.15309
+18.44341
 </td>
 <td style="text-align:right;">
-24.14705
+23.56778
 </td>
 <td style="text-align:right;">
 41.31053
@@ -1718,7 +1717,7 @@ female
 0
 </td>
 <td style="text-align:right;">
-20.028091
+18.318410
 </td>
 <td style="text-align:right;">
 1
@@ -1744,46 +1743,46 @@ start
 int
 </td>
 <td style="text-align:right;">
-11.78031
+12.79480
 </td>
 <td style="text-align:right;">
-4.356588
+10.75476
 </td>
 <td style="text-align:right;">
-576099.6
+362284.3
 </td>
 <td style="text-align:right;">
-684612.4
+402550.9
 </td>
 <td style="text-align:right;">
-4.965907
+13.65504
 </td>
 <td style="text-align:right;">
-14.48082
+16.07424
 </td>
 <td style="text-align:right;">
-4.9914407
+4.7538198
 </td>
 <td style="text-align:right;">
-3.7435805
+3.5653648
 </td>
 <td style="text-align:right;">
-2.994864e+05
+2.852292e+05
 </td>
 <td style="text-align:right;">
-5.4004277
+5.1228222
 </td>
 <td style="text-align:right;">
-4.0503208
+3.8421166
 </td>
 <td style="text-align:right;">
-324025.66
+307369.33
 </td>
 <td style="text-align:right;">
-21.31760
+16.19924
 </td>
 <td style="text-align:right;">
-14.48082
+Inf
 </td>
 <td style="text-align:right;">
 37.44090
@@ -1792,25 +1791,25 @@ int
 female
 </td>
 <td style="text-align:right;">
-2.994864e+05
+2.852292e+05
 </td>
 <td style="text-align:right;">
 0.0000
 </td>
 <td style="text-align:right;">
-3.7435805
+3.5653648
 </td>
 <td style="text-align:right;">
-324025.66
+307369.33
 </td>
 <td style="text-align:right;">
-4.0503208
+3.8421166
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-5.400428
+5.122822
 </td>
 <td style="text-align:right;">
 1
@@ -1821,10 +1820,10 @@ female
 </tr>
 <tr>
 <td style="text-align:left;">
-idfs
+ttot.beva
 </td>
 <td style="text-align:right;">
-5.400428
+5.122822
 </td>
 <td style="text-align:right;">
 0.000000
@@ -1836,46 +1835,46 @@ idfs
 int
 </td>
 <td style="text-align:right;">
-11.78031
+12.79480
 </td>
 <td style="text-align:right;">
-4.356588
+10.75476
 </td>
 <td style="text-align:right;">
-576099.6
+362284.3
 </td>
 <td style="text-align:right;">
-684612.4
+402550.9
 </td>
 <td style="text-align:right;">
-4.965907
+13.65504
 </td>
 <td style="text-align:right;">
-14.48082
+16.07424
 </td>
 <td style="text-align:right;">
-0.0000000
+1.5157562
 </td>
 <td style="text-align:right;">
-0.0000000
+1.1368171
 </td>
 <td style="text-align:right;">
-0.000000e+00
+3.486239e+04
 </td>
 <td style="text-align:right;">
-0.0000000
+1.8111969
 </td>
 <td style="text-align:right;">
-0.0000000
+1.3583977
 </td>
 <td style="text-align:right;">
-0.00
+41657.53
 </td>
 <td style="text-align:right;">
-21.31760
+16.19924
 </td>
 <td style="text-align:right;">
-14.48082
+Inf
 </td>
 <td style="text-align:right;">
 37.44090
@@ -1884,25 +1883,25 @@ int
 female
 </td>
 <td style="text-align:right;">
-0.000000e+00
+3.486239e+04
 </td>
 <td style="text-align:right;">
 0.0000
 </td>
 <td style="text-align:right;">
-0.0000000
+1.1368171
 </td>
 <td style="text-align:right;">
-0.00
+41657.53
 </td>
 <td style="text-align:right;">
-0.0000000
+1.3583977
 </td>
 <td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
-5.400428
+6.934019
 </td>
 <td style="text-align:right;">
 1
@@ -1955,10 +1954,10 @@ start
 int
 </td>
 <td style="text-align:left;">
-idfs
+ttot.early
 </td>
 <td style="text-align:right;">
-1973
+1968
 </td>
 </tr>
 <tr>
@@ -1966,10 +1965,10 @@ idfs
 int
 </td>
 <td style="text-align:left;">
-ttot.early
+idfs
 </td>
 <td style="text-align:right;">
-1973
+1961
 </td>
 </tr>
 <tr>
@@ -1980,7 +1979,7 @@ int
 ttot.beva
 </td>
 <td style="text-align:right;">
-1953
+1956
 </td>
 </tr>
 <tr>
@@ -1991,7 +1990,7 @@ int
 remission
 </td>
 <td style="text-align:right;">
-1588
+1582
 </td>
 </tr>
 <tr>
@@ -2002,7 +2001,7 @@ int
 recurrence
 </td>
 <td style="text-align:right;">
-1355
+1349
 </td>
 </tr>
 <tr>
@@ -2013,7 +2012,7 @@ int
 ae
 </td>
 <td style="text-align:right;">
-1142
+1138
 </td>
 </tr>
 <tr>
@@ -2024,7 +2023,7 @@ int
 ttot
 </td>
 <td style="text-align:right;">
-552
+576
 </td>
 </tr>
 <tr>
@@ -2035,7 +2034,7 @@ int
 progression.mbc
 </td>
 <td style="text-align:right;">
-542
+564
 </td>
 </tr>
 <tr>
@@ -2057,7 +2056,7 @@ int
 2ndline_mbc
 </td>
 <td style="text-align:right;">
-231
+240
 </td>
 </tr>
 <tr>
@@ -2090,7 +2089,7 @@ noint
 ttot.early
 </td>
 <td style="text-align:right;">
-1975
+1974
 </td>
 </tr>
 <tr>
@@ -2101,7 +2100,7 @@ noint
 idfs
 </td>
 <td style="text-align:right;">
-1971
+1970
 </td>
 </tr>
 <tr>
@@ -2112,7 +2111,7 @@ noint
 remission
 </td>
 <td style="text-align:right;">
-1580
+1588
 </td>
 </tr>
 <tr>
@@ -2123,7 +2122,7 @@ noint
 ae
 </td>
 <td style="text-align:right;">
-1374
+1347
 </td>
 </tr>
 <tr>
@@ -2134,7 +2133,7 @@ noint
 recurrence
 </td>
 <td style="text-align:right;">
-1225
+1185
 </td>
 </tr>
 <tr>
@@ -2145,7 +2144,7 @@ noint
 ttot
 </td>
 <td style="text-align:right;">
-473
+440
 </td>
 </tr>
 <tr>
@@ -2156,7 +2155,7 @@ noint
 progression.mbc
 </td>
 <td style="text-align:right;">
-453
+436
 </td>
 </tr>
 <tr>
@@ -2167,7 +2166,7 @@ noint
 start.early.mbc
 </td>
 <td style="text-align:right;">
-368
+362
 </td>
 </tr>
 <tr>
@@ -2178,7 +2177,7 @@ noint
 2ndline_mbc
 </td>
 <td style="text-align:right;">
-200
+193
 </td>
 </tr>
 </tbody>
@@ -2240,7 +2239,7 @@ vs. remission and cure or recurrence).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

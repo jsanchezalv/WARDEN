@@ -6,16 +6,24 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Example for a Sick-Sicker-Dead model, Quasi-Random Sobol Sequence vs. Purely Random • WARDEN</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
-<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="icon" sizes="any" href="../favicon.ico">
-<link rel="manifest" href="../site.webmanifest">
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Example for a Sick-Sicker-Dead model, Quasi-Random Sobol Sequence vs. Purely Random">
+<!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZEDNGW5QRP"></script><script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZEDNGW5QRP');
+</script><!-- Google tag (gtag.js) -->
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -25,7 +33,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,15 +47,20 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd.html">Example in a Sick-Sicker-Dead Model</a></li>
+<li><h6 class="dropdown-header" data-toc-skip>Basic Tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd.html">Sick-Sicker-Dead Model (SSD)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_constrained.html">Resource Constrained Sick-Sicker-Dead model</a></li>
     <li><a class="dropdown-item" href="../articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Example in a Sick-Sicker-Dead Model - Random Number Streams &amp; Luck Adjustment</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random</a></li>
-    <li><a class="dropdown-item" href="../articles/example_eBC.html">Example in Early Breast Cancer</a></li>
-    <li><a class="dropdown-item" href="../articles/example_markov.html">Example in a Markov Model</a></li>
+    <li><a class="dropdown-item" href="../articles/example_eBC.html">Early Breast Cancer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ipd.html">Using Individual Patient Data</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Tips</h6></li>
+    <li><a class="dropdown-item" href="../articles/example_markov.html">Cohort Markov Model</a></li>
+    <li><a class="dropdown-item" href="../articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ipd.html">Example for Individual Patient Data</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
+    <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
   </ul>
 </li>
       </ul>
@@ -69,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">May 23, 2025</h4>
+            <h4 data-toc-skip class="date">octubre 07, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/HEAD/vignettes/articles/example_ssd_sobol.Rmd" class="external-link"><code>vignettes/articles/example_ssd_sobol.Rmd</code></a></small>
       <div class="d-none name"><code>example_ssd_sobol.Rmd</code></div>
@@ -93,7 +106,6 @@ Alvarez</h4>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.4.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'kableExtra'</span></span>
@@ -218,15 +230,15 @@ number</p>
 <span>               input <span class="op">=</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"sicker"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="va">util.sicker</span>,</span>
-<span>                                  c_default <span class="op">=</span> <span class="va">cost.sicker</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span>,</span>
-<span>                                  fl.sick <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="va">util.sicker</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.sicker</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span></span>
+<span>                 <span class="va">fl.sick</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"death"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
-<span>                 <span class="fu"><a href="../reference/modify_item.html">modify_item</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>                                  c_default <span class="op">=</span> <span class="fl">0</span>, </span>
-<span>                                  curtime <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> </span>
+<span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="fl">0</span> </span>
+<span>                 <span class="va">curtime</span> <span class="op">&lt;-</span> <span class="cn">Inf</span> </span>
 <span>               <span class="op">}</span><span class="op">)</span> </span></code></pre></div>
 </div>
 </div>
@@ -275,17 +287,18 @@ the different speed of convergence.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.45s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.73s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.57s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.61s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.37s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.94s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.39s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.7s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.39s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 2.17s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.19s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 1.05s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 4.03s</span></span>
+<span><span class="co">#&gt; Total time to run: 4.05s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="va">results_sobol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
 <span>  npats<span class="op">=</span><span class="va">N</span>,                               </span>
@@ -305,17 +318,18 @@ the different speed of convergence.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.41s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 1.4s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.39s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 1.27s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.37s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.86s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.41s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.72s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.38s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 1.96s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.96s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 5: 1s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 5.25s</span></span>
+<span><span class="co">#&gt; Total time to run: 5.25s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -333,60 +347,60 @@ model converge much more slowly than the sobol sequences.</p>
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results_unif</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> </span>
-<span><span class="co">#&gt;                                       int                   noint</span></span>
-<span><span class="co">#&gt; costs             59,311 (57,800; 61,194) 52,090 (50,768; 53,725)</span></span>
-<span><span class="co">#&gt; dcosts                           0 (0; 0)    7,220 (7,033; 7,469)</span></span>
-<span><span class="co">#&gt; lys                     9.73 (9.59; 9.91)       9.73 (9.59; 9.91)</span></span>
-<span><span class="co">#&gt; dlys                             0 (0; 0)                0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys                   6.26 (6.19; 6.39)           6.07 (6; 6.2)</span></span>
-<span><span class="co">#&gt; dqalys                           0 (0; 0)    0.188 (0.178; 0.197)</span></span>
-<span><span class="co">#&gt; ICER                         NaN (NA; NA)          Inf (Inf; Inf)</span></span>
-<span><span class="co">#&gt; ICUR                         NaN (NA; NA) 38,402 (36,651; 42,023)</span></span>
-<span><span class="co">#&gt; INMB                         NaN (NA; NA)    2,201 (1,419; 2,604)</span></span>
-<span><span class="co">#&gt; costs_undisc      74,738 (72,422; 77,338) 65,881 (63,864; 68,132)</span></span>
-<span><span class="co">#&gt; dcosts_undisc                    0 (0; 0)    8,857 (8,558; 9,206)</span></span>
-<span><span class="co">#&gt; lys_undisc                12 (11.8; 12.3)         12 (11.8; 12.3)</span></span>
-<span><span class="co">#&gt; dlys_undisc                      0 (0; 0)                0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys_undisc              7.6 (7.49; 7.8)       7.37 (7.26; 7.55)</span></span>
-<span><span class="co">#&gt; dqalys_undisc                    0 (0; 0)    0.236 (0.223; 0.249)</span></span>
-<span><span class="co">#&gt; ICER_undisc                  NaN (NA; NA)          Inf (Inf; Inf)</span></span>
-<span><span class="co">#&gt; ICUR_undisc                  NaN (NA; NA) 37,578 (35,380; 41,293)</span></span>
-<span><span class="co">#&gt; INMB_undisc                  NaN (NA; NA)    2,956 (1,942; 3,550)</span></span>
-<span><span class="co">#&gt; c_default         59,311 (57,800; 61,194) 52,090 (50,768; 53,725)</span></span>
-<span><span class="co">#&gt; dc_default                       0 (0; 0)    7,220 (7,033; 7,469)</span></span>
-<span><span class="co">#&gt; c_default_undisc  74,738 (72,422; 77,338) 65,881 (63,864; 68,132)</span></span>
-<span><span class="co">#&gt; dc_default_undisc                0 (0; 0)    8,857 (8,558; 9,206)</span></span>
-<span><span class="co">#&gt; q_default               6.26 (6.19; 6.39)           6.07 (6; 6.2)</span></span>
-<span><span class="co">#&gt; dq_default                       0 (0; 0)    0.188 (0.178; 0.197)</span></span>
-<span><span class="co">#&gt; q_default_undisc          7.6 (7.49; 7.8)       7.37 (7.26; 7.55)</span></span>
-<span><span class="co">#&gt; dq_default_undisc                0 (0; 0)    0.236 (0.223; 0.249)</span></span>
+<span><span class="co">#&gt;                                       int                                noint</span></span>
+<span><span class="co">#&gt; costs             59,311 (57,721; 61,331)              52,090 (50,691; 53,841)</span></span>
+<span><span class="co">#&gt; dcosts                           0 (0; 0)                 7,220 (7,030; 7,490)</span></span>
+<span><span class="co">#&gt; lys                     9.73 (9.59; 9.92)                    9.73 (9.59; 9.92)</span></span>
+<span><span class="co">#&gt; dlys                             0 (0; 0)                             0 (0; 0)</span></span>
+<span><span class="co">#&gt; qalys                   6.26 (6.19; 6.41)                       6.07 (6; 6.21)</span></span>
+<span><span class="co">#&gt; dqalys                           0 (0; 0)                 0.188 (0.177; 0.198)</span></span>
+<span><span class="co">#&gt; ICER                         NaN (NA; NA) Inf (4,098,046,449,958,334,464; Inf)</span></span>
+<span><span class="co">#&gt; ICUR                         NaN (NA; NA)              38,402 (36,636; 42,307)</span></span>
+<span><span class="co">#&gt; INMB                         NaN (NA; NA)                 2,201 (1,362; 2,608)</span></span>
+<span><span class="co">#&gt; costs_undisc      74,738 (72,292; 77,497)              65,881 (63,744; 68,262)</span></span>
+<span><span class="co">#&gt; dcosts_undisc                    0 (0; 0)                 8,857 (8,548; 9,234)</span></span>
+<span><span class="co">#&gt; lys_undisc                12 (11.8; 12.3)                      12 (11.8; 12.3)</span></span>
+<span><span class="co">#&gt; dlys_undisc                      0 (0; 0)                             0 (0; 0)</span></span>
+<span><span class="co">#&gt; qalys_undisc             7.6 (7.49; 7.82)                    7.37 (7.25; 7.57)</span></span>
+<span><span class="co">#&gt; dqalys_undisc                    0 (0; 0)                  0.236 (0.222; 0.25)</span></span>
+<span><span class="co">#&gt; ICER_undisc                  NaN (NA; NA)                       Inf (Inf; Inf)</span></span>
+<span><span class="co">#&gt; ICUR_undisc                  NaN (NA; NA)              37,578 (35,334; 41,552)</span></span>
+<span><span class="co">#&gt; INMB_undisc                  NaN (NA; NA)                 2,956 (1,878; 3,550)</span></span>
+<span><span class="co">#&gt; c_default         59,311 (57,721; 61,331)              52,090 (50,691; 53,841)</span></span>
+<span><span class="co">#&gt; dc_default                       0 (0; 0)                 7,220 (7,030; 7,490)</span></span>
+<span><span class="co">#&gt; c_default_undisc  74,738 (72,292; 77,497)              65,881 (63,744; 68,262)</span></span>
+<span><span class="co">#&gt; dc_default_undisc                0 (0; 0)                 8,857 (8,548; 9,234)</span></span>
+<span><span class="co">#&gt; q_default               6.26 (6.19; 6.41)                       6.07 (6; 6.21)</span></span>
+<span><span class="co">#&gt; dq_default                       0 (0; 0)                 0.188 (0.177; 0.198)</span></span>
+<span><span class="co">#&gt; q_default_undisc         7.6 (7.49; 7.82)                    7.37 (7.25; 7.57)</span></span>
+<span><span class="co">#&gt; dq_default_undisc                0 (0; 0)                  0.236 (0.222; 0.25)</span></span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results_sobol</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> </span>
 <span><span class="co">#&gt;                                       int                   noint</span></span>
-<span><span class="co">#&gt; costs             59,690 (59,529; 59,855) 52,398 (52,243; 52,536)</span></span>
-<span><span class="co">#&gt; dcosts                           0 (0; 0)    7,292 (7,257; 7,319)</span></span>
-<span><span class="co">#&gt; lys                     9.74 (9.72; 9.77)       9.74 (9.72; 9.77)</span></span>
+<span><span class="co">#&gt; costs             59,690 (59,520; 59,864) 52,398 (52,230; 52,544)</span></span>
+<span><span class="co">#&gt; dcosts                           0 (0; 0)    7,292 (7,254; 7,320)</span></span>
+<span><span class="co">#&gt; lys                     9.74 (9.72; 9.78)       9.74 (9.72; 9.78)</span></span>
 <span><span class="co">#&gt; dlys                             0 (0; 0)                0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys                   6.24 (6.23; 6.26)       6.06 (6.04; 6.08)</span></span>
+<span><span class="co">#&gt; qalys                   6.24 (6.22; 6.26)       6.06 (6.04; 6.08)</span></span>
 <span><span class="co">#&gt; dqalys                           0 (0; 0)    0.184 (0.183; 0.185)</span></span>
 <span><span class="co">#&gt; ICER                         NaN (NA; NA)          Inf (Inf; Inf)</span></span>
-<span><span class="co">#&gt; ICUR                         NaN (NA; NA) 39,650 (39,204; 39,964)</span></span>
-<span><span class="co">#&gt; INMB                         NaN (NA; NA)    1,904 (1,835; 1,998)</span></span>
-<span><span class="co">#&gt; costs_undisc      75,219 (74,967; 75,467) 66,248 (66,004; 66,457)</span></span>
-<span><span class="co">#&gt; dcosts_undisc                    0 (0; 0)    8,971 (8,920; 9,010)</span></span>
+<span><span class="co">#&gt; ICUR                         NaN (NA; NA) 39,650 (39,172; 39,973)</span></span>
+<span><span class="co">#&gt; INMB                         NaN (NA; NA)    1,904 (1,833; 2,005)</span></span>
+<span><span class="co">#&gt; costs_undisc      75,219 (74,954; 75,482) 66,248 (65,985; 66,470)</span></span>
+<span><span class="co">#&gt; dcosts_undisc                    0 (0; 0)    8,971 (8,915; 9,012)</span></span>
 <span><span class="co">#&gt; lys_undisc                  12 (12; 12.1)           12 (12; 12.1)</span></span>
 <span><span class="co">#&gt; dlys_undisc                      0 (0; 0)                0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys_undisc            7.58 (7.56; 7.61)       7.36 (7.33; 7.38)</span></span>
+<span><span class="co">#&gt; qalys_undisc            7.58 (7.56; 7.62)       7.36 (7.33; 7.39)</span></span>
 <span><span class="co">#&gt; dqalys_undisc                    0 (0; 0)    0.229 (0.227; 0.231)</span></span>
 <span><span class="co">#&gt; ICER_undisc                  NaN (NA; NA)          Inf (Inf; Inf)</span></span>
-<span><span class="co">#&gt; ICUR_undisc                  NaN (NA; NA) 39,184 (38,675; 39,524)</span></span>
-<span><span class="co">#&gt; INMB_undisc                  NaN (NA; NA)    2,477 (2,382; 2,612)</span></span>
-<span><span class="co">#&gt; c_default         59,690 (59,529; 59,855) 52,398 (52,243; 52,536)</span></span>
-<span><span class="co">#&gt; dc_default                       0 (0; 0)    7,292 (7,257; 7,319)</span></span>
-<span><span class="co">#&gt; c_default_undisc  75,219 (74,967; 75,467) 66,248 (66,004; 66,457)</span></span>
-<span><span class="co">#&gt; dc_default_undisc                0 (0; 0)    8,971 (8,920; 9,010)</span></span>
-<span><span class="co">#&gt; q_default               6.24 (6.23; 6.26)       6.06 (6.04; 6.08)</span></span>
+<span><span class="co">#&gt; ICUR_undisc                  NaN (NA; NA) 39,184 (38,637; 39,531)</span></span>
+<span><span class="co">#&gt; INMB_undisc                  NaN (NA; NA)    2,477 (2,381; 2,622)</span></span>
+<span><span class="co">#&gt; c_default         59,690 (59,520; 59,864) 52,398 (52,230; 52,544)</span></span>
+<span><span class="co">#&gt; dc_default                       0 (0; 0)    7,292 (7,254; 7,320)</span></span>
+<span><span class="co">#&gt; c_default_undisc  75,219 (74,954; 75,482) 66,248 (65,985; 66,470)</span></span>
+<span><span class="co">#&gt; dc_default_undisc                0 (0; 0)    8,971 (8,915; 9,012)</span></span>
+<span><span class="co">#&gt; q_default               6.24 (6.22; 6.26)       6.06 (6.04; 6.08)</span></span>
 <span><span class="co">#&gt; dq_default                       0 (0; 0)    0.184 (0.183; 0.185)</span></span>
-<span><span class="co">#&gt; q_default_undisc        7.58 (7.56; 7.61)       7.36 (7.33; 7.38)</span></span>
+<span><span class="co">#&gt; q_default_undisc        7.58 (7.56; 7.62)       7.36 (7.33; 7.39)</span></span>
 <span><span class="co">#&gt; dq_default_undisc                0 (0; 0)    0.229 (0.227; 0.231)</span></span>
 <span></span>
 <span></span>
@@ -481,17 +495,18 @@ model converge much more slowly than the sobol sequences.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.39s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.67s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.46s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.56s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.38s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.52s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.41s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.51s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.39s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 2.03s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.05s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.49s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 2.75s</span></span>
+<span><span class="co">#&gt; Total time to run: 2.75s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="va">results_sobol_psa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
 <span>  npats<span class="op">=</span><span class="va">N</span>,                               </span>
@@ -512,17 +527,18 @@ model converge much more slowly than the sobol sequences.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.4s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.47s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.41s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.75s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.39s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 1.03s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.41s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.85s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.39s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 2s</span></span>
-<span><span class="co">#&gt; Total time to run: 2s</span></span></code></pre></div>
+<span><span class="co">#&gt; Time to run simulation 5: 0.78s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 3.88s</span></span>
+<span><span class="co">#&gt; Total time to run: 3.89s</span></span>
+<span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -540,61 +556,61 @@ model converge much more slowly than the sobol sequences.</p>
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results_unif_psa</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> </span>
-<span><span class="co">#&gt;                                       int                   noint</span></span>
-<span><span class="co">#&gt; costs             60,135 (58,403; 63,016) 53,027 (51,497; 55,211)</span></span>
-<span><span class="co">#&gt; dcosts                           0 (0; 0)    7,108 (5,994; 7,805)</span></span>
-<span><span class="co">#&gt; lys                       10 (9.85; 10.2)         10 (9.85; 10.2)</span></span>
-<span><span class="co">#&gt; dlys                             0 (0; 0)                0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys                   6.33 (5.63; 6.78)       6.12 (5.53; 6.53)</span></span>
-<span><span class="co">#&gt; dqalys                           0 (0; 0)      0.21 (0.105; 0.25)</span></span>
-<span><span class="co">#&gt; ICER                         NaN (NA; NA)          Inf (Inf; Inf)</span></span>
-<span><span class="co">#&gt; ICUR                         NaN (NA; NA) 38,930 (24,578; 70,228)</span></span>
-<span><span class="co">#&gt; INMB                         NaN (NA; NA)   3,388 (-1,708; 6,245)</span></span>
-<span><span class="co">#&gt; costs_undisc      73,464 (71,678; 76,647) 64,968 (62,991; 67,367)</span></span>
-<span><span class="co">#&gt; dcosts_undisc                    0 (0; 0)    8,495 (7,170; 9,280)</span></span>
-<span><span class="co">#&gt; lys_undisc                12 (11.8; 12.3)         12 (11.8; 12.3)</span></span>
-<span><span class="co">#&gt; dlys_undisc                      0 (0; 0)                0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys_undisc             7.48 (6.7; 7.99)       7.22 (6.57; 7.69)</span></span>
-<span><span class="co">#&gt; dqalys_undisc                    0 (0; 0)    0.254 (0.127; 0.302)</span></span>
-<span><span class="co">#&gt; ICER_undisc                  NaN (NA; NA)          Inf (Inf; Inf)</span></span>
-<span><span class="co">#&gt; ICUR_undisc                  NaN (NA; NA) 38,554 (24,223; 69,703)</span></span>
-<span><span class="co">#&gt; INMB_undisc                  NaN (NA; NA)   4,183 (-1,988; 7,695)</span></span>
-<span><span class="co">#&gt; c_default         60,135 (58,403; 63,016) 53,027 (51,497; 55,211)</span></span>
-<span><span class="co">#&gt; dc_default                       0 (0; 0)    7,108 (5,994; 7,805)</span></span>
-<span><span class="co">#&gt; c_default_undisc  73,464 (71,678; 76,647) 64,968 (62,991; 67,367)</span></span>
-<span><span class="co">#&gt; dc_default_undisc                0 (0; 0)    8,495 (7,170; 9,280)</span></span>
-<span><span class="co">#&gt; q_default               6.33 (5.63; 6.78)       6.12 (5.53; 6.53)</span></span>
-<span><span class="co">#&gt; dq_default                       0 (0; 0)      0.21 (0.105; 0.25)</span></span>
-<span><span class="co">#&gt; q_default_undisc         7.48 (6.7; 7.99)       7.22 (6.57; 7.69)</span></span>
-<span><span class="co">#&gt; dq_default_undisc                0 (0; 0)    0.254 (0.127; 0.302)</span></span>
+<span><span class="co">#&gt;                                       int                                 noint</span></span>
+<span><span class="co">#&gt; costs             60,135 (58,358; 63,200)               53,027 (51,433; 55,367)</span></span>
+<span><span class="co">#&gt; dcosts                           0 (0; 0)                  7,108 (5,895; 7,833)</span></span>
+<span><span class="co">#&gt; lys                       10 (9.85; 10.2)                       10 (9.85; 10.2)</span></span>
+<span><span class="co">#&gt; dlys                             0 (0; 0)                              0 (0; 0)</span></span>
+<span><span class="co">#&gt; qalys                   6.33 (5.57; 6.79)                     6.12 (5.47; 6.54)</span></span>
+<span><span class="co">#&gt; dqalys                           0 (0; 0)                    0.21 (0.093; 0.25)</span></span>
+<span><span class="co">#&gt; ICER                         NaN (NA; NA) Inf (-4,409,497,606,028,984,320; Inf)</span></span>
+<span><span class="co">#&gt; ICUR                         NaN (NA; NA)               38,930 (24,034; 74,072)</span></span>
+<span><span class="co">#&gt; INMB                         NaN (NA; NA)                 3,388 (-2,237; 6,369)</span></span>
+<span><span class="co">#&gt; costs_undisc      73,464 (71,670; 76,813)               64,968 (62,912; 67,508)</span></span>
+<span><span class="co">#&gt; dcosts_undisc                    0 (0; 0)                  8,495 (7,051; 9,305)</span></span>
+<span><span class="co">#&gt; lys_undisc                12 (11.8; 12.3)                       12 (11.8; 12.3)</span></span>
+<span><span class="co">#&gt; dlys_undisc                      0 (0; 0)                              0 (0; 0)</span></span>
+<span><span class="co">#&gt; qalys_undisc            7.48 (6.62; 7.99)                     7.22 (6.51; 7.69)</span></span>
+<span><span class="co">#&gt; dqalys_undisc                    0 (0; 0)                  0.254 (0.112; 0.302)</span></span>
+<span><span class="co">#&gt; ICER_undisc                  NaN (NA; NA) Inf (-5,238,257,628,334,784,512; Inf)</span></span>
+<span><span class="co">#&gt; ICUR_undisc                  NaN (NA; NA)               38,554 (23,613; 73,550)</span></span>
+<span><span class="co">#&gt; INMB_undisc                  NaN (NA; NA)                 4,183 (-2,637; 7,879)</span></span>
+<span><span class="co">#&gt; c_default         60,135 (58,358; 63,200)               53,027 (51,433; 55,367)</span></span>
+<span><span class="co">#&gt; dc_default                       0 (0; 0)                  7,108 (5,895; 7,833)</span></span>
+<span><span class="co">#&gt; c_default_undisc  73,464 (71,670; 76,813)               64,968 (62,912; 67,508)</span></span>
+<span><span class="co">#&gt; dc_default_undisc                0 (0; 0)                  8,495 (7,051; 9,305)</span></span>
+<span><span class="co">#&gt; q_default               6.33 (5.57; 6.79)                     6.12 (5.47; 6.54)</span></span>
+<span><span class="co">#&gt; dq_default                       0 (0; 0)                    0.21 (0.093; 0.25)</span></span>
+<span><span class="co">#&gt; q_default_undisc        7.48 (6.62; 7.99)                     7.22 (6.51; 7.69)</span></span>
+<span><span class="co">#&gt; dq_default_undisc                0 (0; 0)                  0.254 (0.112; 0.302)</span></span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results_sobol_psa</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> </span>
 <span><span class="co">#&gt;                                       int                   noint</span></span>
-<span><span class="co">#&gt; costs             60,571 (58,122; 64,995) 53,370 (52,034; 56,982)</span></span>
-<span><span class="co">#&gt; dcosts                           0 (0; 0)    7,200 (6,049; 8,074)</span></span>
+<span><span class="co">#&gt; costs             60,571 (57,975; 65,556) 53,370 (52,029; 57,428)</span></span>
+<span><span class="co">#&gt; dcosts                           0 (0; 0)    7,200 (5,946; 8,128)</span></span>
 <span><span class="co">#&gt; lys                       10 (9.99; 10.1)         10 (9.99; 10.1)</span></span>
 <span><span class="co">#&gt; dlys                             0 (0; 0)                0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys                    6.31 (5.66; 6.8)        6.1 (5.55; 6.56)</span></span>
-<span><span class="co">#&gt; dqalys                           0 (0; 0)    0.203 (0.105; 0.242)</span></span>
+<span><span class="co">#&gt; qalys                   6.31 (5.59; 6.83)         6.1 (5.5; 6.59)</span></span>
+<span><span class="co">#&gt; dqalys                           0 (0; 0)    0.203 (0.092; 0.242)</span></span>
 <span><span class="co">#&gt; ICER                         NaN (NA; NA)          Inf (Inf; Inf)</span></span>
-<span><span class="co">#&gt; ICUR                         NaN (NA; NA) 40,231 (26,808; 71,510)</span></span>
-<span><span class="co">#&gt; INMB                         NaN (NA; NA)   2,970 (-1,776; 5,273)</span></span>
-<span><span class="co">#&gt; costs_undisc      73,994 (71,014; 79,434) 65,368 (63,730; 69,820)</span></span>
-<span><span class="co">#&gt; dcosts_undisc                    0 (0; 0)    8,626 (7,239; 9,685)</span></span>
+<span><span class="co">#&gt; ICUR                         NaN (NA; NA) 40,231 (26,299; 75,677)</span></span>
+<span><span class="co">#&gt; INMB                         NaN (NA; NA)   2,970 (-2,366; 5,358)</span></span>
+<span><span class="co">#&gt; costs_undisc      73,994 (70,836; 80,126) 65,368 (63,721; 70,376)</span></span>
+<span><span class="co">#&gt; dcosts_undisc                    0 (0; 0)    8,626 (7,115; 9,750)</span></span>
 <span><span class="co">#&gt; lys_undisc                  12 (12; 12.1)           12 (12; 12.1)</span></span>
 <span><span class="co">#&gt; dlys_undisc                      0 (0; 0)                0 (0; 0)</span></span>
-<span><span class="co">#&gt; qalys_undisc            7.45 (6.73; 8.03)        7.21 (6.6; 7.74)</span></span>
-<span><span class="co">#&gt; dqalys_undisc                    0 (0; 0)    0.244 (0.126; 0.289)</span></span>
+<span><span class="co">#&gt; qalys_undisc            7.45 (6.66; 8.07)       7.21 (6.55; 7.78)</span></span>
+<span><span class="co">#&gt; dqalys_undisc                    0 (0; 0)    0.244 (0.111; 0.289)</span></span>
 <span><span class="co">#&gt; ICER_undisc                  NaN (NA; NA)          Inf (Inf; Inf)</span></span>
-<span><span class="co">#&gt; ICUR_undisc                  NaN (NA; NA) 40,091 (26,705; 71,186)</span></span>
-<span><span class="co">#&gt; INMB_undisc                  NaN (NA; NA)   3,590 (-2,091; 6,365)</span></span>
-<span><span class="co">#&gt; c_default         60,571 (58,122; 64,995) 53,370 (52,034; 56,982)</span></span>
-<span><span class="co">#&gt; dc_default                       0 (0; 0)    7,200 (6,049; 8,074)</span></span>
-<span><span class="co">#&gt; c_default_undisc  73,994 (71,014; 79,434) 65,368 (63,730; 69,820)</span></span>
-<span><span class="co">#&gt; dc_default_undisc                0 (0; 0)    8,626 (7,239; 9,685)</span></span>
-<span><span class="co">#&gt; q_default                6.31 (5.66; 6.8)        6.1 (5.55; 6.56)</span></span>
-<span><span class="co">#&gt; dq_default                       0 (0; 0)    0.203 (0.105; 0.242)</span></span>
-<span><span class="co">#&gt; q_default_undisc        7.45 (6.73; 8.03)        7.21 (6.6; 7.74)</span></span>
-<span><span class="co">#&gt; dq_default_undisc                0 (0; 0)    0.244 (0.126; 0.289)</span></span>
+<span><span class="co">#&gt; ICUR_undisc                  NaN (NA; NA) 40,091 (26,173; 75,312)</span></span>
+<span><span class="co">#&gt; INMB_undisc                  NaN (NA; NA)   3,590 (-2,809; 6,477)</span></span>
+<span><span class="co">#&gt; c_default         60,571 (57,975; 65,556) 53,370 (52,029; 57,428)</span></span>
+<span><span class="co">#&gt; dc_default                       0 (0; 0)    7,200 (5,946; 8,128)</span></span>
+<span><span class="co">#&gt; c_default_undisc  73,994 (70,836; 80,126) 65,368 (63,721; 70,376)</span></span>
+<span><span class="co">#&gt; dc_default_undisc                0 (0; 0)    8,626 (7,115; 9,750)</span></span>
+<span><span class="co">#&gt; q_default               6.31 (5.59; 6.83)         6.1 (5.5; 6.59)</span></span>
+<span><span class="co">#&gt; dq_default                       0 (0; 0)    0.203 (0.092; 0.242)</span></span>
+<span><span class="co">#&gt; q_default_undisc        7.45 (6.66; 8.07)       7.21 (6.55; 7.78)</span></span>
+<span><span class="co">#&gt; dq_default_undisc                0 (0; 0)    0.244 (0.111; 0.289)</span></span>
 <span></span>
 <span></span>
 <span><span class="va">psa_ipd_unif</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results_unif_psa</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"unif"</span><span class="op">)</span></span>
@@ -631,7 +647,7 @@ model converge much more slowly than the sobol sequences.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

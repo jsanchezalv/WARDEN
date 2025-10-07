@@ -2,25 +2,33 @@
 % Please edit documentation in R/input_f.R
 \name{new_event}
 \alias{new_event}
-\title{Generate new events to be added to existing vector of events}
+\title{Add Events to the Queue for a Patient}
 \usage{
-new_event(evt)
+new_event(events, ptr, patient_id)
 }
 \arguments{
-\item{evt}{Event name and event time}
+\item{events}{A named numeric vector. Names are event types, values are event times. It can also handle lists instead of named vectors (at a small computational cost).}
+
+\item{ptr}{The event queue pointer. Defaults to \code{cur_evtlist}.}
+
+\item{patient_id}{The patient ID. Defaults to \code{i}.}
 }
 \value{
-No return value, adds event to \code{cur_evtlist} and integrates it with the main list for storage
+NULL (invisible). Modifies the queue in-place.
 }
 \description{
-Generate new events to be added to existing vector of events
+Adds one or more events for a given patient to the queue.
 }
 \details{
-The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
+The functions to add/modify events/inputs use named vectors or lists. Whenever several inputs/events are added or modified,
+it's recommended to group them within one function, as it reduces the computation cost.
 So rather than use two \code{new_event} with a list of one element, it's better to group them into a single \code{new_event} with a list of two elements.
+
+While multiple events can be added, they must be named differently. If the same event is added multiple times at once, only the last occurrence will be kept
+(only one event per event type in the queue of events yet to occur). If an event occurs, then a new one with the same name can be set.
 
 This function is intended to be used only within the \code{add_reactevt} function in its \code{input} parameter and should not be run elsewhere or it will return an error.
 }
 \examples{
-add_reactevt(name_evt = "idfs",input = {new_event(list("ae"=5))})
+add_reactevt(name_evt = "idfs",input = {new_event(c("ae"=5))})
 }

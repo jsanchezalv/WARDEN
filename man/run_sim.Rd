@@ -28,6 +28,7 @@ run_sim(
   n_sensitivity = 1,
   input_out = character(),
   ipd = 1,
+  constrained = FALSE,
   timed_freq = NULL,
   debug = FALSE,
   accum_backwards = FALSE,
@@ -82,11 +83,13 @@ run_sim(
 
 \item{ipd}{Integer taking value 1 for full IPD data returned, and 2 IPD data but aggregating events (returning last value for numeric/character/factor variables. For other objects (e.g., matrices), the IPD will still be returned as the aggregation rule is not clear). Other values mean no IPD data returned (removes non-numerical or length>1 items)}
 
+\item{constrained}{Boolean, FALSE by default, which runs the simulation with patients not interacting with each other, TRUE if resources are shared within an arm (allows constrained resources)}
+
 \item{timed_freq}{If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)}
 
 \item{debug}{If TRUE, will generate a log file}
 
-\item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. If TRUE, user must use \code{modify_item} and \code{modify_item_seq} or results will be incorrect.}
+\item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.}
 
 \item{continue_on_error}{If TRUE, on error it will attempt to continue by skipping the current simulation}
 
@@ -123,9 +126,7 @@ changes looking forward (e.g., o_q = utility at event 1, at event 2 utility does
 so we want to make sure to add o_q = utility at event 3 before updating utility. The program will automatically
 look back until event 1). Note that in previous versions of the package backward was the default, and now this has switched to forward.
 
-If using \code{accum_backwards = TRUE}, then it is mandatory for the user to use \code{modify_item} and \code{modify_item_seq} in event reactions,
-as the standard assignment approach (e.g., \code{a <- 5}) will not calculate the right results, particularly in the presence of
-conditional statements.
+The requirement to use \code{modify_item} if using \code{accum_backwards = TRUE}, is no longer the case thanks to a new method using active bindings, so it can be used normally.
 
 It is important to note that the QALYs and Costs (ongoing or instant or per cycle) used should be of length 1.
 If they were of length > 1, the model would expand the data,
@@ -141,7 +142,7 @@ maximum number of cycles, it should be set equal to NA).
 \code{debug = TRUE} will export a log file with the timestamp up the error in the main working directory. Note that
 using this mode without modify_item or modify_item_seq may lead to inaccuracies if assignments are done in non-standard ways,
 as the AST may not catch all the relevant assignments (e.g., an assigment like assign(paste("x_",i),5)
-in a loop will not be identified, unless using modify_item(_seq)).
+in a loop will not be identified).
 
 \code{continue_on_error} will skip the current simulation (so it won't continue for the rest of patient-arms) if TRUE.
 Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.
@@ -181,15 +182,15 @@ add_reactevt(name_evt = "sick",
              input = {}) \%>\%
   add_reactevt(name_evt = "sicker",
                input = {
-                 modify_item(list(q_default = util.sicker,
-                                  c_default = cost.sicker + if(arm=="int"){cost.int}else{0},
-                                  fl.sick = 0)) 
+                 q_default <- util.sicker
+                 c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
+                 fl.sick <- 0 
                }) \%>\%
   add_reactevt(name_evt = "death",
                input = {
-                 modify_item(list(q_default = 0,
-                                  c_default = 0, 
-                                  curtime = Inf)) 
+                 q_default <- 0
+                 c_default <- 0
+                 curtime <- Inf
                }) 
                
 util_ongoing <- "q_default"
