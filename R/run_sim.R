@@ -397,7 +397,7 @@ run_sim <- function(arm_list=c("int","noint"),
   if(!is.null(sensitivity_inputs)){
     on_error_check({
       load_inputs(inputs = input_list_sens,list_uneval_inputs = sensitivity_inputs)
-    })
+    }, continue_on_error = continue_on_error)
     if(.skip_to_next){next}
     
     
@@ -439,7 +439,7 @@ run_sim <- function(arm_list=c("int","noint"),
       if(!is.null(common_all_inputs)){
         on_error_check({
           load_inputs(inputs = input_list,list_uneval_inputs = common_all_inputs)
-        })
+        }, continue_on_error = continue_on_error)
         if(.skip_to_next){next}
         
         if(input_list_sens$debug){ 
@@ -481,7 +481,7 @@ run_sim <- function(arm_list=c("int","noint"),
                      seed = seed,
                      .warden_ctx = .warden_ctx)   
         }
-      })
+      }, continue_on_error = continue_on_error)
       if(.skip_to_next){next}
       
    
