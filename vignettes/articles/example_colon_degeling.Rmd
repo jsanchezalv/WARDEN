@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
 
 This document makes use of the code provided by [Degeling et al. (2025)](https://link.springer.com/article/10.1007/s40258-025-00983-8) which use simmer in their original approach, to showcase how the same model would be written with WARDEN instead of using simmer, reflecting on the advantages and disadvantages of each approach.
 
-Note that the model used is not resource constrained, which implies WARDEN can be used to replicate the model. We will then see an alternative approach that could have been taken in the model design to simplify the code and reduce the number of events defined.
+Note that the model used is not resource constrained, so in WARDEN we would use with the `constrained = FALSE` argument (which is FALSE by default). We will then see an alternative approach that could have been taken in the model design to simplify the code and reduce the number of events defined.
 
 In this document I have made a few modifications to ensure the random numbers used are cloned for a patient across arms, that way we should be able to reduce the number of simulations needed to achieve convergence.
 
@@ -1554,7 +1554,7 @@ evt_react_list <-
                 }
                 final_TTD <- TTD+curtime
                 # Check whether TTD is lower than BS, if not correct to BS.
-                 if(cur_evtlist[["death"]] > final_TTD){
+                 if(get_event("death") > final_TTD){
                    modify_event(list(death = final_TTD)) 
                  }
                 q_total <- u_advanced
@@ -1718,7 +1718,7 @@ evt_react_list <-
   add_reactevt(name_evt = "start",
                input = {
                   #how many toxic events will we have?
-                   n_cycles_tobedone <- min(10,min(cur_evtlist) %/% t_adjuvant_cycle)
+                   n_cycles_tobedone <- min(10,next_event()$event_time %/% t_adjuvant_cycle)
                    n_tox <- ifelse(n_cycles_tobedone ==0, 0,sum(random_tox[1:n_cycles_tobedone] < p_toxicity))
                    #calculate the proportion out of maximum possible
                    prop_tox <- n_tox/(n_cycles_tobedone)
@@ -1762,7 +1762,7 @@ evt_react_list <-
                 }
                 final_TTD <- TTD+curtime
                 # Check whether TTD is lower than BS, if not correct to BS.
-                 if(cur_evtlist[["death"]] > final_TTD){
+                 if(get_event("death") > final_TTD){
                    modify_event(list(death = final_TTD)) 
                  }
                  
@@ -1802,7 +1802,7 @@ We can check speed of convergence. Note that making sure the random numbers are 
 
 We have plotted the observations through the simulation run for simmer with 3 different seeds (to display Monte Carlo error) and WARDEN (original, reworked and reworked with two different seeds). It's very noticeable that stability of the ICER is achieved faster with WARDEN, this is due to the use of cloning of the random numbers, which means that ~30,000 simulations would suffice to achieve stability. While the differences between simulations seem relatively large, in reality with the cloning random numbers approach it can be seen that the ICER remains within 2% of the final value already after 10,000 simulations.
 
-The running times with the original WARDEN approach are comparable to those of simmer shown by the paper, even if simmer uses a C++ implementation in the back-end. By using the reworked approach, WARDEN is able to cut running time by half. In my computer simmer took between 220 and 300 seconds to run 100,000 simulations. With WARDEN, the "one to one" approach took around 200 seconds. The reworked approach took 100 seconds.
+The running times with the original WARDEN approach are comparable to those of simmer shown by the paper, even if simmer uses a complex C++ implementation in the back-end. By using the reworked approach, WARDEN is able to cut running time by half. In my computer simmer took between 220 and 300 seconds to run 100,000 simulations. With WARDEN, the "one to one" approach took around 200 seconds. The reworked approach took 100 seconds.
 
 ```{r echo = FALSE, warning=FALSE, message=FALSE}
 

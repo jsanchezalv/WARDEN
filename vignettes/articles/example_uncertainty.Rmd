@@ -400,7 +400,7 @@ evt_react_list <-
                               c_ae = cost.ae
                  
                  modify_event(list(
-                              "os" = max(cur_evtlist[["os"]] - 0.125,curtime +0.0001) ))#each AE brings forward death by 1.5 months
+                              "os" = max(get_event("os") - 0.125,curtime +0.0001) ))#each AE brings forward death by 1.5 months
                }) %>%
   add_reactevt(name_evt = "os",
                input = {

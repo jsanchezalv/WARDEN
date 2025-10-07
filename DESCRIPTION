@@ -14,7 +14,7 @@ Authors@R:
       family = "Aponte Ribero",
       role = "ctb",
       email = ""))     
-Description: Toolkit to support and perform discrete event simulations without
+Description: Toolkit to support and perform discrete event simulations with and without
     resource constraints in the context of health technology assessments (HTA).
     The package focuses on cost-effectiveness modelling and aims to be submission-ready
     to relevant HTA bodies in alignment with 'NICE TSD 15'

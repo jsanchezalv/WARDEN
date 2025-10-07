@@ -4,7 +4,7 @@
 ## Introduction
 
 `WARDEN` is a user-friendly package that facilitates the use of discrete
-event simulations without resource constraints for cost-effectiveness
+event simulations with or without resource constraints for cost-effectiveness
 analysis. The package supports a flexible, transparent, practical
 approach to discrete event simulation while keeping an acceptable
 performance.

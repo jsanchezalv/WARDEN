@@ -26,28 +26,30 @@ navbar:
       href: reference/index.html
     - text: "Articles"
       menu:
+        - text: "Basic Tutorials"
         - text: "Warden Explained"
           href: articles/warden_explained.html
-        - text: "Example in a Sick-Sicker-Dead Model"
+        - text: "Sick-Sicker-Dead Model (SSD)"
           href: articles/example_ssd.html
-        - text: "Example for a Resource Constrained Sick-Sicker-Dead model"
+        - text: "Resource Constrained Sick-Sicker-Dead model"
           href: articles/example_ssd_constrained.html
-        - text: "Example in a Sick-Sicker-Dead Model - Random Number Streams & Luck Adjustment"
-          href: articles/example_ssd_stream.html
-        - text: "Example in a Sick-Sicker-Dead Model - Quasi-Random Sobol Sequence vs. Purely Random"
-          href: articles/example_ssd_sobol.html
-        - text: "Example in Early Breast Cancer"
-          href: articles/example_eBC.html
-        - text: "Example in a Markov Model"
-          href: articles/example_markov.html
         - text: "How to Use the Automatic Input Selector"
           href: articles/inputs_selector.html
+        - text: "Early Breast Cancer"
+          href: articles/example_eBC.html
+        - text: "Using Individual Patient Data"
+          href: articles/example_ipd.html
+        - text: "Other Tutorials and Tips"
+        - text: "Cohort Markov Model"
+          href: articles/example_markov.html
         - text: "How to Avoid Using Cycles to Speed Up Model"
           href: articles/example_avoiding_cycles.html
         - text: "Structural and Parametric Uncertainty"
           href: articles/example_uncertainty.html
-        - text: "Example for Individual Patient Data"
-          href: articles/example_ipd.html
+        - text: "Random Number Streams & Luck Adjustment (SSD model)"
+          href: articles/example_ssd_stream.html
+        - text: "Quasi-Random Sobol Sequence vs. Purely Random (SSD model)"
+          href: articles/example_ssd_sobol.html
         - text: "Degeling (2025) using WARDEN instead of simmer"
           href: articles/example_colon_degeling.html
   right:

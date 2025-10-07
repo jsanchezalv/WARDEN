@@ -485,12 +485,12 @@ add_item <- function(..., .data = NULL, input) {
 #'
 #' @return A substituted expression to be evaluated by engine 
 #'
-#' @importFrom lifecycle deprecate_warn
+#' @importFrom lifecycle deprecate_stop
 #'
 #' @export
 #'
 #' @details
-#' The functions to add/modify events/inputs use lists. If chaining together add_item2, it will just append the expressions together in the order established.
+#' DEPRECATED (old description): The functions to add/modify events/inputs use named vectors or lists. If chaining together add_item2, it will just append the expressions together in the order established.
 #'
 #' If using `pick_val_v`, note it should be used with the `deploy_env = TRUE` argument so that add_item2 process it correctly.
 #'
@@ -522,7 +522,7 @@ add_item <- function(..., .data = NULL, input) {
 #' )
 #'
 add_item2 <- function(.data=NULL,input){
-  lifecycle::deprecate_warn("2.0.0", "add_item2()", "add_item()")
+  lifecycle::deprecate_stop("2.0.0", "add_item2()", "add_item()")
   
   data_list <- .data
   
@@ -550,7 +550,7 @@ add_item2 <- function(.data=NULL,input){
 #' @export
 #'
 #' @details
-#' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
+#' DEPRECATED (old description): The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 #' So rather than use two `modify_item` with a list of one element, it's better to group them into a single `modify_item` with a list of two elements.
 #' 
 #' Note that `modify_item` nor `modify_item_seq` can work on subelements (e.g.,
@@ -674,7 +674,7 @@ queue_create <- function(priority_order) {
 #' @importFrom stats setNames
 #'
 #' @details
-#' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified,
+#' The functions to add/modify events/inputs use named vectors or lists. Whenever several inputs/events are added or modified,
 #'  it's recommended to group them within one function, as it reduces the computation cost.
 #' So rather than use two `new_event` with a list of one element, it's better to group them into a single `new_event` with a list of two elements.
 #' 
@@ -692,9 +692,9 @@ new_event <- function(events, ptr, patient_id) {
     events <- unlist(events)
   }
   
-  if(parent.frame()$debug){
-    input_list_arm <- parent.frame()
-    
+  input_list_arm <- parent.frame()
+  if(is.null(input_list_arm$debug)){input_list_arm$debug <- FALSE}
+  if(input_list_arm$debug){
     new_evt_name <- names(events)
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                   "; Sim: ", input_list_arm$simulation,
@@ -792,11 +792,40 @@ pop_and_return_event <- function(ptr) {
 #' @return NULL (invisible). Modifies the queue in-place.
 #' @export
 remove_event <- function(events, ptr, patient_id) {
-  if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
-  if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+  if (missing(ptr)) {ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)}
+  if (missing(patient_id)) {patient_id <- get("i", envir = parent.frame(), inherits = TRUE)}
   if(is.list(events)){
     events <- unlist(events)
   }
+  
+  input_list_arm <- parent.frame()
+  if(is.null(input_list_arm$debug)){input_list_arm$debug <- FALSE}
+  if(input_list_arm$debug){
+    events_values <- setNames(get_event(events, ptr, patient_id),events)
+    loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
+                  "; Sim: ", input_list_arm$simulation,
+                  "; Patient: ", patient_id,
+                  "; Arm: ", input_list_arm$arm,
+                  "; Event: ", input_list_arm$evt,
+                  "; Time: ", round(ifelse(is.null(input_list_arm$curtime),NA,input_list_arm$curtime),3)
+    )
+    if(!is.null(input_list_arm$log_list[[loc]])){
+      input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value,events_values)
+      input_list_arm$log_list[[loc]]$cur_value <- c(input_list_arm$log_list[[loc]]$cur_value,setNames(rep(Inf, length(events)),events))
+      
+    }else{
+      dump_info <- list(
+        list(prev_value = events_values,
+             cur_value = setNames(rep(Inf, length(events)),events)
+        )
+      )
+      names(dump_info) <- loc
+      
+      input_list_arm$log_list <- c(input_list_arm$log_list, dump_info)
+      
+    }
+  }
+  
   remove_event_cpp(ptr, patient_id, events)
 }
 
@@ -813,7 +842,7 @@ remove_event <- function(events, ptr, patient_id) {
 #' @export
 #'
 #' @details
-#' The functions to add/modify events/inputs use lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
+#' The functions to add/modify events/inputs use named vectors or lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost.
 #' So rather than use two `modify_event` with a list of one element, it's better to group them into a single `modify_event` with a list of two elements.
 #'
 #' This function does not evaluate sequentially.
@@ -833,6 +862,7 @@ modify_event <- function(events, create_if_missing = TRUE, ptr, patient_id) {
   }
   
   input_list_arm <- parent.frame()
+  if(is.null(input_list_arm$debug)){input_list_arm$debug <- FALSE}
   if(input_list_arm$debug){ 
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                   "; Sim: ", input_list_arm$simulation,
@@ -896,7 +926,7 @@ queue_size <- function(ptr) {
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #' @param patient_id The patient ID. Defaults to `i`.
 #'
-#' @return Logical, TRUE if the event exists for the patient, FALSE otherwise.
+#' @return Logical, TRUE if the event exists for the patient (even if Inf), FALSE otherwise.
 #' @export
 has_event <- function(event_name, ptr, patient_id) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
