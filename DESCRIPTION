@@ -58,5 +58,3 @@ Depends:
 URL: https://jsanchezalv.github.io/WARDEN/
 LinkingTo: 
     Rcpp
-SystemRequirements: 
-    C++11

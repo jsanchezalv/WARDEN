@@ -403,7 +403,7 @@ on_error_check <- function(expr, continue_on_error = NULL){
   caller <- parent.frame()
   
   expr_q <- substitute(expr)
-  if(is.null(continue_on_error)){continue_on_error <- get("continue_on_error", caller, inherits = TRUE)}
+  if(is.null(continue_on_error)){continue_on_error <- get0("continue_on_error", caller, inherits = TRUE, ifnotfound = FALSE)}
   if (continue_on_error) {
       tryCatch({
         eval.parent(expr_q) 
