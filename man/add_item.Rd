@@ -20,14 +20,14 @@ A single \code{{}} call (language object) ready for \code{load_inputs()}.
 \description{
 Build a single \code{{}} expression that defines inputs for a simulation.
 \itemize{
-\item Named args in \code{...} become assignments (\code{name <- expr}), e.g., add_item(a=5)
+\item Named args in \code{...} become assignments (\code{name <- expr}), e.g., \code{add_item(a=5)}
 \item Unnamed args are inserted raw/unevaluated. If an unnamed arg is a \code{{}} block,
-its statements are spliced (flattened). add_item(pick_val_v(...))
+its statements are spliced (flattened). \code{add_item(pick_val_v(...))}
 \item Works with magrittr pipes: a leading \code{.} (the LHS) is resolved to its value;
 if that value is a \code{{}} block (or list of expressions), it becomes the
 starting block.
 \item input argument can be used to handle alternative \code{add_item2} method,
-e.g. add_item(input = {a <- 5})
+e.g. \code{add_item(input = {a <- 5})}
 }
 }
 \examples{
