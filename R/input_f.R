@@ -362,14 +362,14 @@ pick_val_v <- function(base,
 #' Define or append model inputs
 #'
 #' Build a single `{}` expression that defines inputs for a simulation.
-#' - Named args in `...` become assignments (`name <- expr`), e.g., add_item(a=5)
+#' - Named args in `...` become assignments (`name <- expr`), e.g., `add_item(a=5)`
 #' - Unnamed args are inserted raw/unevaluated. If an unnamed arg is a `{}` block,
-#'   its statements are spliced (flattened). add_item(pick_val_v(...))
+#'   its statements are spliced (flattened). `add_item(pick_val_v(...))`
 #' - Works with magrittr pipes: a leading `.` (the LHS) is resolved to its value;
 #'   if that value is a `{}` block (or list of expressions), it becomes the
 #'   starting block.
 #' - input argument can be used to handle alternative `add_item2` method,
-#'   e.g. add_item(input = {a <- 5})
+#'   e.g. `add_item(input = {a <- 5})`
 #'
 #' @param ... Unevaluated arguments. Named → `name <- expr`; unnamed → raw expr.
 #' @param .data Optional named argument: an existing `{}` block (or list of
