@@ -157,7 +157,7 @@ regardless of mode, following normal R semantics.</p>
 <span class="r-in"><span><span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu">shared_input</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">b2</span> <span class="op">&lt;-</span> <span class="va">b1</span>        <span class="co"># alias (same state)</span></span></span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">modify</span><span class="op">(</span><span class="fl">11</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55590e5e0b58&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x5604416a5068&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "shared_input_env" "shared_input"    </span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>; <span class="va">b2</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>  <span class="co"># both 11</span></span></span>
@@ -166,7 +166,7 @@ regardless of mode, following normal R semantics.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">b3</span> <span class="op">&lt;-</span> <span class="va">b1</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">modify</span><span class="op">(</span><span class="fl">99</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55590e4f73b0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x560441431b60&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "shared_input_env" "shared_input"    </span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>; <span class="va">b3</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>  <span class="co"># 99, 11</span></span></span>
