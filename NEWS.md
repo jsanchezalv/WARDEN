@@ -6,7 +6,7 @@
 * Unit tests for shared_inputs and run_sim_parallel added.
 * add_item and add_item2 have now been integrated into add_item, with both behaviors being accepted. This means load_inputs has been overwritten with the load_inputs2 form.
 
-# WARDEN 1.3.3
+# WARDEN 2.0.0
 * Rcpp event based handler has been created using queues for high efficiency. In the new system,
 a unique event per patient is accepted in the queue, so small changes may be needed in codes where
 multiple equally named events were set to accommodate the new system. This is to ensure best practices and clarity

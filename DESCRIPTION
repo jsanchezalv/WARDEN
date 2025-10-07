@@ -1,6 +1,6 @@
 Package: WARDEN
 Title: Workflows for Health Technology Assessments in R using Discrete EveNts
-Version: 1.3.5
+Version: 2.0.0
 Authors@R: 
     c(person(given = "Javier",
            family = "Sanchez Alvarez",
