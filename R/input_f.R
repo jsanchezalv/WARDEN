@@ -730,7 +730,7 @@ new_event <- function(events, ptr, patient_id) {
 #' @param n Number of events to retrieve. Default is 1.
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #'
-#' @return A list of events, each with `patient_id`, `event_name`, and `event_time`.
+#' @return A list of events, each with `patient_id`, `event_name`, and `time`.
 #' @export
 next_event <- function(n = 1, ptr) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
@@ -745,7 +745,7 @@ next_event <- function(n = 1, ptr) {
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #' @param patient_id The patient ID. Defaults to `i`.
 #'
-#' @return A list of events, each with `patient_id`, `event_name`, and `event_time`.
+#' @return A list of events, each with `patient_id`, `event_name`, and `time`.
 #' @export
 next_event_pt <- function(n = 1, ptr, patient_id) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
@@ -774,7 +774,7 @@ pop_event <- function(ptr) {
 #'
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #'
-#' @return A named list with `patient_id`, `event_name`, and `event_time`.
+#' @return A named list with `patient_id`, `event_name`, and `time`.
 #' @export
 pop_and_return_event <- function(ptr) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)

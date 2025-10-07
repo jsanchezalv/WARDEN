@@ -1520,9 +1520,9 @@ evt_react_list <-
   
                    #we create new treatment cycle if possible, if not we call monitoring at end of cycle
                    if(AdjuvantCycles<n_max_adjuvant_cycles){
-                     new_event(list(trt_cycle = t_adjuvant_cycle + curtime))
+                     new_event(c(trt_cycle = t_adjuvant_cycle + curtime))
                    } else{
-                     modify_event(list(monitor_cycle = t_adjuvant_cycle + curtime))
+                     modify_event(c(monitor_cycle = t_adjuvant_cycle + curtime))
                    }
                    
                }) %>%
@@ -1533,12 +1533,12 @@ evt_react_list <-
                  q_total <- u_diseasefree
                  
                  if(MonitorCycles<n_max_monitor_cycles){
-                  new_event(list(monitor_cycle = curtime + t_monitor_cycle))
+                  new_event(c(monitor_cycle = curtime + t_monitor_cycle))
                  }
                }) %>%
   add_reactevt(name_evt = "advanced",
                input = {
-                 modify_event(list(trt_cycle = Inf, monitor_cycle = Inf)) #remove the trt_cycle and monitor_cycle event
+                 modify_event(c(trt_cycle = Inf, monitor_cycle = Inf)) #remove the trt_cycle and monitor_cycle event
                  
                  # Sample TTD based on arm
                 if(arm == "one") {
@@ -1555,7 +1555,7 @@ evt_react_list <-
                 final_TTD <- TTD+curtime
                 # Check whether TTD is lower than BS, if not correct to BS.
                  if(get_event("death") > final_TTD){
-                   modify_event(list(death = final_TTD)) 
+                   modify_event(c(death = final_TTD)) 
                  }
                 q_total <- u_advanced
                 cost_advanced <- c_advanced
@@ -1763,7 +1763,7 @@ evt_react_list <-
                 final_TTD <- TTD+curtime
                 # Check whether TTD is lower than BS, if not correct to BS.
                  if(get_event("death") > final_TTD){
-                   modify_event(list(death = final_TTD)) 
+                   modify_event(c(death = final_TTD)) 
                  }
                  
                  cost_advanced <- c_advanced

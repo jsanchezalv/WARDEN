@@ -214,7 +214,7 @@ evt_react_list <-
                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}
                  pfs.time=curtime
                  fl.prog= 1
-                 if(arm=="int"){modify_event(list("TxDisc" = curtime))} #Trigger treatment discontinuation at progression
+                 if(arm=="int"){modify_event(c("TxDisc" = curtime))} #Trigger treatment discontinuation at progression
                }) %>%
   add_reactevt(name_evt = "Death",
                input = {
@@ -230,7 +230,7 @@ evt_react_list <-
                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}
                  
                  if(fl.prog == 0){ #Event only accelerates progression if progression has not occurred yet
-                 modify_event(list(
+                 modify_event(c(
                    "Progression"=max(draw_tte(1,'weibull',coef1=TTP.shape, coef2= TTP.scale + TTP.coef.int*fl.int, beta_tx = 1.2, seed = as.numeric(paste0(1,i,simulation))),curtime))) #Occurrence of event accelerates progression by a factor of 1.2
                  }
                })
