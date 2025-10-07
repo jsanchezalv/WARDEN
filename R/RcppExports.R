@@ -490,16 +490,16 @@ modify_event_cpp <- function(ptr, patient_id, events, create_if_missing = FALSE)
     invisible(.Call(`_WARDEN_modify_event_cpp`, ptr, patient_id, events, create_if_missing))
 }
 
-queue_empty_cpp <- function(ptr) {
-    .Call(`_WARDEN_queue_empty_cpp`, ptr)
+queue_empty_cpp <- function(ptr, exclude_inf = FALSE) {
+    .Call(`_WARDEN_queue_empty_cpp`, ptr, exclude_inf)
 }
 
-queue_size_cpp <- function(ptr) {
-    .Call(`_WARDEN_queue_size_cpp`, ptr)
+queue_size_cpp <- function(ptr, exclude_inf = FALSE) {
+    .Call(`_WARDEN_queue_size_cpp`, ptr, exclude_inf)
 }
 
-has_event_cpp <- function(ptr, patient_id, event_name) {
-    .Call(`_WARDEN_has_event_cpp`, ptr, patient_id, event_name)
+has_event_cpp <- function(ptr, patient_id, event_name, exclude_inf = FALSE) {
+    .Call(`_WARDEN_has_event_cpp`, ptr, patient_id, event_name, exclude_inf)
 }
 
 get_event_cpp <- function(ptr, patient_id, event_name) {

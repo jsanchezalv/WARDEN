@@ -284,6 +284,8 @@ common_all_inputs <-add_item(input = {
                       random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
                       beds <- resource_discrete(1000)
                       beds_free <- beds$n_free()
+                      shared_accumulator <- shared_input(0)
+                      value_accum <- shared_accumulator$value()
 })  
 
 #Logic is: per patient, per intervention, per event, react to that event.
@@ -337,7 +339,13 @@ common_all_inputs <- add_item(
                        names_out   = list_par[["parameter_name"]]
                        )
             ) %>%
-  add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE)) #we don't add this variable ot the sensitivity analysis
+  add_item(input = {
+    random_seed_sicker_i = sample(1:1000,1000,replace = FALSE) #we don't add this variable to the sensitivity analysis
+    beds <- resource_discrete(1000)
+    beds_free <- beds$n_free()
+    shared_accumulator <- shared_input(0)
+    value_accum <- shared_accumulator$value()
+    }) 
 
 ```
 ## Model Execution
@@ -431,6 +439,9 @@ common_all_inputs <-add_item(input = {
                       random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
                       beds <- resource_discrete(65)
                       beds_free <- beds$n_free()
+                      shared_accumulator <- shared_input(0)
+                      value_accum <- shared_accumulator$value()
+                      
 })  
 
 

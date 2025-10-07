@@ -620,8 +620,8 @@ cond_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
 #' @param xptr external pointer from resource_discrete()$.ptr
 #' 
 #' @return new cloned discrete resource
-#'
 #' 
+#' @keywords internal
 .resource_discrete_from_xptr <- function(xptr) {
   env <- new.env(parent = emptyenv())
   env$.ptr <- xptr

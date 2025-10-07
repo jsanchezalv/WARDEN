@@ -75,12 +75,16 @@ reference:
       - next_event_pt
       - queue_empty
       - queue_size
+      - queue_create
+      - pop_event
+      - pop_and_return_event
 
       
   - subtitle: Resource Constrained Specific Functions
     contents:
       - resource_discrete
       - shared_input
+      - discrete_resource_clone
 
 
   - subtitle: Modelling Auxiliary Functions
@@ -98,6 +102,7 @@ reference:
       - summary_results_det
       - summary_results_sens
       - summary_results_sim
+      
 
   - title: Statistics Functions
   - subtitle: Statistics Auxiliary Functions
@@ -107,6 +112,7 @@ reference:
       - luck_adj
       - qtimecov
       - adj_val
+      
   - subtitle: Statistics Distributions Functions
     contents:
       - cond_dirichlet
@@ -114,6 +120,7 @@ reference:
       - rgamma_mse
       - qgamma_mse
       - rpoisgamma
+      - rpoisgamma_rcpp
       - qbeta_mse
       - qcond_exp
       - qcond_gamma
@@ -129,17 +136,32 @@ reference:
       - rdirichlet
       - rdirichlet_prob
       - pcond_gompertz
+      
 
   - title: Other Functions and Utilities
     contents:
-      - disc_cycle
       - disc_cycle_v
-      - disc_instant
       - disc_instant_v
-      - disc_ongoing
       - disc_ongoing_v
       - ast_as_list
       - extract_elements_from_list
       - extract_from_reactions
       - extract_psa_result
       - tte.df
+      
+      
+  - title: Deprecated Functions
+    contents:
+      - add_item2
+      - modify_item
+      - modify_item_seq
+      - disc_cycle
+      - disc_instant
+      - disc_ongoing
+      
+      
+  - title: internal
+    contents:
+      - .resource_discrete_from_xptr
+      - print.resource_discrete
+      - with_write_flags_lang

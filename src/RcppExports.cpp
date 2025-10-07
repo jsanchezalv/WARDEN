@@ -293,37 +293,40 @@ BEGIN_RCPP
 END_RCPP
 }
 // queue_empty_cpp
-bool queue_empty_cpp(SEXP ptr);
-RcppExport SEXP _WARDEN_queue_empty_cpp(SEXP ptrSEXP) {
+bool queue_empty_cpp(SEXP ptr, bool exclude_inf);
+RcppExport SEXP _WARDEN_queue_empty_cpp(SEXP ptrSEXP, SEXP exclude_infSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
-    rcpp_result_gen = Rcpp::wrap(queue_empty_cpp(ptr));
+    Rcpp::traits::input_parameter< bool >::type exclude_inf(exclude_infSEXP);
+    rcpp_result_gen = Rcpp::wrap(queue_empty_cpp(ptr, exclude_inf));
     return rcpp_result_gen;
 END_RCPP
 }
 // queue_size_cpp
-int queue_size_cpp(SEXP ptr);
-RcppExport SEXP _WARDEN_queue_size_cpp(SEXP ptrSEXP) {
+int queue_size_cpp(SEXP ptr, bool exclude_inf);
+RcppExport SEXP _WARDEN_queue_size_cpp(SEXP ptrSEXP, SEXP exclude_infSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
-    rcpp_result_gen = Rcpp::wrap(queue_size_cpp(ptr));
+    Rcpp::traits::input_parameter< bool >::type exclude_inf(exclude_infSEXP);
+    rcpp_result_gen = Rcpp::wrap(queue_size_cpp(ptr, exclude_inf));
     return rcpp_result_gen;
 END_RCPP
 }
 // has_event_cpp
-bool has_event_cpp(SEXP ptr, int patient_id, std::string event_name);
-RcppExport SEXP _WARDEN_has_event_cpp(SEXP ptrSEXP, SEXP patient_idSEXP, SEXP event_nameSEXP) {
+bool has_event_cpp(SEXP ptr, int patient_id, std::string event_name, bool exclude_inf);
+RcppExport SEXP _WARDEN_has_event_cpp(SEXP ptrSEXP, SEXP patient_idSEXP, SEXP event_nameSEXP, SEXP exclude_infSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
     Rcpp::traits::input_parameter< int >::type patient_id(patient_idSEXP);
     Rcpp::traits::input_parameter< std::string >::type event_name(event_nameSEXP);
-    rcpp_result_gen = Rcpp::wrap(has_event_cpp(ptr, patient_id, event_name));
+    Rcpp::traits::input_parameter< bool >::type exclude_inf(exclude_infSEXP);
+    rcpp_result_gen = Rcpp::wrap(has_event_cpp(ptr, patient_id, event_name, exclude_inf));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -590,9 +593,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_pop_and_return_event_cpp", (DL_FUNC) &_WARDEN_pop_and_return_event_cpp, 1},
     {"_WARDEN_remove_event_cpp", (DL_FUNC) &_WARDEN_remove_event_cpp, 3},
     {"_WARDEN_modify_event_cpp", (DL_FUNC) &_WARDEN_modify_event_cpp, 4},
-    {"_WARDEN_queue_empty_cpp", (DL_FUNC) &_WARDEN_queue_empty_cpp, 1},
-    {"_WARDEN_queue_size_cpp", (DL_FUNC) &_WARDEN_queue_size_cpp, 1},
-    {"_WARDEN_has_event_cpp", (DL_FUNC) &_WARDEN_has_event_cpp, 3},
+    {"_WARDEN_queue_empty_cpp", (DL_FUNC) &_WARDEN_queue_empty_cpp, 2},
+    {"_WARDEN_queue_size_cpp", (DL_FUNC) &_WARDEN_queue_size_cpp, 2},
+    {"_WARDEN_has_event_cpp", (DL_FUNC) &_WARDEN_has_event_cpp, 4},
     {"_WARDEN_get_event_cpp", (DL_FUNC) &_WARDEN_get_event_cpp, 3},
     {"_WARDEN_create_discrete_resource_cpp", (DL_FUNC) &_WARDEN_create_discrete_resource_cpp, 1},
     {"_WARDEN_discrete_resource_size_cpp", (DL_FUNC) &_WARDEN_discrete_resource_size_cpp, 1},

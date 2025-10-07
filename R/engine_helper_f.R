@@ -460,6 +460,9 @@ on_error_check <- function(expr, continue_on_error = NULL){
 #' Install only for the duration of the block and tear down immediately
 #' (handled for you). If your block performs many reads and few writes,
 #' consider a snapshot-and-diff approach instead
+#' 
+#' @keywords internal
+#' 
 with_write_flags_lang <- function(expr_lang, tracked, env, flag_value = 1L) {
   store <- new.env(parent = emptyenv())
   installed <- character(0)

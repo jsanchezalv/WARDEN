@@ -511,30 +511,54 @@ void modify_event_cpp(SEXP ptr, int patient_id, NumericVector events,
 }
 
 // [[Rcpp::export]]
-bool queue_empty_cpp(SEXP ptr) {
+bool queue_empty_cpp(SEXP ptr, bool exclude_inf = false) {
   try {
     EventQueuePtr q(ptr);
-    return q->empty();
+    if (!exclude_inf) {
+      return q->empty();
+    }
+    // Exclude events with Inf
+    const auto& lookup = q->get_lookup();
+    for (const auto& pair : lookup) {
+      if (!Rcpp::NumericVector::is_na(pair.second.time) && !Rcpp::traits::is_infinite<REALSXP>(pair.second.time))
+        return false; // Found finite event → not empty
+    }
+    return true; // All Inf
   } catch (const std::exception& e) {
     throw Rcpp::exception(e.what());
   }
 }
 
 // [[Rcpp::export]]
-int queue_size_cpp(SEXP ptr) {
+int queue_size_cpp(SEXP ptr, bool exclude_inf = false) {
   try {
     EventQueuePtr q(ptr);
-    return static_cast<int>(q->size());
+    if (!exclude_inf) {
+      return static_cast<int>(q->size());
+    }
+    const auto& lookup = q->get_lookup();
+    int count = 0;
+    for (const auto& pair : lookup) {
+      if (!Rcpp::NumericVector::is_na(pair.second.time) && !Rcpp::traits::is_infinite<REALSXP>(pair.second.time))
+        count++;
+    }
+    return count;
   } catch (const std::exception& e) {
     throw Rcpp::exception(e.what());
   }
 }
 
 // [[Rcpp::export]]
-bool has_event_cpp(SEXP ptr, int patient_id, std::string event_name) {
+bool has_event_cpp(SEXP ptr, int patient_id, std::string event_name, bool exclude_inf = false) {
   try {
     EventQueuePtr q(ptr);
-    return q->has_event(patient_id, event_name);
+    const auto& lookup = q->get_lookup();
+    Key k = {patient_id, event_name};
+    auto it = lookup.find(k);
+    if (it == lookup.end()) return false;
+    if (exclude_inf && Rcpp::traits::is_infinite<REALSXP>(it->second.time))
+      return false;
+    return true;
   } catch (const std::exception& e) {
     throw Rcpp::exception(e.what());
   }

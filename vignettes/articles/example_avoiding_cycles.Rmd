@@ -58,6 +58,7 @@ This is a very simple model, where we just have a time to death given by an expo
 Additionally, we have a multiplicative utility age adjustment factor, so at every yearly cycle we also adjust for that factor. 
 
 Treatment costs are yearly as well, so we add them as an instantaneous cost at every cycle, including time 0.
+
 ## Inputs
 ```{r cycles}
 
@@ -173,6 +174,7 @@ To fix the time to death with time varying covariates, we use `timecov` with yea
 The multiplicative utility age adjustment factor is implemented by `adj_val`, a function that given an expression that changes with time, reweighs the evaluated values by the ongoing discounting factor that would apply so that even if a single value is returned, the discounted outcome will still be the same as in the traditional cycle approach. Note however that undiscounted outcomes will not be correct (in this case we do not care about it, but we could just create another value like `other_q_default` where the `adj_val` is used with 0 discounting, and that value will be correct undiscounted). The very small difference INMB comes from rounding effects.
 
 Treatment costs are yearly, so we just use the per cycle approach instead of instantaneous costs at every year.
+
 ## Inputs
 ```{r noncycles}
 

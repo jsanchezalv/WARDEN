@@ -757,12 +757,11 @@ next_event_pt <- function(n = 1, ptr, patient_id) {
 
 #' Remove the Next Event from the Queue
 #'
-#' Removes the next scheduled event from the queue.
+#' Removes the next scheduled event from the queue. Not needed by user.
 #'
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #'
 #' @return NULL (invisible). Modifies the queue in-place.
-#' @export
 pop_event <- function(ptr) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   pop_event_cpp(ptr)
@@ -770,12 +769,11 @@ pop_event <- function(ptr) {
 
 #' Pop and Return the Next Event
 #'
-#' Removes the next event from the queue and returns its details.
+#' Removes the next event from the queue and returns its details. Not needed by user.
 #'
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #'
 #' @return A named list with `patient_id`, `event_name`, and `time`.
-#' @export
 pop_and_return_event <- function(ptr) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   pop_and_return_event_cpp(ptr)
@@ -901,23 +899,25 @@ modify_event <- function(events, create_if_missing = TRUE, ptr, patient_id) {
 #' Check if the Event Queue is Empty
 #'
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#' @param exclude_inf Logical, whether to exclude events with Inf time. Default is FALSE.
 #'
 #' @return Logical, TRUE if the queue is empty, FALSE otherwise.
 #' @export
-queue_empty <- function(ptr) {
+queue_empty <- function(ptr, exclude_inf = FALSE) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
-  queue_empty_cpp(ptr)
+  queue_empty_cpp(ptr, exclude_inf)
 }
 
 #' Get the Size of the Event Queue
 #'
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
+#' @param exclude_inf Logical, whether to exclude events with Inf time. Default is FALSE.
 #'
 #' @return An integer indicating the number of events in the queue.
 #' @export
-queue_size <- function(ptr) {
+queue_size <- function(ptr, exclude_inf = FALSE) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
-  queue_size_cpp(ptr)
+  queue_size_cpp(ptr, exclude_inf)
 }
 
 #' Check if a Patient Has a Specific Event
@@ -925,13 +925,14 @@ queue_size <- function(ptr) {
 #' @param event_name Character string, the name of the event.
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #' @param patient_id The patient ID. Defaults to `i`.
+#' @param exclude_inf Logical, whether to exclude events with Inf time. Default is FALSE.
 #'
-#' @return Logical, TRUE if the event exists for the patient (even if Inf), FALSE otherwise.
+#' @return Logical, TRUE if the event exists for the patient (optionally excluding Inf), FALSE otherwise.
 #' @export
-has_event <- function(event_name, ptr, patient_id) {
+has_event <- function(event_name, ptr, patient_id, exclude_inf = FALSE) {
   if (missing(ptr)) ptr <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
   if (missing(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
-  has_event_cpp(ptr, patient_id, event_name)
+  has_event_cpp(ptr, patient_id, event_name, exclude_inf)
 }
 
 
@@ -1209,6 +1210,9 @@ resource_discrete <- function(n) {
 #' Print method for resource_discrete
 #' @param x A resource_discrete object
 #' @param ... Additional arguments (ignored)
+#' 
+#' @keywords internal
+#' 
 #' @export
 print.resource_discrete <- function(x, ...) {
   cat("Discrete Resource:\n")
