@@ -1,5 +1,5 @@
+suppressMessages({
 test_that("Test minimal model runs with some basic settings", {
-  
 
 # No discount rate, no qalys nor costs --------------------------------------------------------
 
@@ -1028,6 +1028,6 @@ test_that("Test everything but with constrained = TRUE", {
   
 })
 
-
+})
 
     

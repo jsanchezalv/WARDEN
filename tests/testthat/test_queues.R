@@ -5,6 +5,7 @@
     
     expect_true(!is.null(q))
     expect_true(queue_empty(q))
+    expect_true(queue_empty(q, exclude_inf = TRUE))
     expect_equal(queue_size(q), 0L)
   })
   
@@ -13,7 +14,7 @@
     q <- queue_create(c("death", "dropout", "visit"))
     new_event(c(death = 11), ptr = q, patient_id = 10)
     
-    expect_false(queue_empty(q))
+    expect_false(queue_empty(q, exclude_inf = TRUE))
     expect_equal(queue_size(q), 1L)
     expect_true(has_event("death", ptr = q, patient_id = 10))
     
@@ -24,6 +25,16 @@
     
     pop_event(ptr = q)
     expect_true(queue_empty(q))
+    
+    q <- queue_create(c("death", "dropout", "visit"))
+    new_event(c(death = Inf), ptr = q, patient_id = 10)
+    expect_false(queue_empty(q))
+    expect_true(queue_empty(q, exclude_inf = TRUE))
+    expect_equal(queue_size(q), 1L)
+    expect_equal(queue_size(q, exclude_inf = TRUE), 0L)
+    
+    expect_true(has_event("death", ptr = q, patient_id = 10))
+    expect_false(has_event("death", ptr = q, patient_id = 10, exclude_inf = TRUE))
   })
   
   test_that("Multiple events for one patient work", {
