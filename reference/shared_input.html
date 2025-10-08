@@ -25,14 +25,14 @@
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Basic Tutorials</h6></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Core Tutorials</h6></li>
     <li><a class="dropdown-item" href="../articles/warden_explained.html">Warden Explained</a></li>
     <li><a class="dropdown-item" href="../articles/example_ssd.html">Sick-Sicker-Dead Model (SSD)</a></li>
-    <li><a class="dropdown-item" href="../articles/example_ssd_constrained.html">Resource Constrained Sick-Sicker-Dead model</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ssd_constrained.html">Resource Constrained SSD model</a></li>
     <li><a class="dropdown-item" href="../articles/inputs_selector.html">How to Use the Automatic Input Selector</a></li>
     <li><a class="dropdown-item" href="../articles/example_eBC.html">Early Breast Cancer</a></li>
     <li><a class="dropdown-item" href="../articles/example_ipd.html">Using Individual Patient Data</a></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Tips</h6></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Other Tutorials and Best Practices</h6></li>
     <li><a class="dropdown-item" href="../articles/example_markov.html">Cohort Markov Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_avoiding_cycles.html">How to Avoid Using Cycles to Speed Up Model</a></li>
     <li><a class="dropdown-item" href="../articles/example_uncertainty.html">Structural and Parametric Uncertainty</a></li>
@@ -157,7 +157,7 @@ regardless of mode, following normal R semantics.</p>
 <span class="r-in"><span><span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu">shared_input</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">b2</span> <span class="op">&lt;-</span> <span class="va">b1</span>        <span class="co"># alias (same state)</span></span></span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">modify</span><span class="op">(</span><span class="fl">11</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x562cd74b3b18&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55770624d720&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "shared_input_env" "shared_input"    </span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>; <span class="va">b2</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>  <span class="co"># both 11</span></span></span>
@@ -166,7 +166,7 @@ regardless of mode, following normal R semantics.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">b3</span> <span class="op">&lt;-</span> <span class="va">b1</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">modify</span><span class="op">(</span><span class="fl">99</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x562cd7398a90&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x557706160028&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "shared_input_env" "shared_input"    </span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>; <span class="va">b3</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>  <span class="co"># 99, 11</span></span></span>
