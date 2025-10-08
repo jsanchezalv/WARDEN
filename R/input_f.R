@@ -633,7 +633,7 @@ queue_create <- function(priority_order) {
   queue_create_cpp(priority_order)
 }
 
-#' Add Events to the Queue for a Patient
+#' Add events to the queue for a patient
 #'
 #' Adds one or more events for a given patient to the queue.
 #'
@@ -696,7 +696,7 @@ new_event <- function(events, ptr, patient_id) {
   new_event_cpp(ptr, patient_id, events)
 }
 
-#' Get the Next Event(s) in the Queue
+#' Get the next events in the queue
 #'
 #' Retrieves the next `n` events (without removing them).
 #'
@@ -710,7 +710,7 @@ next_event <- function(n = 1, ptr) {
   next_event_cpp(ptr, n)
 }
 
-#' Get the Next Event(s) in the Queue for a specific patient
+#' Get the next events in the queue for a specific patient
 #'
 #' Retrieves the next `n` events (without removing them).
 #'
@@ -728,7 +728,7 @@ next_event_pt <- function(n = 1, ptr, patient_id) {
 }
 
 
-#' Remove the Next Event from the Queue
+#' Remove the next event from the queue
 #'
 #' Removes the next scheduled event from the queue. Not needed by user.
 #'
@@ -740,7 +740,7 @@ pop_event <- function(ptr) {
   pop_event_cpp(ptr)
 }
 
-#' Pop and Return the Next Event
+#' Pop and return the next event
 #'
 #' Removes the next event from the queue and returns its details. Not needed by user.
 #'
@@ -752,7 +752,7 @@ pop_and_return_event <- function(ptr) {
   pop_and_return_event_cpp(ptr)
 }
 
-#' Remove Events for a Patient
+#' Remove events for a patient
 #'
 #' Removes one or more events from the queue for the given patient.
 #'
@@ -800,7 +800,7 @@ remove_event <- function(events, ptr, patient_id) {
   remove_event_cpp(ptr, patient_id, events)
 }
 
-#' Modify or Add Events for a Patient
+#' Modify or add events for a patient
 #'
 #' Modifies existing event times, or adds new events if `create_if_missing` is TRUE.
 #'
@@ -869,7 +869,7 @@ modify_event <- function(events, create_if_missing = TRUE, ptr, patient_id) {
   modify_event_cpp(ptr, patient_id, events, create_if_missing)
 }
 
-#' Check if the Event Queue is Empty
+#' Check if the event queue is empty
 #'
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
 #' @param exclude_inf Logical, whether to exclude events with Inf time. Default is FALSE.
@@ -893,7 +893,7 @@ queue_size <- function(ptr, exclude_inf = FALSE) {
   queue_size_cpp(ptr, exclude_inf)
 }
 
-#' Check if a Patient Has a Specific Event
+#' Check if a patient has a specific event in the queue
 #'
 #' @param event_name Character string, the name of the event.
 #' @param ptr The event queue pointer. Defaults to `cur_evtlist`.
@@ -926,7 +926,7 @@ get_event <- function(event_name, ptr , patient_id ) {
 
 # discrete resource -------------------------------------------------------
 
-#' Create a Discrete Resource
+#' Create a discrete resource
 #' 
 #' Creates a discrete resource management system for discrete event simulations.
 #' This system manages a fixed number of identical resource units that can be

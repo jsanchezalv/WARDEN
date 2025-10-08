@@ -296,7 +296,7 @@ qgamma_mse <- function(q=1, mean_v, se, seed=NULL) {
   out
 }
 
-#' Draw from a Conditional Gompertz distribution (lower and upper bound)
+#' Draw from a conditional Gompertz distribution (lower and upper bound)
 #'
 #' @param n The number of observations to be drawn
 #' @param shape The shape parameter of the Gompertz distribution, defined as in the coef() output on a flexsurvreg object

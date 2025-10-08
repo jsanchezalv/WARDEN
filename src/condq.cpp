@@ -366,7 +366,7 @@ NumericVector luck_adj(NumericVector prevsurv,
                             NumericVector luck,
                             bool condq);
 
-//' Draw Time-to-Event with Time-Dependent Covariates and Luck Adjustment
+//' Draw time-to-event with time-dependent covariates and luck adjustment
 //'
 //' Simulate a time-to-event (TTE) from a parametric distribution with parameters varying over time.
 //' User provides parameter functions and distribution name. The function uses internal survival and
