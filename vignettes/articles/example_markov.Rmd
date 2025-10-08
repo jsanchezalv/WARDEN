@@ -207,9 +207,9 @@ cost_ongoing <- "c_default"
 
 # Model
 ## Model Execution
-The model can be run using the function `run_sim` below. We must define the number of patients to be simulated, the number of simulations, whether we want to run a PSA or not, the strategy list, the inputs, events and reactions defined above, utilities, costs and also if we want any extra output and the level of ipd data desired to be exported.
+The model can be run using the function `run_sim()` below. We must define the number of patients to be simulated, the number of simulations, whether we want to run a PSA or not, the strategy list, the inputs, events and reactions defined above, utilities, costs and also if we want any extra output and the level of ipd data desired to be exported.
 
-It is worth noting that the `psa_bool` argument does not run a PSA automatically, but is rather an additional input/flag of the model that we use as a reference to determine whether we want to use a deterministic or stochastic input. As such, it could also be defined in `common_all_inputs` as the first item to be defined, and the result would be the same. However, we recommend it to be defined in `run_sim`.
+It is worth noting that the `psa_bool` argument does not run a PSA automatically, but is rather an additional input/flag of the model that we use as a reference to determine whether we want to use a deterministic or stochastic input. As such, it could also be defined in `common_all_inputs` as the first item to be defined, and the result would be the same. However, we recommend it to be defined in `run_sim()`.
 
 Note that the distribution chosen, the number of events and the interaction between events can have a substantial impact on the running time of the model. Since we are taking a cohort approach, we just need to indicate `npats = 1`.
 

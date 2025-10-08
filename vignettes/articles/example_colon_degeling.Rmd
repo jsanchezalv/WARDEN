@@ -1346,7 +1346,7 @@ The first way to create the model is by copying the approach taken in the origin
 
 ## Inputs
 
-As with any model, we need to load inputs, set initial TTE, event reactions, utilities/costs, etc. We'll first replicate the deterministic analysis, and will then redo the inputs to use the probabilistic analysis, showcasing as well how `pick_val_v` function can be used to have everything done at once.
+As with any model, we need to load inputs, set initial TTE, event reactions, utilities/costs, etc. We'll first replicate the deterministic analysis, and will then redo the inputs to use the probabilistic analysis, showcasing as well how `pick_val_v()` function can be used to have everything done at once.
 
 
 ```{r input_delayed}
@@ -1841,7 +1841,7 @@ ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","W
 ```
 
 # Probabilistic Case
-We will now use the`pick_val_v` function. We just showcase this, and will not run it for the sake of saving computation time.
+We will now use the`pick_val_v()` function. We just showcase this, and will not run it for the sake of saving computation time.
 
 ```{r}
 

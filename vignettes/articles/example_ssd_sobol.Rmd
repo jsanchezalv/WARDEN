@@ -49,7 +49,7 @@ options(tibble.print_max = 50)
 # Introduction
 This document runs a discrete event simulation model in the context of a late oncology model to show how using quasi-random numbers can radically change convergence speed by using quasi-random sobol sequences instead of purely random numbers.
 
-Sobol sequences are a deterministic way of generating numbers (between 0 and 1) in a way that fills the space very evenly. Several methods can be used to randomize the generation of these sequences, and to create multiple dimensions when we want to have multiple variables using these sequences. Sobol sequences can fill out the space more evenly than a random uniform distribution, so they can make a model converge faster. 
+Sobol sequences are a deterministic way of generating numbers (between 0 and 1) in a way that fills the space very evenly. Several methods can be used to randomize the generation of these sequences, and to create multiple dimensions when we want to have multiple variables using these sequences. Sobol sequences can fill out the space more evenly than a random uniform distribution, so they can make a model converge faster. There are some references that mention that as the number of random number streams increases, the sobol sequences may lose their advantage to drawing from standard random uniform distributions. However, this vignette showcases how for models which do not have a lot of random variables it can still converge much faster.
 
 This vignette explores how one can use sobol sequences to accelerate convergence and reduce the number of profiles needed.
 

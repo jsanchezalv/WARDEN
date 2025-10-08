@@ -26,9 +26,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-This document shows how one can substantially reduce running time in models where cycle events are used by utilizing three features of WARDEN: 1) per cycle costs and qalys, 2) time to event predictions which take into account time-varying covariates through `qtimecov` and 3) adjustment of ongoing outputs to be corrected by cycle-type of adjustments (e.g., utility adjustment by age) through `adj_val`.
-
-30% speed gains can be expected, though the final impact depends on the number of cycles and complexity at each cycle. Note that no function has been implemented in C++, so if discounting, `qtimecov` and `adj_val` are implemented in C++, substantial gains can be expected.
+This document shows how one can substantially reduce running time in models where cycle events are used by utilizing three features of WARDEN: 1) per cycle costs and qalys, 2) time to event predictions which take into account time-varying covariates through `qtimecov()` and 3) adjustment of ongoing outputs to be corrected by cycle-type of adjustments (e.g., utility adjustment by age) through `adj_val()`.
 
 Note as well that this approach to avoid cycles could smoothly handle treatment waning, changes in covariates (like weight, BMI, etc), etc.
 
@@ -169,9 +167,9 @@ psa_ipd[1:10,] %>%
 # Model avoiding cycles
 We now avoid to use cycles. 
 
-To fix the time to death with time varying covariates, we use `timecov` with yearly updates (`dt = 1`) and passing the parameter as a function of time, so the function automatically iterates over each year to obtain the relevant time to event. This means we can obtain the final time to event in one go at start. While still iterative, it's less time consuming than having events created at every year.
+To fix the time to death with time varying covariates, we use `timecov` with yearly updates (`dt = 1`) and passing the parameter as a function of time, so the function automatically iterates over each year to obtain the relevant time to event. This means we can obtain the final time to event in one go at start. While still iterative, it's less time consuming than having events created at every year. Note that if we had a continuous time changing covariate, we could still approximate it quite well by using `dt = 0.01` (every 3.5 days updates).
 
-The multiplicative utility age adjustment factor is implemented by `adj_val`, a function that given an expression that changes with time, reweighs the evaluated values by the ongoing discounting factor that would apply so that even if a single value is returned, the discounted outcome will still be the same as in the traditional cycle approach. Note however that undiscounted outcomes will not be correct (in this case we do not care about it, but we could just create another value like `other_q_default` where the `adj_val` is used with 0 discounting, and that value will be correct undiscounted). The very small difference INMB comes from rounding effects.
+The multiplicative utility age adjustment factor is implemented by `adj_val()`, a function that given an expression that changes with time, reweighs the evaluated values by the ongoing discounting factor that would apply so that even if a single value is returned, the discounted outcome will still be the same as in the traditional cycle approach. Note however that undiscounted outcomes will not be correct (in this case we do not care about it, but we could just create another value like `other_q_default` where the `adj_val()` is used with 0 discounting, and that value will be correct undiscounted). The very small difference INMB comes from rounding effects.
 
 Treatment costs are yearly, so we just use the per cycle approach instead of instantaneous costs at every year.
 

@@ -68,7 +68,7 @@ df_cost <- data.frame( name = c("cost.idfs.tx" ,"cost.recurrence" ,"cost.mbc.tx"
 ```
 
 # General inputs with delayed execution
-Initial inputs and flags that will be used in the model can be defined below. We can define inputs that are common to all patients (`common_all_inputs`) within a simulation, inputs that are unique to a patient independently of the treatment (e.g. natural death, defined in `common_pt_inputs`), and inputs that are unique to that patient and that treatment (`unique_pt_inputs`). Items can be included through the `add_item` function, and can be used in subsequent items (e.g. below, we define `sex_pt` and we use it in `nat.os.s` to get the background mortality for that patient). All these inputs are generated before the events and the reaction to events are executed. Furthermore, the program first executes `common_all_inputs`, then `common_pt_inputs` and then `unique_pt_inputs`. So one could use the items generated in `common_all_inputs` in `unique_pt_inputs`.
+Initial inputs and flags that will be used in the model can be defined below. We can define inputs that are common to all patients (`common_all_inputs`) within a simulation, inputs that are unique to a patient independently of the treatment (e.g. natural death, defined in `common_pt_inputs`), and inputs that are unique to that patient and that treatment (`unique_pt_inputs`). Items can be included through the `add_item()` function, and can be used in subsequent items (e.g. below, we define `sex_pt` and we use it in `nat.os.s` to get the background mortality for that patient). All these inputs are generated before the events and the reaction to events are executed. Furthermore, the program first executes `common_all_inputs`, then `common_pt_inputs` and then `unique_pt_inputs`. So one could use the items generated in `common_all_inputs` in `unique_pt_inputs`.
 
 The flag `fl.remission` is drawn using a Bernoulli distribution with probability 0.8. This means that 80% of the patients will have a remission, while 20% will go into early metastatic BC. Note that this could also be modeled differently by using a time to remission and time to early metastatic BC, comparing these and choosing the pathway depending on which one is smaller. 
 
@@ -142,9 +142,9 @@ unique_pt_inputs <- add_item(input={
 
 # Events
 ## Add Initial Events
-Events are added below through the `add_tte` function. We use this function twice, one per intervention. We must define several arguments: one to indicate the intervention, one to define the names of the events used, one to define the names of other objects created that we would like to store (optional, maybe we generate an intermediate input which is not an event but that we want to save) and the actual input in which we generate the time to event. Events and other objects will be automatically initialized to `Inf`. We draw the times to event for the patients. This chunk is a bit more complex, so it's worth spending a bit of time explaining it.
+Events are added below through the `add_tte()` function. We use this function twice, one per intervention. We must define several arguments: one to indicate the intervention, one to define the names of the events used, one to define the names of other objects created that we would like to store (optional, maybe we generate an intermediate input which is not an event but that we want to save) and the actual input in which we generate the time to event. Events and other objects will be automatically initialized to `Inf`. We draw the times to event for the patients. This chunk is a bit more complex, so it's worth spending a bit of time explaining it.
 
-The `init_event_list` object is populated by using the `add_tte` function twice, one for the "int" strategy and other for the "noint" strategy. We first declare the `start` time to be `0`.
+The `init_event_list` object is populated by using the `add_tte()` function twice, one for the "int" strategy and other for the "noint" strategy. We first declare the `start` time to be `0`.
 
 We then proceed to generate the actual time to event. We use the `draw_tte()` function to generate the time to event using a log-normal distribution for the event variables that are of interest. One should always be aware of how the competing risks interact with each other. While we have abstracted from these type of corrections here, it is recommended to have an understanding about how these affect the results and have a look at the competing risks/semi-competing risks literature.
 
@@ -255,7 +255,7 @@ init_event_list <-
 ```
 
 ## Add Reaction to Those Events
-Once the initial times of the events have been defined, we also need to declare how events react and affect each other. To do so, we use the `evt_react_list` object and the `add_reactevt` function. This function just needs to state which event is affected, and the actual reaction (usually setting flags to 1 or 0, or creating new/adjusting events).
+Once the initial times of the events have been defined, we also need to declare how events react and affect each other. To do so, we use the `evt_react_list` object and the `add_reactevt()` function. This function just needs to state which event is affected, and the actual reaction (usually setting flags to 1 or 0, or creating new/adjusting events).
 
 There are a series of objects that can be used in this context to help with the reactions. Apart from the global objects and flags defined above, we can also use `curtime` for the current event time, `prevtime` for the time of the previous event, `cur_evtlist` is the C++ external pointer which can be interacted with using the event functions that is yet to happen for that patient, `arm` for the current treatment in the loop, `evt` for the current event being processed, `i` expresses the patient iteration, and `simulation` the specific simulation (relevant when the number of simulations is greater than 1). Furthermore, one can also call any other input/item that has been created before or create new ones. For example, we could even modify a cost/utility item by changing it directly, e.g. through `cost.idfs.tx <- 500)`.
 
@@ -270,24 +270,24 @@ Item | What does it do
 `simulation` | Simulation being iterated (numeric)
 `sens` | Sensitivity analysis being iterated (numeric)
 
-The functions to add/modify events and inputs use named vectors or lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost. So rather than use two `modify_event` with a list of one element, it's better to group them into a single `modify_event` with a list of two elements. 
+The functions to add/modify events and inputs use named vectors or lists. Whenever several inputs/events are added or modified, it's recommended to group them within one function, as it reduces the computation cost. So rather than use two `modify_event()` with a list of one element, it's better to group them into a single `modify_event()` with a list of two elements. 
 
 The list of relevant functions to be used within `add_reactevt` are:
-`new_event`allows to generate events and add them to the vector of events. It accepts more than one event but a single event per event type. 
-`modify_event` allows to modify events (e.g. delay death). When adding an event, the name of the events and the time of the events must be defined. When using `modify_event`, one must indicate which events are affected and what are the new times of the events. If the event specified does not exist or has already occurred, it will return an error. `modify_event` with `create_if_null = TRUE` argument will also generate events if they don't exist. 
-`remove_event` will remove an event from the event queue (could also be modified instead and set to `Inf`).
-`get_event` will return the TTE of the specified event name.
-`has_event` will return a TRUE/FALSE flag depending on whether the given patient has a specific event in the queue (will return TRUE even if time is `Inf`).
-`next_event` will return a list with the next event in the queue, with time, patient, and event name (`patient_id`, `event_name`, and `event_time`).
-`next_event_pt` will return a list with the next event in the queue for a specific patient, with time, patient, and event name (`patient_id`, `event_name`, and `event_time`).
-`queue_empty` will return TRUE if the queue of events is empty (no more events to process, but `Inf` events are considered part of the queue)
-`queue_size` allows to check the size of the queue of events, including `Inf` events.
+`new_event()`allows to generate events and add them to the vector of events. It accepts more than one event but a single event per event type. 
+`modify_event()` allows to modify events (e.g. delay death). When adding an event, the name of the events and the time of the events must be defined. When using `modify_event`, one must indicate which events are affected and what are the new times of the events. If the event specified does not exist or has already occurred, it will return an error. `modify_event` with `create_if_null = TRUE` argument will also generate events if they don't exist. 
+`remove_event()` will remove an event from the event queue (could also be modified instead and set to `Inf`).
+`get_event()` will return the TTE of the specified event name.
+`has_event()` will return a TRUE/FALSE flag depending on whether the given patient has a specific event in the queue (will return TRUE even if time is `Inf`).
+`next_event()` will return a list with the next event in the queue, with time, patient, and event name (`patient_id`, `event_name()`, and `time`).
+`next_event_pt` will return a list with the next event in the queue for a specific patient, with time, patient, and event name (`patient_id`, `event_name`, and `time`).
+`queue_empty()` will return TRUE if the queue of events is empty (no more events to process, but `Inf` events are considered part of the queue)
+`queue_size()` allows to check the size of the queue of events, including `Inf` events.
 
 Note that one could potentially omit part of the modeling set in `init_event_list` and actually define new events dynamically through the reactions (we do that below for the `"ae"` event). However, this can have an impact in computation time, so if possible it's always better to use `init_event_list`.
 
 The model will run until `curtime` is set to `Inf`, so the event that terminates the model (in this case, `os`), should modify `curtime` and set it to `Inf`.
 
-Finally, note that there could be two different ways of accumulating continuous outcomes, backwards (i.e., in the example below, we would set q_default = util.sick at the sicker event, and modify the `q_default` value in the death event) and forwards (as in the example below). This option can be modified in the `run_sim` function using the `accum_backwards` argument, which assumes forwards by default.
+Finally, note that there could be two different ways of accumulating continuous outcomes, backwards (see SSD example to see how the implementation would change) and forwards (as in the example below). This option can be modified in the `run_sim()` function using the `accum_backwards` argument, which assumes forwards by default.
 
 ```{r model_reaction}
 
@@ -472,7 +472,7 @@ evt_react_list <-
 # Costs and Utilities
 Costs and utilities are introduced below. However, it's worth noting that the model is able to run without costs or utilities.
 
-Utilities/Costs/Other outputs are defined by declaring which object belongs to utilities/costs/other outputs, and whether they need to be discounted continuously or discretely (instantaneous). These will be passed to the `run_sim` function.
+Utilities/Costs/Other outputs are defined by declaring which object belongs to utilities/costs/other outputs, and whether they need to be discounted continuously or discretely (instantaneous). These will be passed to the `run_sim()` function.
 ## Utilities
 
 ```{r utilities}
@@ -493,9 +493,9 @@ cost_instant <-  "c_ae"
 
 # Model
 ## Model Execution
-The model can be run using the function `run_sim` below. We must define the number of patients to be simulated, the number of simulations, whether we want to run a PSA or not, the strategy list, the inputs, events and reactions defined above, utilities, costs and also if we want any extra output and the level of ipd data desired to be exported.
+The model can be run using the function `run_sim()` below. We must define the number of patients to be simulated, the number of simulations, whether we want to run a PSA or not, the strategy list, the inputs, events and reactions defined above, utilities, costs and also if we want any extra output and the level of ipd data desired to be exported.
 
-It is worth noting that the `psa_bool` argument does not run a PSA automatically, but is rather an additional input/flag of the model that we use as a reference to determine whether we want to use a deterministic or stochastic input. As such, it could also be defined in `common_all_inputs` as the first item to be defined, and the result would be the same. However, we recommend it to be defined in `run_sim`.
+It is worth noting that the `psa_bool` argument does not run a PSA automatically, but is rather an additional input/flag of the model that we use as a reference to determine whether we want to use a deterministic or stochastic input. As such, it could also be defined in `common_all_inputs` as the first item to be defined, and the result would be the same. However, we recommend it to be defined in `run_sim()`.
 
 Note that the distribution chosen, the number of events and the interaction between events can have a substantial impact on the running time of the model.
 
