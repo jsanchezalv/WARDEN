@@ -59,7 +59,7 @@ navbar:
 
 reference:
   - title: Main Modelling Functions
-  - subtitle:Core Functions
+  - subtitle: Core Functions
     contents:
       - run_sim
       - run_sim_parallel
