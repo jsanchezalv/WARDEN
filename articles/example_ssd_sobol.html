@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">October 07, 2025</h4>
+            <h4 data-toc-skip class="date">October 08, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_ssd_sobol.Rmd" class="external-link"><code>vignettes/articles/example_ssd_sobol.Rmd</code></a></small>
       <div class="d-none name"><code>example_ssd_sobol.Rmd</code></div>
@@ -137,7 +137,11 @@ methods can be used to randomize the generation of these sequences, and
 to create multiple dimensions when we want to have multiple variables
 using these sequences. Sobol sequences can fill out the space more
 evenly than a random uniform distribution, so they can make a model
-converge faster.</p>
+converge faster. There are some references that mention that as the
+number of random number streams increases, the sobol sequences may lose
+their advantage to drawing from standard random uniform distributions.
+However, this vignette showcases how for models which do not have a lot
+of random variables it can still converge much faster.</p>
 <p>This vignette explores how one can use sobol sequences to accelerate
 convergence and reduce the number of profiles needed.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -286,17 +290,17 @@ the different speed of convergence.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.38s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.37s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.53s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.52s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.34s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.32s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.34s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.33s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.33s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 1.92s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.92s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.32s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 1.87s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.87s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="va">results_sobol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
@@ -317,17 +321,17 @@ the different speed of convergence.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.35s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.34s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.37s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.35s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.34s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.35s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.36s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 1.79s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.79s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.35s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 1.75s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.75s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
@@ -494,17 +498,17 @@ model converge much more slowly than the sobol sequences.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.35s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.34s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.33s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.57s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.53s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.32s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.31s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.34s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 1.91s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.91s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 1.85s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.86s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="va">results_sobol_psa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
@@ -528,13 +532,13 @@ model converge much more slowly than the sobol sequences.</p>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.33s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.34s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.33s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.34s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.35s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.53s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.54s</span></span>
 <span><span class="co">#&gt; Time to run analysis 1: 1.9s</span></span>
 <span><span class="co">#&gt; Total time to run: 1.9s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>

@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">October 07, 2025</h4>
+            <h4 data-toc-skip class="date">October 08, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_avoiding_cycles.Rmd" class="external-link"><code>vignettes/articles/example_avoiding_cycles.Rmd</code></a></small>
       <div class="d-none name"><code>example_avoiding_cycles.Rmd</code></div>
@@ -95,15 +95,10 @@ Alvarez</h4>
 <p>This document shows how one can substantially reduce running time in
 models where cycle events are used by utilizing three features of
 WARDEN: 1) per cycle costs and qalys, 2) time to event predictions which
-take into account time-varying covariates through <code>qtimecov</code>
-and 3) adjustment of ongoing outputs to be corrected by cycle-type of
-adjustments (e.g., utility adjustment by age) through
-<code>adj_val</code>.</p>
-<p>30% speed gains can be expected, though the final impact depends on
-the number of cycles and complexity at each cycle. Note that no function
-has been implemented in C++, so if discounting, <code>qtimecov</code>
-and <code>adj_val</code> are implemented in C++, substantial gains can
-be expected.</p>
+take into account time-varying covariates through
+<code><a href="../reference/qtimecov.html">qtimecov()</a></code> and 3) adjustment of ongoing outputs to be
+corrected by cycle-type of adjustments (e.g., utility adjustment by age)
+through <code><a href="../reference/adj_val.html">adj_val()</a></code>.</p>
 <p>Note as well that this approach to avoid cycles could smoothly handle
 treatment waning, changes in covariates (like weight, BMI, etc),
 etc.</p>
@@ -242,9 +237,9 @@ instantaneous cost at every cycle, including time 0.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 17.32s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 17.32s</span></span>
-<span><span class="co">#&gt; Total time to run: 17.33s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 16.75s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 16.76s</span></span>
+<span><span class="co">#&gt; Total time to run: 16.76s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -913,15 +908,17 @@ passing the parameter as a function of time, so the function
 automatically iterates over each year to obtain the relevant time to
 event. This means we can obtain the final time to event in one go at
 start. While still iterative, it’s less time consuming than having
-events created at every year.</p>
+events created at every year. Note that if we had a continuous time
+changing covariate, we could still approximate it quite well by using
+<code>dt = 0.01</code> (every 3.5 days updates).</p>
 <p>The multiplicative utility age adjustment factor is implemented by
-<code>adj_val</code>, a function that given an expression that changes
+<code><a href="../reference/adj_val.html">adj_val()</a></code>, a function that given an expression that changes
 with time, reweighs the evaluated values by the ongoing discounting
 factor that would apply so that even if a single value is returned, the
 discounted outcome will still be the same as in the traditional cycle
 approach. Note however that undiscounted outcomes will not be correct
 (in this case we do not care about it, but we could just create another
-value like <code>other_q_default</code> where the <code>adj_val</code>
+value like <code>other_q_default</code> where the <code><a href="../reference/adj_val.html">adj_val()</a></code>
 is used with 0 discounting, and that value will be correct
 undiscounted). The very small difference INMB comes from rounding
 effects.</p>
@@ -1009,9 +1006,9 @@ instead of instantaneous costs at every year.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 4.62s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 4.62s</span></span>
-<span><span class="co">#&gt; Total time to run: 4.63s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 4.56s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 4.56s</span></span>
+<span><span class="co">#&gt; Total time to run: 4.56s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 <div class="section level3">

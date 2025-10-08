@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">October 07, 2025</h4>
+            <h4 data-toc-skip class="date">October 08, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_markov.Rmd" class="external-link"><code>vignettes/articles/example_markov.Rmd</code></a></small>
       <div class="d-none name"><code>example_markov.Rmd</code></div>
@@ -332,7 +332,7 @@ that the model is able to run without costs or utilities.</p>
 <div class="section level3">
 <h3 id="model-execution">Model Execution<a class="anchor" aria-label="anchor" href="#model-execution"></a>
 </h3>
-<p>The model can be run using the function <code>run_sim</code> below.
+<p>The model can be run using the function <code><a href="../reference/run_sim.html">run_sim()</a></code> below.
 We must define the number of patients to be simulated, the number of
 simulations, whether we want to run a PSA or not, the strategy list, the
 inputs, events and reactions defined above, utilities, costs and also if
@@ -344,7 +344,7 @@ model that we use as a reference to determine whether we want to use a
 deterministic or stochastic input. As such, it could also be defined in
 <code>common_all_inputs</code> as the first item to be defined, and the
 result would be the same. However, we recommend it to be defined in
-<code>run_sim</code>.</p>
+<code><a href="../reference/run_sim.html">run_sim()</a></code>.</p>
 <p>Note that the distribution chosen, the number of events and the
 interaction between events can have a substantial impact on the running
 time of the model. Since we are taking a cohort approach, we just need
@@ -371,7 +371,7 @@ to indicate <code>npats = 1</code>.</p>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 1: 0.07s</span></span>
-<span><span class="co">#&gt; Total time to run: 0.08s</span></span>
+<span><span class="co">#&gt; Total time to run: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>

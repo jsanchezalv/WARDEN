@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">October 07, 2025</h4>
+            <h4 data-toc-skip class="date">October 08, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/warden_explained.Rmd" class="external-link"><code>vignettes/articles/warden_explained.Rmd</code></a></small>
       <div class="d-none name"><code>warden_explained.Rmd</code></div>
@@ -101,44 +101,54 @@ rationale for certain design decisions.</p>
 <p>WARDEN main simulation engine at its core is nothing but a nested
 loop at different levels. However, for this to work we need to delay the
 execution of the inputs provided by the user, so the relevant inputs
-provided through <code>add_tte</code>, <code>add_item</code> and
-<code>add_reactevt</code> are substituted for delayed execution and
+provided through <code><a href="../reference/add_tte.html">add_tte()</a></code>, <code><a href="../reference/add_item.html">add_item()</a></code> and
+<code><a href="../reference/add_reactevt.html">add_reactevt()</a></code> are substituted for delayed execution and
 stored as lists.</p>
+<p>The basic engine works as indicated below. This is the engine used
+for unconstrained DES. For constrained DES, the only difference is that
+once all inputs are loaded (analysis, simulation, arm, patient), they
+are all saved, and we then iterate over the queue of events in order,
+loading the corresponding inputs for the patient for which the event
+applies, evaluating the event, and then moving on to the next event (and
+the corresponding patient).</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong>Per Analysis (DSA, scenarios) “sens”</strong>
 <ol style="list-style-type: decimal">
-<li>Load inputs sequentially. If it’s an unnamed list, unlist it and
-assign to the “sens” input list.</li>
+<li>Load inputs sequentially and assign to the “sens” input
+environment.</li>
 <li>
 <strong>Per Simulation (PSA or deterministic) “simulation”</strong>
 <ol style="list-style-type: decimal">
-<li>Load inputs sequentially. If it’s an unnamed list, unlist it and
-store its components. The “sens” list is integrated into a new list with
-the “simulation” input list.</li>
+<li>Load inputs sequentially and store its components. The “sens”
+environment is integrated into a new environment with the “simulation”
+input environment.</li>
 <li>
 <strong>Per Patient “i”</strong>
 <ol style="list-style-type: decimal">
-<li>Load inputs sequentially. If it’s an unnamed list, unlist it and
-store its components. The “simulation” list is integrated into a new
-list with the “i” input list.</li>
+<li>Load inputs sequentially and store its components. The “simulation”
+environment is integrated into a new environment with the “i” input
+environment</li>
 <li>
 <strong>Per Arm “arm”</strong>
 <ol style="list-style-type: decimal">
-<li>Load inputs sequentially. If it’s an unnamed list, unlist it and
-store its components. The “i” list is integrated into a new list with
-the “arm” input list.</li>
+<li>Load inputs sequentially and store its components. The “i”
+environment is integrated into a new environment with the “arm” input
+environment</li>
 <li>Load initial time to events. First look into the initial time to
 event expression declared by user; if not found, look into the input
-list already declared; if not found, set equal to <code>Inf</code>.</li>
+list already declared; if not found, set equal to <code>Inf</code>.
+Events are added to an event queue object defined within C++ for
+efficient management of the queue.</li>
 <li>
 <strong>While <code>curtime</code> (simulation time) is &lt;
 <code>Inf</code></strong>
 <ol style="list-style-type: decimal">
-<li>Select the next event by checking the event with minimum time to
-event; in case of ties, untie using the order declared in
-<code>add_tte</code> for initial time to events. If there are no events
-left, set <code>curtime = Inf</code> (end simulation)</li>
+<li>Select the next event by checking the event queue; in case of ties,
+untie using the order declared in <code>add_tte</code> for initial time
+to events. If there are no events left, the event time is
+<code>Inf</code> or if the user sets <code>curtime = Inf</code> then the
+simulation ends.</li>
 <li>Evaluate the reaction of the event by looking at the relevant
 expression from the list of event reactions</li>
 </ol>
@@ -167,8 +177,7 @@ state of R if they conditional trigger random expressions (e.g.,
 <code>if(arm==2){runif(1)}else{5}</code>) that change per intervention.
 To keep the random number cloned as intended, it’s very strongly
 recommended to pre-draw random numbers for each type of random object
-used and use those (see the
-<code>Example for a Sick-Sicker-Dead model - Random Number Streams &amp; Luck Adjustment</code>
+used and use those (see the <code>vignette("example_ssd_stream")</code>
 vignette for more information). WARDEN uses L’Ecuyer-CMRG random number
 generator.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a></span>
@@ -185,8 +194,9 @@ generator.</p>
 </h3>
 <p>Multiple ways of storing inputs and processing events can be thought
 of. A few of these could be 1) data.frames, 2) lists, 3) environments,
-or 4) utilize a C++ implementation (among others). WARDEN uses lists to
-store inputs and to process events.</p>
+or 4) utilize a C++ implementation (among others). WARDEN uses
+environments to store inputs, and a queue with unordered maps in C++ to
+process events.</p>
 <p>Data.frames can be slow and memory-intense to manipulate, so they
 were avoided for this purpose.</p>
 <p>[Changed with WARDEN 1.0] The limitation with the debugging mode has
@@ -197,22 +207,38 @@ where <code>i</code> is created by a loop) are NOT captured by the
 debugging engine, and therefore will be excluded from the debugging log
 file. So the user should try to assign variables explicitly whenever
 possible, e.g., <code>x_1 &lt;- 5</code>.</p>
-<p>A C++ implementation was avoided as the purpose of WARDEN is to be
-user-friendly and to give the user as much as freedom as possible on how
-to define their inputs. While likely much faster, implementation in C++
-would require very careful handling of every user input, likely forcing
-us to restrict it to very specific data types and functions. [Changed
-with WARDEN 2.0] In the most recent version of WARDEN, several functions
-now use a C++ function under the hood for speed improvement. The core
-engine has been revamped so that events now use a C++ implementation of
-a queue, but it has been designed so that users can interact as before
-with the queue using pure, simple R. Furthermore, a resource-constrained
-engine has been created and a discrete constrained resource object has
-been created using C++. Again, the user can interact with these objects
-using clear R functions. Speed-wise, for the unconstrained set-up the
-user is unlikely to see large speed gains, as there is an implicit cost
-of setting up each event queue, modifying events, etc. The constrained
-approach can achieve similar speeds to the unconstrained method.</p>
+<p>[Changed with WARDEN 2.0] A C++ implementation was avoided for a long
+time as the purpose of WARDEN is to be user-friendly and to give the
+user as much as freedom as possible on how to define their inputs. While
+it can make the constrained implementation doable and faster,
+implementation in C++ requires careful consideration on how the user can
+interact with the object in question. [Changed with WARDEN 2.0] In the
+most recent version of WARDEN, several functions now use a C++ function
+under the hood for speed improvement, but the user will not notice any
+change relative to the R counterpart. The core engine has been revamped
+so that events now use a C++ implementation of a queue, but it has been
+designed so that users can interact as before with the queue using pure,
+simple R (so <code><a href="../reference/modify_event.html">modify_event()</a></code> is still used, etc).
+Furthermore, a resource-constrained engine has been created and a
+discrete constrained resource object has been created using C++. Again,
+the user can interact with these objects using clear R functions.
+Speed-wise, for the unconstrained set-up the user is unlikely to see
+large speed gains, as there is an implicit cost of setting up each event
+queue, modifying events, etc. The constrained approach can achieve
+similar speeds to the unconstrained method.</p>
+<p>Several objects now in WARDEN use an R6-like interaction,
+particularly the random streams (<code><a href="../reference/random_stream.html">random_stream()</a></code>),
+restricted resources (<code><a href="../reference/resource_discrete.html">resource_discrete()</a></code>) and shared
+inputs across patients (<code><a href="../reference/shared_input.html">shared_input()</a></code>). The reason to
+select this type of object is due to the type of interaction the user
+needs to perform with this objects. For example for random streams we
+want to do two things at once: 1) draw a random number from a
+pre-generated list of random numbers, and 2) also remove the last used
+number from the list. For a discrete resource, we want a patient to
+attempt to block the resource, and to also modify at the same time the
+discrete resource object (add the patient status to be using the
+resource, or to join the queue). This solution makes the code much
+easier to implement from a user perspective.</p>
 </div>
 <div class="section level3">
 <h3 id="parallel-engine-approach">Parallel engine approach<a class="anchor" aria-label="anchor" href="#parallel-engine-approach"></a>

@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">October 07, 2025</h4>
+            <h4 data-toc-skip class="date">October 08, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_eBC.Rmd" class="external-link"><code>vignettes/articles/example_eBC.Rmd</code></a></small>
       <div class="d-none name"><code>example_eBC.Rmd</code></div>
@@ -163,7 +163,7 @@ defined below. We can define inputs that are common to all patients
 unique to a patient independently of the treatment (e.g. natural death,
 defined in <code>common_pt_inputs</code>), and inputs that are unique to
 that patient and that treatment (<code>unique_pt_inputs</code>). Items
-can be included through the <code>add_item</code> function, and can be
+can be included through the <code><a href="../reference/add_item.html">add_item()</a></code> function, and can be
 used in subsequent items (e.g. below, we define <code>sex_pt</code> and
 we use it in <code>nat.os.s</code> to get the background mortality for
 that patient). All these inputs are generated before the events and the
@@ -261,8 +261,8 @@ trouble.</p>
 <div class="section level3">
 <h3 id="add-initial-events">Add Initial Events<a class="anchor" aria-label="anchor" href="#add-initial-events"></a>
 </h3>
-<p>Events are added below through the <code>add_tte</code> function. We
-use this function twice, one per intervention. We must define several
+<p>Events are added below through the <code><a href="../reference/add_tte.html">add_tte()</a></code> function.
+We use this function twice, one per intervention. We must define several
 arguments: one to indicate the intervention, one to define the names of
 the events used, one to define the names of other objects created that
 we would like to store (optional, maybe we generate an intermediate
@@ -272,7 +272,7 @@ will be automatically initialized to <code>Inf</code>. We draw the times
 to event for the patients. This chunk is a bit more complex, so it’s
 worth spending a bit of time explaining it.</p>
 <p>The <code>init_event_list</code> object is populated by using the
-<code>add_tte</code> function twice, one for the “int” strategy and
+<code><a href="../reference/add_tte.html">add_tte()</a></code> function twice, one for the “int” strategy and
 other for the “noint” strategy. We first declare the <code>start</code>
 time to be <code>0</code>.</p>
 <p>We then proceed to generate the actual time to event. We use the
@@ -393,7 +393,7 @@ seen in the section below.</p>
 </h3>
 <p>Once the initial times of the events have been defined, we also need
 to declare how events react and affect each other. To do so, we use the
-<code>evt_react_list</code> object and the <code>add_reactevt</code>
+<code>evt_react_list</code> object and the <code><a href="../reference/add_reactevt.html">add_reactevt()</a></code>
 function. This function just needs to state which event is affected, and
 the actual reaction (usually setting flags to 1 or 0, or creating
 new/adjusting events).</p>
@@ -459,36 +459,37 @@ patient</td>
 <p>The functions to add/modify events and inputs use named vectors or
 lists. Whenever several inputs/events are added or modified, it’s
 recommended to group them within one function, as it reduces the
-computation cost. So rather than use two <code>modify_event</code> with
-a list of one element, it’s better to group them into a single
-<code>modify_event</code> with a list of two elements.</p>
+computation cost. So rather than use two <code><a href="../reference/modify_event.html">modify_event()</a></code>
+with a list of one element, it’s better to group them into a single
+<code><a href="../reference/modify_event.html">modify_event()</a></code> with a list of two elements.</p>
 <p>The list of relevant functions to be used within
-<code>add_reactevt</code> are: <code>new_event</code>allows to generate
-events and add them to the vector of events. It accepts more than one
-event but a single event per event type. <code>modify_event</code>
-allows to modify events (e.g. delay death). When adding an event, the
-name of the events and the time of the events must be defined. When
-using <code>modify_event</code>, one must indicate which events are
-affected and what are the new times of the events. If the event
-specified does not exist or has already occurred, it will return an
-error. <code>modify_event</code> with <code>create_if_null = TRUE</code>
-argument will also generate events if they don’t exist.
-<code>remove_event</code> will remove an event from the event queue
-(could also be modified instead and set to <code>Inf</code>).
-<code>get_event</code> will return the TTE of the specified event name.
-<code>has_event</code> will return a TRUE/FALSE flag depending on
-whether the given patient has a specific event in the queue (will return
-TRUE even if time is <code>Inf</code>). <code>next_event</code> will
-return a list with the next event in the queue, with time, patient, and
-event name (<code>patient_id</code>, <code>event_name</code>, and
-<code>event_time</code>). <code>next_event_pt</code> will return a list
-with the next event in the queue for a specific patient, with time,
-patient, and event name (<code>patient_id</code>,
-<code>event_name</code>, and <code>event_time</code>).
-<code>queue_empty</code> will return TRUE if the queue of events is
-empty (no more events to process, but <code>Inf</code> events are
-considered part of the queue) <code>queue_size</code> allows to check
-the size of the queue of events, including <code>Inf</code> events.</p>
+<code>add_reactevt</code> are: <code><a href="../reference/new_event.html">new_event()</a></code>allows to
+generate events and add them to the vector of events. It accepts more
+than one event but a single event per event type.
+<code><a href="../reference/modify_event.html">modify_event()</a></code> allows to modify events (e.g. delay death).
+When adding an event, the name of the events and the time of the events
+must be defined. When using <code>modify_event</code>, one must indicate
+which events are affected and what are the new times of the events. If
+the event specified does not exist or has already occurred, it will
+return an error. <code>modify_event</code> with
+<code>create_if_null = TRUE</code> argument will also generate events if
+they don’t exist. <code><a href="../reference/remove_event.html">remove_event()</a></code> will remove an event from
+the event queue (could also be modified instead and set to
+<code>Inf</code>). <code><a href="../reference/get_event.html">get_event()</a></code> will return the TTE of the
+specified event name. <code><a href="../reference/has_event.html">has_event()</a></code> will return a TRUE/FALSE
+flag depending on whether the given patient has a specific event in the
+queue (will return TRUE even if time is <code>Inf</code>).
+<code><a href="../reference/next_event.html">next_event()</a></code> will return a list with the next event in the
+queue, with time, patient, and event name (<code>patient_id</code>,
+<code>event_name()</code>, and <code>time</code>).
+<code>next_event_pt</code> will return a list with the next event in the
+queue for a specific patient, with time, patient, and event name
+(<code>patient_id</code>, <code>event_name</code>, and
+<code>time</code>). <code><a href="../reference/queue_empty.html">queue_empty()</a></code> will return TRUE if the
+queue of events is empty (no more events to process, but
+<code>Inf</code> events are considered part of the queue)
+<code><a href="../reference/queue_size.html">queue_size()</a></code> allows to check the size of the queue of
+events, including <code>Inf</code> events.</p>
 <p>Note that one could potentially omit part of the modeling set in
 <code>init_event_list</code> and actually define new events dynamically
 through the reactions (we do that below for the <code>"ae"</code>
@@ -499,12 +500,11 @@ possible it’s always better to use <code>init_event_list</code>.</p>
 <code>os</code>), should modify <code>curtime</code> and set it to
 <code>Inf</code>.</p>
 <p>Finally, note that there could be two different ways of accumulating
-continuous outcomes, backwards (i.e., in the example below, we would set
-q_default = util.sick at the sicker event, and modify the
-<code>q_default</code> value in the death event) and forwards (as in the
-example below). This option can be modified in the <code>run_sim</code>
-function using the <code>accum_backwards</code> argument, which assumes
-forwards by default.</p>
+continuous outcomes, backwards (see SSD example to see how the
+implementation would change) and forwards (as in the example below).
+This option can be modified in the <code><a href="../reference/run_sim.html">run_sim()</a></code> function using
+the <code>accum_backwards</code> argument, which assumes forwards by
+default.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">evt_react_list</span> <span class="op">&lt;-</span></span>
@@ -692,7 +692,7 @@ that the model is able to run without costs or utilities.</p>
 <p>Utilities/Costs/Other outputs are defined by declaring which object
 belongs to utilities/costs/other outputs, and whether they need to be
 discounted continuously or discretely (instantaneous). These will be
-passed to the <code>run_sim</code> function. ## Utilities</p>
+passed to the <code><a href="../reference/run_sim.html">run_sim()</a></code> function. ## Utilities</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">util_ongoing</span> <span class="op">&lt;-</span> <span class="st">"q_default"</span></span></code></pre></div>
@@ -713,7 +713,7 @@ passed to the <code>run_sim</code> function. ## Utilities</p>
 <div class="section level3">
 <h3 id="model-execution">Model Execution<a class="anchor" aria-label="anchor" href="#model-execution"></a>
 </h3>
-<p>The model can be run using the function <code>run_sim</code> below.
+<p>The model can be run using the function <code><a href="../reference/run_sim.html">run_sim()</a></code> below.
 We must define the number of patients to be simulated, the number of
 simulations, whether we want to run a PSA or not, the strategy list, the
 inputs, events and reactions defined above, utilities, costs and also if
@@ -725,7 +725,7 @@ model that we use as a reference to determine whether we want to use a
 deterministic or stochastic input. As such, it could also be defined in
 <code>common_all_inputs</code> as the first item to be defined, and the
 result would be the same. However, we recommend it to be defined in
-<code>run_sim</code>.</p>
+<code><a href="../reference/run_sim.html">run_sim()</a></code>.</p>
 <p>Note that the distribution chosen, the number of events and the
 interaction between events can have a substantial impact on the running
 time of the model.</p>
@@ -753,9 +753,9 @@ time of the model.</p>
 <span>          <span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 3.35s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 3.35s</span></span>
-<span><span class="co">#&gt; Total time to run: 3.36s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 3.32s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 3.32s</span></span>
+<span><span class="co">#&gt; Total time to run: 3.32s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
