@@ -26,12 +26,12 @@ navbar:
       href: reference/index.html
     - text: "Articles"
       menu:
-        - text: "Basic Tutorials"
+        - text: "Core Tutorials"
         - text: "Warden Explained"
           href: articles/warden_explained.html
         - text: "Sick-Sicker-Dead Model (SSD)"
           href: articles/example_ssd.html
-        - text: "Resource Constrained Sick-Sicker-Dead model"
+        - text: "Resource Constrained SSD model"
           href: articles/example_ssd_constrained.html
         - text: "How to Use the Automatic Input Selector"
           href: articles/inputs_selector.html
@@ -39,7 +39,7 @@ navbar:
           href: articles/example_eBC.html
         - text: "Using Individual Patient Data"
           href: articles/example_ipd.html
-        - text: "Other Tutorials and Tips"
+        - text: "Other Tutorials and Best Practices"
         - text: "Cohort Markov Model"
           href: articles/example_markov.html
         - text: "How to Avoid Using Cycles to Speed Up Model"
@@ -59,7 +59,7 @@ navbar:
 
 reference:
   - title: Main Modelling Functions
-  - subtitle: Modelling Core Functions
+  - subtitle:Core Functions
     contents:
       - run_sim
       - run_sim_parallel
@@ -87,7 +87,7 @@ reference:
       - discrete_resource_clone
 
 
-  - subtitle: Modelling Auxiliary Functions
+  - subtitle: Auxiliary Functions
     contents:
       - create_indicators
       - sens_iterator
@@ -95,7 +95,7 @@ reference:
       - pick_val_v
       - replicate_profiles
 
-  - subtitle: Modelling Summary Functions
+  - subtitle: Summary Functions
     contents:
       - ceac_des
       - evpi_des
@@ -105,7 +105,7 @@ reference:
       
 
   - title: Statistics Functions
-  - subtitle: Statistics Auxiliary Functions
+  - subtitle: Auxiliary Functions
     contents:
       - draw_tte
       - random_stream
@@ -113,7 +113,7 @@ reference:
       - qtimecov
       - adj_val
       
-  - subtitle: Statistics Distributions Functions
+  - subtitle: Distributions Functions
     contents:
       - cond_dirichlet
       - cond_mvn
