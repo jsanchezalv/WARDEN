@@ -1,0 +1,931 @@
+---
+title: 'Lin and Briggs (2025) Scottish CVD DES using WARDEN'
+author: "Javier Sanchez Alvarez"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    embed-resources: true
+    self-contained-math: true
+vignette: >
+  %\VignetteIndexEntry{example_ScotCVD_LinBriggs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = TRUE
+)
+```
+
+# Introduction
+
+This document makes use of the code provided by [Lin and Briggs (2025)](https://link.springer.com/article/10.1007/s40273-025-01560-6) which use R ad-hoc created functions to translate an existing Markov Scottish CVD model into a DES model. We showcase how the same model would be written with WARDEN.
+
+Note that the model used is not resource constrained, so in WARDEN we would use with the `constrained = FALSE` argument (which is FALSE by default). 
+
+## Main options
+
+```{r setup}
+library(WARDEN)
+library(flexsurv)
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+library(purrr)
+library(tidyr)
+library(readxl)
+
+
+#Copied directly from original code
+choose_coef_by_sex <- function(sex, coef, list = list_coef) {
+  if (sex == "male") {
+    as.matrix(list[[paste0(coef,"_m")]] %>% keep(is.numeric))
+  } else if (sex == "female"){
+    as.matrix(list[[paste0(coef,"_f")]] %>% keep(is.numeric))
+  } else {
+    stop("The sex argument should be either 'male' or 'female'.")
+  }
+}
+
+# Age in year (continuous)
+# Normal distribution
+list_age <- list(mean = 60, sd = 0, dist = "rnorm")
+
+# Scottish Index of Multiple Deprivation (continuous, range: 0 to 100)
+# Beta distribution
+list_SIMD <- list(mean = 60.8, sd = 15, min = 0, max = 100, dist = "rbeta")
+
+# % of diabetes (proportion, range: from 0 to 1)
+# Bernoulli distribution for each patient
+list_Diabetes <- list(prop = 0, label = c("yes", "no"))
+
+# % of family history (proportion, range: from 0 to 1)
+# Bernoulli distribution for each patient
+list_FH <- list(prop = 0, label = c("yes", "no"))
+
+# No. of cigarette per day (continuous)
+# Gamma distribution
+list_CPD <- list(mean = 20, sd = 0, dist = "rgamma")
+
+# Systolic blood pressure (continuous)
+# Normal distribution
+list_SBP <- list(mean = 160, sd = 0, dist = "rnorm")
+
+# Total cholesterol (continuous)
+# Normal distribution
+list_TC <- list(mean = 7, sd = 0, dist = "rnorm")
+
+# High density cholesterol (continuous)
+# Normal distribution
+list_HDL <- list(mean = 1, sd = 0, dist = "rnorm")
+
+# % of male (proportion, range: from 0 to 1)
+# Bernoulli distribution for each patient
+list_sex <- list(prop = 0.5, label = c("male", "female"))
+
+tm <- 100 # maximum = 100
+# time spline variables for cost models were reported up to t = 100 
+# (Lawson 2016. Appendix. Table A7 A8 A9 A10 A11 A12)
+
+disc <- 0.035 # disc <-0 for undiscounted
+
+# treatment effects on ldl and hdl
+list_tx <- list(ldleffect = 0.26, 
+                hdleffect = 1.04, 
+                cost = 13, 
+                disu = 0.001)
+
+
+
+sheet_names <- excel_sheets(here::here("data/CVDparameters.xlsx"))
+
+list_coef <- lapply(seq_along(sheet_names), 
+                    function(x) {
+  dt <- read_excel(here::here("data/CVDparameters.xlsx"), sheet = x, col_names = TRUE)
+})
+
+names(list_coef) <- sheet_names
+
+list_coef2 <- list_coef
+
+calib <- list(f1 = 0.96,
+              multi_m = 0.99,
+              multi_f = 1.05)
+
+# Constant adjustment
+j <- which(list_coef$first_event_coef_m$covariate == "constant")
+list_coef$first_event_coef_m[j, -1] <- list_coef$first_event_coef_m[j, -1] * 
+  calib$multi_m
+list_coef$first_event_coef_f[j, -1] <- list_coef$first_event_coef_f[j, -1] * 
+  calib$multi_f
+
+# coefficient adjustment for TC and HDL for nonCVDdeath first event for male
+j <- which(list_coef$first_event_coef_m$covariate %in% c("TC", "HDL"))
+list_coef$first_event_coef_m[j, "first_event_nonCVD_death"] <- 0
+
+# coefficient adjustment for TC CBVD and nonCVDdeath first events for female
+j <- which(list_coef$first_event_coef_m$covariate %in% "TC")
+list_coef$first_event_coef_f[j, c("first_event_nonfatal_CBVD", "first_event_nonCVD_death")] <- 0
+
+
+list_coef <- lapply(list_coef, function(x) x %>% keep(is.numeric) %>% as.matrix())
+
+list_u_norms <-
+  list(
+    u_norms_m = tibble(
+      age = c("<25", "25-34", "35-44", "45-54", "55-64", "65-74", ">74"),
+      age_min = c(0, 25, 35, 45, 55, 65, 75),
+      age_max = c(25, 35, 45, 55, 65, 75, Inf),
+      Index = c(0, seq(
+        from = 25, to = 75, by = 10
+      )),
+      utility = c(0.831, 0.823, 0.820, 0.806, 0.801, 0.788, 0.774)
+    ),
+    u_norms_f = tibble(
+      age = c("<25", "25-34", "35-44", "45-54", "55-64", "65-74", ">74"),
+      age_min = c(0, 25, 35, 45, 55, 65, 75),
+      age_max = c(25, 35, 45, 55, 65, 75, Inf),
+      Index = c(0, seq(
+        from = 25, to = 75, by = 10
+      )),
+      utility = c(0.809, 0.811, 0.802, 0.785, 0.787, 0.777, 0.721)
+    )
+  )
+
+list_coef <- append(list_coef, list_u_norms)
+
+rm(list_u_norms)
+
+
+#RCS derived coefficients, directly from running the original code
+nl_RCS <- list(
+  nl_RCS_pre = list(
+    male = list(
+      knots = c(2, 7, 17),
+      coef_a_1j = c(
+        `(Intercept)` = -0.0355554000000008,
+        C_ti1 = 0.0533331869047627,
+        x2 = -0.0266666285714288,
+        x3 = 0.00444444166666668
+      ),
+      coef_a_2j = c(
+        `(Intercept)` = 2.25111027435915,
+        C_ti1 = -0.926666325718771,
+        x2 = 0.113333293706297,
+        x3 = -0.002222220901321
+      ),
+      coef_a_3j = c(`(Intercept)` = -8.66666405454546,
+                    C_ti1 = 0.999999754545455),
+      r2_check = c(0.999999999999985, 0.999999999999987,
+                   0.999999999999926)
+    ),
+    female = list(
+      knots = c(2, 8, 17),
+      coef_a_1j = c(
+        `(Intercept)` = -0.0355553999999988,
+        C_ti1 = 0.0533331869047611,
+        x2 = -0.0266666285714284,
+        x3 = 0.00444444166666666
+      ),
+      coef_a_2j = c(
+        `(Intercept)` = 3.75704726107239,
+        C_ti1 = -1.3688915683761,
+        x2 = 0.151111334498837,
+        x3 = -0.00296296891996898
+      ),
+      coef_a_3j = c(`(Intercept)` = -10.8,
+                    C_ti1 = 1.2),
+      r2_check = c(0.999999999999995, 0.999999999999996,
+                   1)
+    )
+  ),
+  nl_RCS_postCHD = list(
+    male = list(
+      knots = c(1, 6, 14),
+      coef_a_1j = c(
+        `(Intercept)` = -0.00591723333333363,
+        C_ti1 = 0.0177515847883601,
+        x2 = -0.0177515103174604,
+        x3 = 0.00591716203703705
+      ),
+      coef_a_2j = c(
+        `(Intercept)` = 2.07101078181822,
+        C_ti1 = -1.02071181916788,
+        x2 = 0.155325643795095,
+        x3 = -0.00369823198653204
+      ),
+      coef_a_3j = c(`(Intercept)` = -8.07693209999999, C_ti1 = 1.15384662727273),
+      r2_check = c(0.999999999999999, 0.999999999999992, 0.999999999999465)
+    ),
+    female = list(
+      knots = c(1, 5, 12),
+      coef_a_1j = c(
+        `(Intercept)` = -0.00826453999999968,
+        C_ti1 = 0.0247935047619046,
+        x2 = -0.0247934285714285,
+        x3 = 0.00826446666666666
+      ),
+      coef_a_2j = c(
+        `(Intercept)` = 1.61511016623365,
+        C_ti1 = -0.949231624530986,
+        x2 = 0.170011662337658,
+        x3 = -0.00472254343434329
+      ),
+      coef_a_3j = c(`(Intercept)` = -6.54546038181818,
+                    C_ti1 = 1.09090950909091),
+      r2_check = c(0.999999999999997, 0.999999999999993,
+                   0.999999999999926)
+    )
+  ),
+  nl_RCS_postCBVD = list(
+    male = list(
+      knots = c(1,
+                5, 12),
+      coef_a_1j = c(
+        `(Intercept)` = -0.00826453999999968,
+        C_ti1 = 0.0247935047619046,
+        x2 = -0.0247934285714285,
+        x3 = 0.00826446666666666
+      ),
+      coef_a_2j = c(
+        `(Intercept)` = 1.61511016623365,
+        C_ti1 = -0.949231624530986,
+        x2 = 0.170011662337658,
+        x3 = -0.00472254343434329
+      ),
+      coef_a_3j = c(`(Intercept)` = -6.54546038181818, C_ti1 = 1.09090950909091),
+      r2_check = c(0.999999999999997, 0.999999999999993, 0.999999999999926)
+    ),
+    female = list(
+      knots = c(1, 5, 12),
+      coef_a_1j = c(
+        `(Intercept)` = -0.00826453999999968,
+        C_ti1 = 0.0247935047619046,
+        x2 = -0.0247934285714285,
+        x3 = 0.00826446666666666
+      ),
+      coef_a_2j = c(
+        `(Intercept)` = 1.61511016623365,
+        C_ti1 = -0.949231624530986,
+        x2 = 0.170011662337658,
+        x3 = -0.00472254343434329
+      ),
+      coef_a_3j = c(`(Intercept)` = -6.54546038181818,
+                    C_ti1 = 1.09090950909091),
+      r2_check = c(0.999999999999997, 0.999999999999993,
+                   0.999999999999926)
+    )
+  )
+)
+
+```
+
+```{r main_opt, results='hide', message=FALSE}
+options(scipen = 999)
+options(digits=3)
+options(tibble.print_max = 50)
+```
+
+
+```{r results_premade, echo = FALSE}
+
+
+```
+
+# Conversion to WARDEN
+
+## Inputs
+
+As with any model, we need to load inputs, set initial TTE, event reactions, utilities/costs, etc. We'll use the `pick_val_v()` function to have all inputs set-up at once.
+
+Though the model is a cohort one except for the SIMD variable, we assume here that we could use one with individual variation, so we define the parameters at the individual level instead of pre-loading them as a cohort (though we could do that as well). Since we do not have any uncertainty around the cohort parameters, we assume those are excluded from the PSA as in the original publication.
+
+Normally, we would model each of the different events independently, i.e., we would allow the model to naturally choose and express the competitive risks (we would have an event for "nonfatal_CHD", another for "nonfatal_CBVD", etc), but for the sake of replication we will proceed as in the original paper.
+
+We create the time to event for the first event within the patient-arm level inputs.
+
+
+```{r input_delayed}
+
+#helper functions for the restricted cube
+rcs_du <-  function(du_all, du, t2, b5, b6, a0, a1, a2, a3){
+  sum(du_all * pnorm(q = du + b5 * t2 + b6 * (a3 * t2^3 + a2 * t2^2 + a1 * t2 + a0)))
+}
+
+disu_sec_f <- function(time,DU_ALL, DU, B5, B6, nl_RCS_ch){
+  
+  if(time < nl_RCS_ch$knots[1]){
+    rcs_du(DU_ALL, DU, time, B5, B6 , 0,0,0,0)
+    
+  } else if (between(time, nl_RCS_ch$knots[1],nl_RCS_ch$knots[2])) {
+    rcs_du(DU_ALL, DU, time, B5, B6 , nl_RCS_ch[[2]][1],nl_RCS_ch[[2]][2],nl_RCS_ch[[2]][3],nl_RCS_ch[[2]][4])
+    
+    
+  } else if (between(time, nl_RCS_ch$knots[2],nl_RCS_ch$knots[3])){
+    rcs_du(DU_ALL, DU, time, B5, B6 ,  nl_RCS_ch[[3]][1],nl_RCS_ch[[3]][2],nl_RCS_ch[[3]][3],nl_RCS_ch[[3]][4])
+    
+  } else {
+    rcs_du(DU_ALL, DU, time, B5, B6 ,0,0,0,0)
+  }
+}
+
+rcs_cost_f <- function(time, nl_RCS_ch){
+  if(time < nl_RCS_ch$knots[1]){
+    0
+  } else if (between(time, nl_RCS_ch$knots[1],nl_RCS_ch$knots[2])) {
+    nl_RCS_ch[[2]][1] + nl_RCS_ch[[2]][2] * time + nl_RCS_ch[[2]][3] * time^2 + nl_RCS_ch[[2]][4] * time^3
+  } else if (between(time, nl_RCS_ch$knots[2],nl_RCS_ch$knots[3])){
+    nl_RCS_ch[[3]][1] + nl_RCS_ch[[3]][2] * time + nl_RCS_ch[[3]][3] * time^2 + nl_RCS_ch[[3]][4] * time^3
+  } else {
+    nl_RCS_ch[[4]][1] + nl_RCS_ch[[4]][2] * time
+  }
+}
+
+#reform parameters so it's clearer for model
+l_CVD_inputs <- list(parameter_name = list(
+                                      "first_event_nonfatal_CHD_m",
+                                      "first_event_nonfatal_CBVD_m",
+                                      "first_event_CVD_death_m", 
+                                      "first_event_nonCVD_death_m",
+                                      "post_CHD_m",
+                                      "post_CBVD_m",
+                                      "first_event_nonfatal_CHD_f",
+                                      "first_event_nonfatal_CBVD_f",
+                                      "first_event_CVD_death_f", 
+                                      "first_event_nonCVD_death_f",
+                                      "post_CHD_f",
+                                      "post_CBVD_f"
+                                      ),
+                 base_value = list(
+                    list_coef$first_event_coef_m[,1],
+                    list_coef$first_event_coef_m[,2],
+                    list_coef$first_event_coef_m[,3],
+                    list_coef$first_event_coef_m[,4],
+                    list_coef$post_event_coef_m[,1],
+                    list_coef$post_event_coef_m[,2],
+                    list_coef$first_event_coef_f[,1],
+                    list_coef$first_event_coef_f[,2],
+                    list_coef$first_event_coef_f[,3],
+                    list_coef$first_event_coef_f[,4],
+                    list_coef$post_event_coef_f[,1],
+                    list_coef$post_event_coef_f[,2]
+                   ),
+                 PSA_dist = list("mvrnorm",
+                                 "mvrnorm",
+                                 "mvrnorm",
+                                 "mvrnorm",
+                                 "mvrnorm",
+                                 "mvrnorm",
+                                 "mvrnorm",
+                                 "mvrnorm",
+                                 "mvrnorm",
+                                 "mvrnorm",
+                                 "mvrnorm",
+                                 "mvrnorm"
+                                ),
+                 a=list(
+                    list_coef$first_event_coef_m[,1],
+                    list_coef$first_event_coef_m[,2],
+                    list_coef$first_event_coef_m[,3],
+                    list_coef$first_event_coef_m[,4],
+                    list_coef$post_event_coef_m[,1],
+                    list_coef$post_event_coef_m[,2],
+                    list_coef$first_event_coef_f[,1],
+                    list_coef$first_event_coef_f[,2],
+                    list_coef$first_event_coef_f[,3],
+                    list_coef$first_event_coef_f[,4],
+                    list_coef$post_event_coef_m[,1],
+                    list_coef$post_event_coef_m[,2]
+                   ),
+                 b=list(
+                    list_coef$cov_firstE_CHD_m,
+                    list_coef$cov_firstE_CBVD_m,
+                    list_coef$cov_fatal_CVD_m,
+                    list_coef$cov_fatal_nonCVD_m,
+                    list_coef$cov_surv_postCHD_m,
+                    list_coef$cov_surv_postCBVD_m,
+                    list_coef$cov_firstE_CHD_f,
+                    list_coef$cov_firstE_CBVD_f,
+                    list_coef$cov_fatal_CVD_f,
+                    list_coef$cov_fatal_nonCVD_f,
+                    list_coef$cov_surv_postCHD_f,
+                    list_coef$cov_surv_postCBVD_f
+                   ),
+                 n=list(1,1,1,1,1,1,1,1,1,1,1,1),
+                 psa_indicators = list(1,1,1,1,1,1,1,1,1,1,1,1)
+                 )
+
+
+common_all_inputs <-add_item(input = {
+                      drc       <- disc
+                      drq       <- disc
+                      ldleffect <- 0.26
+                      hdleffect <- 1.04 
+                      cost_tx    <- 13
+                      cost      <- 0
+                      disu      <- 0.001
+                      f1        <- 0.96
+                      multi_m   <- 0.99
+                      multi_f   <- 1.05
+                      time_horizon <- tm
+                      
+                      #patient level (not needed to have the stats part since sd is 0 except for SIMD, but we leave it as example since it does not impact results)
+                      age_v      <- rnorm(npats, list_age$mean, list_age$sd)
+                      SIMD_v     <- rbeta_mse(npats, list_SIMD$mean/100, list_SIMD$sd/100)
+                      Diabetes_v <- rbinom(npats, 1, list_Diabetes$prop)
+                      FH_v       <- rbinom(npats, 1, list_FH$prop)
+                      CPD_v      <- rgamma_mse(npats, list_CPD$mean, list_CPD$sd)
+                      SBP_v      <- rnorm(npats, list_SBP$mean, list_SBP$sd)
+                      TC_v       <- rnorm(npats, list_TC$mean, list_TC$sd)
+                      HDL_v      <- rnorm(npats, list_HDL$mean, list_HDL$sd)
+                      sex_v      <- rbinom(npats, 1, list_sex$prop)
+                      status_v   <- rep(0, npats)
+                      
+                      # CVD coefs
+                      pick_val_v(
+                        base= l_CVD_inputs[["base_value"]],
+                        psa = pick_psa(
+                            l_CVD_inputs[["PSA_dist"]],
+                            l_CVD_inputs[["n"]],
+                            l_CVD_inputs[["a"]],
+                            l_CVD_inputs[["b"]]),
+                        psa_ind     = psa_bool,
+                        sens_ind    = FALSE, 
+                        names_out   = l_CVD_inputs[["parameter_name"]],
+                        indicator   = rep(1,12), 
+                        indicator_psa = l_CVD_inputs[["psa_indicators"]],
+                        deploy_env = TRUE
+                      ) 
+                      
+                      ldleffect <- 0.26 
+                      hdleffect <- 1.04 
+                      disu <- 0.001
+                      odd_seq <- seq(1,10,2)
+                      even_seq <- seq(2,10,2)
+                      q_total <- 0
+                      
+})  
+
+
+common_pt_inputs <- add_item(input={
+    sex <- sex_v[i]
+    bs_age <- age_v[i] 
+    age <- bs_age
+    SIMD <- SIMD_v[i] * 100
+    Diabetes <- Diabetes_v[i] 
+    FH <- FH_v[i] 
+    CPD <- CPD_v[i] 
+    SBP <- SBP_v[i] 
+    status <- status_v[i] 
+    u_norms <- if(sex == 1){list_coef$u_norms_m}else{list_coef$u_norms_f}
+    v_du <- if(sex == 1){list_coef$coef_u_m}else{list_coef$coef_u_f}
+    v_du <- c(v_du,0) #append 0 for time horizon case
+    second_event_du_coef <- if(sex == 1){list_coef$second_event_coef_m}else{list_coef$second_event_coef_f}
+    coef_c1 <- if(sex == 1){list_coef$coef_c1_m}else{list_coef$coef_c1_f}
+    coef_c1_pre <- coef_c1[,c(1,2,5,6)]
+    coef_c1_post <- coef_c1[,c(3,4)]
+    coef_c2 <- if(sex == 1){list_coef$coef_c2_m}else{list_coef$coef_c2_f}
+    post_CHD <- if(sex == 1){post_CHD_m}else{post_CHD_f}
+    post_CBVD <- if(sex == 1){post_CBVD_m}else{post_CBVD_f}
+    
+}) 
+
+unique_pt_inputs <- add_item(input = {
+    treatment <- as.numeric(arm == "int")
+    TC  <- TC_v[i] - (TC_v[i] - HDL_v[i]) * treatment * ldleffect
+    HDL <- HDL_v[i] * hdleffect ^ treatment
+    
+    m_pat_ch <- matrix(c(age, SIMD, Diabetes, FH, CPD, SBP, TC, HDL, 1), ncol = 9)
+    first_event_nonfatal_CHD <- if(sex == 1){first_event_nonfatal_CHD_m}else{first_event_nonfatal_CHD_f} 
+    lp_first_event_nonfatal_CHD <- m_pat_ch %*% first_event_nonfatal_CHD[1:9] * f1
+    
+    first_event_nonfatal_CBVD <- if(sex == 1){first_event_nonfatal_CBVD_m}else{first_event_nonfatal_CBVD_f} 
+    lp_first_event_nonfatal_CBVD <- m_pat_ch %*% first_event_nonfatal_CBVD[1:9] * f1
+    
+    first_event_CVD_death <- if(sex == 1){first_event_CVD_death_m}else{first_event_CVD_death_f}
+    lp_first_event_CVD_death <- m_pat_ch %*% first_event_CVD_death[1:9] * f1
+    
+    first_event_nonCVD_death <- if(sex == 1){first_event_nonCVD_death_m}else{first_event_nonCVD_death_f}
+    lp_first_event_nonCVD_death <- m_pat_ch %*% first_event_nonCVD_death[1:9] * f1
+    
+    t_firstE_nonfatal_CHD  <- rgompertz(1, rate = exp(lp_first_event_nonfatal_CHD),  shape = first_event_nonfatal_CHD[10])
+    t_firstE_nonfatal_CBVD <- rgompertz(1, rate = exp(lp_first_event_nonfatal_CBVD), shape = first_event_nonfatal_CBVD[10])
+    t_firstE_CVD_death     <- rgompertz(1, rate = exp(lp_first_event_CVD_death),     shape = first_event_CVD_death[10])
+    t_firstE_nonCVD_death  <- rgompertz(1, rate = exp(lp_first_event_nonCVD_death),  shape = first_event_nonCVD_death[10])
+    
+    v_first_times <- c(t_firstE_nonfatal_CHD,t_firstE_nonfatal_CBVD, t_firstE_CVD_death, t_firstE_nonCVD_death, time_horizon) 
+    
+    status_1 = which.min(v_first_times)
+    tte_first <- v_first_times[status_1]
+    
+    seq_ch <- if(status_1 == 1){odd_seq}else if(status_1 == 2){even_seq}else{NA}
+    
+    b5 <- second_event_du_coef[seq_ch,1]
+    b6 <- second_event_du_coef[seq_ch,2]
+})
+
+
+```
+
+## Events
+
+### Add Initial Events
+
+We set up event times. 
+
+```{r model_evts}
+init_event_list <- 
+  add_tte(arm=c("int","comp"), evts = c("start","event_1","event_2"), input={
+  start <- 0
+  event_1 <- tte_first
+  event_2 <- Inf
+  })
+
+```
+
+### Add Reaction to the Events
+This is where the biggest differences are between WARDEN and the original model. WARDEN simulates each patient individually, while the original paper takes advantage of vectorization to speed things up, at the cost of 1) transparency, and 2) lack of adaptability to other model structures. This is particularly impactful in this model as both costs and utilities have a restricted cubic spline approach, which means we need to use `adj_val()` to calculate how they would change over time and integrate that value. This is computationally heavy, and in our case we choose to update these values monthly, as the imprecision is expected to be minimal.
+
+
+
+```{r model_reaction}
+evt_react_list <-
+  add_reactevt(name_evt = "start",
+               input = {
+                 #cost
+                 linpred_cost <- c(age, SIMD, FH, 1) %*% coef_c1_pre[3:6,]
+                 linpred_cost <- ifelse(status_1>4,0,linpred_cost[status_1])
+                 coef_cost_1  <- ifelse(status_1>4,0,coef_c1_pre[1,status_1])
+                 coef_cost_2  <- ifelse(status_1>4,0,coef_c1_pre[2,status_1])
+                 cost_2 <- adj_val(
+                      curtime,
+                      next_event()$time,
+                      by = 1/12,
+                      (.time-curtime) * coef_cost_1 +
+                        coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS[["nl_RCS_pre"]][[sex + 1]]),
+                      discount = drc
+                 )
+                 
+                 cost <- linpred_cost + 
+                   cost_2 +
+                   cost_tx * as.integer(arm=="int")
+                   
+
+                 #utility
+                 adj_factor <- adj_val(
+                      curtime,
+                      next_event()$time,
+                      by = 1/12,
+                      u_norms$utility[.time + bs_age < (u_norms$age_max)][1],
+                      discount = drq
+                 )
+                 q_total <- adj_factor - disu * as.integer(arm=="int")
+               }) %>% 
+  add_reactevt(name_evt = "event_1",
+               input = {
+              if(status_1>2){ #if death stop
+                curtime <- Inf
+                
+              } else{
+                age <- age + curtime
+                m_pat_ch_2 <-  matrix(c(age, SIMD, FH, 1), ncol = 4)
+                 
+               
+                lp_post_CHD <- m_pat_ch_2 %*% post_CHD[1:4]
+                lp_post_CBVD <- m_pat_ch_2 %*% post_CBVD[1:4]
+                
+                t_postSurv_CHD  <- rgompertz(1, rate = exp(lp_post_CHD), shape = post_CHD[5])
+                t_postSurv_CBVD <- rgompertz(1, rate = exp(lp_post_CBVD), shape = post_CBVD[5])
+                
+                v_second_times <- c(t_postSurv_CHD,t_postSurv_CBVD) 
+                status_2 = which.min(v_second_times)
+                tte_second <- v_second_times[status_2]
+                status_2 <- ifelse(is.infinite(tte_second), 0, status_2)
+                modify_event(c(event_2 = tte_second + curtime))
+                
+                #cost
+                linpred_cost <- c(age, SIMD, FH,1) %*% coef_c1_post[3:6,]
+                linpred_cost <- ifelse(status_2>4,0,linpred_cost[status_1])
+                coef_cost_1  <- ifelse(status_2>4,0,coef_c1_post[1,status_1])
+                coef_cost_2  <- ifelse(status_2>4,0,coef_c1_post[2,status_1])
+                cost_2 <- adj_val(
+                     curtime,
+                     next_event()$time,
+                     by = 1/12,
+                     (.time-curtime) * coef_cost_1 +
+                       coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS[[status_1+1]][[sex + 1]]),
+                     discount = drc
+                )
+                
+                cost <- linpred_cost + cost_2 
+                
+                #utility
+                lp_disusecond <- matrix(c(age, SIMD, FH, 1),ncol = 4) %*% t(second_event_du_coef[, 3:6]) 
+                lp_disusecond <- lp_disusecond[seq_ch]
+               
+                adj_factor <- adj_val(
+                      curtime,
+                      next_event()$time,
+                      by = 1/12,
+                      u_norms$utility[.time + bs_age < (u_norms$age_max)][1] -
+                        disu_sec_f(.time - curtime,v_du[-6], lp_disusecond, b5, b6, nl_RCS[[status_1+1]][[sex + 1]]),
+                      discount = drq
+                )
+                q_total <- adj_factor - v_du[status_1] 
+              }
+                 
+               }) %>%
+  add_reactevt(name_evt = "event_2", #which is death
+               input = {
+                 curtime <- Inf
+               })
+
+
+```
+
+## Costs and Utilities
+
+```{r cost_utilities}
+
+util_ongoing <- "q_total"
+
+cost_ongoing <- "cost"
+
+```
+
+## Model
+
+### Model Execution
+
+```{r model_run}
+results <- run_sim(  
+  npats=50,                               # number of patients to be simulated
+  n_sim=1,                                  # number of simulations to run
+  psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
+  arm_list = c("int", "comp"),             # intervention list
+  common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
+  common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
+  unique_pt_inputs = unique_pt_inputs,
+  init_event_list = init_event_list,        # initial event list
+  evt_react_list = evt_react_list,          # reaction of events
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  ipd = 1
+)
+```
+
+## Post-processing of Model Outputs
+
+### Summary of Example Results
+
+```{r post-processing_summary}
+
+
+summary_results_det(results[[1]][[1]], arm ="int") #print first simulation
+
+psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
+
+psa_ipd[1:10,] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+```
+
+
+```{r post-processing_analysis,echo=FALSE, message=FALSE, include = FALSE}
+
+# 
+# merged_ipd <- psa_ipd  %>%
+#   group_by(arm) %>%
+#   mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
+#          cumul_total_costs = cumsum(total_costs)/pat_id) %>%
+#   transmute(pat_id, arm, cumul_total_qalys, cumul_total_costs) %>%
+#   tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
+#   mutate(inc_costs = cumul_total_costs_two - cumul_total_costs_one,
+#          inc_qalys = cumul_total_qalys_two - cumul_total_qalys_one,
+#          ICER = inc_costs/ inc_qalys)
+
+# merged_ipd_results <- merged_ipd %>% select(pat_id,inc_costs,inc_qalys,ICER) %>%  slice(seq(1, n(), by = 500))
+
+```
+
+## Summary of Results
+We can check speed of convergence. Note that making sure the random numbers are "cloned" per patient across arms means that convergence occurs faster than in the original paper, which can save computation time, and ensures more stability of all the outcomes.
+
+We have plotted the observations through the simulation run for simmer with 3 different seeds (to display Monte Carlo error) and WARDEN (original, reworked and reworked with two different seeds). It's very noticeable that stability of the ICER is achieved faster with WARDEN, this is due to the use of cloning of the random numbers, which means that ~30,000 simulations would suffice to achieve stability. While the differences between simulations seem relatively large, in reality with the cloning random numbers approach it can be seen that the ICER remains within 2% of the final value already after 10,000 simulations.
+
+The running times with the original WARDEN approach are comparable to those of simmer shown by the paper, even if simmer uses a complex C++ implementation in the back-end. By using the reworked approach, WARDEN is able to cut running time by half. In my computer simmer took between 220 and 300 seconds to run 100,000 simulations. With WARDEN, the "one to one" approach took around 200 seconds. The reworked approach took 100 seconds.
+
+```{r echo = FALSE, warning=FALSE, message=FALSE}
+
+
+summary_results_det(results2[[1]][[1]], arm ="two") #print first simulation
+
+psa_ipd2 <- bind_rows(map(results2[[1]], "merged_df")) 
+
+psa_ipd2[1:10,] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
+ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")) 
+       , aes(x=pat_id,y=ICER, group = type, col = linetype))+
+   geom_line(linewidth=1.1) +
+  theme_bw() +
+  ylim(45000,52000)+
+    theme(legend.position="bottom")
+
+ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
+       aes(x=pat_id,y=inc_costs, group = type, col = linetype))+
+    geom_line(linewidth=1.1) +
+  theme_bw()  +
+  ylim(92500,94500)+
+    theme(legend.position="bottom")
+
+ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
+       aes(x=pat_id,y=inc_qalys, group = type, col = linetype))+
+  geom_line(linewidth=1.1) +
+  theme_bw() +
+  ylim(1.8,2.1)+
+    theme(legend.position="bottom")
+
+
+```
+
+# Probabilistic Case
+We will now use the`pick_val_v()` function. We just showcase this, and will not run it for the sake of saving computation time.
+
+```{r}
+
+thetaToProb <- function(x) unname(exp(x) / (1 + exp(x)))
+
+#Uncertainty is only assumed on TTR, utility, toxicities, TTD and certain costs
+
+l_inputs<- list(parameter_name = list("m_TTR",
+                                      "u_adjuvant",
+                                      "p_tox_1", 
+                                      "p_tox_2",
+                                      "c_tox",
+                                      "u_dis_tox",
+                                      "u_diseasefree",
+                                      "m_TTD",
+                                      "c_advanced",
+                                      "u_advanced"),
+                 base_value = list(
+                   c(df_survival_models$d_RF_R_1_low_cure,
+                    df_survival_models$d_RF_R_1_high_cure,
+                    df_survival_models$d_RF_R_2_low_cure,
+                    df_survival_models$d_RF_R_2_high_cure,
+                    df_survival_models$d_RF_R_1_low_shape,
+                    df_survival_models$d_RF_R_1_high_shape,
+                    df_survival_models$d_RF_R_2_low_shape,
+                    df_survival_models$d_RF_R_2_high_shape,
+                    df_survival_models$d_RF_R_1_low_scale,
+                    df_survival_models$d_RF_R_1_high_scale,
+                    df_survival_models$d_RF_R_2_low_scale,
+                    df_survival_models$d_RF_R_2_high_scale),
+                    0.7,
+                    0.2,
+                    0.4,
+                    2000,
+                    0.1,
+                    0.8,
+                    c(df_survival_models$d_R_D_1_shape,
+                    df_survival_models$d_R_D_2_shape,
+                    df_survival_models$d_R_D_1_scale,
+                    df_survival_models$d_R_D_2_scale),
+                    40000,
+                    0.6),
+                 PSA_dist = list("mvrnorm",
+                                 "rlnorm",
+                                 "rbeta",
+                                 "rbeta",
+                                 "rgamma",
+                                 "rlnorm",
+                                 "rlnorm",
+                                 "mvrnorm",
+                                 "rgamma",
+                                 "rlnorm"),
+                 a=list(fit_RF_R$coefficients,
+                        -0.35738872,
+                        0.1*500,
+                        0.2*500,10000,
+                        -2.30756026,
+                        -0.2237682,
+                        fit_R_D$coefficients,
+                        200000,
+                        -0.51165826),
+                 b=list(fit_RF_R$cov,
+                        0.03778296,
+                        (1-0.1)*500,
+                        (1-0.2)*500,
+                        5,
+                        0.09975135,
+                        0.0353443,
+                        fit_R_D$cov,
+                        5,0.04080783),
+                 n=list(1,1,1,1,1,1,1,1,1,1),
+                 psa_indicators = list(1,1,1,1,1,1,1,1,1,1)
+                 )
+
+common_all_inputs2 <-add_item(input = {
+ 
+                      drc         <- 0.04 
+                      drq         <- 0.015
+                      p_highrisk  <- 0.6
+                      
+                      pick_val_v(
+                        base= l_inputs[["base_value"]],
+                        psa = pick_psa(
+                            l_inputs[["PSA_dist"]],
+                            l_inputs[["n"]],
+                            l_inputs[["a"]],
+                            l_inputs[["b"]]),
+                        psa_ind     = psa_bool,
+                        sens_ind    = FALSE, 
+                        names_out   = l_inputs[["parameter_name"]],
+                        indicator   = rep(1,10), 
+                        indicator_psa = l_inputs[["psa_indicators"]],
+                        deploy_env = TRUE
+                      ) 
+
+                      
+                      d_BS_shape <- df_survival_models$d_RF_D_shape
+                      d_BS_rate  <- df_survival_models$d_RF_D_rate
+                      d_TTR_cure_1_low  <- thetaToProb(m_TTR["theta"])
+                      d_TTR_cure_1_high <- thetaToProb(m_TTR["theta"]+ m_TTR["node4"])
+                      d_TTR_cure_2_low  <- thetaToProb(m_TTR["theta"]+ m_TTR["rxLev+5FU"])
+                      d_TTR_cure_2_high <- thetaToProb(m_TTR["theta"]+ m_TTR["rxLev+5FU"] + m_TTR["node4"])
+                      d_TTR_shape_1_low  <- exp(m_TTR["shape"])
+                      d_TTR_shape_1_high <- exp(m_TTR["shape"])
+                      d_TTR_shape_2_low  <- exp(m_TTR["shape"])
+                      d_TTR_shape_2_high <- exp(m_TTR["shape"])
+                      d_TTR_scale_1_low  <- exp(m_TTR["scale"])
+                      d_TTR_scale_1_high <- exp(m_TTR["scale"]+ m_TTR["scale(node4)"])
+                      d_TTR_scale_2_low  <- exp(m_TTR["scale"]+ m_TTR["scale(rxLev+5FU)"])
+                      d_TTR_scale_2_high <- exp(m_TTR["scale"]+ m_TTR["scale(rxLev+5FU)"] + m_TTR["scale(node4)"])
+
+                      # Adjuvant treatment costs
+                      c_adjuvant_cycle_1 <- 5000
+                      c_adjuvant_cycle_2 <- 15000
+                      
+                      # Other adjuvant treatment parameters
+                      t_adjuvant_cycle      <- 3/52 # in years
+                      n_max_adjuvant_cycles <- 10
+                      
+                     
+                      ## DISEASE MONITORING
+                      
+                      # Cost of a monitoring cycle
+                      c_monitor <- 1000
+                      
+                      # Other disease monitoring parameters
+                      t_monitor_cycle      <- 1 # in years
+                      n_max_monitor_cycles <- 5
+                      
+                      
+                      ## RECURRENCE OF DISEASE
+                      
+                      # Log-logistic distribution for the time-to-death due to cancer after recurrence                    (TTD)
+                      # - conditional on treatment arm
+                      d_TTD_shape_1 <- exp(m_TTD["shape"])
+                      d_TTD_shape_2 <- exp(m_TTD["shape"] + m_TTD["shape(rxLev+5FU)"])
+                      
+                      d_TTD_scale_1 <- exp(m_TTD["scale"])
+                      d_TTD_scale_2 <- exp(m_TTD["scale"] + m_TTD["rxLev+5FU"])
+                     
+
+})  
+
+results_psa <- run_sim_parallel(  
+  npats=1000,                               # number of patients to be simulated
+  n_sim=5,                                  # number of simulations to run
+  psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
+  arm_list = c("one", "two"),             # intervention list
+  common_all_inputs = common_all_inputs2,    # inputs common that do not change within a simulation
+  common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
+  unique_pt_inputs = unique_pt_inputs2,
+  init_event_list = init_event_list,        # initial event list
+  evt_react_list = evt_react_list,          # reaction of events
+  util_ongoing_list = util_ongoing,
+  cost_instant_list = cost_instant,
+  cost_cycle_list = cost_cycle,
+  ipd = 3,
+  ncores = 1 #for github pages to work, could be set to min(future::availableCores(omit=1),4)
+)
+  
+summary_results_sim(results_psa[[1]], arm ="two") 
+
+  
+```
+
+
+
