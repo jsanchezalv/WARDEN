@@ -494,6 +494,8 @@ common_pt_inputs <- add_item(input={
     coef_c2 <- if(sex == 1){list_coef$coef_c2_m}else{list_coef$coef_c2_f}
     post_CHD <- if(sex == 1){post_CHD_m}else{post_CHD_f}
     post_CBVD <- if(sex == 1){post_CBVD_m}else{post_CBVD_f}
+    rnd_v_1 <- runif(4)
+    rnd_v_2 <- runif(2)
     
 }) 
 
@@ -515,10 +517,10 @@ unique_pt_inputs <- add_item(input = {
     first_event_nonCVD_death <- if(sex == 1){first_event_nonCVD_death_m}else{first_event_nonCVD_death_f}
     lp_first_event_nonCVD_death <- m_pat_ch %*% first_event_nonCVD_death[1:9] * f1
     
-    t_firstE_nonfatal_CHD  <- rgompertz(1, rate = exp(lp_first_event_nonfatal_CHD),  shape = first_event_nonfatal_CHD[10])
-    t_firstE_nonfatal_CBVD <- rgompertz(1, rate = exp(lp_first_event_nonfatal_CBVD), shape = first_event_nonfatal_CBVD[10])
-    t_firstE_CVD_death     <- rgompertz(1, rate = exp(lp_first_event_CVD_death),     shape = first_event_CVD_death[10])
-    t_firstE_nonCVD_death  <- rgompertz(1, rate = exp(lp_first_event_nonCVD_death),  shape = first_event_nonCVD_death[10])
+    t_firstE_nonfatal_CHD  <- qgompertz(rnd_v_1[1], rate = exp(lp_first_event_nonfatal_CHD),  shape = first_event_nonfatal_CHD[10])
+    t_firstE_nonfatal_CBVD <- qgompertz(rnd_v_1[2], rate = exp(lp_first_event_nonfatal_CBVD), shape = first_event_nonfatal_CBVD[10])
+    t_firstE_CVD_death     <- qgompertz(rnd_v_1[3], rate = exp(lp_first_event_CVD_death),     shape = first_event_CVD_death[10])
+    t_firstE_nonCVD_death  <- qgompertz(rnd_v_1[4], rate = exp(lp_first_event_nonCVD_death),  shape = first_event_nonCVD_death[10])
     
     v_first_times <- c(t_firstE_nonfatal_CHD,t_firstE_nonfatal_CBVD, t_firstE_CVD_death, t_firstE_nonCVD_death, time_horizon) 
     
@@ -597,14 +599,13 @@ evt_react_list <-
                 age <- age + curtime
                 m_pat_ch_2 <-  matrix(c(age, SIMD, FH, 1), ncol = 4)
                  
-               
                 lp_post_CHD <- m_pat_ch_2 %*% post_CHD[1:4]
                 lp_post_CBVD <- m_pat_ch_2 %*% post_CBVD[1:4]
                 
-                t_postSurv_CHD  <- rgompertz(1, rate = exp(lp_post_CHD), shape = post_CHD[5])
-                t_postSurv_CBVD <- rgompertz(1, rate = exp(lp_post_CBVD), shape = post_CBVD[5])
+                t_postSurv_CHD  <- qgompertz(rnd_v_2[1], rate = exp(lp_post_CHD), shape = post_CHD[5])
+                t_postSurv_CBVD <- qgompertz(rnd_v_2[2], rate = exp(lp_post_CBVD), shape = post_CBVD[5])
                 
-                v_second_times <- c(t_postSurv_CHD,t_postSurv_CBVD) 
+                v_second_times <- c(t_postSurv_CHD,t_postSurv_CBVD, time_horizon - curtime) 
                 status_2 = which.min(v_second_times)
                 tte_second <- v_second_times[status_2]
                 status_2 <- ifelse(is.infinite(tte_second), 0, status_2)
@@ -612,9 +613,9 @@ evt_react_list <-
                 
                 #cost
                 linpred_cost <- c(age, SIMD, FH,1) %*% coef_c1_post[3:6,]
-                linpred_cost <- ifelse(status_2>4,0,linpred_cost[status_1])
-                coef_cost_1  <- ifelse(status_2>4,0,coef_c1_post[1,status_1])
-                coef_cost_2  <- ifelse(status_2>4,0,coef_c1_post[2,status_1])
+                linpred_cost <- ifelse(status_1>4,0,linpred_cost[status_1])
+                coef_cost_1  <- ifelse(status_1>4,0,coef_c1_post[1,status_1])
+                coef_cost_2  <- ifelse(status_1>4,0,coef_c1_post[2,status_1])
                 cost_2 <- adj_val(
                      curtime,
                      next_event()$time,
