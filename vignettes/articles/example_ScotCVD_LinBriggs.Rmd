@@ -44,7 +44,10 @@ if(!require(readxl)){
     install.packages("readxl")
     library(readxl)
 }
-
+if(!require(here)){
+    install.packages("here")
+    library(here)
+}
 
 #Copied directly from original code
 choose_coef_by_sex <- function(sex, coef, list = list_coef) {
