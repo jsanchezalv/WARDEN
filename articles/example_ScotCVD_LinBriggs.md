@@ -41,20 +41,11 @@ if(!require(readxl)){
     library(readxl)
 }
 #> Loading required package: readxl
-#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-#> logical.return = TRUE, : there is no package called 'readxl'
-#> Installing package into '/home/runner/work/_temp/Library'
-#> (as 'lib' is unspecified)
-#> also installing the dependencies 'rematch', 'hms', 'cellranger', 'cpp11', 'progress'
 if(!require(here)){
     install.packages("here")
     library(here)
 }
 #> Loading required package: here
-#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-#> logical.return = TRUE, : there is no package called 'here'
-#> Installing package into '/home/runner/work/_temp/Library'
-#> (as 'lib' is unspecified)
 #> here() starts at /home/runner/work/WARDEN/WARDEN
 
 #Copied directly from original code
@@ -800,9 +791,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 77.05s
-#> Time to run analysis 1: 77.05s
-#> Total time to run: 77.05s
+#> Time to run simulation 1: 77.52s
+#> Time to run analysis 1: 77.52s
+#> Total time to run: 77.52s
 #> Simulation finalized;
 ```
 
@@ -865,3 +856,55 @@ psa_ipd[1:10,] %>%
 We can see that the ICER stabilizes pretty quickly, with the ICUR
 changing in absolute terms less than 500 GBP after 2,500 patients
 simulated.
+
+``` r
+
+merged_ipd <- psa_ipd  %>%
+  group_by(arm) %>%
+  mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
+         cumul_total_costs = cumsum(total_costs)/pat_id) %>%
+  transmute(pat_id, arm, cumul_total_qalys, cumul_total_costs) %>%
+  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
+  mutate(inc_costs = cumul_total_costs_int - cumul_total_costs_comp,
+         inc_qalys = cumul_total_qalys_int - cumul_total_qalys_comp,
+         ICUR = inc_costs/ inc_qalys)
+
+merged_ipd_results <- merged_ipd %>% select(pat_id,inc_costs,inc_qalys,ICUR) %>%  slice(seq(1, n(), by = 50))
+
+
+ggplot(merged_ipd_results, aes(x=pat_id,y=ICUR))+
+    geom_line(linewidth=1.1) +
+    ylim(0,5000)+
+    theme_bw() +
+    theme(legend.position="bottom") 
+#> Warning: Removed 6 rows containing missing values or values outside the scale range
+#> (`geom_line()`).
+```
+
+![](example_ScotCVD_LinBriggs_files/figure-html/post-processing_analysis-1.png)
+
+``` r
+
+
+ggplot(merged_ipd_results, aes(x=pat_id,y=inc_costs))+
+    geom_line(linewidth=1.1) +
+    ylim(0,1000)+
+    theme_bw() +
+    theme(legend.position="bottom") 
+#> Warning: Removed 6 rows containing missing values or values outside the scale range
+#> (`geom_line()`).
+```
+
+![](example_ScotCVD_LinBriggs_files/figure-html/post-processing_analysis-2.png)
+
+``` r
+
+
+ggplot(merged_ipd_results, aes(x=pat_id,y=inc_qalys))+
+    geom_line(linewidth=1.1) +
+    ylim(0,1)+
+    theme_bw() +
+    theme(legend.position="bottom") 
+```
+
+![](example_ScotCVD_LinBriggs_files/figure-html/post-processing_analysis-3.png)
