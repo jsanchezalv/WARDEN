@@ -40,7 +40,10 @@ library(ggplot2)
 library(kableExtra)
 library(purrr)
 library(tidyr)
-library(readxl)
+if(!require(readxl)){
+    install.packages("readxl")
+    library(readxl)
+}
 
 
 #Copied directly from original code

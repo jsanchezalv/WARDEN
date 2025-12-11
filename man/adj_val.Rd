@@ -4,7 +4,14 @@
 \alias{adj_val}
 \title{Adjusted Value Calculation}
 \usage{
-adj_val(curtime, nexttime, by, expression, discount = NULL)
+adj_val(
+  curtime,
+  nexttime,
+  by,
+  expression,
+  discount = NULL,
+  vectorized_f = FALSE
+)
 }
 \arguments{
 \item{curtime}{Numeric. The current time point.}
@@ -13,9 +20,12 @@ adj_val(curtime, nexttime, by, expression, discount = NULL)
 
 \item{by}{Numeric. The step size for evaluation within the interval.}
 
-\item{expression}{An expression evaluated at each step. Use \code{time} as the variable within the expression.}
+\item{expression}{An expression evaluated at each step. Use \code{.time} as the variable within the expression.}
 
 \item{discount}{Numeric or NULL. The discount rate to apply, or NULL for no discounting.}
+
+\item{vectorized_f}{boolean, FALSE by default. If TRUE, evaluates the expression once using \code{.time} as a vector.
+If FALSE, it repeatedly evaluates the expression with time as a single value (slower).}
 }
 \value{
 Numeric. The calculated adjusted value.
@@ -28,7 +38,7 @@ the vignette on avoiding cycles for an example in a model.
 }
 \details{
 The user can use the \code{.time} variable to select the corresponding time of the sequence being evaluated.
-For example, in c\verb{urtime = 0, nexttime = 4, by = 1}, \code{time} would correspond to \verb{0, 1, 2, 3}.
+For example, in \verb{curtime = 0, nexttime = 4, by = 1}, \code{.time} would correspond to \verb{0, 1, 2, 3}.
 If using \code{nexttime = 4.2}, \verb{0, 1, 2, 3, 4}
 }
 \examples{
@@ -39,6 +49,8 @@ vec <- 1:8/10
 # Calculate adjusted value without discounting
 adj_val(0, 4, by = 1, expression = vec[floor(.time + bs_age)])
 adj_val(0, 4, by = 1, expression = .time * 1.1)
+#same result since .time * 1.1 can be vectorized w.r.t time
+adj_val(0, 4, by = 1, expression = .time * 1.1, vectorized_f = TRUE)
 
 # Calculate adjusted value with discounting
 adj_val(0, 4, by = 1, expression = vec[floor(.time + bs_age)], discount = 0.03)
