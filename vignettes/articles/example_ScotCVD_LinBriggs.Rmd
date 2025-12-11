@@ -788,7 +788,7 @@ psa_ipd[1:10,] %>%
 
 We can see that the ICER stabilizes pretty quickly, with the ICUR changing in absolute terms less than 500 GBP after 2,500 patients simulated.
 
-```{r post-processing_analysis,echo=FALSE, message=FALSE, include = FALSE}
+```{r post-processing_analysis}
 
 merged_ipd <- psa_ipd  %>%
   group_by(arm) %>%
