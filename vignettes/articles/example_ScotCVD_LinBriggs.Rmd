@@ -293,12 +293,6 @@ options(digits=3)
 options(tibble.print_max = 50)
 ```
 
-
-```{r results_premade, echo = FALSE}
-
-
-```
-
 # Conversion to WARDEN
 
 ## Inputs
@@ -307,47 +301,107 @@ As with any model, we need to load inputs, set initial TTE, event reactions, uti
 
 Though the model is a cohort one except for the SIMD variable, we assume here that we could use one with individual variation, so we define the parameters at the individual level instead of pre-loading them as a cohort (though we could do that as well). Since we do not have any uncertainty around the cohort parameters, we assume those are excluded from the PSA as in the original publication.
 
-Normally, we would model each of the different events independently, i.e., we would allow the model to naturally choose and express the competitive risks (we would have an event for "nonfatal_CHD", another for "nonfatal_CBVD", etc), but for the sake of replication we will proceed as in the original paper.
+Normally, we would model each of the different events independently, i.e., we would allow the model to naturally choose and express the competitive risks (we would have an event for "nonfatal_CHD", another for "nonfatal_CBVD", etc), but for the sake of replication we will proceed as in the original paper, merging them into event 1 and event 2.
 
 We create the time to event for the first event within the patient-arm level inputs.
 
+We also create 3 ad-hoc functions to handle the restricted cube spline. 
 
 ```{r input_delayed}
 
 #helper functions for the restricted cube
-rcs_du <-  function(du_all, du, t2, b5, b6, a0, a1, a2, a3){
-  sum(du_all * pnorm(q = du + b5 * t2 + b6 * (a3 * t2^3 + a2 * t2^2 + a1 * t2 + a0)))
-}
 
-disu_sec_f <- function(time,DU_ALL, DU, B5, B6, nl_RCS_ch){
+rcs_du_v <-  function(du_all, du, t2, b5, b6, a0, a1, a2, a3){
+  l_t <- length(t2)
+  l_du <- length(du)
   
-  if(time < nl_RCS_ch$knots[1]){
-    rcs_du(DU_ALL, DU, time, B5, B6 , 0,0,0,0)
-    
-  } else if (between(time, nl_RCS_ch$knots[1],nl_RCS_ch$knots[2])) {
-    rcs_du(DU_ALL, DU, time, B5, B6 , nl_RCS_ch[[2]][1],nl_RCS_ch[[2]][2],nl_RCS_ch[[2]][3],nl_RCS_ch[[2]][4])
-    
-    
-  } else if (between(time, nl_RCS_ch$knots[2],nl_RCS_ch$knots[3])){
-    rcs_du(DU_ALL, DU, time, B5, B6 ,  nl_RCS_ch[[3]][1],nl_RCS_ch[[3]][2],nl_RCS_ch[[3]][3],nl_RCS_ch[[3]][4])
-    
-  } else {
-    rcs_du(DU_ALL, DU, time, B5, B6 ,0,0,0,0)
-  }
+  # Polynomial term per time (length T)
+  poly_t <- a3 * t2^3 + a2 * t2^2 + a1 * t2 + a0
+  
+  # Linear predictor matrix T × M
+  # Each row t: du + b5*t + b6*poly(t)
+  lp <- outer(t2, b5, "*") +            # B5 term: T×M
+        outer(poly_t, b6, "*") +         # B6 * poly term: T×M
+        matrix(du, l_t, l_du, byrow = TRUE)   # add du
+  
+  # Apply pnorm elementwise
+  p <- pnorm(lp)
+  
+  # Weighted sum over DU_ALL (matrix multiply)
+  drop(p %*% du_all)
 }
 
-rcs_cost_f <- function(time, nl_RCS_ch){
-  if(time < nl_RCS_ch$knots[1]){
-    0
-  } else if (between(time, nl_RCS_ch$knots[1],nl_RCS_ch$knots[2])) {
-    nl_RCS_ch[[2]][1] + nl_RCS_ch[[2]][2] * time + nl_RCS_ch[[2]][3] * time^2 + nl_RCS_ch[[2]][4] * time^3
-  } else if (between(time, nl_RCS_ch$knots[2],nl_RCS_ch$knots[3])){
-    nl_RCS_ch[[3]][1] + nl_RCS_ch[[3]][2] * time + nl_RCS_ch[[3]][3] * time^2 + nl_RCS_ch[[3]][4] * time^3
-  } else {
-    nl_RCS_ch[[4]][1] + nl_RCS_ch[[4]][2] * time
+disu_sec_vec <- function(time, DU_ALL, DU, B5, B6, nl_RCS_ch) {
+  
+   # Segment indicator
+  seg <- cut(
+    time,
+    breaks = c(-Inf, nl_RCS_ch$knots, Inf),
+    labels = FALSE,
+    right = FALSE
+  )
+  
+  # Preallocate spline coefficients (per time)
+  A <- matrix(0, nrow = length(time), ncol = 4)
+  
+  # Segment 2
+  s2 <- seg == 2
+  if (any(s2)) {
+    A[s2,] <- matrix(nl_RCS_ch[[2]], ncol = 4, nrow = sum(s2), byrow = TRUE)
   }
+  
+  # Segment 3
+  s3 <- seg == 3
+  if (any(s3)) {
+    A[s3,] <- matrix(nl_RCS_ch[[3]], ncol = 4, nrow = sum(s3), byrow = TRUE)
+  }
+  
+  # Now A[,1]=a0, A[,2]=a1, A[,3]=a2, A[,4]=a3
+  
+  rcs_du_v(
+    t2  = time,
+    du_all = DU_ALL,
+    du = DU,
+    b5 = B5,
+    b6 = B6,
+    a0 = A[,1],
+    a1 = A[,2],
+    a2 = A[,3],
+    a3 = A[,4]
+  )
 }
 
+rcs_cost_f <- function(time, nl_RCS_ch) {
+  
+  out <- numeric(length(time))
+  
+  i1 <- time < nl_RCS_ch$knots[1]
+  i2 <- time >= nl_RCS_ch$knots[1] & time < nl_RCS_ch$knots[2]
+  i3 <- time >= nl_RCS_ch$knots[2] & time < nl_RCS_ch$knots[3]
+  i4 <- time >= nl_RCS_ch$knots[3]
+  
+  # Segment 1: below first knot → zero
+  out[i1] <- 0
+  
+  # Segment 2: cubic spline piece 2
+  if (any(i2)) {
+    t <- time[i2]
+    out[i2] <- as.numeric(nl_RCS_ch[[2]] %*% rbind(1, t, t^2, t^3))
+  }
+  
+  # Segment 3: cubic spline piece 3
+  if (any(i3)) {
+    t <- time[i3]
+    out[i3] <- as.numeric(nl_RCS_ch[[3]] %*% rbind(1, t, t^2, t^3))
+  }
+  
+  # Segment 4: linear tail
+  if (any(i4)) {
+    t <- time[i4]
+    out[i4] <- as.numeric(nl_RCS_ch[[4]] %*% rbind(1, t))
+  }
+  out
+}
 #reform parameters so it's clearer for model
 l_CVD_inputs <- list(parameter_name = list(
                                       "first_event_nonfatal_CHD_m",
@@ -496,7 +550,6 @@ common_pt_inputs <- add_item(input={
     post_CBVD <- if(sex == 1){post_CBVD_m}else{post_CBVD_f}
     rnd_v_1 <- runif(4)
     rnd_v_2 <- runif(2)
-    
 }) 
 
 unique_pt_inputs <- add_item(input = {
@@ -553,9 +606,9 @@ init_event_list <-
 ```
 
 ### Add Reaction to the Events
-This is where the biggest differences are between WARDEN and the original model. WARDEN simulates each patient individually, while the original paper takes advantage of vectorization to speed things up, at the cost of 1) transparency, and 2) lack of adaptability to other model structures. This is particularly impactful in this model as both costs and utilities have a restricted cubic spline approach, which means we need to use `adj_val()` to calculate how they would change over time and integrate that value. This is computationally heavy, and in our case we choose to update these values monthly, as the imprecision is expected to be minimal.
+This is where the biggest differences are between WARDEN and the original model. WARDEN simulates each patient individually, while the original paper takes advantage of full patient vectorization to speed things up, at the cost of 1) transparency, and 2) lack of adaptability to other model structures. This is particularly impactful in this model as both costs and utilities have a restricted cubic spline approach, which means we take advantage of the `adj_val` function to process these functions over time. In this particular case, we use the argument `vectorized_f` to accelerate the process because our functions can handle time as a vector. In any case this process can be computationally heavy, and in our case we choose to update these values monthly, as the imprecision is expected to be minimal.
 
-
+With WARDEN, we would suggest for programmers to model each event individually, e.g., CHD, CBVD, time horizon, and even potentially secondary events if needed. Competing events can easily be deactivated, etc, and it would make the model more transparent, easier to read, debug and understand.
 
 ```{r model_reaction}
 evt_react_list <-
@@ -572,7 +625,8 @@ evt_react_list <-
                       by = 1/12,
                       (.time-curtime) * coef_cost_1 +
                         coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS[["nl_RCS_pre"]][[2-sex]]),
-                      discount = drc
+                      discount = drc,
+                      vectorized_f = TRUE
                  )
                  
                  cost <- linpred_cost + 
@@ -581,12 +635,20 @@ evt_react_list <-
                    
 
                  #utility
+                 #use adj_val to calculate the utility changing over time between curtime and next event time due to age change
                  adj_factor <- adj_val(
                       curtime,
                       next_event()$time,
                       by = 1/12,
-                      u_norms$utility[.time + bs_age < (u_norms$age_max)][1],
-                      discount = drq
+                      {cutoff <- .time + bs_age
+                       pos <- findInterval(cutoff, u_norms$age_max) + 1
+                       
+                       # Clamp to bounds
+                       pos[pos > length(u_norms$utility)] <- NA
+                       
+                       u_norms$utility[pos]},
+                      discount = drq,
+                      vectorized_f = TRUE
                  )
                  q_total <- adj_factor - disu * as.integer(arm=="int")
                }) %>% 
@@ -618,13 +680,16 @@ evt_react_list <-
                 linpred_cost <- ifelse(status_1>4,0,linpred_cost[status_1])
                 coef_cost_1  <- ifelse(status_1>4,0,coef_c1_post[1,status_1])
                 coef_cost_2  <- ifelse(status_1>4,0,coef_c1_post[2,status_1])
+                
+                #use adj_val to calculate the cost changing over time between curtime and next event time
                 cost_2 <- adj_val(
                      curtime,
                      next_event()$time,
                      by = 1/12,
                      (.time-curtime) * coef_cost_1 +
                        coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS[[status_1+1]][[2-sex]]),
-                     discount = drc
+                     discount = drc,
+                     vectorized_f = TRUE
                 )
                 
                 cost <- linpred_cost + cost_2 
@@ -633,13 +698,24 @@ evt_react_list <-
                 lp_disusecond <- matrix(c(age, SIMD, FH, 1),ncol = 4) %*% t(second_event_du_coef[, 3:6]) 
                 lp_disusecond <- lp_disusecond[seq_ch]
                
+                #use adj_val to calculate the utility changing over time between curtime and next event time due to age change and due to disutilities because of secondary events
                 adj_factor <- adj_val(
                       curtime,
                       next_event()$time,
                       by = 1/12,
-                      u_norms$utility[.time + bs_age < (u_norms$age_max)][1] -
-                        disu_sec_f(.time - curtime,v_du[-6], lp_disusecond, b5, b6, nl_RCS[[status_1+1]][[2-sex]]),
-                      discount = drq
+                      {cutoff <- .time + bs_age
+                       pos <- findInterval(cutoff, u_norms$age_max) + 1
+                       
+                       # Clamp to bounds
+                       pos[pos > length(u_norms$utility)] <- NA
+                       
+                      out <- u_norms$utility[pos] -
+                      disu_sec_vec(.time - curtime,v_du[-6], lp_disusecond, b5, b6, nl_RCS[[status_1+1]][[2-sex]])
+                      out
+                        }
+                      ,
+                      discount = drq,
+                      vectorized_f = TRUE
                 )
                 q_total <- adj_factor - v_du[status_1] 
               }
@@ -667,20 +743,22 @@ cost_ongoing <- "cost"
 
 ### Model Execution
 
+Note that because of the patient-level loop approach, this model is 2-3x slower to run than the original one (37 seconds vs. 110 seconds).
+
 ```{r model_run}
 results <- run_sim(  
-  npats=1000,                               # number of patients to be simulated
-  n_sim=1,                                  # number of simulations to run
-  psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
-  arm_list = c("int", "comp"),             # intervention list
-  common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
-  common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
+  npats=30000,                              
+  n_sim=1,                                  
+  psa_bool = FALSE,                         
+  arm_list = c("int", "comp"),            
+  common_all_inputs = common_all_inputs,    
+  common_pt_inputs = common_pt_inputs,      
   unique_pt_inputs = unique_pt_inputs,
-  init_event_list = init_event_list,        # initial event list
-  evt_react_list = evt_react_list,          # reaction of events
+  init_event_list = init_event_list,        
+  evt_react_list = evt_react_list,         
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  ipd = 1
+  ipd = 2
 )
 ```
 
@@ -702,233 +780,41 @@ psa_ipd[1:10,] %>%
 
 ```
 
+We can see that the ICER stabilizes pretty quickly, with the ICUR changing in absolute terms less than 500 GBP after 2,500 patients simulated.
 
 ```{r post-processing_analysis,echo=FALSE, message=FALSE, include = FALSE}
 
-# 
-# merged_ipd <- psa_ipd  %>%
-#   group_by(arm) %>%
-#   mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
-#          cumul_total_costs = cumsum(total_costs)/pat_id) %>%
-#   transmute(pat_id, arm, cumul_total_qalys, cumul_total_costs) %>%
-#   tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
-#   mutate(inc_costs = cumul_total_costs_two - cumul_total_costs_one,
-#          inc_qalys = cumul_total_qalys_two - cumul_total_qalys_one,
-#          ICER = inc_costs/ inc_qalys)
+merged_ipd <- psa_ipd  %>%
+  group_by(arm) %>%
+  mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
+         cumul_total_costs = cumsum(total_costs)/pat_id) %>%
+  transmute(pat_id, arm, cumul_total_qalys, cumul_total_costs) %>%
+  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
+  mutate(inc_costs = cumul_total_costs_int - cumul_total_costs_comp,
+         inc_qalys = cumul_total_qalys_int - cumul_total_qalys_comp,
+         ICUR = inc_costs/ inc_qalys)
 
-# merged_ipd_results <- merged_ipd %>% select(pat_id,inc_costs,inc_qalys,ICER) %>%  slice(seq(1, n(), by = 500))
-
-```
-
-## Summary of Results
-We can check speed of convergence. Note that making sure the random numbers are "cloned" per patient across arms means that convergence occurs faster than in the original paper, which can save computation time, and ensures more stability of all the outcomes.
-
-We have plotted the observations through the simulation run for simmer with 3 different seeds (to display Monte Carlo error) and WARDEN (original, reworked and reworked with two different seeds). It's very noticeable that stability of the ICER is achieved faster with WARDEN, this is due to the use of cloning of the random numbers, which means that ~30,000 simulations would suffice to achieve stability. While the differences between simulations seem relatively large, in reality with the cloning random numbers approach it can be seen that the ICER remains within 2% of the final value already after 10,000 simulations.
-
-The running times with the original WARDEN approach are comparable to those of simmer shown by the paper, even if simmer uses a complex C++ implementation in the back-end. By using the reworked approach, WARDEN is able to cut running time by half. In my computer simmer took between 220 and 300 seconds to run 100,000 simulations. With WARDEN, the "one to one" approach took around 200 seconds. The reworked approach took 100 seconds.
-
-```{r echo = FALSE, warning=FALSE, message=FALSE}
+merged_ipd_results <- merged_ipd %>% select(pat_id,inc_costs,inc_qalys,ICUR) %>%  slice(seq(1, n(), by = 50))
 
 
-summary_results_det(results2[[1]][[1]], arm ="two") #print first simulation
-
-psa_ipd2 <- bind_rows(map(results2[[1]], "merged_df")) 
-
-psa_ipd2[1:10,] %>%
-  kable() %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
-
-
-ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")) 
-       , aes(x=pat_id,y=ICER, group = type, col = linetype))+
-   geom_line(linewidth=1.1) +
-  theme_bw() +
-  ylim(45000,52000)+
-    theme(legend.position="bottom")
-
-ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
-       aes(x=pat_id,y=inc_costs, group = type, col = linetype))+
+ggplot(merged_ipd_results, aes(x=pat_id,y=ICUR))+
     geom_line(linewidth=1.1) +
-  theme_bw()  +
-  ylim(92500,94500)+
-    theme(legend.position="bottom")
+    ylim(0,5000)+
+    theme_bw() +
+    theme(legend.position="bottom") 
 
-ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
-       aes(x=pat_id,y=inc_qalys, group = type, col = linetype))+
-  geom_line(linewidth=1.1) +
-  theme_bw() +
-  ylim(1.8,2.1)+
-    theme(legend.position="bottom")
 
+ggplot(merged_ipd_results, aes(x=pat_id,y=inc_costs))+
+    geom_line(linewidth=1.1) +
+    ylim(0,1000)+
+    theme_bw() +
+    theme(legend.position="bottom") 
+
+
+ggplot(merged_ipd_results, aes(x=pat_id,y=inc_qalys))+
+    geom_line(linewidth=1.1) +
+    ylim(0,1)+
+    theme_bw() +
+    theme(legend.position="bottom") 
 
 ```
-
-# Probabilistic Case
-We will now use the`pick_val_v()` function. We just showcase this, and will not run it for the sake of saving computation time.
-
-```{r}
-
-thetaToProb <- function(x) unname(exp(x) / (1 + exp(x)))
-
-#Uncertainty is only assumed on TTR, utility, toxicities, TTD and certain costs
-
-l_inputs<- list(parameter_name = list("m_TTR",
-                                      "u_adjuvant",
-                                      "p_tox_1", 
-                                      "p_tox_2",
-                                      "c_tox",
-                                      "u_dis_tox",
-                                      "u_diseasefree",
-                                      "m_TTD",
-                                      "c_advanced",
-                                      "u_advanced"),
-                 base_value = list(
-                   c(df_survival_models$d_RF_R_1_low_cure,
-                    df_survival_models$d_RF_R_1_high_cure,
-                    df_survival_models$d_RF_R_2_low_cure,
-                    df_survival_models$d_RF_R_2_high_cure,
-                    df_survival_models$d_RF_R_1_low_shape,
-                    df_survival_models$d_RF_R_1_high_shape,
-                    df_survival_models$d_RF_R_2_low_shape,
-                    df_survival_models$d_RF_R_2_high_shape,
-                    df_survival_models$d_RF_R_1_low_scale,
-                    df_survival_models$d_RF_R_1_high_scale,
-                    df_survival_models$d_RF_R_2_low_scale,
-                    df_survival_models$d_RF_R_2_high_scale),
-                    0.7,
-                    0.2,
-                    0.4,
-                    2000,
-                    0.1,
-                    0.8,
-                    c(df_survival_models$d_R_D_1_shape,
-                    df_survival_models$d_R_D_2_shape,
-                    df_survival_models$d_R_D_1_scale,
-                    df_survival_models$d_R_D_2_scale),
-                    40000,
-                    0.6),
-                 PSA_dist = list("mvrnorm",
-                                 "rlnorm",
-                                 "rbeta",
-                                 "rbeta",
-                                 "rgamma",
-                                 "rlnorm",
-                                 "rlnorm",
-                                 "mvrnorm",
-                                 "rgamma",
-                                 "rlnorm"),
-                 a=list(fit_RF_R$coefficients,
-                        -0.35738872,
-                        0.1*500,
-                        0.2*500,10000,
-                        -2.30756026,
-                        -0.2237682,
-                        fit_R_D$coefficients,
-                        200000,
-                        -0.51165826),
-                 b=list(fit_RF_R$cov,
-                        0.03778296,
-                        (1-0.1)*500,
-                        (1-0.2)*500,
-                        5,
-                        0.09975135,
-                        0.0353443,
-                        fit_R_D$cov,
-                        5,0.04080783),
-                 n=list(1,1,1,1,1,1,1,1,1,1),
-                 psa_indicators = list(1,1,1,1,1,1,1,1,1,1)
-                 )
-
-common_all_inputs2 <-add_item(input = {
- 
-                      drc         <- 0.04 
-                      drq         <- 0.015
-                      p_highrisk  <- 0.6
-                      
-                      pick_val_v(
-                        base= l_inputs[["base_value"]],
-                        psa = pick_psa(
-                            l_inputs[["PSA_dist"]],
-                            l_inputs[["n"]],
-                            l_inputs[["a"]],
-                            l_inputs[["b"]]),
-                        psa_ind     = psa_bool,
-                        sens_ind    = FALSE, 
-                        names_out   = l_inputs[["parameter_name"]],
-                        indicator   = rep(1,10), 
-                        indicator_psa = l_inputs[["psa_indicators"]],
-                        deploy_env = TRUE
-                      ) 
-
-                      
-                      d_BS_shape <- df_survival_models$d_RF_D_shape
-                      d_BS_rate  <- df_survival_models$d_RF_D_rate
-                      d_TTR_cure_1_low  <- thetaToProb(m_TTR["theta"])
-                      d_TTR_cure_1_high <- thetaToProb(m_TTR["theta"]+ m_TTR["node4"])
-                      d_TTR_cure_2_low  <- thetaToProb(m_TTR["theta"]+ m_TTR["rxLev+5FU"])
-                      d_TTR_cure_2_high <- thetaToProb(m_TTR["theta"]+ m_TTR["rxLev+5FU"] + m_TTR["node4"])
-                      d_TTR_shape_1_low  <- exp(m_TTR["shape"])
-                      d_TTR_shape_1_high <- exp(m_TTR["shape"])
-                      d_TTR_shape_2_low  <- exp(m_TTR["shape"])
-                      d_TTR_shape_2_high <- exp(m_TTR["shape"])
-                      d_TTR_scale_1_low  <- exp(m_TTR["scale"])
-                      d_TTR_scale_1_high <- exp(m_TTR["scale"]+ m_TTR["scale(node4)"])
-                      d_TTR_scale_2_low  <- exp(m_TTR["scale"]+ m_TTR["scale(rxLev+5FU)"])
-                      d_TTR_scale_2_high <- exp(m_TTR["scale"]+ m_TTR["scale(rxLev+5FU)"] + m_TTR["scale(node4)"])
-
-                      # Adjuvant treatment costs
-                      c_adjuvant_cycle_1 <- 5000
-                      c_adjuvant_cycle_2 <- 15000
-                      
-                      # Other adjuvant treatment parameters
-                      t_adjuvant_cycle      <- 3/52 # in years
-                      n_max_adjuvant_cycles <- 10
-                      
-                     
-                      ## DISEASE MONITORING
-                      
-                      # Cost of a monitoring cycle
-                      c_monitor <- 1000
-                      
-                      # Other disease monitoring parameters
-                      t_monitor_cycle      <- 1 # in years
-                      n_max_monitor_cycles <- 5
-                      
-                      
-                      ## RECURRENCE OF DISEASE
-                      
-                      # Log-logistic distribution for the time-to-death due to cancer after recurrence                    (TTD)
-                      # - conditional on treatment arm
-                      d_TTD_shape_1 <- exp(m_TTD["shape"])
-                      d_TTD_shape_2 <- exp(m_TTD["shape"] + m_TTD["shape(rxLev+5FU)"])
-                      
-                      d_TTD_scale_1 <- exp(m_TTD["scale"])
-                      d_TTD_scale_2 <- exp(m_TTD["scale"] + m_TTD["rxLev+5FU"])
-                     
-
-})  
-
-results_psa <- run_sim_parallel(  
-  npats=1000,                               # number of patients to be simulated
-  n_sim=5,                                  # number of simulations to run
-  psa_bool = TRUE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
-  arm_list = c("one", "two"),             # intervention list
-  common_all_inputs = common_all_inputs2,    # inputs common that do not change within a simulation
-  common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
-  unique_pt_inputs = unique_pt_inputs2,
-  init_event_list = init_event_list,        # initial event list
-  evt_react_list = evt_react_list,          # reaction of events
-  util_ongoing_list = util_ongoing,
-  cost_instant_list = cost_instant,
-  cost_cycle_list = cost_cycle,
-  ipd = 3,
-  ncores = 1 #for github pages to work, could be set to min(future::availableCores(omit=1),4)
-)
-  
-summary_results_sim(results_psa[[1]], arm ="two") 
-
-  
-```
-
-
-

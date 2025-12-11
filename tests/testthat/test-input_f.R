@@ -938,6 +938,7 @@ test_that("adj_val works as intended",{
   expect_equal(adj_val(8,9,by=0.5, vec[floor(.time + bs_age)], discount = Inf),0)
   expect_equal(adj_val(8,9,by=0.5, 1),1)
   expect_equal(adj_val(0,4,by=1, .time),1.5)
+  expect_equal(adj_val(0,4,by=1, .time),adj_val(0,4,by=1, .time,vectorized_f = TRUE))
   
   expect_equal({
     val <- 0.8 * adj_val(0,5.2,by=1, vec[floor(.time + bs_age)], discount = 0.03)

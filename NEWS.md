@@ -1,10 +1,5 @@
-# WARDEN 1.3.5
-* Accumulation backwards now uses active bindings to recognize which ongoing outputs are being modified.
-* Deprecated modify_item_seq, modify_item as they are no longer needed to run even if backwards = TRUE. Removed from all examples.
-
-# WARDEN 1.3.4
-* Unit tests for shared_inputs and run_sim_parallel added.
-* add_item and add_item2 have now been integrated into add_item, with both behaviors being accepted. This means load_inputs has been overwritten with the load_inputs2 form.
+# WARDEN 2.0.1
+*adj_val now accepts a vectorized_f argument to speed computations in the case of vectorized functions
 
 # WARDEN 2.0.0
 * Rcpp event based handler has been created using queues for high efficiency. In the new system,
@@ -18,6 +13,14 @@ and/or inputs can be shared across patients within an arm. This can be activated
 working similar to R6 objects). This can be created by using resource_discrete()
 * Shared inputs have been created to be used in constrained DES (works similar to R6 objects). This can be created by using shared_input().
 * New vignette showcasing an example for constrained DES has been created.
+
+# WARDEN 1.3.5
+* Accumulation backwards now uses active bindings to recognize which ongoing outputs are being modified.
+* Deprecated modify_item_seq, modify_item as they are no longer needed to run even if backwards = TRUE. Removed from all examples.
+
+# WARDEN 1.3.4
+* Unit tests for shared_inputs and run_sim_parallel added.
+* add_item and add_item2 have now been integrated into add_item, with both behaviors being accepted. This means load_inputs has been overwritten with the load_inputs2 form.
 
 # WARDEN 1.3.0
 * Rcpp versions of key functions have been implemented for speed improvements:

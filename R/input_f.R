@@ -1560,8 +1560,10 @@ add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
 #' @param curtime Numeric. The current time point.
 #' @param nexttime Numeric. The next time point. Must be greater than or equal to `curtime`.
 #' @param by Numeric. The step size for evaluation within the interval.
-#' @param expression An expression evaluated at each step. Use `time` as the variable within the expression.
+#' @param expression An expression evaluated at each step. Use `.time` as the variable within the expression.
 #' @param discount Numeric or NULL. The discount rate to apply, or NULL for no discounting.
+#' @param vectorized_f boolean, FALSE by default. If TRUE, evaluates the expression once using `.time` as a vector.
+#' If FALSE, it repeatedly evaluates the expression with time as a single value (slower).
 #' 
 #' @export
 #'
@@ -1572,7 +1574,7 @@ add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
 #' 
 #' @details
 #'  The user can use the `.time` variable to select the corresponding time of the sequence being evaluated.
-#'  For example, in c`urtime = 0, nexttime = 4, by = 1`, `time` would correspond to `0, 1, 2, 3`.
+#'  For example, in `curtime = 0, nexttime = 4, by = 1`, `.time` would correspond to `0, 1, 2, 3`.
 #'  If using `nexttime = 4.2`, `0, 1, 2, 3, 4`
 #' 
 #'
@@ -1584,11 +1586,13 @@ add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
 #' # Calculate adjusted value without discounting
 #' adj_val(0, 4, by = 1, expression = vec[floor(.time + bs_age)])
 #' adj_val(0, 4, by = 1, expression = .time * 1.1)
+#' #same result since .time * 1.1 can be vectorized w.r.t time
+#' adj_val(0, 4, by = 1, expression = .time * 1.1, vectorized_f = TRUE)
 #'
 #' # Calculate adjusted value with discounting
 #' adj_val(0, 4, by = 1, expression = vec[floor(.time + bs_age)], discount = 0.03)
 #' 
-adj_val <- function(curtime, nexttime, by, expression, discount = NULL) {
+adj_val <- function(curtime, nexttime, by, expression, discount = NULL, vectorized_f = FALSE) {
   duration <- nexttime - curtime
   if (duration < 0) stop("curtime - nexttime is negative (negative duration)")
   if (duration == 0) return(0)
@@ -1606,11 +1610,15 @@ adj_val <- function(curtime, nexttime, by, expression, discount = NULL) {
   parent <- parent.frame()
   expr_sub <- substitute(expression)
   
-  values <- vapply(eval_times, function(tt) {
-    val <- eval(expr_sub, envir = list(.time = tt), enclos = parent)
-    if (is.na(val)) stop("NA value encountered during evaluation at time: ", tt)
-    val
-  }, numeric(1))
+  if(vectorized_f){
+    values <- eval(expr_sub, envir = list(.time = eval_times), enclos = parent)
+  } else{
+    values <- vapply(eval_times, function(tt) {
+      val <- eval(expr_sub, envir = list(.time = tt), enclos = parent)
+      if (is.na(val)) stop("NA value encountered during evaluation at time: ", tt)
+      val
+    }, numeric(1))
+  }
   
   if (!is.null(discount)) {
     # Compute present value of $1 over each interval (weights)
