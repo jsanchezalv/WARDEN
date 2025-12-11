@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,6 +60,7 @@
     <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ScotCVD_LinBriggs.html">Lin and Briggs (2025) Scottish CVD DES using WARDEN'</a></li>
   </ul>
 </li>
       </ul>
@@ -81,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">October 08, 2025</h4>
+            <h4 data-toc-skip class="date">December 11, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/inputs_selector.Rmd" class="external-link"><code>vignettes/articles/inputs_selector.Rmd</code></a></small>
       <div class="d-none name"><code>inputs_selector.Rmd</code></div>
@@ -704,8 +705,8 @@ for that we simply use the <code>sens_iterator</code> function.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.05s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.05s</span></span>
 <span><span class="co">#&gt; Total time to run: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
@@ -1379,26 +1380,26 @@ dq_default_undisc
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 0.12s</span></span>
 <span><span class="co">#&gt; Analysis number: 4</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run analysis 4: 0.12s</span></span>
+<span><span class="co">#&gt; Analysis number: 5</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 4: 0.11s</span></span>
-<span><span class="co">#&gt; Analysis number: 5</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.05s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.05s</span></span>
-<span><span class="co">#&gt; Time to run analysis 5: 0.12s</span></span>
+<span><span class="co">#&gt; Time to run analysis 5: 0.11s</span></span>
 <span><span class="co">#&gt; Analysis number: 6</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.05s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.11s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 0.12s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
@@ -1413,7 +1414,7 @@ dq_default_undisc
 <span><span class="co">#&gt; Time to run analysis 8: 0.12s</span></span>
 <span><span class="co">#&gt; Analysis number: 9</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.05s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
 <span><span class="co">#&gt; Time to run analysis 9: 0.11s</span></span>
@@ -1437,17 +1438,17 @@ dq_default_undisc
 <span><span class="co">#&gt; Time to run analysis 12: 0.12s</span></span>
 <span><span class="co">#&gt; Analysis number: 13</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.05s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 13: 0.11s</span></span>
+<span><span class="co">#&gt; Time to run analysis 13: 0.12s</span></span>
 <span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
 <span><span class="co">#&gt; Time to run analysis 14: 0.12s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.65s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.67s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
@@ -2121,20 +2122,20 @@ category.</p>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
 <span><span class="co">#&gt; Time to run analysis 2: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 0.12s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 4: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run analysis 4: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 5</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
@@ -2146,7 +2147,7 @@ category.</p>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
@@ -2164,13 +2165,13 @@ category.</p>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 9: 0.12s</span></span>
+<span><span class="co">#&gt; Time to run analysis 9: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 10: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run analysis 10: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 11</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
@@ -2191,16 +2192,16 @@ category.</p>
 <span><span class="co">#&gt; Time to run analysis 13: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 14: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 15</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 15: 0.12s</span></span>
+<span><span class="co">#&gt; Time to run analysis 15: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 16</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -2219,7 +2220,7 @@ category.</p>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
 <span><span class="co">#&gt; Time to run analysis 18: 0.13s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.31s</span></span>
+<span><span class="co">#&gt; Total time to run: 2.33s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
@@ -2984,10 +2985,10 @@ number of dsa iterations (5).</p>
 <span><span class="co">#&gt; Time to run analysis 2: 0.12s</span></span>
 <span><span class="co">#&gt; Analysis number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 0.12s</span></span>
 <span><span class="co">#&gt; Analysis number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -3005,7 +3006,7 @@ number of dsa iterations (5).</p>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.12s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
@@ -3030,7 +3031,7 @@ number of dsa iterations (5).</p>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
 <span><span class="co">#&gt; Time to run analysis 10: 0.12s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.28s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.29s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
@@ -3460,7 +3461,7 @@ probabilistic DSA, deterministic case, or standard PSA.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
 <span><span class="co">#&gt; Time to run analysis 1: 0.13s</span></span>
@@ -3530,7 +3531,7 @@ probabilistic DSA, deterministic case, or standard PSA.</p>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
 <span><span class="co">#&gt; Time to run analysis 12: 0.13s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.54s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.56s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
@@ -4039,7 +4040,7 @@ v_state
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

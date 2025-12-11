@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,6 +60,7 @@
     <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ScotCVD_LinBriggs.html">Lin and Briggs (2025) Scottish CVD DES using WARDEN'</a></li>
   </ul>
 </li>
       </ul>
@@ -81,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">October 08, 2025</h4>
+            <h4 data-toc-skip class="date">December 11, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_colon_degeling.Rmd" class="external-link"><code>vignettes/articles/example_colon_degeling.Rmd</code></a></small>
       <div class="d-none name"><code>example_colon_degeling.Rmd</code></div>
@@ -484,9 +485,9 @@ results.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 14.19s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 14.19s</span></span>
-<span><span class="co">#&gt; Total time to run: 14.2s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 14.34s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 14.34s</span></span>
+<span><span class="co">#&gt; Total time to run: 14.34s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
@@ -1368,9 +1369,9 @@ structure.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 6.45s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 6.45s</span></span>
-<span><span class="co">#&gt; Total time to run: 6.45s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 6.42s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 6.43s</span></span>
+<span><span class="co">#&gt; Total time to run: 6.43s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="summary-of-results">Summary of Results<a class="anchor" aria-label="anchor" href="#summary-of-results"></a>
@@ -2503,7 +2504,7 @@ two
 </tr>
 </tbody>
 </table>
-<p><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-1.png" width="700"><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-2.png" width="700"><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-3.png" width="700"></p>
+<p><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" width="700"><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-2.png" class="r-plt" width="700"><img src="example_colon_degeling_files/figure-html/unnamed-chunk-2-3.png" class="r-plt" width="700"></p>
 </div>
 </div>
 <div class="section level2">
@@ -2677,8 +2678,8 @@ time.</p>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 7.35s</span></span>
-<span><span class="co">#&gt; Total time to run: 7.36s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 7.65s</span></span>
+<span><span class="co">#&gt; Total time to run: 7.65s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span>  </span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results_psa</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, arm <span class="op">=</span><span class="st">"two"</span><span class="op">)</span> </span>
@@ -2808,7 +2809,7 @@ time.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,7 @@
     <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ScotCVD_LinBriggs.html">Lin and Briggs (2025) Scottish CVD DES using WARDEN'</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jsanchezalv/WARDEN" aria-label="View on Github"><span class="fa fa-github"></span></a></li>
       </ul></div>
@@ -56,14 +57,12 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
       <h3 id="core-functions">Core Functions<a class="anchor" aria-label="anchor" href="#core-functions"></a></h3>
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -74,97 +73,113 @@
 
         </dt>
         <dd>Run the simulation</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="run_sim_parallel.html">run_sim_parallel()</a></code>
 
         </dt>
         <dd>Run simulations in parallel mode (at the simulation level)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="add_item.html">add_item()</a></code>
 
         </dt>
         <dd>Define or append model inputs</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="add_reactevt.html">add_reactevt()</a></code>
 
         </dt>
         <dd>Define the modifications to other events, costs, utilities, or other items affected by the occurrence of the event</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="add_tte.html">add_tte()</a></code>
 
         </dt>
         <dd>Define events and the initial event time</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="new_event.html">new_event()</a></code>
 
         </dt>
         <dd>Add Events to the Queue for a Patient</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="modify_event.html">modify_event()</a></code>
 
         </dt>
         <dd>Modify or Add Events for a Patient</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="remove_event.html">remove_event()</a></code>
 
         </dt>
         <dd>Remove Events for a Patient</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_event.html">get_event()</a></code>
 
         </dt>
         <dd>Get a specific event time</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="has_event.html">has_event()</a></code>
 
         </dt>
         <dd>Check if a Patient Has a Specific Event</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="next_event.html">next_event()</a></code>
 
         </dt>
         <dd>Get the Next Event(s) in the Queue</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="next_event_pt.html">next_event_pt()</a></code>
 
         </dt>
         <dd>Get the Next Event(s) in the Queue for a specific patient</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="queue_empty.html">queue_empty()</a></code>
 
         </dt>
         <dd>Check if the Event Queue is Empty</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="queue_size.html">queue_size()</a></code>
 
         </dt>
         <dd>Get the Size of the Event Queue</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="queue_create.html">queue_create()</a></code>
 
         </dt>
         <dd>Create a New Event Queue</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="pop_event.html">pop_event()</a></code>
 
         </dt>
         <dd>Remove the Next Event from the Queue</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="pop_and_return_event.html">pop_and_return_event()</a></code>
 
@@ -175,8 +190,7 @@
       <h3 id="resource-constrained-specific-functions">Resource Constrained Specific Functions<a class="anchor" aria-label="anchor" href="#resource-constrained-specific-functions"></a></h3>
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -187,13 +201,15 @@
 
         </dt>
         <dd>Create a Discrete Resource</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="shared_input.html">shared_input()</a></code>
 
         </dt>
         <dd>Shared input object</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="discrete_resource_clone.html">discrete_resource_clone()</a></code>
 
@@ -204,8 +220,7 @@
       <h3 id="auxiliary-functions">Auxiliary Functions<a class="anchor" aria-label="anchor" href="#auxiliary-functions"></a></h3>
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -216,25 +231,29 @@
 
         </dt>
         <dd>Creates a vector of indicators (0 and 1) for sensitivity/DSA analysis</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="sens_iterator.html">sens_iterator()</a></code>
 
         </dt>
         <dd>Create an iterator based on sens of the current iteration within a scenario (DSA)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="pick_psa.html">pick_psa()</a></code>
 
         </dt>
         <dd>Helper function to create a list with random draws or whenever a series of functions needs to be called. Can be implemented within <code>pick_val_v</code>.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="pick_val_v.html">pick_val_v()</a></code>
 
         </dt>
         <dd>Select which values should be applied in the corresponding loop for several values (vector or list).</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="replicate_profiles.html">replicate_profiles()</a></code>
 
@@ -245,8 +264,7 @@
       <h3 id="summary-functions">Summary Functions<a class="anchor" aria-label="anchor" href="#summary-functions"></a></h3>
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -257,25 +275,29 @@
 
         </dt>
         <dd>Calculate the cost-effectiveness acceptability curve (CEAC) for a DES model with a PSA result</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="evpi_des.html">evpi_des()</a></code>
 
         </dt>
         <dd>Calculate the Expected Value of Perfect Information (EVPI) for a DES model with a PSA result</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="summary_results_det.html">summary_results_det()</a></code>
 
         </dt>
         <dd>Deterministic results for a specific treatment</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="summary_results_sens.html">summary_results_sens()</a></code>
 
         </dt>
         <dd>Summary of sensitivity outputs for a treatment</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="summary_results_sim.html">summary_results_sim()</a></code>
 
@@ -286,14 +308,12 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
       <h3 id="auxiliary-functions-1">Auxiliary Functions<a class="anchor" aria-label="anchor" href="#auxiliary-functions-1"></a></h3>
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -304,25 +324,29 @@
 
         </dt>
         <dd>Draw a time to event from a list of parametric survival functions</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="random_stream.html">random_stream()</a></code>
 
         </dt>
         <dd>Creates an environment (similar to R6 class) of random uniform numbers to be drawn from</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="luck_adj.html">luck_adj()</a></code>
 
         </dt>
         <dd>Perform luck adjustment</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qtimecov.html">qtimecov()</a></code>
 
         </dt>
         <dd>Draw Time-to-Event with Time-Dependent Covariates and Luck Adjustment</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="adj_val.html">adj_val()</a></code>
 
@@ -333,8 +357,7 @@
       <h3 id="distributions-functions">Distributions Functions<a class="anchor" aria-label="anchor" href="#distributions-functions"></a></h3>
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -345,121 +368,141 @@
 
         </dt>
         <dd>Calculate conditional dirichlet values</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="cond_mvn.html">cond_mvn()</a></code>
 
         </dt>
         <dd>Calculate conditional multivariate normal values</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rgamma_mse.html">rgamma_mse()</a></code>
 
         </dt>
         <dd>Draw from a gamma distribution based on mean and se</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qgamma_mse.html">qgamma_mse()</a></code>
 
         </dt>
         <dd>Use quantiles from a gamma distribution based on mean and se</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rpoisgamma.html">rpoisgamma()</a></code>
 
         </dt>
         <dd>Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rpoisgamma_rcpp.html">rpoisgamma_rcpp()</a></code>
 
         </dt>
         <dd>Draw time to event (tte) from a Poisson or Poisson-Gamma (PG) Mixture/Negative Binomial (NB) Process using C++</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qbeta_mse.html">qbeta_mse()</a></code>
 
         </dt>
         <dd>Draw from a beta distribution based on mean and se (quantile)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qcond_exp.html">qcond_exp()</a></code>
 
         </dt>
         <dd>Conditional quantile function for exponential distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qcond_gamma.html">qcond_gamma()</a></code>
 
         </dt>
         <dd>Conditional quantile function for gamma distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qcond_gompertz.html">qcond_gompertz()</a></code>
 
         </dt>
         <dd>Quantile function for conditional Gompertz distribution (lower bound only)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qcond_llogis.html">qcond_llogis()</a></code>
 
         </dt>
         <dd>Conditional quantile function for loglogistic distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qcond_lnorm.html">qcond_lnorm()</a></code>
 
         </dt>
         <dd>Conditional quantile function for lognormal distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qcond_norm.html">qcond_norm()</a></code>
 
         </dt>
         <dd>Conditional quantile function for normal distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qcond_weibull.html">qcond_weibull()</a></code>
 
         </dt>
         <dd>Conditional quantile function for weibull distribution</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="qcond_weibullPH.html">qcond_weibullPH()</a></code>
 
         </dt>
         <dd>Conditional quantile function for WeibullPH (flexsurv)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rbeta_mse.html">rbeta_mse()</a></code>
 
         </dt>
         <dd>Draw from a beta distribution based on mean and se</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rcond_gompertz.html">rcond_gompertz()</a></code>
 
         </dt>
         <dd>Draw from a conditional Gompertz distribution (lower bound only)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rcond_gompertz_lu.html">rcond_gompertz_lu()</a></code>
 
         </dt>
         <dd>Draw from a Conditional Gompertz distribution (lower and upper bound)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rdirichlet.html">rdirichlet()</a></code>
 
         </dt>
         <dd>Draw from a dirichlet distribution based on number of counts in transition. Adapted from brms::rdirichlet</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rdirichlet_prob.html">rdirichlet_prob()</a></code>
 
         </dt>
         <dd>Draw from a dirichlet distribution based on mean transition probabilities and standard errors</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="pcond_gompertz.html">pcond_gompertz()</a></code>
 
@@ -470,8 +513,7 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -482,43 +524,50 @@
 
         </dt>
         <dd>Cycle discounting for vectors</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="disc_instant_v.html">disc_instant_v()</a></code>
 
         </dt>
         <dd>Calculate instantaneous discounted costs or qalys for vectors</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="disc_ongoing_v.html">disc_ongoing_v()</a></code>
 
         </dt>
         <dd>Calculate discounted costs and qalys between events for vectors</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="ast_as_list.html">ast_as_list()</a></code>
 
         </dt>
         <dd>Transform a substituted expression to its Abstract Syntax Tree (AST) as a list</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="extract_elements_from_list.html">extract_elements_from_list()</a></code>
 
         </dt>
         <dd>Extracts items and events by looking into assignments, modify_event and new_event</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="extract_from_reactions.html">extract_from_reactions()</a></code>
 
         </dt>
         <dd>Extract all items and events and their interactions from the event reactions list</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="extract_psa_result.html">extract_psa_result()</a></code>
 
         </dt>
         <dd>Extract PSA results from a treatment</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="tte.df.html">tte.df</a></code>
 
@@ -529,8 +578,7 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -541,31 +589,36 @@
 
         </dt>
         <dd>Define parameters that may be used in model calculations (uses expressions)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="modify_item.html">modify_item()</a></code>
 
         </dt>
         <dd>Modify the value of existing items</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="modify_item_seq.html">modify_item_seq()</a></code>
 
         </dt>
         <dd>Modify the value of existing items</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="disc_cycle.html">disc_cycle()</a></code>
 
         </dt>
         <dd>Cycle discounting</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="disc_instant.html">disc_instant()</a></code>
 
         </dt>
         <dd>Calculate instantaneous discounted costs or qalys</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="disc_ongoing.html">disc_ongoing()</a></code>
 
@@ -581,7 +634,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

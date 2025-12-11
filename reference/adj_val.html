@@ -19,7 +19,7 @@ the vignette on avoiding cycles for an example in a model.'><meta property="og:i
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,7 @@ the vignette on avoiding cycles for an example in a model.'><meta property="og:i
     <li><a class="dropdown-item" href="../articles/example_ssd_stream.html">Random Number Streams &amp; Luck Adjustment (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_ssd_sobol.html">Quasi-Random Sobol Sequence vs. Purely Random (SSD model)</a></li>
     <li><a class="dropdown-item" href="../articles/example_colon_degeling.html">Degeling (2025) using WARDEN instead of simmer</a></li>
+    <li><a class="dropdown-item" href="../articles/example_ScotCVD_LinBriggs.html">Lin and Briggs (2025) Scottish CVD DES using WARDEN'</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jsanchezalv/WARDEN" aria-label="View on Github"><span class="fa fa-github"></span></a></li>
       </ul></div>
@@ -68,7 +69,14 @@ the vignette on avoiding cycles for an example in a model.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adj_val</span><span class="op">(</span><span class="va">curtime</span>, <span class="va">nexttime</span>, <span class="va">by</span>, <span class="va">expression</span>, discount <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adj_val</span><span class="op">(</span></span>
+<span>  <span class="va">curtime</span>,</span>
+<span>  <span class="va">nexttime</span>,</span>
+<span>  <span class="va">by</span>,</span>
+<span>  <span class="va">expression</span>,</span>
+<span>  discount <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  vectorized_f <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -88,11 +96,16 @@ the vignette on avoiding cycles for an example in a model.</p>
 
 
 <dt id="arg-expression">expression<a class="anchor" aria-label="anchor" href="#arg-expression"></a></dt>
-<dd><p>An expression evaluated at each step. Use <code>time</code> as the variable within the expression.</p></dd>
+<dd><p>An expression evaluated at each step. Use <code>.time</code> as the variable within the expression.</p></dd>
 
 
 <dt id="arg-discount">discount<a class="anchor" aria-label="anchor" href="#arg-discount"></a></dt>
 <dd><p>Numeric or NULL. The discount rate to apply, or NULL for no discounting.</p></dd>
+
+
+<dt id="arg-vectorized-f">vectorized_f<a class="anchor" aria-label="anchor" href="#arg-vectorized-f"></a></dt>
+<dd><p>boolean, FALSE by default. If TRUE, evaluates the expression once using <code>.time</code> as a vector.
+If FALSE, it repeatedly evaluates the expression with time as a single value (slower).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -102,7 +115,7 @@ the vignette on avoiding cycles for an example in a model.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The user can use the <code>.time</code> variable to select the corresponding time of the sequence being evaluated.
-For example, in c<code>urtime = 0, nexttime = 4, by = 1</code>, <code>time</code> would correspond to <code>0, 1, 2, 3</code>.
+For example, in <code>curtime = 0, nexttime = 4, by = 1</code>, <code>.time</code> would correspond to <code>0, 1, 2, 3</code>.
 If using <code>nexttime = 4.2</code>, <code>0, 1, 2, 3, 4</code></p>
     </div>
 
@@ -116,6 +129,9 @@ If using <code>nexttime = 4.2</code>, <code>0, 1, 2, 3, 4</code></p>
 <span class="r-in"><span><span class="fu">adj_val</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span>, by <span class="op">=</span> <span class="fl">1</span>, expression <span class="op">=</span> <span class="va">vec</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="va">.time</span> <span class="op">+</span> <span class="va">bs_age</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.25</span>
 <span class="r-in"><span><span class="fu">adj_val</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span>, by <span class="op">=</span> <span class="fl">1</span>, expression <span class="op">=</span> <span class="va">.time</span> <span class="op">*</span> <span class="fl">1.1</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.65</span>
+<span class="r-in"><span><span class="co">#same result since .time * 1.1 can be vectorized w.r.t time</span></span></span>
+<span class="r-in"><span><span class="fu">adj_val</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span>, by <span class="op">=</span> <span class="fl">1</span>, expression <span class="op">=</span> <span class="va">.time</span> <span class="op">*</span> <span class="fl">1.1</span>, vectorized_f <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.65</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Calculate adjusted value with discounting</span></span></span>
@@ -133,7 +149,7 @@ If using <code>nexttime = 4.2</code>, <code>0, 1, 2, 3, 4</code></p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

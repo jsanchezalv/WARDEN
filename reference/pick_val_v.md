@@ -1,0 +1,153 @@
+# Select which values should be applied in the corresponding loop for several values (vector or list).
+
+Select which values should be applied in the corresponding loop for
+several values (vector or list).
+
+## Usage
+
+``` r
+pick_val_v(
+  base,
+  psa,
+  sens,
+  psa_ind = psa_bool,
+  sens_ind = sens_bool,
+  indicator,
+  indicator_psa = NULL,
+  names_out = NULL,
+  indicator_sens_binary = TRUE,
+  sens_iterator = NULL,
+  distributions = NULL,
+  covariances = NULL,
+  deploy_env = TRUE
+)
+```
+
+## Arguments
+
+- base:
+
+  Value if no PSA/DSA/Scenario
+
+- psa:
+
+  Value if PSA
+
+- sens:
+
+  Value if DSA/Scenario
+
+- psa_ind:
+
+  Boolean whether PSA is active
+
+- sens_ind:
+
+  Boolean whether Scenario/DSA is active
+
+- indicator:
+
+  Indicator which checks whether the specific parameter/parameters
+  is/are active in the DSA or Scenario loop
+
+- indicator_psa:
+
+  Indicator which checks whether the specific parameter/parameters
+  is/are active in the PSA loop. If NULL, it's assumed to be a vector of
+  1s of length equal to length(indicator)
+
+- names_out:
+
+  Names to give the output list
+
+- indicator_sens_binary:
+
+  Boolean, TRUE if parameters will be varied fully, FALSE if some
+  elements of the parameters may be changed but not all
+
+- sens_iterator:
+
+  Current iterator number of the DSA/scenario being run, e.g., 5 if it
+  corresponds to the 5th DSA parameter being changed
+
+- distributions:
+
+  List with length equal to length of base where the distributions are
+  stored
+
+- covariances:
+
+  List with length equal to length of base where the
+  variance/covariances are stored (only relevant if multivariate normal
+  are being used)
+
+- deploy_env:
+
+  Boolean, if TRUE will deploy all objects in the environment where the
+  function is called for. Must be active if using add_item (and FALSE if
+  a list must be returned)
+
+## Value
+
+List used for the inputs
+
+## Details
+
+This function can be used with vectors or lists, but will always return
+a list. Lists should be used when correlated variables are introduced to
+make sure the selector knows how to choose among those This function
+allows to choose between using an approach where only the full
+parameters are varied, and an approach where subelements of the
+parameters can be changed
+
+## Examples
+
+``` r
+pick_val_v(base = list(0,0),
+             psa =list(rnorm(1,0,0.1),rnorm(1,0,0.1)),
+             sens = list(2,3),
+             psa_ind = FALSE,
+             sens_ind = TRUE,
+             indicator=list(1,2),
+             indicator_sens_binary = FALSE,
+             sens_iterator = 2,
+             distributions = list("rnorm","rnorm"),
+             deploy_env = FALSE
+)
+#> [[1]]
+#> [1] 0
+#> 
+#> [[2]]
+#> [1] 3
+#> 
+
+pick_val_v(base = list(2,3,c(1,2)),
+             psa =sapply(1:3,
+                         function(x) eval(call(
+                           c("rnorm","rnorm","mvrnorm")[[x]],
+                           1,
+                           c(2,3,list(c(1,2)))[[x]],
+                           c(0.1,0.1,list(matrix(c(1,0.1,0.1,1),2,2)))[[x]]
+                         ))),
+             sens = list(4,5,c(1.3,2.3)),
+             psa_ind = FALSE,
+             sens_ind = TRUE,
+             indicator=list(1,2,c(3,4)),
+             names_out=c("util","util2","correlated_vector") ,
+             indicator_sens_binary = FALSE,
+             sens_iterator = 4,
+             distributions = list("rnorm","rnorm","mvrnorm"),
+             covariances = list(0.1,0.1,matrix(c(1,0.1,0.1,1),2,2)),
+             deploy_env = FALSE
+)
+#> $util
+#> [1] 2
+#> 
+#> $util2
+#> [1] 3
+#> 
+#> $correlated_vector
+#> [1] 1.03 2.30
+#> 
+ 
+```

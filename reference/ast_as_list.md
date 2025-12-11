@@ -1,0 +1,68 @@
+# Transform a substituted expression to its Abstract Syntax Tree (AST) as a list
+
+Transform a substituted expression to its Abstract Syntax Tree (AST) as
+a list
+
+## Usage
+
+``` r
+ast_as_list(ee)
+```
+
+## Arguments
+
+- ee:
+
+  Substituted expression
+
+## Value
+
+Nested list with the Abstract Syntax Tree (AST)
+
+## Examples
+
+``` r
+expr <- substitute({
+
+a <- sum(5+7)
+
+modify_item(list(afsa=ifelse(TRUE,"asda",NULL)))
+
+modify_item_seq(list(
+  
+  o_other_q_gold1 = if(gold == 1) { utility } else { 0 },
+  
+  o_other_q_gold2 = if(gold == 2) { utility } else { 0 },
+  
+  o_other_q_gold3 = if(gold == 3) { utility } else { 0 },
+  
+  o_other_q_gold4 = if(gold == 4) { utility } else { 0 },
+  
+  o_other_q_on_dup = if(on_dup) { utility } else { 0 }
+ 
+))
+
+if(a==1){
+  modify_item(list(a=list(6+b)))
+  
+  modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
+} else{
+  modify_event(list(e_exn = curtime + 14 / days_in_year + qexp(rnd_exn, r_exn)))
+  if(a>6){
+    modify_item(list(a=8))
+  }
+  
+}
+
+
+if (sel_resp_incl == 1 & on_dup == 1) {
+  
+  modify_event(list(e_response = curtime, z = 6))
+  
+}
+
+})
+
+
+out <- ast_as_list(expr)
+```
