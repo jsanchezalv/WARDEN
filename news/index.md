@@ -2,6 +2,8 @@
 
 ## WARDEN 2.0.1
 
+CRAN release: 2025-12-11
+
 \*adj_val now accepts a vectorized_f argument to speed computations in
 the case of vectorized functions
 
