@@ -333,8 +333,8 @@ ipd = 1,
 ncores = 1)
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run analysis 1: 0.9s
-#> Total time to run: 0.9s
+#> Time to run analysis 1: 0.91s
+#> Total time to run: 0.91s
 #> Simulation finalized; 
 #> [[1]]
 #> [[1]][[1]]

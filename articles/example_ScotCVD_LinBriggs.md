@@ -770,8 +770,8 @@ cost_ongoing <- "cost"
 
 #### Model Execution
 
-Note that because of the patient-level loop approach, this model is 2-3x
-slower to run than the original one (37 seconds vs. 110 seconds).
+Note that because of the patient-level loop approach, this model is 2x
+slower to run than the original one (37 seconds vs. 77 seconds).
 
 ``` r
 results <- run_sim(  
@@ -791,9 +791,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 77.27s
-#> Time to run analysis 1: 77.27s
-#> Total time to run: 77.27s
+#> Time to run simulation 1: 77.34s
+#> Time to run analysis 1: 77.35s
+#> Total time to run: 77.35s
 #> Simulation finalized;
 ```
 

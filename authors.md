@@ -11,7 +11,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/jsanchezalv/WARDEN/blob/v2.0.1/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/jsanchezalv/WARDEN/blob/main/DESCRIPTION)
 
 Sanchez Alvarez J (2025). *WARDEN: Workflows for Health Technology
 Assessments in R using Discrete EveNts*. R package version 2.0.1,
