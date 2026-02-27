@@ -65,15 +65,17 @@ common_all_inputs <-add_item(input = {
                       cost.sicker <- 7000
                       cost.int    <- 1000
                       coef_noint  <- log(0.2)
-                      HR_int      <- 0.8
+                      coef_death  <- log(0.05)
+                      HR_int      <- 0.7
                       drc         <- 0.035 #different values than what's assumed by default
                       drq         <- 0.035
                       random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
+                      random_seed_death_i <- runif(npats)
 })  #to be used as seeds to draw the time to event for sicker, to ensure same luck for the same patient independently of the arm
 
 
 #Put objects here that do not change as we loop through treatments for a patient
-common_pt_inputs <- add_item(death= max(0.0000001,rnorm(n=1, mean=12, sd=3))) 
+common_pt_inputs <- add_item(death= qexp(random_seed_death_i[i], exp(coef_death))) 
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
 unique_pt_inputs <- add_item(fl.sick = 1,
@@ -150,6 +152,12 @@ evt_react_list <-
                  q_default <- util.sicker
                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
                  fl.sick   <- 0 
+                 
+                 modify_event(c(
+                   "death" = max(
+                     curtime + (get_event("death")-curtime)*0.8,
+                     curtime)))
+                 
                }) %>%
   add_reactevt(name_evt = "death",
                input = {
@@ -171,6 +179,8 @@ evt_react_list <-
 #                      q_default = util.sick
 #                      c_default = cost.sick + if(arm=="int"){cost.int}else{0}
 #                      fl.sick = 0
+#                      modify_event(c("death" = max(get_event("death") - 0.5,curtime)))
+#
 #                  }) %>%
 #     add_reactevt(name_evt = "death",
 #                  input = {
@@ -332,15 +342,15 @@ Note that `pick_val_v()` can be directly loaded as parameters (in fact, a named 
 
 ```{r dsa_inputs}
 #Load some data
-list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
-                              base_value = list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
-                              DSA_min = list(0.6,0.3,1000,5000,800,log(0.1),0.5),
-                              DSA_max = list(0.9,0.7,5000,9000,2000,log(0.4),0.9),
-                              PSA_dist = list("rnorm","rbeta_mse","rgamma_mse","rgamma_mse","rgamma_mse","rnorm","rlnorm"),
-                              a=list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)),
-                              b=lapply(list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)), function(x) abs(x/5)),
-                              scenario_1=list(0.6,0.3,1000,5000,800,log(0.1),0.5),
-                              scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),0.9)
+list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),
+                              base_value = list(0.8,0.5,3000,7000,1000,log(0.2),log(0.05),0.7),
+                              DSA_min = list(0.6,0.3,1000,5000,800,log(0.1),log(0.1),0.5),
+                              DSA_max = list(0.9,0.7,5000,9000,2000,log(0.4),log(0.03),0.9),
+                              PSA_dist = list("rnorm","rbeta_mse","rgamma_mse","rgamma_mse","rgamma_mse","rnorm","rnorm","rlnorm"),
+                              a=list(0.8,0.5,3000,7000,1000,log(0.2),log(0.05),log(0.7)),
+                              b=lapply(list(0.8,0.5,3000,7000,1000,log(0.2),log(0.05),log(0.7)), function(x) abs(x/5)),
+                              scenario_1=list(0.6,0.3,1000,5000,800,log(0.1),log(0.03),0.5),
+                              scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),log(0.2),log(0.1),0.9)
                               )
 
 sensitivity_inputs <-add_item(
@@ -358,7 +368,8 @@ common_all_inputs <- add_item(
                        names_out   = list_par[["parameter_name"]]
                        )
             ) %>%
-  add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE)) #we don't add this variable ot the sensitivity analysis
+  add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE),
+           random_seed_death_i <- runif(npats)) #we don't add these variables to the sensitivity analysis
 
 ```
 ## Model Execution
@@ -393,7 +404,7 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
+data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
 
 ```
 
@@ -430,7 +441,7 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
+data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
 
 ```
 ## Model Execution, Simple PSA
@@ -464,6 +475,6 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_simulation <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_simulation %>% group_by(simulation) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
+data_simulation %>% group_by(simulation) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
 
 ```

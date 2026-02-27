@@ -49,17 +49,6 @@ if(!require(here)){
     library(here)
 }
 
-#Copied directly from original code
-choose_coef_by_sex <- function(sex, coef, list = list_coef) {
-  if (sex == "male") {
-    as.matrix(list[[paste0(coef,"_m")]] %>% keep(is.numeric))
-  } else if (sex == "female"){
-    as.matrix(list[[paste0(coef,"_f")]] %>% keep(is.numeric))
-  } else {
-    stop("The sex argument should be either 'male' or 'female'.")
-  }
-}
-
 # Age in year (continuous)
 # Normal distribution
 list_age <- list(mean = 60, sd = 0, dist = "rnorm")
@@ -362,8 +351,6 @@ disu_sec_vec <- function(time, DU_ALL, DU, B5, B6, nl_RCS_ch) {
     A[s3,] <- matrix(nl_RCS_ch[[3]], ncol = 4, nrow = sum(s3), byrow = TRUE)
   }
   
-  # Now A[,1]=a0, A[,2]=a1, A[,3]=a2, A[,4]=a3
-  
   rcs_du_v(
     t2  = time,
     du_all = DU_ALL,
@@ -630,7 +617,7 @@ evt_react_list <-
                       next_event()$time,
                       by = 1/12,
                       (.time-curtime) * coef_cost_1 +
-                        coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS[["nl_RCS_pre"]][[2-sex]]),
+                        coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS[["nl_RCS_pre"]][[2-sex]]), 
                       discount = drc,
                       vectorized_f = TRUE
                  )
@@ -749,7 +736,7 @@ cost_ongoing <- "cost"
 
 ### Model Execution
 
-Note that because of the patient-level loop approach, this model is 2-3x slower to run than the original one (37 seconds vs. 110 seconds).
+Note that because of the patient-level loop approach, this model is 2x slower to run than the original one (37 seconds vs. 80 seconds).
 
 ```{r model_run}
 results <- run_sim(  
