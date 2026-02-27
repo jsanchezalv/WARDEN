@@ -86,15 +86,17 @@ common_all_inputs <-add_item(input = {
                       cost.sicker <- 7000
                       cost.int    <- 1000
                       coef_noint  <- log(0.2)
-                      HR_int      <- 0.8
+                      coef_death  <- log(0.05)
+                      HR_int      <- 0.7
                       drc         <- 0.035 #different values than what's assumed by default
                       drq         <- 0.035
                       random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
+                      random_seed_death_i <- runif(npats)
 })  #to be used as seeds to draw the time to event for sicker, to ensure same luck for the same patient independently of the arm
 
 
 #Put objects here that do not change as we loop through treatments for a patient
-common_pt_inputs <- add_item(death= max(0.0000001,rnorm(n=1, mean=12, sd=3))) 
+common_pt_inputs <- add_item(death= qexp(random_seed_death_i[i], exp(coef_death))) 
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
 unique_pt_inputs <- add_item(fl.sick = 1,
@@ -264,6 +266,12 @@ evt_react_list <-
                  q_default <- util.sicker
                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
                  fl.sick   <- 0 
+                 
+                 modify_event(c(
+                   "death" = max(
+                     curtime + (get_event("death")-curtime)*0.8,
+                     curtime)))
+                 
                }) %>%
   add_reactevt(name_evt = "death",
                input = {
@@ -285,6 +293,8 @@ evt_react_list <-
 #                      q_default = util.sick
 #                      c_default = cost.sick + if(arm=="int"){cost.int}else{0}
 #                      fl.sick = 0
+#                      modify_event(c("death" = max(get_event("death") - 0.5,curtime)))
+#
 #                  }) %>%
 #     add_reactevt(name_evt = "death",
 #                  input = {
@@ -319,14 +329,15 @@ df_interactions <- extract_from_reactions(evt_react_list)
 kable(df_interactions)
 ```
 
-| event  | name      | type | conditional_flag | definition                                          |
-|:-------|:----------|:-----|:-----------------|:----------------------------------------------------|
-| sicker | q_default | item | FALSE            | util.sicker                                         |
-| sicker | c_default | item | FALSE            | cost.sicker + if (arm == ‘int’) {cost.int} else {0} |
-| sicker | fl.sick   | item | FALSE            | 0                                                   |
-| death  | q_default | item | FALSE            | 0                                                   |
-| death  | c_default | item | FALSE            | 0                                                   |
-| death  | curtime   | item | FALSE            | Inf                                                 |
+| event  | name      | type  | conditional_flag | definition                                                    |
+|:-------|:----------|:------|:-----------------|:--------------------------------------------------------------|
+| sicker | q_default | item  | FALSE            | util.sicker                                                   |
+| sicker | c_default | item  | FALSE            | cost.sicker + if (arm == ‘int’) {cost.int} else {0}           |
+| sicker | fl.sick   | item  | FALSE            | 0                                                             |
+| sicker | death     | event | FALSE            | max(curtime + (get_event(‘death’) - curtime) \* 0.8, curtime) |
+| death  | q_default | item  | FALSE            | 0                                                             |
+| death  | c_default | item  | FALSE            | 0                                                             |
+| death  | curtime   | item  | FALSE            | Inf                                                           |
 
 ## Costs and Utilities
 
@@ -400,9 +411,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.88s
-#> Time to run analysis 1: 0.88s
-#> Total time to run: 0.88s
+#> Time to run simulation 1: 0.62s
+#> Time to run analysis 1: 0.62s
+#> Total time to run: 0.62s
 #> Simulation finalized;
 ```
 
@@ -424,119 +435,120 @@ collect here to plot in the `psa_ipd` object.
 
 
 summary_results_det(results[[1]][[1]]) #print first simulation
-#>                        int    noint
-#> costs             58978.88 51768.23
-#> dcosts                0.00  7210.66
-#> lys                   9.72     9.72
-#> dlys                  0.00     0.00
-#> qalys                 6.27     6.08
-#> dqalys                0.00     0.19
-#> ICER                    NA      Inf
-#> ICUR                    NA 38286.46
-#> INMB                    NA  2206.06
-#> costs_undisc      74324.03 65474.81
-#> dcosts_undisc         0.00  8849.22
-#> lys_undisc           11.99    11.99
-#> dlys_undisc           0.00     0.00
-#> qalys_undisc          7.62     7.38
-#> dqalys_undisc         0.00     0.24
-#> ICER_undisc             NA      Inf
-#> ICUR_undisc             NA 37557.56
-#> INMB_undisc             NA  2931.65
-#> c_default         58978.88 51768.23
-#> dc_default            0.00  7210.66
-#> c_default_undisc  74324.03 65474.81
-#> dc_default_undisc     0.00  8849.22
-#> q_default             6.27     6.08
-#> dq_default            0.00     0.19
-#> q_default_undisc      7.62     7.38
-#> dq_default_undisc     0.00     0.24
+#>                         int     noint
+#> costs              71261.66  63063.40
+#> dcosts                 0.00   8198.25
+#> lys                   11.21     11.08
+#> dlys                   0.00      0.12
+#> qalys                  6.98      6.63
+#> dqalys                 0.00      0.35
+#> ICER                     NA  66484.18
+#> ICUR                     NA  23296.79
+#> INMB                     NA   9396.99
+#> costs_undisc      118130.54 104038.82
+#> dcosts_undisc          0.00  14091.72
+#> lys_undisc            17.48     17.22
+#> dlys_undisc            0.00      0.26
+#> qalys_undisc          10.37      9.85
+#> dqalys_undisc          0.00      0.52
+#> ICER_undisc              NA  54006.07
+#> ICUR_undisc              NA  27003.04
+#> INMB_undisc              NA  12001.13
+#> c_default          71261.66  63063.40
+#> dc_default             0.00   8198.25
+#> c_default_undisc  118130.54 104038.82
+#> dc_default_undisc      0.00  14091.72
+#> q_default              6.98      6.63
+#> dq_default             0.00      0.35
+#> q_default_undisc      10.37      9.85
+#> dq_default_undisc      0.00      0.52
 
 summary_results_sim(results[[1]])
-#>                                       int                   noint
-#> costs             58,979 (58,979; 58,979) 51,768 (51,768; 51,768)
-#> dcosts                           0 (0; 0)    7,211 (7,211; 7,211)
-#> lys                     9.72 (9.72; 9.72)       9.72 (9.72; 9.72)
-#> dlys                             0 (0; 0)                0 (0; 0)
-#> qalys                   6.27 (6.27; 6.27)       6.08 (6.08; 6.08)
-#> dqalys                           0 (0; 0)    0.188 (0.188; 0.188)
-#> ICER                         NaN (NA; NA)          Inf (Inf; Inf)
-#> ICUR                         NaN (NA; NA) 38,286 (38,286; 38,286)
-#> INMB                         NaN (NA; NA)    2,206 (2,206; 2,206)
-#> costs_undisc      74,324 (74,324; 74,324) 65,475 (65,475; 65,475)
-#> dcosts_undisc                    0 (0; 0)    8,849 (8,849; 8,849)
-#> lys_undisc                    12 (12; 12)             12 (12; 12)
-#> dlys_undisc                      0 (0; 0)                0 (0; 0)
-#> qalys_undisc            7.62 (7.62; 7.62)       7.38 (7.38; 7.38)
-#> dqalys_undisc                    0 (0; 0)    0.236 (0.236; 0.236)
-#> ICER_undisc                  NaN (NA; NA)          Inf (Inf; Inf)
-#> ICUR_undisc                  NaN (NA; NA) 37,558 (37,558; 37,558)
-#> INMB_undisc                  NaN (NA; NA)    2,932 (2,932; 2,932)
-#> c_default         58,979 (58,979; 58,979) 51,768 (51,768; 51,768)
-#> dc_default                       0 (0; 0)    7,211 (7,211; 7,211)
-#> c_default_undisc  74,324 (74,324; 74,324) 65,475 (65,475; 65,475)
-#> dc_default_undisc                0 (0; 0)    8,849 (8,849; 8,849)
-#> q_default               6.27 (6.27; 6.27)       6.08 (6.08; 6.08)
-#> dq_default                       0 (0; 0)    0.188 (0.188; 0.188)
-#> q_default_undisc        7.62 (7.62; 7.62)       7.38 (7.38; 7.38)
-#> dq_default_undisc                0 (0; 0)    0.236 (0.236; 0.236)
+#>                                          int                      noint
+#> costs                71,262 (71,262; 71,262)    63,063 (63,063; 63,063)
+#> dcosts                              0 (0; 0)       8,198 (8,198; 8,198)
+#> lys                        11.2 (11.2; 11.2)          11.1 (11.1; 11.1)
+#> dlys                                0 (0; 0)       0.123 (0.123; 0.123)
+#> qalys                      6.98 (6.98; 6.98)          6.63 (6.63; 6.63)
+#> dqalys                              0 (0; 0)       0.352 (0.352; 0.352)
+#> ICER                            NaN (NA; NA)    66,484 (66,484; 66,484)
+#> ICUR                            NaN (NA; NA)    23,297 (23,297; 23,297)
+#> INMB                            NaN (NA; NA)       9,397 (9,397; 9,397)
+#> costs_undisc      118,131 (118,131; 118,131) 104,039 (104,039; 104,039)
+#> dcosts_undisc                       0 (0; 0)    14,092 (14,092; 14,092)
+#> lys_undisc                 17.5 (17.5; 17.5)          17.2 (17.2; 17.2)
+#> dlys_undisc                         0 (0; 0)       0.261 (0.261; 0.261)
+#> qalys_undisc               10.4 (10.4; 10.4)          9.85 (9.85; 9.85)
+#> dqalys_undisc                       0 (0; 0)       0.522 (0.522; 0.522)
+#> ICER_undisc                     NaN (NA; NA)    54,006 (54,006; 54,006)
+#> ICUR_undisc                     NaN (NA; NA)    27,003 (27,003; 27,003)
+#> INMB_undisc                     NaN (NA; NA)    12,001 (12,001; 12,001)
+#> c_default            71,262 (71,262; 71,262)    63,063 (63,063; 63,063)
+#> dc_default                          0 (0; 0)       8,198 (8,198; 8,198)
+#> c_default_undisc  118,131 (118,131; 118,131) 104,039 (104,039; 104,039)
+#> dc_default_undisc                   0 (0; 0)    14,092 (14,092; 14,092)
+#> q_default                  6.98 (6.98; 6.98)          6.63 (6.63; 6.63)
+#> dq_default                          0 (0; 0)       0.352 (0.352; 0.352)
+#> q_default_undisc           10.4 (10.4; 10.4)          9.85 (9.85; 9.85)
+#> dq_default_undisc                   0 (0; 0)       0.522 (0.522; 0.522)
 
 summary_results_sens(results)
-#>        arm analysis analysis_name          variable                   value
-#>     <char>    <int>        <char>            <fctr>                  <char>
-#>  1:    int        1                           costs 58,979 (58,979; 58,979)
-#>  2:  noint        1                           costs 51,768 (51,768; 51,768)
-#>  3:    int        1                          dcosts                0 (0; 0)
-#>  4:  noint        1                          dcosts    7,211 (7,211; 7,211)
-#>  5:    int        1                             lys       9.72 (9.72; 9.72)
-#>  6:  noint        1                             lys       9.72 (9.72; 9.72)
-#>  7:    int        1                            dlys                0 (0; 0)
-#>  8:  noint        1                            dlys                0 (0; 0)
-#>  9:    int        1                           qalys       6.27 (6.27; 6.27)
-#> 10:  noint        1                           qalys       6.08 (6.08; 6.08)
-#> 11:    int        1                          dqalys                0 (0; 0)
-#> 12:  noint        1                          dqalys    0.188 (0.188; 0.188)
-#> 13:    int        1                            ICER            NaN (NA; NA)
-#> 14:  noint        1                            ICER          Inf (Inf; Inf)
-#> 15:    int        1                            ICUR            NaN (NA; NA)
-#> 16:  noint        1                            ICUR 38,286 (38,286; 38,286)
-#> 17:    int        1                            INMB            NaN (NA; NA)
-#> 18:  noint        1                            INMB    2,206 (2,206; 2,206)
-#> 19:    int        1                    costs_undisc 74,324 (74,324; 74,324)
-#> 20:  noint        1                    costs_undisc 65,475 (65,475; 65,475)
-#> 21:    int        1                   dcosts_undisc                0 (0; 0)
-#> 22:  noint        1                   dcosts_undisc    8,849 (8,849; 8,849)
-#> 23:    int        1                      lys_undisc             12 (12; 12)
-#> 24:  noint        1                      lys_undisc             12 (12; 12)
-#> 25:    int        1                     dlys_undisc                0 (0; 0)
-#> 26:  noint        1                     dlys_undisc                0 (0; 0)
-#> 27:    int        1                    qalys_undisc       7.62 (7.62; 7.62)
-#> 28:  noint        1                    qalys_undisc       7.38 (7.38; 7.38)
-#> 29:    int        1                   dqalys_undisc                0 (0; 0)
-#> 30:  noint        1                   dqalys_undisc    0.236 (0.236; 0.236)
-#> 31:    int        1                     ICER_undisc            NaN (NA; NA)
-#> 32:  noint        1                     ICER_undisc          Inf (Inf; Inf)
-#> 33:    int        1                     ICUR_undisc            NaN (NA; NA)
-#> 34:  noint        1                     ICUR_undisc 37,558 (37,558; 37,558)
-#> 35:    int        1                     INMB_undisc            NaN (NA; NA)
-#> 36:  noint        1                     INMB_undisc    2,932 (2,932; 2,932)
-#> 37:    int        1                       c_default 58,979 (58,979; 58,979)
-#> 38:  noint        1                       c_default 51,768 (51,768; 51,768)
-#> 39:    int        1                      dc_default                0 (0; 0)
-#> 40:  noint        1                      dc_default    7,211 (7,211; 7,211)
-#> 41:    int        1                c_default_undisc 74,324 (74,324; 74,324)
-#> 42:  noint        1                c_default_undisc 65,475 (65,475; 65,475)
-#> 43:    int        1               dc_default_undisc                0 (0; 0)
-#> 44:  noint        1               dc_default_undisc    8,849 (8,849; 8,849)
-#> 45:    int        1                       q_default       6.27 (6.27; 6.27)
-#> 46:  noint        1                       q_default       6.08 (6.08; 6.08)
-#> 47:    int        1                      dq_default                0 (0; 0)
-#> 48:  noint        1                      dq_default    0.188 (0.188; 0.188)
-#> 49:    int        1                q_default_undisc       7.62 (7.62; 7.62)
-#> 50:  noint        1                q_default_undisc       7.38 (7.38; 7.38)
-#> 51:    int        1               dq_default_undisc                0 (0; 0)
-#> 52:  noint        1               dq_default_undisc    0.236 (0.236; 0.236)
-#>        arm analysis analysis_name          variable                   value
+#>        arm analysis analysis_name          variable                      value
+#>     <char>    <int>        <char>            <fctr>                     <char>
+#>  1:    int        1                           costs    71,262 (71,262; 71,262)
+#>  2:  noint        1                           costs    63,063 (63,063; 63,063)
+#>  3:    int        1                          dcosts                   0 (0; 0)
+#>  4:  noint        1                          dcosts       8,198 (8,198; 8,198)
+#>  5:    int        1                             lys          11.2 (11.2; 11.2)
+#>  6:  noint        1                             lys          11.1 (11.1; 11.1)
+#>  7:    int        1                            dlys                   0 (0; 0)
+#>  8:  noint        1                            dlys       0.123 (0.123; 0.123)
+#>  9:    int        1                           qalys          6.98 (6.98; 6.98)
+#> 10:  noint        1                           qalys          6.63 (6.63; 6.63)
+#> 11:    int        1                          dqalys                   0 (0; 0)
+#> 12:  noint        1                          dqalys       0.352 (0.352; 0.352)
+#> 13:    int        1                            ICER               NaN (NA; NA)
+#> 14:  noint        1                            ICER    66,484 (66,484; 66,484)
+#> 15:    int        1                            ICUR               NaN (NA; NA)
+#> 16:  noint        1                            ICUR    23,297 (23,297; 23,297)
+#> 17:    int        1                            INMB               NaN (NA; NA)
+#> 18:  noint        1                            INMB       9,397 (9,397; 9,397)
+#> 19:    int        1                    costs_undisc 118,131 (118,131; 118,131)
+#> 20:  noint        1                    costs_undisc 104,039 (104,039; 104,039)
+#> 21:    int        1                   dcosts_undisc                   0 (0; 0)
+#> 22:  noint        1                   dcosts_undisc    14,092 (14,092; 14,092)
+#> 23:    int        1                      lys_undisc          17.5 (17.5; 17.5)
+#> 24:  noint        1                      lys_undisc          17.2 (17.2; 17.2)
+#> 25:    int        1                     dlys_undisc                   0 (0; 0)
+#> 26:  noint        1                     dlys_undisc       0.261 (0.261; 0.261)
+#> 27:    int        1                    qalys_undisc          10.4 (10.4; 10.4)
+#> 28:  noint        1                    qalys_undisc          9.85 (9.85; 9.85)
+#> 29:    int        1                   dqalys_undisc                   0 (0; 0)
+#> 30:  noint        1                   dqalys_undisc       0.522 (0.522; 0.522)
+#> 31:    int        1                     ICER_undisc               NaN (NA; NA)
+#> 32:  noint        1                     ICER_undisc    54,006 (54,006; 54,006)
+#> 33:    int        1                     ICUR_undisc               NaN (NA; NA)
+#> 34:  noint        1                     ICUR_undisc    27,003 (27,003; 27,003)
+#> 35:    int        1                     INMB_undisc               NaN (NA; NA)
+#> 36:  noint        1                     INMB_undisc    12,001 (12,001; 12,001)
+#> 37:    int        1                       c_default    71,262 (71,262; 71,262)
+#> 38:  noint        1                       c_default    63,063 (63,063; 63,063)
+#> 39:    int        1                      dc_default                   0 (0; 0)
+#> 40:  noint        1                      dc_default       8,198 (8,198; 8,198)
+#> 41:    int        1                c_default_undisc 118,131 (118,131; 118,131)
+#> 42:  noint        1                c_default_undisc 104,039 (104,039; 104,039)
+#> 43:    int        1               dc_default_undisc                   0 (0; 0)
+#> 44:  noint        1               dc_default_undisc    14,092 (14,092; 14,092)
+#> 45:    int        1                       q_default          6.98 (6.98; 6.98)
+#> 46:  noint        1                       q_default          6.63 (6.63; 6.63)
+#> 47:    int        1                      dq_default                   0 (0; 0)
+#> 48:  noint        1                      dq_default       0.352 (0.352; 0.352)
+#> 49:    int        1                q_default_undisc          10.4 (10.4; 10.4)
+#> 50:  noint        1                q_default_undisc          9.85 (9.85; 9.85)
+#> 51:    int        1               dq_default_undisc                   0 (0; 0)
+#> 52:  noint        1               dq_default_undisc       0.522 (0.522; 0.522)
+#>        arm analysis analysis_name          variable                      value
+#>     <char>    <int>        <char>            <fctr>                     <char>
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
@@ -545,18 +557,18 @@ psa_ipd[1:10,] %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
-| evtname | evttime | prevtime | pat_id | arm | total_lys | total_qalys | total_costs | total_costs_undisc | total_qalys_undisc | total_lys_undisc |    lys | qalys | costs | lys_undisc | qalys_undisc | costs_undisc | c_default | q_default | c_default_undisc | q_default_undisc | nexttime | simulation | sensitivity |
-|:--------|--------:|---------:|-------:|:----|----------:|------------:|------------:|-------------------:|-------------------:|-----------------:|-------:|------:|------:|-----------:|-------------:|-------------:|----------:|----------:|-----------------:|-----------------:|---------:|-----------:|------------:|
-| sick    |   0.000 |    0.000 |      1 | int |     10.34 |        8.27 |       41358 |              51112 |              10.22 |            12.78 | 10.339 | 8.272 | 41358 |     12.778 |       10.222 |        51112 |     41358 |     8.272 |            51112 |           10.222 |   12.778 |          1 |           1 |
-| death   |  12.778 |    0.000 |      1 | int |     10.34 |        8.27 |       41358 |              51112 |              10.22 |            12.78 |  0.000 | 0.000 |     0 |      0.000 |        0.000 |            0 |         0 |     0.000 |                0 |            0.000 |   12.778 |          1 |           1 |
-| sick    |   0.000 |    0.000 |      2 | int |      7.75 |        4.14 |       58485 |              68551 |               4.78 |             9.02 |  0.887 | 0.710 |  3549 |      0.901 |        0.721 |         3604 |      3549 |     0.710 |             3604 |            0.721 |    0.901 |          1 |           1 |
-| sicker  |   0.901 |    0.000 |      2 | int |      7.75 |        4.14 |       58485 |              68551 |               4.78 |             9.02 |  6.867 | 3.434 | 54937 |      8.118 |        4.059 |        64947 |     54937 |     3.434 |            64947 |            4.059 |    9.019 |          1 |           1 |
-| death   |   9.019 |    0.901 |      2 | int |      7.75 |        4.14 |       58485 |              68551 |               4.78 |             9.02 |  0.000 | 0.000 |     0 |      0.000 |        0.000 |            0 |         0 |     0.000 |                0 |            0.000 |    9.019 |          1 |           1 |
-| sick    |   0.000 |    0.000 |      3 | int |     10.94 |        5.57 |       86287 |             108582 |               6.96 |            13.73 |  0.317 | 0.253 |  1266 |      0.318 |        0.255 |         1273 |      1266 |     0.253 |             1273 |            0.255 |    0.318 |          1 |           1 |
-| sicker  |   0.318 |    0.000 |      3 | int |     10.94 |        5.57 |       86287 |             108582 |               6.96 |            13.73 | 10.628 | 5.314 | 85020 |     13.414 |        6.707 |       107309 |     85020 |     5.314 |           107309 |            6.707 |   13.732 |          1 |           1 |
-| death   |  13.732 |    0.318 |      3 | int |     10.94 |        5.57 |       86287 |             108582 |               6.96 |            13.73 |  0.000 | 0.000 |     0 |      0.000 |        0.000 |            0 |         0 |     0.000 |                0 |            0.000 |   13.732 |          1 |           1 |
-| sick    |   0.000 |    0.000 |      4 | int |      8.61 |        5.24 |       56449 |              68546 |               6.10 |            10.22 |  3.116 | 2.493 | 12463 |      3.296 |        2.637 |        13183 |     12463 |     2.493 |            13183 |            2.637 |    3.296 |          1 |           1 |
-| sicker  |   3.296 |    0.000 |      4 | int |      8.61 |        5.24 |       56449 |              68546 |               6.10 |            10.22 |  5.498 | 2.749 | 43986 |      6.920 |        3.460 |        55363 |     43986 |     2.749 |            55363 |            3.460 |   10.216 |          1 |           1 |
+| evtname | evttime | prevtime | pat_id | arm | total_lys | total_qalys | total_costs | total_costs_undisc | total_qalys_undisc | total_lys_undisc |   lys | qalys | costs | lys_undisc | qalys_undisc | costs_undisc | c_default | q_default | c_default_undisc | q_default_undisc | nexttime | simulation | sensitivity |
+|:--------|--------:|---------:|-------:|:----|----------:|------------:|------------:|-------------------:|-------------------:|-----------------:|------:|------:|------:|-----------:|-------------:|-------------:|----------:|----------:|-----------------:|-----------------:|---------:|-----------:|------------:|
+| sick    |   0.000 |    0.000 |      1 | int |     1.965 |       1.572 |        7860 |               8138 |              1.628 |            2.034 | 1.965 | 1.572 |  7860 |      2.034 |        1.628 |         8138 |      7860 |     1.572 |             8138 |            1.628 |    2.034 |          1 |           1 |
+| death   |   2.034 |    0.000 |      1 | int |     1.965 |       1.572 |        7860 |               8138 |              1.628 |            2.034 | 0.000 | 0.000 |     0 |      0.000 |        0.000 |            0 |         0 |     0.000 |                0 |            0.000 |    2.034 |          1 |           1 |
+| sick    |   0.000 |    0.000 |      2 | int |     4.811 |       2.709 |       34439 |              37953 |              2.938 |            5.259 | 1.012 | 0.809 |  4047 |      1.030 |        0.824 |         4119 |      4047 |     0.809 |             4119 |            0.824 |    1.030 |          1 |           1 |
+| sicker  |   1.030 |    0.000 |      2 | int |     4.811 |       2.709 |       34439 |              37953 |              2.938 |            5.259 | 3.799 | 1.900 | 30392 |      4.229 |        2.115 |        33834 |     30392 |     1.900 |            33834 |            2.115 |    5.259 |          1 |           1 |
+| death   |   5.259 |    1.030 |      2 | int |     4.811 |       2.709 |       34439 |              37953 |              2.938 |            5.259 | 0.000 | 0.000 |     0 |      0.000 |        0.000 |            0 |         0 |     0.000 |                0 |            0.000 |    5.259 |          1 |           1 |
+| sick    |   0.000 |    0.000 |      3 | int |     0.807 |       0.512 |        5011 |               5094 |              0.518 |            0.819 | 0.362 | 0.289 |  1446 |      0.364 |        0.291 |         1455 |      1446 |     0.289 |             1455 |            0.291 |    0.364 |          1 |           1 |
+| sicker  |   0.364 |    0.000 |      3 | int |     0.807 |       0.512 |        5011 |               5094 |              0.518 |            0.819 | 0.446 | 0.223 |  3565 |      0.455 |        0.227 |         3638 |      3565 |     0.223 |             3638 |            0.227 |    0.819 |          1 |           1 |
+| death   |   0.819 |    0.364 |      3 | int |     0.807 |       0.512 |        5011 |               5094 |              0.518 |            0.819 | 0.000 | 0.000 |     0 |      0.000 |        0.000 |            0 |         0 |     0.000 |                0 |            0.000 |    0.819 |          1 |           1 |
+| sick    |   0.000 |    0.000 |      4 | int |     9.356 |       5.738 |       60714 |              75252 |              6.775 |           11.290 | 3.533 | 2.826 | 14131 |      3.767 |        3.013 |        15066 |     14131 |     2.826 |            15066 |            3.013 |    3.767 |          1 |           1 |
+| sicker  |   3.767 |    0.000 |      4 | int |     9.356 |       5.738 |       60714 |              75252 |              6.775 |           11.290 | 5.823 | 2.911 | 46583 |      7.523 |        3.762 |        60186 |     46583 |     2.911 |            60186 |            3.762 |   11.290 |          1 |           1 |
 
 We can also check what has been the absolute number of events per
 strategy.
@@ -565,10 +577,10 @@ strategy.
 |:------|:--------|-----:|
 | int   | death   | 1000 |
 | int   | sick    | 1000 |
-| int   | sicker  |  827 |
+| int   | sicker  |  733 |
 | noint | death   | 1000 |
 | noint | sick    | 1000 |
-| noint | sicker  |  880 |
+| noint | sicker  |  785 |
 
 ### Plots
 
@@ -668,15 +680,15 @@ use a data.frame.
 
 ``` r
 #Load some data
-list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
-                              base_value = list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
-                              DSA_min = list(0.6,0.3,1000,5000,800,log(0.1),0.5),
-                              DSA_max = list(0.9,0.7,5000,9000,2000,log(0.4),0.9),
-                              PSA_dist = list("rnorm","rbeta_mse","rgamma_mse","rgamma_mse","rgamma_mse","rnorm","rlnorm"),
-                              a=list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)),
-                              b=lapply(list(0.8,0.5,3000,7000,1000,log(0.2),log(0.8)), function(x) abs(x/5)),
-                              scenario_1=list(0.6,0.3,1000,5000,800,log(0.1),0.5),
-                              scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),0.9)
+list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),
+                              base_value = list(0.8,0.5,3000,7000,1000,log(0.2),log(0.05),0.7),
+                              DSA_min = list(0.6,0.3,1000,5000,800,log(0.1),log(0.1),0.5),
+                              DSA_max = list(0.9,0.7,5000,9000,2000,log(0.4),log(0.03),0.9),
+                              PSA_dist = list("rnorm","rbeta_mse","rgamma_mse","rgamma_mse","rgamma_mse","rnorm","rnorm","rlnorm"),
+                              a=list(0.8,0.5,3000,7000,1000,log(0.2),log(0.05),log(0.7)),
+                              b=lapply(list(0.8,0.5,3000,7000,1000,log(0.2),log(0.05),log(0.7)), function(x) abs(x/5)),
+                              scenario_1=list(0.6,0.3,1000,5000,800,log(0.1),log(0.03),0.5),
+                              scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),log(0.2),log(0.1),0.9)
                               )
 
 sensitivity_inputs <-add_item(
@@ -694,7 +706,8 @@ common_all_inputs <- add_item(
                        names_out   = list_par[["parameter_name"]]
                        )
             ) %>%
-  add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE)) #we don't add this variable ot the sensitivity analysis
+  add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE),
+           random_seed_death_i <- runif(npats)) #we don't add these variables to the sensitivity analysis
 ```
 
 ### Model Execution
@@ -733,20 +746,20 @@ results <- run_sim(
 #> Time to run analysis 1: 0.13s
 #> Analysis number: 2
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Time to run analysis 2: 0.12s
+#> Time to run simulation 1: 0.17s
+#> Time to run analysis 2: 0.17s
 #> Analysis number: 3
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 3: 0.13s
+#> Time to run simulation 1: 0.14s
+#> Time to run analysis 3: 0.14s
 #> Analysis number: 4
 #> Simulation number: 1
 #> Time to run simulation 1: 0.13s
 #> Time to run analysis 4: 0.13s
 #> Analysis number: 5
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Time to run analysis 5: 0.12s
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 5: 0.13s
 #> Analysis number: 6
 #> Simulation number: 1
 #> Time to run simulation 1: 0.13s
@@ -757,12 +770,12 @@ results <- run_sim(
 #> Time to run analysis 7: 0.13s
 #> Analysis number: 8
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Time to run analysis 8: 0.12s
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 8: 0.13s
 #> Analysis number: 9
 #> Simulation number: 1
 #> Time to run simulation 1: 0.13s
-#> Time to run analysis 9: 0.13s
+#> Time to run analysis 9: 0.14s
 #> Analysis number: 10
 #> Simulation number: 1
 #> Time to run simulation 1: 0.13s
@@ -773,17 +786,25 @@ results <- run_sim(
 #> Time to run analysis 11: 0.13s
 #> Analysis number: 12
 #> Simulation number: 1
-#> Time to run simulation 1: 0.35s
-#> Time to run analysis 12: 0.35s
+#> Time to run simulation 1: 0.14s
+#> Time to run analysis 12: 0.14s
 #> Analysis number: 13
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Time to run analysis 13: 0.12s
+#> Time to run simulation 1: 0.14s
+#> Time to run analysis 13: 0.14s
 #> Analysis number: 14
 #> Simulation number: 1
 #> Time to run simulation 1: 0.13s
 #> Time to run analysis 14: 0.13s
-#> Total time to run: 2s
+#> Analysis number: 15
+#> Simulation number: 1
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 15: 0.13s
+#> Analysis number: 16
+#> Simulation number: 1
+#> Time to run simulation 1: 0.14s
+#> Time to run analysis 16: 0.14s
+#> Total time to run: 2.19s
 #> Simulation finalized;
 ```
 
@@ -797,8 +818,8 @@ corresponding parameter value.
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
-#> # A tibble: 14 × 8
+data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
+#> # A tibble: 16 × 9
 #>    sensitivity util.sick util.sicker cost.sick cost.sicker cost.int coef_noint
 #>          <int>     <dbl>       <dbl>     <dbl>       <dbl>    <dbl>      <dbl>
 #>  1           1       0.6         0.5      3000        7000     1000      -1.61
@@ -815,7 +836,9 @@ data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.
 #> 12          12       0.8         0.5      3000        7000     1000      -1.61
 #> 13          13       0.8         0.5      3000        7000     1000      -1.61
 #> 14          14       0.8         0.5      3000        7000     1000      -1.61
-#> # ℹ 1 more variable: HR_int <dbl>
+#> 15          15       0.8         0.5      3000        7000     1000      -1.61
+#> 16          16       0.8         0.5      3000        7000     1000      -1.61
+#> # ℹ 2 more variables: coef_death <dbl>, HR_int <dbl>
 ```
 
 ### Model Execution, probabilistic DSA
@@ -843,9 +866,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
+#> Time to run simulation 1: 0.32s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.12s
+#> Time to run simulation 2: 0.13s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.12s
 #> Simulation number: 4
@@ -853,53 +876,39 @@ results <- run_sim(
 #> Simulation number: 5
 #> Time to run simulation 5: 0.12s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 1: 0.73s
+#> Time to run simulation 6: 0.13s
+#> Time to run analysis 1: 0.95s
 #> Analysis number: 2
 #> Simulation number: 1
 #> Time to run simulation 1: 0.12s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.12s
+#> Time to run simulation 2: 0.14s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.12s
+#> Time to run simulation 3: 0.13s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.12s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.12s
+#> Time to run simulation 5: 0.13s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.12s
-#> Time to run analysis 2: 0.73s
+#> Time to run analysis 2: 0.78s
 #> Analysis number: 3
 #> Simulation number: 1
 #> Time to run simulation 1: 0.13s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.12s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.14s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.12s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.13s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 3: 0.76s
-#> Analysis number: 4
-#> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.12s
-#> Simulation number: 3
 #> Time to run simulation 3: 0.13s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.12s
+#> Time to run simulation 4: 0.13s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.13s
+#> Time to run simulation 5: 0.12s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 4: 0.75s
-#> Analysis number: 5
+#> Time to run simulation 6: 0.13s
+#> Time to run analysis 3: 0.78s
+#> Analysis number: 4
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
+#> Time to run simulation 1: 0.12s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.13s
 #> Simulation number: 3
@@ -907,127 +916,85 @@ results <- run_sim(
 #> Simulation number: 4
 #> Time to run simulation 4: 0.13s
 #> Simulation number: 5
+#> Time to run simulation 5: 0.13s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.12s
+#> Time to run analysis 4: 0.77s
+#> Analysis number: 5
+#> Simulation number: 1
+#> Time to run simulation 1: 0.13s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.12s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.13s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.13s
+#> Simulation number: 5
 #> Time to run simulation 5: 0.12s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.13s
-#> Time to run analysis 5: 0.76s
+#> Time to run analysis 5: 0.78s
 #> Analysis number: 6
 #> Simulation number: 1
 #> Time to run simulation 1: 0.12s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.13s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.12s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.13s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.12s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 6: 0.76s
-#> Analysis number: 7
-#> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.12s
-#> Simulation number: 3
 #> Time to run simulation 3: 0.13s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.12s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.13s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 7: 0.77s
+#> Time to run simulation 6: 0.13s
+#> Time to run analysis 6: 0.77s
+#> Analysis number: 7
+#> Simulation number: 1
+#> Time to run simulation 1: 0.12s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.13s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.13s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.13s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.13s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.16s
+#> Time to run analysis 7: 0.8s
 #> Analysis number: 8
 #> Simulation number: 1
 #> Time to run simulation 1: 0.13s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.13s
+#> Time to run simulation 2: 0.14s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.12s
+#> Time to run simulation 3: 0.13s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.13s
+#> Time to run simulation 4: 0.14s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.12s
+#> Time to run simulation 5: 0.14s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.13s
-#> Time to run analysis 8: 0.77s
+#> Time to run analysis 8: 0.81s
 #> Analysis number: 9
-#> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.12s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.13s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.13s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.17s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 9: 0.81s
-#> Analysis number: 10
-#> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.13s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.12s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.13s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.12s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 10: 0.79s
-#> Analysis number: 11
-#> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.14s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.12s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.14s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.12s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.14s
-#> Time to run analysis 11: 0.78s
-#> Analysis number: 12
-#> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.13s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.13s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.12s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.13s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 12: 0.79s
-#> Analysis number: 13
-#> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.14s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.12s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.14s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.15s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 13: 0.81s
-#> Analysis number: 14
 #> Simulation number: 1
 #> Time to run simulation 1: 0.14s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.13s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.14s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.14s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.13s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.14s
+#> Time to run analysis 9: 0.83s
+#> Analysis number: 10
+#> Simulation number: 1
+#> Time to run simulation 1: 0.13s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.14s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.14s
 #> Simulation number: 4
@@ -1036,8 +1003,92 @@ results <- run_sim(
 #> Time to run simulation 5: 0.14s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.14s
-#> Time to run analysis 14: 0.82s
-#> Total time to run: 10.83s
+#> Time to run analysis 10: 0.82s
+#> Analysis number: 11
+#> Simulation number: 1
+#> Time to run simulation 1: 0.13s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.14s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.14s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.14s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.13s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.14s
+#> Time to run analysis 11: 0.82s
+#> Analysis number: 12
+#> Simulation number: 1
+#> Time to run simulation 1: 0.14s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.16s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.13s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.14s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.14s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.13s
+#> Time to run analysis 12: 0.86s
+#> Analysis number: 13
+#> Simulation number: 1
+#> Time to run simulation 1: 0.14s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.14s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.13s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.15s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.14s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.14s
+#> Time to run analysis 13: 0.85s
+#> Analysis number: 14
+#> Simulation number: 1
+#> Time to run simulation 1: 0.14s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.14s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.14s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.14s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.14s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.14s
+#> Time to run analysis 14: 0.85s
+#> Analysis number: 15
+#> Simulation number: 1
+#> Time to run simulation 1: 0.15s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.15s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.13s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.14s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.14s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.16s
+#> Time to run analysis 15: 0.88s
+#> Analysis number: 16
+#> Simulation number: 1
+#> Time to run simulation 1: 0.15s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.14s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.15s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.15s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.15s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.14s
+#> Time to run analysis 16: 0.87s
+#> Total time to run: 13.23s
 #> Simulation finalized;
 ```
 
@@ -1051,25 +1102,27 @@ corresponding parameter value.
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
-#> # A tibble: 14 × 8
+data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
+#> # A tibble: 16 × 9
 #>    sensitivity util.sick util.sicker cost.sick cost.sicker cost.int coef_noint
 #>          <int>     <dbl>       <dbl>     <dbl>       <dbl>    <dbl>      <dbl>
-#>  1           1     0.6         0.580     3156.       7974.    1061.      -1.61
-#>  2           2     0.722       0.3       3156.       7974.    1061.      -1.61
-#>  3           3     0.722       0.580     1000        7974.    1061.      -1.61
-#>  4           4     0.722       0.580     3156.       5000     1061.      -1.61
-#>  5           5     0.722       0.580     3156.       7974.     800       -1.61
-#>  6           6     0.725       0.579     3140.       7957.    1065.      -2.30
-#>  7           7     0.722       0.580     3155.       7973.    1061.      -1.62
-#>  8           8     0.722       0.580     3156.       7974.    1061.      -1.61
-#>  9           9     0.722       0.580     3156.       7974.    1061.      -1.61
-#> 10          10     0.722       0.580     3156.       7974.    1061.      -1.61
-#> 11          11     0.722       0.580     3156.       7974.    1061.      -1.61
-#> 12          12     0.722       0.580     3156.       7974.    1061.      -1.61
-#> 13          13     0.722       0.580     3156.       7974.    1061.      -1.61
-#> 14          14     0.722       0.580     3156.       7974.    1061.      -1.61
-#> # ℹ 1 more variable: HR_int <dbl>
+#>  1           1     0.6         0.579     3162.       7968.    1063.      -1.62
+#>  2           2     0.724       0.3       3162.       7968.    1063.      -1.62
+#>  3           3     0.724       0.579     1000        7968.    1063.      -1.62
+#>  4           4     0.724       0.579     3162.       5000     1063.      -1.62
+#>  5           5     0.724       0.579     3162.       7968.     800       -1.62
+#>  6           6     0.726       0.578     3152.       7955.    1066.      -2.30
+#>  7           7     0.723       0.580     3158.       7972.    1062.      -1.62
+#>  8           8     0.724       0.579     3161.       7967.    1064.      -1.62
+#>  9           9     0.724       0.579     3162.       7968.    1063.      -1.62
+#> 10          10     0.724       0.579     3162.       7968.    1063.      -1.62
+#> 11          11     0.724       0.579     3162.       7968.    1063.      -1.62
+#> 12          12     0.724       0.579     3162.       7968.    1063.      -1.62
+#> 13          13     0.724       0.579     3162.       7968.    1063.      -1.62
+#> 14          14     0.724       0.579     3162.       7968.    1063.      -1.62
+#> 15          15     0.724       0.579     3162.       7968.    1063.      -1.62
+#> 16          16     0.724       0.579     3162.       7968.    1063.      -1.62
+#> # ℹ 2 more variables: coef_death <dbl>, HR_int <dbl>
 ```
 
 ### Model Execution, Simple PSA
@@ -1098,27 +1151,27 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
+#> Time to run simulation 1: 0.13s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.14s
+#> Time to run simulation 2: 0.12s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.14s
+#> Time to run simulation 3: 0.13s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.34s
+#> Time to run simulation 4: 0.12s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.12s
+#> Time to run simulation 5: 0.13s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.13s
 #> Simulation number: 7
 #> Time to run simulation 7: 0.12s
 #> Simulation number: 8
-#> Time to run simulation 8: 0.12s
+#> Time to run simulation 8: 0.13s
 #> Simulation number: 9
 #> Time to run simulation 9: 0.12s
 #> Simulation number: 10
-#> Time to run simulation 10: 0.12s
-#> Time to run analysis 1: 1.51s
-#> Total time to run: 1.51s
+#> Time to run simulation 10: 0.13s
+#> Time to run analysis 1: 1.29s
+#> Total time to run: 1.29s
 #> Simulation finalized;
 ```
 
@@ -1132,8 +1185,8 @@ corresponding parameter values.
 data_simulation <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_simulation %>% group_by(simulation) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
-#> # A tibble: 10 × 8
+data_simulation %>% group_by(simulation) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
+#> # A tibble: 10 × 9
 #>    simulation util.sick util.sicker cost.sick cost.sicker cost.int coef_noint
 #>         <int>     <dbl>       <dbl>     <dbl>       <dbl>    <dbl>      <dbl>
 #>  1          1     0.528       0.563     5010.       9352.    1073.      -1.43
@@ -1146,5 +1199,5 @@ data_simulation %>% group_by(simulation) %>% summarise_at(c("util.sick","util.si
 #>  8          8     0.935       0.438     3954.       6225.     813.      -1.35
 #>  9          9     0.886       0.648     3104.       7909.     695.      -1.75
 #> 10         10     0.870       0.576     3952.       6264.    1176.      -1.52
-#> # ℹ 1 more variable: HR_int <dbl>
+#> # ℹ 2 more variables: coef_death <dbl>, HR_int <dbl>
 ```

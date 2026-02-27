@@ -100,6 +100,7 @@ summary_results_sens(res,arm="int")
 #> 51:    int        1               dq_default_undisc
 #> 52:  noint        1               dq_default_undisc
 #>        arm analysis analysis_name          variable
+#>     <char>    <int>        <char>            <fctr>
 #>                                value
 #>                               <char>
 #>  1:          49,922 (49,922; 49,922)
@@ -155,4 +156,5 @@ summary_results_sens(res,arm="int")
 #> 51:                         0 (0; 0)
 #> 52:             0.027 (0.027; 0.027)
 #>                                value
+#>                               <char>
 ```

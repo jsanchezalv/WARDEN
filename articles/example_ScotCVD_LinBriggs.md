@@ -41,23 +41,21 @@ if(!require(readxl)){
     library(readxl)
 }
 #> Loading required package: readxl
+#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+#> logical.return = TRUE, : there is no package called 'readxl'
+#> Installing package into '/home/runner/work/_temp/Library'
+#> (as 'lib' is unspecified)
+#> also installing the dependencies 'rematch', 'hms', 'prettyunits', 'cellranger', 'cpp11', 'progress'
 if(!require(here)){
     install.packages("here")
     library(here)
 }
 #> Loading required package: here
+#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+#> logical.return = TRUE, : there is no package called 'here'
+#> Installing package into '/home/runner/work/_temp/Library'
+#> (as 'lib' is unspecified)
 #> here() starts at /home/runner/work/WARDEN/WARDEN
-
-#Copied directly from original code
-choose_coef_by_sex <- function(sex, coef, list = list_coef) {
-  if (sex == "male") {
-    as.matrix(list[[paste0(coef,"_m")]] %>% keep(is.numeric))
-  } else if (sex == "female"){
-    as.matrix(list[[paste0(coef,"_f")]] %>% keep(is.numeric))
-  } else {
-    stop("The sex argument should be either 'male' or 'female'.")
-  }
-}
 
 # Age in year (continuous)
 # Normal distribution
@@ -373,8 +371,6 @@ disu_sec_vec <- function(time, DU_ALL, DU, B5, B6, nl_RCS_ch) {
     A[s3,] <- matrix(nl_RCS_ch[[3]], ncol = 4, nrow = sum(s3), byrow = TRUE)
   }
   
-  # Now A[,1]=a0, A[,2]=a1, A[,3]=a2, A[,4]=a3
-  
   rcs_du_v(
     t2  = time,
     du_all = DU_ALL,
@@ -654,7 +650,7 @@ evt_react_list <-
                       next_event()$time,
                       by = 1/12,
                       (.time-curtime) * coef_cost_1 +
-                        coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS[["nl_RCS_pre"]][[2-sex]]),
+                        coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS[["nl_RCS_pre"]][[2-sex]]), 
                       discount = drc,
                       vectorized_f = TRUE
                  )
@@ -791,9 +787,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 77.34s
-#> Time to run analysis 1: 77.35s
-#> Total time to run: 77.35s
+#> Time to run simulation 1: 71.54s
+#> Time to run analysis 1: 71.54s
+#> Total time to run: 71.54s
 #> Simulation finalized;
 ```
 
@@ -813,7 +809,7 @@ summary_results_det(results[[1]][[1]], arm ="int", wtp = 20000) #print first sim
 #> qalys               8.86     8.69
 #> dqalys              0.00     0.17
 #> ICER                  NA   905.60
-#> ICUR                  NA  1125.03
+#> ICUR                  NA  1125.02
 #> INMB                  NA  3267.88
 #> costs_undisc    31193.46 31010.77
 #> dcosts_undisc       0.00   182.69
@@ -823,7 +819,7 @@ summary_results_det(results[[1]][[1]], arm ="int", wtp = 20000) #print first sim
 #> dqalys_undisc       0.00     0.28
 #> ICER_undisc           NA   531.00
 #> ICUR_undisc           NA   654.73
-#> INMB_undisc           NA  5397.83
+#> INMB_undisc           NA  5397.84
 #> cost            20205.52 20010.74
 #> dcost               0.00   194.78
 #> cost_undisc     31193.46 31010.77
