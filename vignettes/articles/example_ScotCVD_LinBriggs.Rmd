@@ -735,8 +735,7 @@ cost_ongoing <- "cost"
 ## Model
 
 ### Model Execution
-
-Note that because of the patient-level loop approach, this model is 2x slower to run than the original one (37 seconds vs. 80 seconds).
+Note that because of the patient-level loop approach, this model is 2x slower to run than the original one (37 seconds vs. 77 seconds).
 
 ```{r model_run}
 results <- run_sim(  
