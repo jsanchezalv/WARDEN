@@ -41,20 +41,11 @@ if(!require(readxl)){
     library(readxl)
 }
 #> Loading required package: readxl
-#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-#> logical.return = TRUE, : there is no package called 'readxl'
-#> Installing package into '/home/runner/work/_temp/Library'
-#> (as 'lib' is unspecified)
-#> also installing the dependencies 'rematch', 'hms', 'prettyunits', 'cellranger', 'cpp11', 'progress'
 if(!require(here)){
     install.packages("here")
     library(here)
 }
 #> Loading required package: here
-#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-#> logical.return = TRUE, : there is no package called 'here'
-#> Installing package into '/home/runner/work/_temp/Library'
-#> (as 'lib' is unspecified)
 #> here() starts at /home/runner/work/WARDEN/WARDEN
 
 # Age in year (continuous)
@@ -787,9 +778,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 71.54s
-#> Time to run analysis 1: 71.54s
-#> Total time to run: 71.54s
+#> Time to run simulation 1: 75.13s
+#> Time to run analysis 1: 75.13s
+#> Total time to run: 75.14s
 #> Simulation finalized;
 ```
 
@@ -809,7 +800,7 @@ summary_results_det(results[[1]][[1]], arm ="int", wtp = 20000) #print first sim
 #> qalys               8.86     8.69
 #> dqalys              0.00     0.17
 #> ICER                  NA   905.60
-#> ICUR                  NA  1125.02
+#> ICUR                  NA  1125.03
 #> INMB                  NA  3267.88
 #> costs_undisc    31193.46 31010.77
 #> dcosts_undisc       0.00   182.69
@@ -819,7 +810,7 @@ summary_results_det(results[[1]][[1]], arm ="int", wtp = 20000) #print first sim
 #> dqalys_undisc       0.00     0.28
 #> ICER_undisc           NA   531.00
 #> ICUR_undisc           NA   654.73
-#> INMB_undisc           NA  5397.84
+#> INMB_undisc           NA  5397.83
 #> cost            20205.52 20010.74
 #> dcost               0.00   194.78
 #> cost_undisc     31193.46 31010.77
