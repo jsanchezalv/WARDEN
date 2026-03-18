@@ -1,3 +1,6 @@
+# WARDEN 2.0.2
+*debug mode now works as intended
+
 # WARDEN 2.0.1
 *adj_val now accepts a vectorized_f argument to speed computations in the case of vectorized functions
 

@@ -1,11 +1,8 @@
 ## UPDATE
 
-* This is a major package update. In this version I have:
+* This is a minor package update. In this version I have:
 
-* Converted several core and auxiliary functions from R to C++ using Rcpp.
-* Simplified functions, code, error management and log management.
-* Added new functions to support new functionality.
-* Added unit tests for the new functions.
+* Amended a bug related to the "debug mode".
 
 ## R CMD check results
 

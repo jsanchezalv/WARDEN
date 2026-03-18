@@ -32,6 +32,9 @@ This document runs a discrete event simulation model using simulated individual 
 library(WARDEN)
 library(dplyr)
 library(survival)
+if (!requireNamespace('survminer', quietly = TRUE)) {
+    install.packages('survminer')
+}
 library(survminer)
 library(kableExtra)
 library(tidyr)
