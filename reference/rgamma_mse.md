@@ -34,5 +34,5 @@ A single estimate from the gamma distribution based on given parameters
 
 ``` r
 rgamma_mse(n=1,mean_v=0.8,se=0.2)
-#> [1] 1.050824
+#> [1] 0.7217052
 ```

@@ -12,6 +12,9 @@ generate a model when IPD from a trial is available.
 library(WARDEN)
 library(dplyr)
 library(survival)
+if (!requireNamespace('survminer', quietly = TRUE)) {
+    install.packages('survminer')
+}
 library(survminer)
 library(kableExtra)
 library(tidyr)
@@ -333,9 +336,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.66s
-#> Time to run analysis 1: 0.66s
-#> Total time to run: 0.67s
+#> Time to run simulation 1: 0.61s
+#> Time to run analysis 1: 0.61s
+#> Total time to run: 0.61s
 #> Simulation finalized;
 ```
 

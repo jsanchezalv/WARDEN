@@ -64,7 +64,7 @@ tte and optionally ind_rate.
 rpoisgamma_rcpp(1, rate = 1, obs_time = 1, theta = 1)
 #> $tte
 #> $tte[[1]]
-#> [1] 0.2308122 0.6734768 0.9150946
+#> [1] 0.6935303
 #> 
 #> 
 

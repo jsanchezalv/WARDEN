@@ -84,6 +84,6 @@ shape = theta and scale = rate/theta.
 ``` r
 rpoisgamma(1,rate=1,obs_time=1,theta=1)
 #> [[1]]
-#> [1] 0.6935303
+#> numeric(0)
 #> 
 ```

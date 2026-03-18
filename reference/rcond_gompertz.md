@@ -41,5 +41,5 @@ parameters
 
 ``` r
 rcond_gompertz(1,shape=0.05,rate=0.01,lower_bound = 50)
-#> [1] 1.42697
+#> [1] 1.641438
 ```

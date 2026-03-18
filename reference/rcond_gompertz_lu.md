@@ -52,5 +52,5 @@ parameters
 
 ``` r
 rcond_gompertz_lu(1,shape=0.05,rate=0.01,lower_bound = 50)
-#> [1] 10.10558
+#> [1] 4.052513
 ```

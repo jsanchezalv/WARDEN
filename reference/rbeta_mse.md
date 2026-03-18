@@ -34,5 +34,5 @@ A single estimate from the beta distribution based on given parameters
 
 ``` r
 rbeta_mse(n=1,mean_v=0.8,se=0.2)
-#> [1] 0.8607445
+#> [1] 0.9507129
 ```

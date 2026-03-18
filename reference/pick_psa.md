@@ -53,10 +53,10 @@ dsa_max=list(c(1,2,3,4),3)
 )
 pick_psa(params[["dist"]],params[["n"]],params[["a"]],params[["b"]])
 #> [[1]]
-#> [1]  1.675586 10.981649 49.775128 34.175660
+#> [1]  4.252388  7.641946 18.516493 36.101879
 #> 
 #> [[2]]
-#> [1] 1.43065
+#> [1] 1.938253
 #> 
 
 #It works with functions that require different number of parameters
@@ -73,13 +73,13 @@ params <- list(
 
 pick_psa(params[["dist"]],params[["n"]],params[["a"]],params[["b"]],params[["c"]])
 #> [[1]]
-#> [1]  3.709214  2.529025 25.594074 43.656966
+#> [1]  3.987722 12.061015 38.895964 31.191468
 #> 
 #> [[2]]
-#> [1] 1.273049
+#> [1] 1.2573
 #> 
 #> [[3]]
-#> [1] 1.151862
+#> [1] 3.813397
 #> 
 
 #Can be combined with multiple type of functions and distributions if parameters are well located
