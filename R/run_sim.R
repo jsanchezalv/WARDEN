@@ -188,7 +188,8 @@ run_sim <- function(arm_list=c("int","noint"),
   
   on.exit({
     do.call(RNGkind, as.list(rng_kind_store))
-    if (debug) export_log(log_sink$entries,paste0("log_model_",format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"),".txt"))
+    if (debug) export_log(lapply(log_sink$entries, transform_debug),
+                          paste0("log_model_", format(Sys.time(), "%Y_%m_%d_%Hh_%mm_%Ss"), ".txt"))
     ctx <- .warden_ctx$last
     
     message(

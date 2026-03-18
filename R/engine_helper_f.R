@@ -393,9 +393,11 @@ interval_out <- function(output_sim, element,round_digit=2) {
 }
 
 # ---- Shared log sink (append-only; survives errors) ----
-log_add <- function(entry) {
-  sink <- get0("log_sink",parent.frame(), inherits = TRUE, ifnotfound = NULL)
-  if (!is.null(sink)) sink$entries <- c(sink$entries, entry)
+log_add <- function(entry, log_sink = NULL) {
+  if (is.null(log_sink)) {
+    log_sink <- get0("log_sink", parent.frame(), inherits = TRUE, ifnotfound = NULL)
+  }
+  if (!is.null(log_sink)) log_sink$entries <- c(log_sink$entries, entry)
   invisible(NULL)
 }
 
@@ -462,7 +464,6 @@ on_error_check <- function(expr, continue_on_error = NULL){
 #' consider a snapshot-and-diff approach instead
 #' 
 #' @keywords internal
-#' 
 with_write_flags_lang <- function(expr_lang, tracked, env, flag_value = 1L) {
   store <- new.env(parent = emptyenv())
   installed <- character(0)

@@ -106,7 +106,7 @@ run_engine <- function(arm_list,
         )
         
         temp_log_pt <- c(temp_log_pt,dump_info)
-        log_add(dump_info)
+        log_add(dump_info, input_list$log_sink)
         
       }
     }
@@ -152,7 +152,7 @@ run_engine <- function(arm_list,
           )
           
           temp_log_pt <- c(temp_log_pt,dump_info)
-          log_add(dump_info)
+          log_add(dump_info, input_list$log_sink)
           
         }
       }
@@ -195,7 +195,7 @@ run_engine <- function(arm_list,
                                      "; Patient: ", input_list_arm$i,
                                      "; Initialize Time to Events for Patient-Arm")
           temp_log_pt <- c(temp_log_pt, dump_info)
-          log_add(dump_info)
+          log_add(dump_info, input_list$log_sink)
           
         }
         
@@ -264,10 +264,9 @@ run_engine <- function(arm_list,
               
               if(debug) {
                 if (!is.null(input_list_arm$log_list)) temp_log_pt <- c(temp_log_pt,input_list_arm$log_list)
-                if (!is.null(input_list_arm$log_list)) log_add(input_list_arm$log_list)
+                if (!is.null(input_list_arm$log_list)) log_add(input_list_arm$log_list, input_list$log_sink)
               }
       }
-      
     }
 
     patdata[[i]] <- this_patient
