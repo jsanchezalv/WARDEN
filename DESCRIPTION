@@ -33,7 +33,6 @@ Suggests:
     rmarkdown,
     kableExtra,
     testthat (>= 3.0.0),
-    survminer,
     survival
 Imports: 
     purrr,
