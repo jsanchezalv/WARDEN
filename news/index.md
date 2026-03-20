@@ -2,6 +2,8 @@
 
 ## WARDEN 2.0.2
 
+CRAN release: 2026-03-18
+
 \*debug mode now works as intended
 
 ## WARDEN 2.0.1
