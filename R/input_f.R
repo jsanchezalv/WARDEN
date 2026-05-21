@@ -420,9 +420,28 @@ add_item <- function(.data = NULL, ..., input) {
     }
   }
   
-  # 1) Start from .data if provided
-  block_elems <- as_block_list(.data)
+  # 1) Start from .data if provided.
+  # Use mc$.data (unevaluated) to decide how to treat the argument:
+  #   - NULL/missing            → start a fresh {} block
+  #   - symbol (variable name)  → evaluate: it holds a prior block (pipe LHS)
+  #   - add_item(...) call       → evaluate: chained pipe (nested add_item)
+  #   - { } literal block       → use as-is as the starting block
+  #   - anything else           → capture unevaluated as the first statement
+  #     (e.g. pick_val_v(), if(), which reference engine-scope vars not yet defined)
+  data_expr <- mc$.data
   built <- list()
+
+  if (is.null(data_expr)) {
+    block_elems <- list(as.name("{"))
+  } else if (is.call(data_expr) && identical(data_expr[[1L]], as.name("{"))) {
+    block_elems <- as.list(data_expr)
+  } else if (is.symbol(data_expr) ||
+             (is.call(data_expr) && as.character(data_expr[[1L]]) == "add_item")) {
+    block_elems <- as_block_list(.data)
+  } else {
+    block_elems <- list(as.name("{"))
+    built <- list(data_expr)
+  }
   
   splice_or_keep <- function(expr) {
     if (is.call(expr) && identical(expr[[1L]], as.name("{"))) {

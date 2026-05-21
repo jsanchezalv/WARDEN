@@ -60,7 +60,7 @@ util.data <- data.frame( name = c("util1" ,"util2" ,"util3" ,"util4"),
 cost.data <- data.frame( name = c("cost1" ,"cost2" ,"cost3" ,"cost4","cost_int"),
                          value = c(1000,3000,6000,0,1000),
                          stringsAsFactors = FALSE
-) %>%
+) |>
   mutate(se= value/5)
 
 ```
@@ -76,7 +76,7 @@ It is important to note that the QALYs and Costs used are of length 1. If they w
 
 ```{r input_delayed}
 #Put objects here that do not change on any patient or intervention loop, for example costs and utilities
-common_all_inputs <- add_item(max_n_cycles = 30) %>%
+common_all_inputs <- add_item(max_n_cycles = 30) |>
   add_item( #utilities
      pick_val_v(base        = util.data$value,
                 psa         = pick_psa(rep("rbeta_mse",nrow(util.data)),rep(1,nrow(util.data)),util.data$value,util.data$se),
@@ -86,7 +86,7 @@ common_all_inputs <- add_item(max_n_cycles = 30) %>%
                 indicator   = rep(0, nrow(util.data)),
                 names_out   = util.data[,"name"]
                 )
-     ) %>%
+     ) |>
   add_item( #costs
     pick_val_v(base         = cost.data$value,
                 psa         = pick_psa(rep("rgamma_mse",nrow(cost.data)),rep(1,nrow(cost.data)),cost.data$value,cost.data$se),
@@ -160,7 +160,7 @@ evt_react_list <-
   add_reactevt(name_evt = "start",
                input = {
                    new_event(list("cycle" = curtime + 1))
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "cycle",
                input = {
 
@@ -246,21 +246,21 @@ psa_ipd <- bind_rows(map(results[[1]], "merged_df"))
 traces <- data.table::rbindlist(results[[1]][[1]]$extradata_raw)
 
 trace_t <- cbind(traces, 
-psa_ipd[rep(seq(1, nrow(psa_ipd)), each = 4)]) %>%
+psa_ipd[rep(seq(1, nrow(psa_ipd)), each = 4)]) |>
   mutate(state = rep(seq(1:4),62))
 
-trace_t[1:10,] %>%
-  kable() %>%
+trace_t[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-life_years <-  trace_t  %>% 
-  group_by(arm) %>%
-  filter(state!=4) %>% #erase death state for LY computation
-  mutate(ly_final = lys*lag(trace,3L)) %>% #multiply by previous trace
+life_years <-  trace_t  |> 
+  group_by(arm) |>
+  filter(state!=4) |> #erase death state for LY computation
+  mutate(ly_final = lys*lag(trace,3L)) |> #multiply by previous trace
 summarise(ly_final = sum(ly_final,na.rm = TRUE)) #get final discounted life years
 
-life_years %>%
-  kable() %>%
+life_years |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 results[[1]][[1]][["total_lys"]][["int"]] <- life_years$ly_final[life_years$arm=="int"]
@@ -274,8 +274,8 @@ We can also check each of the cycles
 
 ```{r post-processing_analysis,echo=FALSE, message=FALSE}
 
-psa_ipd %>%
-  kable() %>%
+psa_ipd |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```

@@ -68,8 +68,8 @@ l_inputs <- list(parameter_name = list("util.sick","util.sicker","cost.sick","co
                  psa_indicators = as.list(c(rep(1,4),rep(0,3)))
                  )
 
-as.data.frame(do.call(cbind,lapply(l_inputs,unlist)))  %>%
-  kable() %>%
+as.data.frame(do.call(cbind,lapply(l_inputs,unlist)))  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -202,12 +202,12 @@ rm(sens, sens_name_used, sensitivity_bool, psa_bool) #remove global objects that
 
 i_sensitivity <-add_item(
   iterator_sensitivity = sens_iterator(sens,n_sensitivity)
-  ) %>%add_item(
+  ) |>add_item(
             indicators = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){  create_indicators(iterator_sensitivity,n_sensitivity*length(sensitivity_names),rep(1,length(l_inputs[[1]]))) #only for DSA we use this approach
               }else{rep(1,length(l_inputs[[1]]))}
                               ) 
 
-i_simple <- add_item() %>%
+i_simple <- add_item() |>
   add_item(
     pick_val_v(
       base = l_inputs[["base_value"]],
@@ -237,7 +237,7 @@ init_event_list <-
 
 evt_react_list <-
   add_reactevt(name_evt = "a1",
-               input = {})  %>%
+               input = {})  |>
   add_reactevt(name_evt = "b1",
                input = {
                  q_default = 0
@@ -262,8 +262,8 @@ results <- run_sim(
   ipd = 1
 )
 
-summary_results_sim(results[[1]])  %>%
-  kable() %>%
+summary_results_sim(results[[1]])  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -288,8 +288,8 @@ results <- run_sim(
   n_sensitivity = 1                   #this argument can also be removed since it's not used
 )
 
-summary_results_sim(results[[1]])  %>%
-  kable() %>%
+summary_results_sim(results[[1]])  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -318,8 +318,8 @@ results <- run_sim(
 summary_results_sens(results)
 
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)  %>%
-  kable() %>%
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
@@ -349,8 +349,8 @@ summary_results_sens(results)
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)  %>%
-  kable() %>%
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -385,7 +385,7 @@ l_inputs_pat <- list(parameter_name = list("age","sex"),
 
 i_sensitivity <- add_item(
   iterator_sensitivity = sens_iterator(sens,n_sensitivity) #resets back to 1 if it goes over n_sensitivity
-  ) %>%
+  ) |>
   add_item(
             indicators = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){
               create_indicators(iterator_sensitivity, 
@@ -394,7 +394,7 @@ i_sensitivity <- add_item(
             }else{
                 rep(1,length(l_inputs[[1]]))
               }
-          ) %>%
+          ) |>
   add_item(
             indicators_pat = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){
               create_indicators(iterator_sensitivity,
@@ -408,7 +408,7 @@ i_sensitivity <- add_item(
 
 
   
-i_pat <- add_item() %>%
+i_pat <- add_item() |>
   add_item(
     pick_val_v(
       base = l_inputs_pat[["base_value"]],
@@ -453,8 +453,8 @@ summary_results_sens(results)
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean)  %>%
-  kable() %>%
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean)  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -499,7 +499,7 @@ i_sensitivity <- add_item(
   ) 
 
 
-i_simple <- add_item() %>%
+i_simple <- add_item() |>
   add_item(
     pick_val_v(
       base = l_inputs[["base_value"]],
@@ -521,7 +521,7 @@ i_simple <- add_item() %>%
       )
     )
   
-i_pat <- add_item() %>%
+i_pat <- add_item() |>
   add_item(
     pick_val_v(
       base = l_inputs_pat[["base_value"]],
@@ -570,8 +570,8 @@ summary_results_sens(results)
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean)  %>%
-  kable() %>%
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean)  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -636,9 +636,9 @@ v_state_avg <- tibble( v_state =
     )
   )
 
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean) %>%
-  bind_cols(v_state_avg)  %>%
-  kable() %>%
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean) |>
+  bind_cols(v_state_avg)  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ``` 
 

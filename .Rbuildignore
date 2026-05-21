@@ -14,6 +14,7 @@
 ^LICENSE\.md$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
+^\.claude$
 ^src/.*\.o$
 ^src/.*\.dll$
 ^src/.*\.so$

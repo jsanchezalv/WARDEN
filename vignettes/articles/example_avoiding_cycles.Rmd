@@ -97,7 +97,7 @@ evt_react_list <-
                  new_rate <- bs_rate
                  q_default <- u_bs * u_age[min(100,floor(curtime + bs_age))]
                  cost_trt <- cost_trt_ins
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "cycle",
                input = {
                  # if(curtime >= 100 - bs_age){
@@ -120,7 +120,7 @@ evt_react_list <-
               ttdeath <- qcond_exp(luck, rate = new_rate) + curtime
               modify_event(c(death = max(curtime, ttdeath)))
 
-               })%>%
+               })|>
   add_reactevt(name_evt = "death",
                input = {
                  curtime <- Inf
@@ -154,8 +154,8 @@ summary_results_det(results[[1]][[1]])
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -226,7 +226,7 @@ evt_react_list <-
                    discount = drq
                    )
                  q_default <- u_bs * adj_factor
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "death",
                input = {
                  curtime <- Inf
@@ -260,8 +260,8 @@ summary_results_det(results2[[1]][[1]])
 
 psa_ipd2 <- bind_rows(map(results2[[1]], "merged_df")) 
 
-psa_ipd2[1:10,] %>%
-  kable() %>%
+psa_ipd2[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 

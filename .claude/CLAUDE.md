@@ -4,28 +4,22 @@
 
 ```
 # To run code
-devtools::load_all()
+Files/R/R-4.2.3/bin/Rscript.exe -e "devtools::load_all(); code"
 
 # To run all tests
-devtools::test()
+Files/R/R-4.2.3/bin/Rscript.exe -e "devtools::test()"
 
 # To run all tests for files starting with {name}
-devtools::test(filter = '^{name}')
-
-# To run all tests for R/{name}.R
-devtools::test_active_file('R/{name}.R')
-
-# To run a single test "blah" for R/{name}.R
-devtools::test_active_file('R/{name}.R', desc = 'blah')
+Files/R/R-4.2.3/bin/Rscript.exe -e "devtools::test(filter = '^{name}')"
 
 # To redocument the package
-devtools::document()
+Files/R/R-4.2.3/bin/Rscript.exe -e "devtools::document()"
 
 # To check pkgdown documentation
-pkgdown::check_pkgdown()
+Files/R/R-4.2.3/bin/Rscript.exe -e "pkgdown::check_pkgdown()"
 
 # To check the package with R CMD check
-devtools::check()
+Files/R/R-4.2.3/bin/Rscript.exe -e "devtools::check()"
 
 ```
 

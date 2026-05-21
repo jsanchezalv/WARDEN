@@ -421,7 +421,6 @@ extract_psa_result <- function(x, element) {
 #' @return A data frame with the CEAC results
 #' 
 #' @importFrom tidyr gather
-#' @importFrom magrittr %>%
 #' 
 #' @export
 #'
@@ -461,20 +460,20 @@ ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
      
      names(nmb_i) <- format(wtp, scientific=F)
      nmb_i$iteration <-  1:nrow(nmb_i)
-     nmb_i <- nmb_i %>% gather(key="wtp",value="nmb",-iteration)
+     nmb_i <- nmb_i |> gather(key="wtp",value="nmb",-iteration)
      nmb_i$comparator <- comparator
      nmb_i$wtp <- as.numeric(nmb_i$wtp)
 
     nmb <- rbind(nmb,nmb_i)
   }
 
-  nmb <- nmb %>%
-    dplyr::group_by(wtp,iteration) %>%
+  nmb <- nmb |>
+    dplyr::group_by(wtp,iteration) |>
     dplyr::mutate(best_nmb= ifelse(max(nmb)>0,comparator[nmb==max(nmb)],NA))
 
-  ceac <- nmb %>%
-    dplyr::group_by(wtp,comparator) %>%
-    dplyr::summarise(prob_best= sum(best_nmb==comparator)/dplyr::n()) %>%
+  ceac <- nmb |>
+    dplyr::group_by(wtp,comparator) |>
+    dplyr::summarise(prob_best= sum(best_nmb==comparator)/dplyr::n()) |>
     dplyr::mutate(prob_best = ifelse(is.na(prob_best),0,prob_best))
 
 
@@ -494,7 +493,6 @@ ceac_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 #' @return A data frame with the EVPI results
 #' 
 #' @importFrom tidyr gather
-#' @importFrom magrittr %>%
 #' 
 #' @export
 #'
@@ -534,23 +532,23 @@ evpi_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
     
     names(nmb_i) <- format(wtp, scientific=F)
     nmb_i$iteration <-  1:nrow(nmb_i)
-    nmb_i <- nmb_i %>% gather(key="wtp",value="nmb",-iteration)
+    nmb_i <- nmb_i |> gather(key="wtp",value="nmb",-iteration)
     nmb_i$comparator <- comparator
     nmb_i$wtp <- as.numeric(nmb_i$wtp)
 
     nmb <- rbind(nmb,nmb_i)
   }
 
-  nmb <-nmb %>%
-    dplyr::group_by(wtp,comparator) %>%
-    dplyr::mutate(mean_nmb=mean(nmb)) %>%
-    dplyr::group_by(wtp,iteration) %>%
-    dplyr::mutate(max_nmb=max(nmb)) %>%
-    dplyr::group_by(wtp) %>%
+  nmb <-nmb |>
+    dplyr::group_by(wtp,comparator) |>
+    dplyr::mutate(mean_nmb=mean(nmb)) |>
+    dplyr::group_by(wtp,iteration) |>
+    dplyr::mutate(max_nmb=max(nmb)) |>
+    dplyr::group_by(wtp) |>
     dplyr::mutate(max_mean_nmb = max(mean_nmb),
-           mean_max_nmb = mean(max_nmb)) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(evpi = mean_max_nmb - max_mean_nmb) %>%
+           mean_max_nmb = mean(max_nmb)) |>
+    dplyr::ungroup() |>
+    dplyr::mutate(evpi = mean_max_nmb - max_mean_nmb) |>
     dplyr::select(wtp,evpi)
 
 

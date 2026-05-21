@@ -129,13 +129,13 @@ options(tibble.print_max = 50)
 
 ```{r results_premade, echo = FALSE}
 
-#  merged_data <- rbind(merged_ipd_results %>% mutate(type = "WARDEN"),
-#                       merged_ipd_results2 %>% mutate(type = "WARDEN (reworked)"),
-#                       merged_ipd_results3 %>% mutate(type = "WARDEN (reworked, seed = 2)"),
-# merged_ipd_results4 %>% mutate(type = "WARDEN (reworked, seed = 3)"),
-#                       original_results %>% mutate(type = "simmer"),
-#                       original_results2 %>% mutate(type = "simmer (seed =2)"),
-# original_data3 %>% mutate(type = "simmer (seed =3)"))
+#  merged_data <- rbind(merged_ipd_results |> mutate(type = "WARDEN"),
+#                       merged_ipd_results2 |> mutate(type = "WARDEN (reworked)"),
+#                       merged_ipd_results3 |> mutate(type = "WARDEN (reworked, seed = 2)"),
+# merged_ipd_results4 |> mutate(type = "WARDEN (reworked, seed = 3)"),
+#                       original_results |> mutate(type = "simmer"),
+#                       original_results2 |> mutate(type = "simmer (seed =2)"),
+# original_data3 |> mutate(type = "simmer (seed =3)"))
 
 merged_data <- structure(list(pat_id = c(1, 501, 1001, 1501, 2001, 2501, 3001, 
 3501, 4001, 4501, 5001, 5501, 6001, 6501, 7001, 7501, 8001, 8501, 
@@ -1525,7 +1525,7 @@ evt_react_list <-
                      modify_event(c(monitor_cycle = t_adjuvant_cycle + curtime))
                    }
                    
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "monitor_cycle",
                input = {
                  MonitorCycles <- MonitorCycles + 1
@@ -1535,7 +1535,7 @@ evt_react_list <-
                  if(MonitorCycles<n_max_monitor_cycles){
                   new_event(c(monitor_cycle = curtime + t_monitor_cycle))
                  }
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "advanced",
                input = {
                  modify_event(c(trt_cycle = Inf, monitor_cycle = Inf)) #remove the trt_cycle and monitor_cycle event
@@ -1560,7 +1560,7 @@ evt_react_list <-
                 q_total <- u_advanced
                 cost_advanced <- c_advanced
                  
-               })%>%
+               })|>
   add_reactevt(name_evt = "death",
                input = {
                  curtime   <- Inf #exits simulation, no need to remove other evts
@@ -1612,8 +1612,8 @@ summary_results_det(results[[1]][[1]], arm ="two") #print first simulation
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -1623,17 +1623,17 @@ psa_ipd[1:10,] %>%
 ```{r post-processing_analysis,echo=FALSE, message=FALSE, include = FALSE}
 
 # 
-# merged_ipd <- psa_ipd  %>%
-#   group_by(arm) %>%
+# merged_ipd <- psa_ipd  |>
+#   group_by(arm) |>
 #   mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
-#          cumul_total_costs = cumsum(total_costs)/pat_id) %>%
-#   transmute(pat_id, arm, cumul_total_qalys, cumul_total_costs) %>%
-#   tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
+#          cumul_total_costs = cumsum(total_costs)/pat_id) |>
+#   transmute(pat_id, arm, cumul_total_qalys, cumul_total_costs) |>
+#   tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) |>
 #   mutate(inc_costs = cumul_total_costs_two - cumul_total_costs_one,
 #          inc_qalys = cumul_total_qalys_two - cumul_total_qalys_one,
 #          ICER = inc_costs/ inc_qalys)
 
-# merged_ipd_results <- merged_ipd %>% select(pat_id,inc_costs,inc_qalys,ICER) %>%  slice(seq(1, n(), by = 500))
+# merged_ipd_results <- merged_ipd |> select(pat_id,inc_costs,inc_qalys,ICER) |>  slice(seq(1, n(), by = 500))
 
 ```
 
@@ -1729,7 +1729,7 @@ evt_react_list <-
                    q_total <- u_adjuvant - prop_tox*u_dis_tox
   
                    
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "monitoring",
                input = {
                  cost_adj <- 0
@@ -1740,7 +1740,7 @@ evt_react_list <-
 
                  q_total <- u_diseasefree
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "advanced",
                input = {
                  
@@ -1768,7 +1768,7 @@ evt_react_list <-
                  
                  cost_advanced <- c_advanced
                  q_total <- u_advanced
-               })%>%
+               })|>
   add_reactevt(name_evt = "death",
                input = {
                  curtime <- Inf #exits simulation, no need to remove other evts
@@ -1811,26 +1811,26 @@ summary_results_det(results2[[1]][[1]], arm ="two") #print first simulation
 
 psa_ipd2 <- bind_rows(map(results2[[1]], "merged_df")) 
 
-psa_ipd2[1:10,] %>%
-  kable() %>%
+psa_ipd2[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
-ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")) 
+ggplot(merged_data |> mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")) 
        , aes(x=pat_id,y=ICER, group = type, col = linetype))+
    geom_line(linewidth=1.1) +
   theme_bw() +
   ylim(45000,52000)+
     theme(legend.position="bottom")
 
-ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
+ggplot(merged_data |> mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
        aes(x=pat_id,y=inc_costs, group = type, col = linetype))+
     geom_line(linewidth=1.1) +
   theme_bw()  +
   ylim(92500,94500)+
     theme(legend.position="bottom")
 
-ggplot(merged_data %>% mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
+ggplot(merged_data |> mutate(linetype = ifelse(grepl("simmer",type),"simmer","WARDEN")),
        aes(x=pat_id,y=inc_qalys, group = type, col = linetype))+
   geom_line(linewidth=1.1) +
   theme_bw() +

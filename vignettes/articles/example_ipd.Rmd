@@ -60,10 +60,10 @@ Parametric survival models are fit to the dummy OS and TTP IPD. We are using the
 tte.df <- WARDEN::tte.df
 
 #Change data frame to wide format
-tte.df <- tte.df %>% select(-PARAM) %>% pivot_wider(names_from = PARAMCD, values_from = c(AVAL,CNSR)) 
+tte.df <- tte.df |> select(-PARAM) |> pivot_wider(names_from = PARAMCD, values_from = c(AVAL,CNSR)) 
 
 #Derive Time to Progression Variable from OS and PFS
-tte.df <- tte.df %>% mutate(
+tte.df <- tte.df |> mutate(
   AVAL_TTP = AVAL_PFS,
   CNSR_TTP = ifelse(AVAL_PFS == AVAL_OS & CNSR_PFS==0 & CNSR_OS==0,1,CNSR_PFS),
   Event_OS = 1-CNSR_OS,
@@ -72,7 +72,7 @@ tte.df <- tte.df %>% mutate(
   )
 
 #Add baseline characteristics (sex and age) to time to event data
-IPD <- tte.df %>% mutate(
+IPD <- tte.df |> mutate(
   SEX = rbinom(500,1,0.5),
   AGE = rnorm(500,60,8)
 )
@@ -204,13 +204,13 @@ evt_react_list <-
                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}
                  c_default_inst = cost.admin.oral
                                   
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "TxDisc",
                input = {
                  q_default = ifelse(fl.prog == 0, util.PFS, util.PPS)
                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}
                  fl.ontx = 0
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "Progression",
                input = {
                  q_default = ifelse(fl.prog == 0, util.PFS, util.PPS)
@@ -218,13 +218,13 @@ evt_react_list <-
                  pfs.time=curtime
                  fl.prog= 1
                  if(arm=="int"){modify_event(c("TxDisc" = curtime))} #Trigger treatment discontinuation at progression
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "Death",
                input = {
                  q_default = ifelse(fl.prog == 0, util.PFS, util.PPS)
                  c_default = ifelse(fl.prog == 0,cost.dm.PFS,cost.dm.PPS) + if(arm=="int"){(cost.drug.int + cost.admin.SC * 12 + cost.ae.int) * fl.ontx}else{cost.drug.ref + cost.ae.ref}
                  curtime = Inf
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "PAE",
                input = {
                  fl.PAE = 1
@@ -303,8 +303,8 @@ summary_results_det(results[[1]][[1]]) #will print the last simulation!
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -314,8 +314,8 @@ We can also check what has been the absolute number of events per strategy.
 
 ```{r post-processing_analysis,echo=FALSE, message=FALSE}
 
-psa_ipd %>% group_by(arm,evtname) %>% summarise(n=n()) %>% arrange(arm,-n)%>%
-  kable() %>%
+psa_ipd |> group_by(arm,evtname) |> summarise(n=n()) |> arrange(arm,-n)|>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -326,7 +326,7 @@ The simulated progression-free survival curve is lower than the observed due to 
 
 ```{r post-processing_plots1, fig.width=7, fig.height=4, fig.align = 'center', warning = FALSE}
 #Overall survival
-KM.death <- psa_ipd %>% filter(evtname=="Death") %>% mutate(Event = 1)
+KM.death <- psa_ipd |> filter(evtname=="Death") |> mutate(Event = 1)
 
 sim.km.OS <- survfit(Surv(evttime, Event) ~ arm, data = KM.death)
 
@@ -344,7 +344,7 @@ ggsurvplot(km.comb, combine = TRUE,
 
 #Progression-free survival
 km.est.PFS <- survfit(Surv(AVAL_PFS/365.25, Event_PFS) ~ ARMCD, data = IPD)
-KM.PFS.DES <- psa_ipd %>% filter(evtname=="Death") %>% mutate(evttime = ifelse(is.na(pfs.time),evttime,pfs.time),
+KM.PFS.DES <- psa_ipd |> filter(evtname=="Death") |> mutate(evttime = ifelse(is.na(pfs.time),evttime,pfs.time),
                                                           Event = 1)
 
 sim.km.PFS <- survfit(Surv(evttime, Event) ~ arm, data = KM.PFS.DES)

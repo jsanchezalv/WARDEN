@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Rscript -e \"devtools::document\\(\\)\")",
+      "Bash(where Rscript)",
+      "Bash(where R)",
+      "Read(//c/Program Files/R/**)",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::document\\(\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::test\\(\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::check\\(\\)\")",
+      "Bash(Files/R/R-4.2.3/bin/Rscript.exe -e \"devtools::test\\(filter = '^test-input_f'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::test\\(filter = '^test-input_f'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::test\\(filter = 'input_f'\\)\")"
+    ]
+  }
+}

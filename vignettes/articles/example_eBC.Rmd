@@ -62,7 +62,7 @@ df_cost <- data.frame( name = c("cost.idfs.tx" ,"cost.recurrence" ,"cost.mbc.tx"
                          value = c(40000,5000,3000,10000,30000,
                                    10000,20000,30000,20000,1000),
                          stringsAsFactors = FALSE
-) %>%
+) |>
   mutate(se= value/5)
 
 ```
@@ -202,7 +202,7 @@ init_event_list <-
     os <- min(os.mbc,os.early,nat.os.s)
     
 
-  }) %>%  add_tte(arm="noint",
+  }) |>  add_tte(arm="noint",
                        evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc"),
                        other_inp = c("os.early","os.mbc"),                       
                        input={  #reference strategy
@@ -293,7 +293,7 @@ Finally, note that there could be two different ways of accumulating continuous 
 
 evt_react_list <-
   add_reactevt(name_evt = "start",
-               input = { }) %>%
+               input = { }) |>
   add_reactevt(name_evt = "ttot",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -306,7 +306,7 @@ evt_react_list <-
                  c_default <- cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline
                  fl.mbcs.ontx <-  0 #Flag that patient is now off-treatment
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "ttot.beva",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -319,7 +319,7 @@ evt_react_list <-
                  c_default <- cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline
                 fl.tx.beva <- 0 #Flag that patient is now off-treatment
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "progression.mbc",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -335,7 +335,7 @@ evt_react_list <-
                  
                  new_event(c("2ndline_mbc" = curtime + qexp(rnd_stream_mbc$draw_n(), 0.08)/12))
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "idfs",
                input = {
                  q_default = if (fl.idfs==1) {
@@ -348,7 +348,7 @@ evt_react_list <-
                  c_default <- if(arm=="noint"){cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs}else{(cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs}
                  fl.idfs <- 0
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "ttot.early",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -368,7 +368,7 @@ evt_react_list <-
                      new_event(c("ae" = curtime + 0.0001))
                      n_ae <- n_ae - 1
                  }
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "remission",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -381,7 +381,7 @@ evt_react_list <-
                  c_default <- cost.recurrence * fl.recurrence
                  fl.remission <- 1
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "recurrence",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -397,7 +397,7 @@ evt_react_list <-
                  fl.mbcs <- 1
                  fl.mbcs.progression.mbc <- 1 #ad-hoc for plot
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "start.early.mbc",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -411,7 +411,7 @@ evt_react_list <-
                  fl.mbcs <- 1
                  fl.mbcs.progression.mbc <- 1
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "2ndline_mbc",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -430,7 +430,7 @@ evt_react_list <-
                      new_event(c("ae" = curtime + 0.0001))
                      n_ae <- n_ae - 1
                  }
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "ae",
                input = {
                  if (n_ae>0) {
@@ -449,7 +449,7 @@ evt_react_list <-
                  c_ae <- cost.ae
                  
                  modify_event(c("os" =max(get_event("os") - 0.125,curtime +0.0001) ))#each AE brings forward death by 1.5 months
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "os",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -536,8 +536,8 @@ summary_results_sim(results[[1]])
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -547,8 +547,8 @@ We can also check what has been the absolute number of events per strategy.
 
 ```{r post-processing_analysis,echo=FALSE, message=FALSE}
 
-psa_ipd %>% group_by(arm,evtname) %>% summarise(n=n()) %>% arrange(arm,-n)%>%
-  kable() %>%
+psa_ipd |> group_by(arm,evtname) |> summarise(n=n()) |> arrange(arm,-n)|>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -559,10 +559,10 @@ We now use the data output to plot the histograms/densities of the simulation.
 
 ```{r post-processing_plots1, fig.width=7, fig.height=4, fig.align = 'center'}
 
-data_plot <- results[[1]][[1]]$merged_df %>%
-  filter(evtname != "start") %>%
-  group_by(arm,evtname,simulation) %>%
-  mutate(median = median(evttime)) %>%
+data_plot <- results[[1]][[1]]$merged_df |>
+  filter(evtname != "start") |>
+  group_by(arm,evtname,simulation) |>
+  mutate(median = median(evttime)) |>
   ungroup()
 
 #Density
@@ -587,7 +587,7 @@ data_qaly_cost<- psa_ipd[,.SD[1],by=.(pat_id,arm,simulation)][,.(arm,qaly=total_
 data_qaly_cost[,ps_id:=paste(pat_id,simulation,sep="_")]
 
 
-mean_data_qaly_cost <- data_qaly_cost %>% group_by(arm) %>% summarise(across(where(is.numeric),mean))
+mean_data_qaly_cost <- data_qaly_cost |> group_by(arm) |> summarise(across(where(is.numeric),mean))
 
 ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = arm)) + 
   geom_point(alpha=0.15,shape = 21) +

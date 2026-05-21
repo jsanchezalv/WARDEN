@@ -130,7 +130,7 @@ j <- which(list_coef$first_event_coef_m$covariate %in% "TC")
 list_coef$first_event_coef_f[j, c("first_event_nonfatal_CBVD", "first_event_nonCVD_death")] <- 0
 
 
-list_coef <- lapply(list_coef, function(x) x %>% keep(is.numeric) %>% as.matrix())
+list_coef <- lapply(list_coef, function(x) x |> keep(is.numeric) |> as.matrix())
 
 list_u_norms <-
   list(
@@ -644,7 +644,7 @@ evt_react_list <-
                       vectorized_f = TRUE
                  )
                  q_total <- adj_factor - disu * as.integer(arm=="int")
-               }) %>% 
+               }) |> 
   add_reactevt(name_evt = "event_1",
                input = {
               if(status_1>2){ #if death stop
@@ -713,7 +713,7 @@ evt_react_list <-
                 q_total <- adj_factor - v_du[status_1] 
               }
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "event_2", #which is death
                input = {
                  curtime <- Inf
@@ -765,8 +765,8 @@ summary_results_det(results[[1]][[1]], arm ="int", wtp = 20000) #print first sim
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -776,17 +776,17 @@ We can see that the ICER stabilizes pretty quickly, with the ICUR changing in ab
 
 ```{r post-processing_analysis}
 
-merged_ipd <- psa_ipd  %>%
-  group_by(arm) %>%
+merged_ipd <- psa_ipd  |>
+  group_by(arm) |>
   mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
-         cumul_total_costs = cumsum(total_costs)/pat_id) %>%
-  transmute(pat_id, arm, cumul_total_qalys, cumul_total_costs) %>%
-  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
+         cumul_total_costs = cumsum(total_costs)/pat_id) |>
+  transmute(pat_id, arm, cumul_total_qalys, cumul_total_costs) |>
+  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) |>
   mutate(inc_costs = cumul_total_costs_int - cumul_total_costs_comp,
          inc_qalys = cumul_total_qalys_int - cumul_total_qalys_comp,
          ICUR = inc_costs/ inc_qalys)
 
-merged_ipd_results <- merged_ipd %>% select(pat_id,inc_costs,inc_qalys,ICUR) %>%  slice(seq(1, n(), by = 50))
+merged_ipd_results <- merged_ipd |> select(pat_id,inc_costs,inc_qalys,ICUR) |>  slice(seq(1, n(), by = 50))
 
 
 ggplot(merged_ipd_results, aes(x=pat_id,y=ICUR))+

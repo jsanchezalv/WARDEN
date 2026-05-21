@@ -123,7 +123,7 @@ evt_react_list <-
                  value_accum <- shared_accumulator$value()
                  beds_free <- beds$n_free()
                  time_in_queue <- NA
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "sicker",
                input = {
                  success_blocking_bed <- beds$attempt_block()
@@ -138,7 +138,7 @@ evt_react_list <-
                  q_default <- util.sicker
                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
                  fl.sick   <- 0 
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "death",
                input = {
                  beds$attempt_free() #remove from using or from the queue
@@ -210,8 +210,8 @@ summary_results_det(results[[1]][[1]]) #print first simulation
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -227,12 +227,12 @@ ggplot(psa_ipd,aes(x=evttime,y=beds_free, col = arm)) +
   scale_x_continuous(expand = c(0, 0)) +
   theme_bw()
 
-ggplot(psa_ipd %>% group_by(arm,pat_id) %>% summarise(had_to_queue=factor(max(had_to_queue))),aes(x=arm, fill = had_to_queue)) +
+ggplot(psa_ipd |> group_by(arm,pat_id) |> summarise(had_to_queue=factor(max(had_to_queue))),aes(x=arm, fill = had_to_queue)) +
   geom_bar(position="fill")+
     scale_y_continuous(labels = scales::percent) +
   theme_bw()
 
-ggplot(psa_ipd %>% group_by(arm,pat_id) %>% summarise(time_in_queue=mean(time_in_queue,na.rm=TRUE)),
+ggplot(psa_ipd |> group_by(arm,pat_id) |> summarise(time_in_queue=mean(time_in_queue,na.rm=TRUE)),
        aes(x=time_in_queue, fill = arm)) +
   geom_histogram()+
   scale_x_continuous(expand = c(0, 0)) +
@@ -338,7 +338,7 @@ common_all_inputs <- add_item(
                        indicator   = indicators,
                        names_out   = list_par[["parameter_name"]]
                        )
-            ) %>%
+            ) |>
   add_item(input = {
     random_seed_sicker_i = sample(1:1000,1000,replace = FALSE) #we don't add this variable to the sensitivity analysis
     beds <- resource_discrete(1000)
@@ -381,7 +381,7 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
 
 ```
 
@@ -419,7 +419,7 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int", "beds_free"),mean)
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int", "beds_free"),mean)
 
 ```
 ## Model Execution, Simple PSA
@@ -473,7 +473,7 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_simulation <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_simulation %>% group_by(simulation) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int", "beds_free"),mean)
+data_simulation |> group_by(simulation) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int", "beds_free"),mean)
 
 ggplot(data_simulation,aes(x=evttime,y=beds_free, col = factor(simulation))) +
   facet_wrap(arm~.) + 

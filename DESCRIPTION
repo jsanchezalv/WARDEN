@@ -46,7 +46,6 @@ Imports:
     MASS,
     zoo,
     progressr,
-    magrittr,
     tidyr,
     lifecycle,
     Rcpp

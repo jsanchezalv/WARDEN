@@ -92,7 +92,7 @@ Note that the model will use the evnets defined in `evts` argument to look for t
 
 This chunk is a bit more complex, so it's worth spending a bit of time explaining it.
 
-The `init_event_list` object is populated by using the `add_tte()` function which applies to both arms, "int" strategy and "noint" strategy. We first declare the `start` time to be `0`. Note this could also be separated by arm if the user wants to have more clarity using two `add_tte` functions (i.e., `add_tte(arm="noint"...) %>% add_tte(arm="int"...)`).
+The `init_event_list` object is populated by using the `add_tte()` function which applies to both arms, "int" strategy and "noint" strategy. We first declare the `start` time to be `0`. Note this could also be separated by arm if the user wants to have more clarity using two `add_tte` functions (i.e., `add_tte(arm="noint"...) |> add_tte(arm="int"...)`).
 
 We then proceed to generate the actual time to event. We use the `draw_tte()` function to generate the time to event, though one can set this up in any other way (e.g., using `rexp()`). One should always be aware of how the competing risks interact with each other. While we have abstracted from these type of corrections here, it is recommended to have an understanding about how these affect the results and have a look at the competing risks/semi-competing risks literature.
 
@@ -146,7 +146,7 @@ Finally, note that there could be two different ways of accumulating continuous 
 ```{r model_reaction}
 evt_react_list <-
   add_reactevt(name_evt = "sick",
-               input = {}) %>%
+               input = {}) |>
   add_reactevt(name_evt = "sicker",
                input = {
                  q_default <- util.sicker
@@ -158,7 +158,7 @@ evt_react_list <-
                      curtime + (get_event("death")-curtime)*0.8,
                      curtime)))
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "death",
                input = {
                  q_default <- 0
@@ -173,7 +173,7 @@ evt_react_list <-
 #
 # evt_react_list <-
 #     add_reactevt(name_evt = "sick",
-#                  input = {}) %>%
+#                  input = {}) |>
 #     add_reactevt(name_evt = "sicker",
 #                  input = {
 #                      q_default = util.sick
@@ -181,7 +181,7 @@ evt_react_list <-
 #                      fl.sick = 0
 #                      modify_event(c("death" = max(get_event("death") - 0.5,curtime)))
 #
-#                  }) %>%
+#                  }) |>
 #     add_reactevt(name_evt = "death",
 #                  input = {
 #                      c_dis <- if(fl.sick==1){cost.sick}else{cost.sicker}
@@ -266,8 +266,8 @@ summary_results_sens(results)
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -277,8 +277,8 @@ We can also check what has been the absolute number of events per strategy.
 
 ```{r post-processing_analysis,echo=FALSE, message=FALSE}
 
-psa_ipd %>% group_by(arm,evtname) %>% summarise(n=n()) %>% arrange(arm,-n)%>%
-  kable() %>%
+psa_ipd |> group_by(arm,evtname) |> summarise(n=n()) |> arrange(arm,-n)|>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -289,10 +289,10 @@ We now use the data output to plot the histograms/densities of the simulation.
 
 ```{r post-processing_plots1, fig.width=10, fig.height=8}
 
-data_plot <- results[[1]][[1]]$merged_df %>%
-  filter(evtname != "sick") %>%
-  group_by(arm,evtname,simulation) %>%
-  mutate(median = median(evttime)) %>%
+data_plot <- results[[1]][[1]]$merged_df |>
+  filter(evtname != "sick") |>
+  group_by(arm,evtname,simulation) |>
+  mutate(median = median(evttime)) |>
   ungroup()
 
 ggplot(data_plot) +
@@ -314,7 +314,7 @@ data_qaly_cost<- psa_ipd[,.SD[1],by=.(pat_id,arm,simulation)][,.(arm,qaly=total_
 data_qaly_cost[,ps_id:=paste(pat_id,simulation,sep="_")]
 
 
-mean_data_qaly_cost <- data_qaly_cost %>% group_by(arm) %>% summarise(across(where(is.numeric),mean))
+mean_data_qaly_cost <- data_qaly_cost |> group_by(arm) |> summarise(across(where(is.numeric),mean))
 
 ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = arm)) + 
   geom_point(alpha=0.15,shape = 21) +
@@ -367,7 +367,7 @@ common_all_inputs <- add_item(
                        indicator   = indicators,
                        names_out   = list_par[["parameter_name"]]
                        )
-            ) %>%
+            ) |>
   add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE),
            random_seed_death_i <- runif(npats)) #we don't add these variables to the sensitivity analysis
 
@@ -404,7 +404,7 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
 
 ```
 
@@ -441,7 +441,7 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
 
 ```
 ## Model Execution, Simple PSA
@@ -475,6 +475,6 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_simulation <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_simulation %>% group_by(simulation) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
+data_simulation |> group_by(simulation) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","coef_death","HR_int"),mean)
 
 ```

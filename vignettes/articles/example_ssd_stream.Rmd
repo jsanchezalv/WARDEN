@@ -99,7 +99,7 @@ We use in this case a luck adjustment as we update the death time to event using
 ```{r model_reaction}
 evt_react_list <-
   add_reactevt(name_evt = "sick",
-               input = {}) %>%
+               input = {}) |>
   add_reactevt(name_evt = "sicker",
                input = {
                  q_default <- util.sicker
@@ -118,7 +118,7 @@ evt_react_list <-
                     }
                  
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "death",
                input = {
                  q_default <- 0
@@ -183,8 +183,8 @@ summary_results_sens(results)
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 
@@ -194,8 +194,8 @@ We can check what has been the absolute number of events per strategy.
 
 ```{r post-processing_analysis,echo=FALSE, message=FALSE}
 
-psa_ipd %>% group_by(arm,evtname) %>% summarise(n=n()) %>% arrange(arm,-n)%>%
-  kable() %>%
+psa_ipd |> group_by(arm,evtname) |> summarise(n=n()) |> arrange(arm,-n)|>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
@@ -206,10 +206,10 @@ We now use the data output to plot the histograms/densities of the simulation.
 
 ```{r post-processing_plots1, fig.width=10, fig.height=8}
 
-data_plot <- results[[1]][[1]]$merged_df %>%
-  filter(evtname != "sick") %>%
-  group_by(arm,evtname,simulation) %>%
-  mutate(median = median(evttime)) %>%
+data_plot <- results[[1]][[1]]$merged_df |>
+  filter(evtname != "sick") |>
+  group_by(arm,evtname,simulation) |>
+  mutate(median = median(evttime)) |>
   ungroup()
 
 ggplot(data_plot) +
@@ -231,7 +231,7 @@ data_qaly_cost<- psa_ipd[,.SD[1],by=.(pat_id,arm,simulation)][,.(arm,qaly=total_
 data_qaly_cost[,ps_id:=paste(pat_id,simulation,sep="_")]
 
 
-mean_data_qaly_cost <- data_qaly_cost %>% group_by(arm) %>% summarise(across(where(is.numeric),mean))
+mean_data_qaly_cost <- data_qaly_cost |> group_by(arm) |> summarise(across(where(is.numeric),mean))
 
 ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = arm)) + 
   geom_point(alpha=0.15,shape = 21) +
@@ -309,7 +309,7 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
 
 ```
 
@@ -346,6 +346,6 @@ We briefly check below that indeed the engine has been changing the correspondin
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
 
 ```
