@@ -1153,3 +1153,67 @@ test_that("add_item: native pipe and magrittr pipe give identical results", {
   magrittr <- add_item(input = { a <- 1 }) %>% add_item(b = 2) %>% add_item(input = { c <- 3 })
   expect_equal(native, magrittr)
 })
+
+# add_item: unnamed expression as first positional arg ----------------------------
+
+test_that("add_item: unnamed function call is captured unevaluated", {
+  # sensitivity_bool does not exist in this scope — must not be evaluated
+  result <- add_item(some_fn(x = sensitivity_bool))
+  expect_equal(result, quote({ some_fn(x = sensitivity_bool) }))
+})
+
+test_that("add_item: unnamed if() expression is captured unevaluated", {
+  result <- add_item(if(x_bool) create_x() else rep(1, 5))
+  expect_equal(result, quote({ if(x_bool) create_x() else rep(1, 5) }))
+})
+
+test_that("add_item: unnamed call followed by named args", {
+  result <- add_item(some_fn(a = b), x = 5)
+  expect_equal(result, quote({ some_fn(a = b); x <- 5 }))
+})
+
+test_that("add_item: native pipe after unnamed call accumulates correctly", {
+  result <- add_item(some_fn(a = b)) |> add_item(x = 5)
+  expect_equal(result, quote({ some_fn(a = b); x <- 5 }))
+})
+
+test_that("add_item: magrittr pipe after unnamed call accumulates correctly", {
+  result <- add_item(some_fn(a = b)) %>% add_item(x = 5)
+  expect_equal(result, quote({ some_fn(a = b); x <- 5 }))
+})
+
+test_that("add_item: pick_val_v-style call with absent engine vars not evaluated", {
+  # psa_bool, sensitivity_bool, indicators are not in scope — must not error
+  result <- add_item(
+    pick_val_v(base = list(1), psa = list(2), sens = list(3),
+               psa_ind = psa_bool, sens_ind = sensitivity_bool,
+               indicator = indicators, names_out = list("a"))
+  ) |> add_item(x = 5)
+  stmts <- as.list(result)[-1L]
+  expect_length(stmts, 2L)
+  expect_identical(stmts[[1L]][[1L]], as.name("pick_val_v"))
+  expect_equal(stmts[[2L]], quote(x <- 5))
+})
+
+test_that("add_item: inline brace block as first positional becomes starting block", {
+  result <- add_item({ a <- 1; b <- 2 }, c = 3)
+  expect_equal(result, quote({ a <- 1; b <- 2; c <- 3 }))
+})
+
+test_that("add_item: variable holding prior block used positionally as start", {
+  prior <- add_item(x = 10)
+  result <- add_item(prior, y = 20)
+  expect_equal(result, quote({ x <- 10; y <- 20 }))
+})
+
+test_that("add_item: unnamed call among named args is captured unevaluated", {
+  # R matches the first unnamed positional to .data, so it leads the block;
+  # named args follow in their call order
+  result <- add_item(x = 1, some_fn(a = absent_var), y = 2)
+  expect_equal(result, quote({ some_fn(a = absent_var); x <- 1; y <- 2 }))
+})
+
+test_that("add_item: three-item native pipe chain with unnamed first call", {
+  result <- add_item(some_fn(a = b)) |> add_item(x = 5) |> add_item(y = 6)
+  expect_equal(result, quote({ some_fn(a = b); x <- 5; y <- 6 }))
+})
