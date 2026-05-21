@@ -1115,3 +1115,41 @@ test_that("works with non-scalar values; note on reference types", {
 })
 
 
+
+# add_item ---------------------------------------------------------------
+
+test_that("add_item: standalone with input= returns correct block", {
+  result <- add_item(input = { a <- 1; b <- 2 })
+  expect_equal(result, quote({ a <- 1; b <- 2 }))
+})
+
+test_that("add_item: named ... args become assignments", {
+  result <- add_item(x = 5, y = 10)
+  expect_equal(result, quote({ x <- 5; y <- 10 }))
+})
+
+test_that("add_item: native pipe chains accumulate expressions", {
+  result <- add_item(input = { a <- 1 }) |>
+    add_item(input = { b <- 2 }) |>
+    add_item(c = 3)
+  expect_equal(result, quote({ a <- 1; b <- 2; c <- 3 }))
+})
+
+test_that("add_item: magrittr pipe chains accumulate expressions", {
+  result <- add_item(input = { a <- 1 }) %>%
+    add_item(input = { b <- 2 }) %>%
+    add_item(c = 3)
+  expect_equal(result, quote({ a <- 1; b <- 2; c <- 3 }))
+})
+
+test_that("add_item: .data arg directly accepts prior block", {
+  prior <- add_item(input = { x <- 10 })
+  result <- add_item(.data = prior, y = 20)
+  expect_equal(result, quote({ x <- 10; y <- 20 }))
+})
+
+test_that("add_item: native pipe and magrittr pipe give identical results", {
+  native <- add_item(input = { a <- 1 }) |> add_item(b = 2) |> add_item(input = { c <- 3 })
+  magrittr <- add_item(input = { a <- 1 }) %>% add_item(b = 2) %>% add_item(input = { c <- 3 })
+  expect_equal(native, magrittr)
+})

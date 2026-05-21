@@ -364,23 +364,20 @@ pick_val_v <- function(base,
 #' Build a single `{}` expression that defines inputs for a simulation.
 #' - Named args in `...` become assignments (`name <- expr`), e.g., `add_item(a=5)`
 #' - Unnamed args are inserted raw/unevaluated. If an unnamed arg is a `{}` block,
-#'   its statements are spliced (flattened). `add_item(pick_val_v(...))`
-#' - Works with magrittr pipes: a leading `.` (the LHS) is resolved to its value;
-#'   if that value is a `{}` block (or list of expressions), it becomes the
-#'   starting block.
+#'   its statements are spliced (flattened). e.g., `add_item(pick_val_v(...))`
+#' - Works with both `|>` (native pipe) and `%>%` (magrittr): the LHS is
+#'   passed to `.data` and becomes the starting block.
 #' - input argument can be used to handle alternative `add_item2` method,
 #'   e.g. `add_item(input = {a <- 5})`
 #'
+#' @param .data Optional: an existing `{}` block (or list of expressions)
+#'   to start from. Receives the LHS value when using `|>` or `%>%`.
 #' @param ... Unevaluated arguments. Named → `name <- expr`; unnamed → raw expr.
-#' @param .data Optional named argument: an existing `{}` block (or list of
-#'   expressions) to start from.
 #' @param input Optional unevaluated expression or `{}` block to splice in.
 #'
 #' @return A single `{}` call (language object) ready for `load_inputs()`.
 #' 
 #' @examples
-#' library(magrittr)
-#'
 #' add_item(input = {fl.idfs <-  0})
 #' add_item(input = {
 #'  util_idfs <- if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}
@@ -406,7 +403,7 @@ pick_val_v <- function(base,
 #' ) 
 #' 
 #' @export
-add_item <- function(..., .data = NULL, input) {
+add_item <- function(.data = NULL, ..., input) {
   mc   <- match.call(expand.dots = FALSE)
   dots <- mc$...
   
@@ -434,27 +431,8 @@ add_item <- function(..., .data = NULL, input) {
       list(expr)
     }
   }
-  
-  # 2) If .data is NULL and first unnamed ... is DOT (.) from magrittr, resolve it
-  if (is.null(.data) && !is.null(dots) && length(dots) > 0) {
-    dn <- names(dots)
-    first_is_named <- !is.null(dn) && nzchar(dn[1L])
-    if (!first_is_named) {
-      first_expr <- dots[[1L]]
-      if (is.symbol(first_expr) && identical(first_expr, as.name("."))) {
-        # Evaluate DOT to get LHS value from the calling frame
-        lhs <- eval(first_expr, parent.frame())
-        block_elems <- as_block_list(lhs)
-        dots <- if (length(dots) > 1L) dots[-1L] else NULL
-      } else if (is.call(first_expr) && identical(first_expr[[1L]], as.name("{"))) {
-        # Promote a literal { } block as the starter
-        block_elems <- as.list(first_expr)
-        dots <- if (length(dots) > 1L) dots[-1L] else NULL
-      }
-    }
-  }
-  
-  # 3) Process remaining ... : named -> assignment; unnamed -> raw/splice
+
+  # 2) Process remaining ... : named -> assignment; unnamed -> raw/splice
   if (!is.null(dots)) {
     dn <- names(dots)
     for (i in seq_along(dots)) {
@@ -468,13 +446,13 @@ add_item <- function(..., .data = NULL, input) {
     }
   }
   
-  # 4) Optional input=
+  # 3) Optional input=
   if (!missing(input)) {
     input_sub <- substitute(input)
     built <- c(built, splice_or_keep(input_sub))
   }
   
-  # 5) Return a proper { ... } call
+  # 4) Return a proper { ... } call
   as.call(c(block_elems, built))
 }
 

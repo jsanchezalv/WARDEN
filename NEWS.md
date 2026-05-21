@@ -1,5 +1,5 @@
 # WARDEN 2.0.2
-*debug mode now works as intended
+* `add_item()` now works correctly with the native pipe (`|>`). The `.data` argument has been moved to the first position (`.data = NULL, ..., input`), so the LHS of `|>` is naturally routed to `.data` without relying on magrittr's `.` symbol. Existing code using `%>%`, `input=`, or named `...` arguments is unaffected (#TODO).
 
 # WARDEN 2.0.1
 *adj_val now accepts a vectorized_f argument to speed computations in the case of vectorized functions
