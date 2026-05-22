@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{next_event}
 \alias{next_event}
-\title{Get the Next Event(s) in the Queue}
+\title{Get the next events in the queue}
 \usage{
 next_event(n = 1, ptr)
 }

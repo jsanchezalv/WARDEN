@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{new_event}
 \alias{new_event}
-\title{Add Events to the Queue for a Patient}
+\title{Add events to the queue for a patient}
 \usage{
 new_event(events, ptr, patient_id)
 }

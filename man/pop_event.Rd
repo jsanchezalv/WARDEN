@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{pop_event}
 \alias{pop_event}
-\title{Remove the Next Event from the Queue}
+\title{Remove the next event from the queue}
 \usage{
 pop_event(ptr)
 }

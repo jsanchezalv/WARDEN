@@ -4,13 +4,13 @@
 \alias{add_item}
 \title{Define or append model inputs}
 \usage{
-add_item(..., .data = NULL, input)
+add_item(.data = NULL, ..., input)
 }
 \arguments{
-\item{...}{Unevaluated arguments. Named → \code{name <- expr}; unnamed → raw expr.}
+\item{.data}{Optional: an existing \code{{}} block (or list of expressions)
+to start from. Receives the LHS value when using \verb{|>} or \verb{\%>\%}.}
 
-\item{.data}{Optional named argument: an existing \code{{}} block (or list of
-expressions) to start from.}
+\item{...}{Unevaluated arguments. Named → \code{name <- expr}; unnamed → raw expr.}
 
 \item{input}{Optional unevaluated expression or \code{{}} block to splice in.}
 }
@@ -22,17 +22,14 @@ Build a single \code{{}} expression that defines inputs for a simulation.
 \itemize{
 \item Named args in \code{...} become assignments (\code{name <- expr}), e.g., \code{add_item(a=5)}
 \item Unnamed args are inserted raw/unevaluated. If an unnamed arg is a \code{{}} block,
-its statements are spliced (flattened). \code{add_item(pick_val_v(...))}
-\item Works with magrittr pipes: a leading \code{.} (the LHS) is resolved to its value;
-if that value is a \code{{}} block (or list of expressions), it becomes the
-starting block.
+its statements are spliced (flattened). e.g., \code{add_item(pick_val_v(...))}
+\item Works with both \verb{|>} (native pipe) and \verb{\%>\%} (magrittr): the LHS is
+passed to \code{.data} and becomes the starting block.
 \item input argument can be used to handle alternative \code{add_item2} method,
 e.g. \code{add_item(input = {a <- 5})}
 }
 }
 \examples{
-library(magrittr)
-
 add_item(input = {fl.idfs <-  0})
 add_item(input = {
  util_idfs <- if(psa_bool){rnorm(1,0.8,0.2)} else{0.8}

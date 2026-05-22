@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{next_event_pt}
 \alias{next_event_pt}
-\title{Get the Next Event(s) in the Queue for a specific patient}
+\title{Get the next events in the queue for a specific patient}
 \usage{
 next_event_pt(n = 1, ptr, patient_id)
 }

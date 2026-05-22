@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{modify_event}
 \alias{modify_event}
-\title{Modify or Add Events for a Patient}
+\title{Modify or add events for a patient}
 \usage{
 modify_event(events, create_if_missing = TRUE, ptr, patient_id)
 }

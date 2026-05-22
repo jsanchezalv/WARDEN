@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{qtimecov}
 \alias{qtimecov}
-\title{Draw Time-to-Event with Time-Dependent Covariates and Luck Adjustment}
+\title{Draw time-to-event with time-dependent covariates and luck adjustment}
 \usage{
 qtimecov(
   luck,

@@ -149,7 +149,6 @@ If \code{continue_on_error} is set to FALSE, it will only export analysis level 
 Note that this will make the progress bar not correct, as a set of patients that were expected to be run is not.
 }
 \examples{
-library(magrittr)
 common_all_inputs <-add_item(
 util.sick = 0.8,
 util.sicker = 0.5,
@@ -180,13 +179,13 @@ add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={
 
 evt_react_list <-
 add_reactevt(name_evt = "sick",
-             input = {}) \%>\%
+             input = {}) |>
   add_reactevt(name_evt = "sicker",
                input = {
                  q_default <- util.sicker
                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
                  fl.sick <- 0
-               }) \%>\%
+               }) |>
   add_reactevt(name_evt = "death",
                input = {
                  q_default <- 0

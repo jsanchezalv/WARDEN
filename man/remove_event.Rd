@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{remove_event}
 \alias{remove_event}
-\title{Remove Events for a Patient}
+\title{Remove events for a patient}
 \usage{
 remove_event(events, ptr, patient_id)
 }

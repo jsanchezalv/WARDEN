@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculator_f.R
 \name{rcond_gompertz_lu}
 \alias{rcond_gompertz_lu}
-\title{Draw from a Conditional Gompertz distribution (lower and upper bound)}
+\title{Draw from a conditional Gompertz distribution (lower and upper bound)}
 \usage{
 rcond_gompertz_lu(
   n,
@@ -30,7 +30,7 @@ rcond_gompertz_lu(
 Estimate(s) from the Conditional Gompertz distribution based on given parameters
 }
 \description{
-Draw from a Conditional Gompertz distribution (lower and upper bound)
+Draw from a conditional Gompertz distribution (lower and upper bound)
 }
 \examples{
 rcond_gompertz_lu(1,shape=0.05,rate=0.01,lower_bound = 50)

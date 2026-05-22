@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{resource_discrete}
 \alias{resource_discrete}
-\title{Create a Discrete Resource}
+\title{Create a discrete resource}
 \usage{
 resource_discrete(n)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{has_event}
 \alias{has_event}
-\title{Check if a Patient Has a Specific Event}
+\title{Check if a patient has a specific event in the queue}
 \usage{
 has_event(event_name, ptr, patient_id, exclude_inf = FALSE)
 }
@@ -19,5 +19,5 @@ has_event(event_name, ptr, patient_id, exclude_inf = FALSE)
 Logical, TRUE if the event exists for the patient (optionally excluding Inf), FALSE otherwise.
 }
 \description{
-Check if a Patient Has a Specific Event
+Check if a patient has a specific event in the queue
 }

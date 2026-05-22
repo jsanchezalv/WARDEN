@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{queue_empty}
 \alias{queue_empty}
-\title{Check if the Event Queue is Empty}
+\title{Check if the event queue is empty}
 \usage{
 queue_empty(ptr, exclude_inf = FALSE)
 }
@@ -15,5 +15,5 @@ queue_empty(ptr, exclude_inf = FALSE)
 Logical, TRUE if the queue is empty, FALSE otherwise.
 }
 \description{
-Check if the Event Queue is Empty
+Check if the event queue is empty
 }

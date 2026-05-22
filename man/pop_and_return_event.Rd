@@ -2,7 +2,7 @@
 % Please edit documentation in R/input_f.R
 \name{pop_and_return_event}
 \alias{pop_and_return_event}
-\title{Pop and Return the Next Event}
+\title{Pop and return the next event}
 \usage{
 pop_and_return_event(ptr)
 }
