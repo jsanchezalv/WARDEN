@@ -293,10 +293,55 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   start_time <-  proc.time()
   
   # Analysis loop ---------------------------------------------------------
-  if (is.null(sensitivity_names)) {
-    length_sensitivities <- n_sensitivity
-  } else{
-    length_sensitivities <- n_sensitivity * length(sensitivity_names)
+
+  # Auto-compute n_sensitivity and collect dsa_names from warden_block_meta
+  all_inputs_args <- list(sensitivity_inputs, common_all_inputs,
+                          common_pt_inputs, unique_pt_inputs)
+  .all_dsa_names <- NULL
+  .meta_found    <- FALSE
+  if (isTRUE(sensitivity_bool)) {
+    for (.blk in all_inputs_args) {
+      .meta <- attr(.blk, "warden_block_meta")
+      if (!is.null(.meta)) {
+        .meta_found <- TRUE
+        if (!is.null(.meta$dsa_names)) {
+          .all_dsa_names <- union(.all_dsa_names, .meta$dsa_names)
+          n_sensitivity <- .meta$n_groups
+        }
+      }
+    }
+  }
+  rm(all_inputs_args)
+
+  # Build per-sensitivity iteration schedule
+  if (!is.null(sensitivity_names) && !is.null(.all_dsa_names)) {
+    # Mixed DSA + scenario: DSA names get n_sensitivity slots, others get 1
+    .sched_name <- character(0)
+    .sched_iter <- integer(0)
+    for (.sn in sensitivity_names) {
+      if (.sn %in% .all_dsa_names) {
+        .sched_name <- c(.sched_name, rep(.sn, n_sensitivity))
+        .sched_iter <- c(.sched_iter, seq_len(n_sensitivity))
+      } else {
+        .sched_name <- c(.sched_name, .sn)
+        .sched_iter <- c(.sched_iter, 1L)
+      }
+    }
+    length_sensitivities <- length(.sched_name)
+  } else if (.meta_found && !is.null(sensitivity_names)) {
+    # input_block present but dsa_names = NULL: all names are scenarios (1 each)
+    .sched_name          <- sensitivity_names
+    .sched_iter          <- rep(1L, length(sensitivity_names))
+    length_sensitivities <- length(sensitivity_names)
+  } else {
+    # No input_block metadata: backward-compatible behaviour
+    .sched_name <- NULL
+    .sched_iter <- NULL
+    if (is.null(sensitivity_names)) {
+      length_sensitivities <- n_sensitivity
+    } else {
+      length_sensitivities <- n_sensitivity * length(sensitivity_names)
+    }
   }
   
   progressr::handlers(progressr::handler_txtprogressbar(width=100))
@@ -313,11 +358,15 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     
     output_sim[[sens]] <- list() #initialize analysis lists
     
-    #e.g., if length_sensitivities is 50 (25 param x 2 DSAs) then take at each iteration the divisor to see which name should be applied
-    if (!is.null(sensitivity_names)) {
-    sens_name_used <- sensitivity_names[ceiling(sens/n_sensitivity)] 
-    } else{
-    sens_name_used <- ""
+    if (!is.null(.sched_name)) {
+      sens_name_used  <- .sched_name[sens]
+      sens_iter_local <- .sched_iter[sens]
+    } else if (!is.null(sensitivity_names)) {
+      sens_name_used  <- sensitivity_names[ceiling(sens/n_sensitivity)]
+      sens_iter_local <- sens_iterator(sens, n_sensitivity)
+    } else {
+      sens_name_used  <- ""
+      sens_iter_local <- sens_iterator(sens, n_sensitivity)
     }
     
     if(debug){
@@ -383,6 +432,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                        sens = sens,
                        sensitivity_names = sensitivity_names,
                        sens_name_used = sens_name_used,
+                       sens_iter_local = sens_iter_local,
                        timed_freq = timed_freq,
                        debug = debug,
                        accum_backwards = accum_backwards,
@@ -398,6 +448,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     # Draw Common parameters  -------------------------------
     input_list_sens <- as.environment(input_list_sens)
     parent.env(input_list_sens) <- environment()
+    input_list_sens$n_elem_before <- 0L
     .set_last_ctx(stage="Error in setup:sensitivity_inputs", sens=sens, .warden_ctx = .warden_ctx)
     
     # Draw Common parameters  -------------------------------

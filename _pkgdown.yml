@@ -95,6 +95,7 @@ reference:
       - sens_iterator
       - pick_psa
       - pick_val_v
+      - input_block
       - replicate_profiles
 
   - subtitle: Summary Functions

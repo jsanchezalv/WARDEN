@@ -16,7 +16,7 @@ test_that("Test minimal model runs with some basic settings", {
       })
     evt_react_list <-
       add_reactevt(name_evt = "start",
-                   input = {}) %>%
+                   input = {}) |>
       add_reactevt(name_evt = "death",
                    input = {
                      curtime   <- Inf
@@ -137,7 +137,7 @@ test_that("Test minimal model runs with some basic settings", {
     
     evt_react_list <-
       add_reactevt(name_evt = "start",
-                   input = {}) %>%
+                   input = {}) |>
       add_reactevt(name_evt = "death",
                    input = {}) 
     
@@ -335,7 +335,7 @@ test_that("Test minimal model runs with some basic settings", {
                    input = {
                      cost_insta <- 100
                      
-                   }) %>%
+                   }) |>
       add_reactevt(name_evt = "cycle",
                    input = {
                      if(curtime<9){
@@ -343,7 +343,7 @@ test_that("Test minimal model runs with some basic settings", {
                      }
                      cost_insta <- 200
                      
-                   }) %>%
+                   }) |>
       add_reactevt(name_evt = "death",
                    input = {
                    }) 
@@ -403,7 +403,7 @@ test_that("Test minimal model runs with some basic settings", {
                    input = {
                      cost_insta <- 100
                      
-                   }) %>%
+                   }) |>
       add_reactevt(name_evt = "cycle",
                    input = {
                      if(curtime<9){
@@ -412,7 +412,7 @@ test_that("Test minimal model runs with some basic settings", {
                      cost_insta <- 200
                      cost_a <- 1
                      
-                   }) %>%
+                   }) |>
       add_reactevt(name_evt = "death",
                    input = {
                    }) 
@@ -469,7 +469,7 @@ test_that("Test everything but with constrained = TRUE", {
     })
   evt_react_list <-
     add_reactevt(name_evt = "start",
-                 input = {}) %>%
+                 input = {}) |>
     add_reactevt(name_evt = "death",
                  input = {
                    curtime   <- Inf
@@ -594,7 +594,7 @@ test_that("Test everything but with constrained = TRUE", {
   
   evt_react_list <-
     add_reactevt(name_evt = "start",
-                 input = {}) %>%
+                 input = {}) |>
     add_reactevt(name_evt = "death",
                  input = {}) 
   
@@ -798,7 +798,7 @@ test_that("Test everything but with constrained = TRUE", {
                  input = {
                    cost_insta <- 100
                    
-                 }) %>%
+                 }) |>
     add_reactevt(name_evt = "cycle",
                  input = {
                    if(curtime<9){
@@ -806,7 +806,7 @@ test_that("Test everything but with constrained = TRUE", {
                    }
                    cost_insta <- 200
                    
-                 }) %>%
+                 }) |>
     add_reactevt(name_evt = "death",
                  input = {
                  }) 
@@ -867,7 +867,7 @@ test_that("Test everything but with constrained = TRUE", {
                  input = {
                    cost_insta <- 100
                    
-                 }) %>%
+                 }) |>
     add_reactevt(name_evt = "cycle",
                  input = {
                    if(curtime<9){
@@ -876,7 +876,7 @@ test_that("Test everything but with constrained = TRUE", {
                    cost_insta <- 200
                    cost_a <- 1
                    
-                 }) %>%
+                 }) |>
     add_reactevt(name_evt = "death",
                  input = {
                  }) 
@@ -961,7 +961,7 @@ test_that("Test everything but with constrained = TRUE", {
                        value_accum <- shared_accumulator$value()
                        beds_free <- beds$n_free()
                        time_in_queue <- NA
-                     }) %>%
+                     }) |>
         add_reactevt(name_evt = "sicker",
                      input = {
                        success_blocking_bed <- beds$attempt_block()
@@ -976,7 +976,7 @@ test_that("Test everything but with constrained = TRUE", {
                        q_default <- util.sicker
                        c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
                        fl.sick   <- 0 
-                     }) %>%
+                     }) |>
         add_reactevt(name_evt = "death",
                      input = {
                        beds$attempt_free() #remove from using or from the queue

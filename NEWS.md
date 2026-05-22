@@ -1,5 +1,7 @@
 # WARDEN 2.0.2
 * `add_item()` now works correctly with the native pipe (`|>`). The `.data` argument has been moved to the first position (`.data = NULL, ..., input`), so the LHS of `|>` is naturally routed to `.data` without relying on magrittr's `.` symbol. Existing code using `%>%`, `input=`, or named `...` arguments is unaffected (#TODO).
+* `input_block()` is a new helper that builds a complete `pick_val_v()` expression from explicit `base`, `psa`, `sens`, and `names_out` arguments. The `binary` and `dsa_indicators` parameters have been renamed to `indicator_sens_binary` and `sens_indicators` respectively to align with `pick_val_v()`. The `dsa_names` argument now defaults to `NULL`, meaning all `sensitivity_names` are treated as scenarios (one iteration per name); supply `dsa_names` explicitly to designate which names are DSA directions. Setting an entry in `sens_indicators` to `0` now permanently excludes that parameter from variation in both DSA and scenario analyses, and the engine automatically deduces `n_sensitivity` from the number of active parameters/groups.
+* `pick_val_v()` now correctly respects `indicator_psa` in grouped mode (`indicator_sens_binary = FALSE`). Previously, when `sens_bool = TRUE` and `psa_bool = TRUE`, all parameters drew from PSA regardless of `indicator_psa`; parameters with `indicator_psa = 0` now correctly draw from `base`.
 
 # WARDEN 2.0.1
 *adj_val now accepts a vectorized_f argument to speed computations in the case of vectorized functions

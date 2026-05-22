@@ -285,12 +285,25 @@ pick_val_v <- function(base,
       stop("sens_iterator nor distributions arguments cannot be NULL if indicator_sens_binary argument is FALSE. sens_indicator should take the value of the corresponding DSA/scenario iterator")
     }
     
-    if(psa_ind){
-      temp_data <- psa #preassign base value
-    }else{
-      temp_data <- base #preassign base value
+    if (is.null(indicator_psa)) {
+      temp_data <- if (psa_ind) psa else base
+    } else {
+      if (length(indicator_psa) != length(base)) {
+        stop("Length of indicator_psa is different than length of base in grouped mode")
+      }
+      temp_data <- vector("list", length(base))
+      for (i in seq_along(base)) {
+        ind_psa_i <- indicator_psa[[i]]
+        if (!psa_ind || !any(ind_psa_i == 1L)) {
+          temp_data[[i]] <- base[[i]]
+        } else if (length(ind_psa_i) == 1L) {
+          temp_data[[i]] <- psa[[i]]
+        } else {
+          temp_data[[i]] <- ifelse(ind_psa_i == 1L, psa[[i]], base[[i]])
+        }
+      }
     }
-    output <- temp_data #preassign base value
+    output <- temp_data
     
     
     #Iterate over each parameter, check which elements are active in the current iterator, then check if an adjustment needs to be done 
@@ -354,7 +367,241 @@ pick_val_v <- function(base,
   } else{
     return(as.list(output))
   }
-} 
+}
+
+
+# Build input block for automatic parameter selection ----------------------
+
+#' Build an input block for automatic parameter selection
+#'
+#' Creates an unevaluated `{}` expression that calls [pick_val_v()] with the
+#' correct arguments for base case, PSA, DSA, and scenario analyses.
+#' The expression is meant to be passed directly to `run_sim()` or
+#' `run_sim_parallel()` as a `*_inputs` argument.
+#'
+#' Supports two modes:
+#' - **Binary** (`indicator_sens_binary = TRUE`): `sens_indicators` are 0/1
+#'   per parameter. Each non-zero parameter is varied independently via
+#'   [create_indicators()].
+#' - **Grouped** (`indicator_sens_binary = FALSE`, the default when
+#'   `sens_indicators` and `distributions` are supplied): `sens_indicators`
+#'   are integer group labels. Parameters sharing the same integer are varied
+#'   together; 0 means the parameter is never varied.
+#'
+#' ## DSA vs scenario analyses
+#' Supply `dsa_names` with the subset of `sensitivity_names` that correspond
+#' to DSA directions (e.g. `c("DSA_min","DSA_max")`). Each DSA name runs one
+#' iteration per active parameter/group; other names (scenarios) apply all
+#' active parameters simultaneously in a single iteration.
+#'
+#' When `dsa_names = NULL` (the default) every sensitivity name is treated as a
+#' scenario — all active parameters take their scenario value at once, one
+#' iteration per `sensitivity_names` entry. This is the correct default when
+#' there is no DSA.
+#'
+#' ## `sens_indicators` and zeros
+#' Any parameter whose `sens_indicators` entry is `0` (or all-zero for
+#' vector-valued parameters) is **never varied**: it always uses the base or
+#' PSA value regardless of whether we are running a DSA or a scenario. This
+#' applies to both modes.
+#'
+#' @param .data Optional existing `{}` block to prepend (for pipe chaining).
+#' @param base A list of base case values, one entry per parameter.
+#' @param psa An unevaluated expression producing PSA draws (e.g.
+#'   `pick_psa(...)`), evaluated at runtime per simulation.
+#' @param sens The sensitivity data object (e.g. `l_inputs`). At runtime the
+#'   engine indexes it as `sens[[sens_name_used]]` to pick the active column.
+#' @param names_out Character vector of output parameter names.
+#' @param psa_indicators List of 0/1 indicators controlling which parameters
+#'   draw from PSA. `NULL` means all parameters draw from PSA.
+#' @param sens_indicators List of indicators, one entry per parameter (may be
+#'   a scalar or a vector for vector-valued parameters). In binary mode: 0 =
+#'   inactive, 1 = active. In grouped mode: 0 = inactive, same integer =
+#'   varied together. `NULL` means all parameters are active. Only in grouped
+#'   mode can subparameters (e.g., elements of a vector parameter) be varied 
+#'   at different steps of a DSA. 
+#' @param indicator_sens_binary Logical. `TRUE` = binary (0/1) mode; each
+#'   active parameter is varied independently via [create_indicators()].
+#'   `FALSE` (default) = grouped integer mode when `sens_indicators` and
+#'   `distributions` are supplied; otherwise falls back to binary mode.
+#' @param dsa_names Character vector of `sensitivity_names` values that are
+#'   DSA directions (e.g. `c("DSA_min","DSA_max")`). Those names iterate
+#'   through active parameters/groups one at a time. All other names passed
+#'   to `sensitivty_names` in [run_sim()] are treated as scenarios. `NULL` 
+#'   (the default) means all sensitivity names are scenarios.
+#' @param distributions List of distribution names (e.g. `"rnorm"`,
+#'   `"mvrnorm"`, `"rdirichlet"`), required in grouped mode to determine
+#'   which parameters are vectors and require conditional distributions.
+#' @param covariances List of covariance matrices or scalars, required for
+#'   `"mvrnorm"` / `"rdirichlet"` distributions.
+#'
+#' @return A `{}` language object (same type as [add_item()]) with a
+#'   `warden_block_meta` attribute used by the engine to build the iteration
+#'   schedule.
+#'
+#' @seealso [pick_val_v()], [add_item()], [run_sim()]
+#'
+#' @export
+#'
+#' @examples
+#' l_inputs <- list(
+#'   parameter_name = list("util.sick", "util.sicker"),
+#'   base_value     = list(0.8, 0.5),
+#'   PSA_dist       = list("rnorm", "rbeta_mse"),
+#'   a              = list(0.8, 0.5),
+#'   b              = list(0.04, 0.025),
+#'   n              = list(1, 1),
+#'   DSA_min        = list(0.6, 0.3),
+#'   DSA_max        = list(0.9, 0.7),
+#'   psa_indicators = list(1, 1)
+#' )
+#'
+#' blk <- input_block(
+#'   base                  = l_inputs[["base_value"]],
+#'   psa                   = pick_psa(l_inputs[["PSA_dist"]], l_inputs[["n"]],
+#'                                    l_inputs[["a"]], l_inputs[["b"]]),
+#'   sens                  = l_inputs,
+#'   names_out             = l_inputs[["parameter_name"]],
+#'   psa_indicators        = l_inputs[["psa_indicators"]],
+#'   indicator_sens_binary = TRUE,
+#'   dsa_names             = c("DSA_min", "DSA_max")
+#' )
+#' stopifnot(is.call(blk))
+#' stopifnot(!is.null(attr(blk, "warden_block_meta")))
+input_block <- function(.data = NULL,
+                        base,
+                        psa,
+                        sens,
+                        names_out,
+                        psa_indicators        = NULL,
+                        sens_indicators       = NULL,
+                        indicator_sens_binary = FALSE,
+                        dsa_names             = NULL,
+                        distributions         = NULL,
+                        covariances           = NULL) {
+
+  base_expr <- substitute(base)
+  psa_expr  <- substitute(psa)
+  sens_expr <- substitute(sens)
+
+  n_params <- length(names_out)
+  if (n_params == 0L) stop("names_out must have at least one element")
+
+  if (!isTRUE(indicator_sens_binary) &&
+      !is.null(sens_indicators) &&
+      is.null(distributions)) {
+    stop("distributions cannot be NULL in grouped mode")
+  }
+
+  mode <- if (!isTRUE(indicator_sens_binary) &&
+              !is.null(sens_indicators) &&
+              !is.null(distributions)) {
+    "grouped"
+  } else {
+    "binary"
+  }
+
+  # Per-parameter active flag (length n_params): 1 if any element non-zero
+  if (is.null(sens_indicators)) {
+    n_groups           <- n_params
+    elem_for_create    <- call("rep", 1L, n_params)
+    scenario_indicator <- call("rep", 1L, n_params)
+  } else {
+    si_per_param <- vapply(
+      sens_indicators,
+      \(x) as.integer(any(as.integer(x) != 0L)),
+      integer(1L)
+    )
+    scenario_indicator <- si_per_param
+    if (mode == "binary") {
+      n_groups        <- sum(si_per_param)
+      elem_for_create <- si_per_param
+    } else {
+      si_all   <- as.integer(unlist(sens_indicators))
+      n_groups <- length(unique(si_all[si_all != 0L]))
+    }
+  }
+
+  # Build sens[[sens_name_used]]
+  sens_indexed <- call("[[", sens_expr, as.name("sens_name_used"))
+
+  # Scenario call: all non-zero-indicator params use their sens value at once
+  pvv_scenario <- call(
+    "pick_val_v",
+    base                  = base_expr,
+    psa                   = psa_expr,
+    sens                  = sens_indexed,
+    psa_ind               = as.name("psa_bool"),
+    sens_ind              = as.name("sensitivity_bool"),
+    indicator             = scenario_indicator,
+    indicator_psa         = psa_indicators,
+    names_out             = names_out,
+    indicator_sens_binary = TRUE
+  )
+
+  if (!is.null(dsa_names)) {
+    is_dsa_cond <- call("&&", as.name("sensitivity_bool"),
+                        call("%in%", as.name("sens_name_used"), dsa_names))
+
+    if (mode == "binary") {
+      pvv_dsa <- call(
+        "pick_val_v",
+        base                  = base_expr,
+        psa                   = psa_expr,
+        sens                  = sens_indexed,
+        psa_ind               = as.name("psa_bool"),
+        sens_ind              = as.name("sensitivity_bool"),
+        indicator             = call("create_indicators",
+                                     as.name("sens_iter_local"),
+                                     as.name("n_sensitivity"),
+                                     elem_for_create,
+                                     0L),
+        indicator_psa         = psa_indicators,
+        names_out             = names_out,
+        indicator_sens_binary = TRUE
+      )
+    } else {
+      pvv_dsa <- call(
+        "pick_val_v",
+        base                  = base_expr,
+        psa                   = psa_expr,
+        sens                  = sens_indexed,
+        psa_ind               = as.name("psa_bool"),
+        sens_ind              = as.name("sensitivity_bool"),
+        indicator             = sens_indicators,
+        indicator_psa         = psa_indicators,
+        names_out             = names_out,
+        indicator_sens_binary = FALSE,
+        sens_iterator         = as.name("sens_iter_local"),
+        distributions         = distributions,
+        covariances           = covariances
+      )
+    }
+
+    pvv_call <- call("if", is_dsa_cond, pvv_dsa, pvv_scenario)
+  } else {
+    # dsa_names = NULL: all sensitivity names are scenarios
+    pvv_call <- pvv_scenario
+  }
+
+  if (is.null(.data)) {
+    result <- call("{", pvv_call)
+  } else if (is.call(.data) && identical(.data[[1L]], as.name("{"))) {
+    result <- as.call(c(as.list(.data), list(pvv_call)))
+  } else {
+    result <- call("{", .data, pvv_call)
+  }
+
+  attr(result, "warden_block_meta") <- list(
+    mode                  = mode,
+    n_params              = n_params,
+    n_groups              = n_groups,
+    dsa_names             = dsa_names,
+    indicator_sens_binary = indicator_sens_binary
+  )
+
+  result
+}
 
 
 # Add item/parameter to list --------------------------------------------------------
@@ -430,19 +677,27 @@ add_item <- function(.data = NULL, ..., input) {
   #     (e.g. pick_val_v(), if(), which reference engine-scope vars not yet defined)
   data_expr <- mc$.data
   built <- list()
+  .meta  <- NULL  # warden_block_meta to carry forward
 
   if (is.null(data_expr)) {
     block_elems <- list(as.name("{"))
   } else if (is.call(data_expr) && identical(data_expr[[1L]], as.name("{"))) {
+    # Literal { } block from match.call; grab any attribute before as.list strips it
+    .meta       <- attr(data_expr, "warden_block_meta")
     block_elems <- as.list(data_expr)
   } else if (is.symbol(data_expr) ||
-             (is.call(data_expr) && as.character(data_expr[[1L]]) == "add_item")) {
+             (is.call(data_expr) && as.character(data_expr[[1L]]) %in%
+              c("add_item", "input_block"))) {
+    # Evaluated prior block (variable, add_item(), or input_block())
     block_elems <- as_block_list(.data)
+    .meta       <- attr(.data, "warden_block_meta")
   } else {
+    # Unnamed unevaluated expression (e.g. pick_val_v(), if(), some_fn())
+    # Do NOT evaluate .data — keep it as a raw expression statement
     block_elems <- list(as.name("{"))
     built <- list(data_expr)
   }
-  
+
   splice_or_keep <- function(expr) {
     if (is.call(expr) && identical(expr[[1L]], as.name("{"))) {
       as.list(expr)[-1L]
@@ -464,15 +719,17 @@ add_item <- function(.data = NULL, ..., input) {
       }
     }
   }
-  
+
   # 3) Optional input=
   if (!missing(input)) {
     input_sub <- substitute(input)
     built <- c(built, splice_or_keep(input_sub))
   }
-  
-  # 4) Return a proper { ... } call
-  as.call(c(block_elems, built))
+
+  # 4) Return a proper { ... } call; carry warden_block_meta from prior block
+  result <- as.call(c(block_elems, built))
+  if (!is.null(.meta)) attr(result, "warden_block_meta") <- .meta
+  result
 }
 
 #' Define parameters that may be used in model calculations (uses expressions)

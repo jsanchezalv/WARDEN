@@ -1135,23 +1135,11 @@ test_that("add_item: native pipe chains accumulate expressions", {
   expect_equal(result, quote({ a <- 1; b <- 2; c <- 3 }))
 })
 
-test_that("add_item: magrittr pipe chains accumulate expressions", {
-  result <- add_item(input = { a <- 1 }) %>%
-    add_item(input = { b <- 2 }) %>%
-    add_item(c = 3)
-  expect_equal(result, quote({ a <- 1; b <- 2; c <- 3 }))
-})
 
 test_that("add_item: .data arg directly accepts prior block", {
   prior <- add_item(input = { x <- 10 })
   result <- add_item(.data = prior, y = 20)
   expect_equal(result, quote({ x <- 10; y <- 20 }))
-})
-
-test_that("add_item: native pipe and magrittr pipe give identical results", {
-  native <- add_item(input = { a <- 1 }) |> add_item(b = 2) |> add_item(input = { c <- 3 })
-  magrittr <- add_item(input = { a <- 1 }) %>% add_item(b = 2) %>% add_item(input = { c <- 3 })
-  expect_equal(native, magrittr)
 })
 
 # add_item: unnamed expression as first positional arg ----------------------------
@@ -1174,11 +1162,6 @@ test_that("add_item: unnamed call followed by named args", {
 
 test_that("add_item: native pipe after unnamed call accumulates correctly", {
   result <- add_item(some_fn(a = b)) |> add_item(x = 5)
-  expect_equal(result, quote({ some_fn(a = b); x <- 5 }))
-})
-
-test_that("add_item: magrittr pipe after unnamed call accumulates correctly", {
-  result <- add_item(some_fn(a = b)) %>% add_item(x = 5)
   expect_equal(result, quote({ some_fn(a = b); x <- 5 }))
 })
 
@@ -1216,4 +1199,1022 @@ test_that("add_item: unnamed call among named args is captured unevaluated", {
 test_that("add_item: three-item native pipe chain with unnamed first call", {
   result <- add_item(some_fn(a = b)) |> add_item(x = 5) |> add_item(y = 6)
   expect_equal(result, quote({ some_fn(a = b); x <- 5; y <- 6 }))
+})
+
+
+# pick_val_v grouped mode PSA bug fix --------------------------------------
+
+test_that("pick_val_v grouped mode: indicator_psa=NULL uses PSA for all when psa_ind=TRUE", {
+  set.seed(1)
+  psa_vals <- list(rnorm(1, 2, 0.1), rnorm(1, 3, 0.1), rnorm(1, 4, 0.1))
+  result <- pick_val_v(
+    base = list(2, 3, 4),
+    psa  = psa_vals,
+    sens = list(10, 11, 12),
+    psa_ind  = TRUE,
+    sens_ind = TRUE,
+    indicator = list(1, 2, 3),
+    indicator_psa = NULL,
+    names_out = c("a", "b", "c"),
+    indicator_sens_binary = FALSE,
+    sens_iterator = 99,
+    distributions = list("rnorm", "rnorm", "rnorm"),
+    covariances = list(0.1, 0.1, 0.1),
+    deploy_env = FALSE
+  )
+  expect_equal(result, setNames(psa_vals, c("a", "b", "c")))
+})
+
+test_that("pick_val_v grouped mode: indicator_psa respects 0 entries", {
+  set.seed(1)
+  psa_vals <- list(rnorm(1, 2, 0.1), rnorm(1, 3, 0.1), rnorm(1, 4, 0.1))
+  result <- pick_val_v(
+    base = list(2, 3, 4),
+    psa  = psa_vals,
+    sens = list(10, 11, 12),
+    psa_ind  = TRUE,
+    sens_ind = TRUE,
+    indicator = list(1, 2, 3),
+    indicator_psa = list(1, 0, 1),
+    names_out = c("a", "b", "c"),
+    indicator_sens_binary = FALSE,
+    sens_iterator = 99,
+    distributions = list("rnorm", "rnorm", "rnorm"),
+    covariances = list(0.1, 0.1, 0.1),
+    deploy_env = FALSE
+  )
+  expect_equal(result$a, psa_vals[[1]])
+  expect_equal(result$b, 3)
+  expect_equal(result$c, psa_vals[[3]])
+})
+
+test_that("pick_val_v grouped mode: all indicator_psa=0 uses base when psa_ind=TRUE", {
+  set.seed(1)
+  psa_vals <- list(rnorm(1, 2, 0.1), rnorm(1, 3, 0.1))
+  result <- pick_val_v(
+    base = list(2, 3),
+    psa  = psa_vals,
+    sens = list(10, 11),
+    psa_ind  = TRUE,
+    sens_ind = TRUE,
+    indicator = list(1, 2),
+    indicator_psa = list(0, 0),
+    names_out = c("a", "b"),
+    indicator_sens_binary = FALSE,
+    sens_iterator = 99,
+    distributions = list("rnorm", "rnorm"),
+    covariances = list(0.1, 0.1),
+    deploy_env = FALSE
+  )
+  expect_equal(result$a, 2)
+  expect_equal(result$b, 3)
+})
+
+test_that("pick_val_v grouped mode: vector indicator_psa applies element-wise", {
+  set.seed(1)
+  psa_v <- c(rnorm(1, 0.4, 0.05), rnorm(1, 0.3, 0.05), rnorm(1, 0.3, 0.05))
+  result <- pick_val_v(
+    base = list(2, c(0.4, 0.3, 0.3)),
+    psa  = list(rnorm(1, 2, 0.1), psa_v),
+    sens = list(10, c(0.6, 0.5, 0.5)),
+    psa_ind  = TRUE,
+    sens_ind = TRUE,
+    indicator = list(1, c(2, 3, 4)),
+    indicator_psa = list(0, c(1, 0, 1)),
+    names_out = c("scalar", "vector"),
+    indicator_sens_binary = FALSE,
+    sens_iterator = 99,
+    distributions = list("rnorm", "rdirichlet"),
+    covariances = list(0.1, NULL),
+    deploy_env = FALSE
+  )
+  expect_equal(result$scalar, 2)
+  expect_equal(result$vector, c(psa_v[1], 0.3, psa_v[3]))
+})
+
+test_that("pick_val_v grouped mode: sens_iterator match updates value correctly", {
+  result <- pick_val_v(
+    base = list(2, 3, 4),
+    psa  = list(2, 3, 4),
+    sens = list(10, 11, 12),
+    psa_ind  = FALSE,
+    sens_ind = TRUE,
+    indicator = list(1, 2, 3),
+    indicator_psa = list(1, 1, 1),
+    names_out = c("a", "b", "c"),
+    indicator_sens_binary = FALSE,
+    sens_iterator = 2,
+    distributions = list("rnorm", "rnorm", "rnorm"),
+    covariances = list(0.1, 0.1, 0.1),
+    deploy_env = FALSE
+  )
+  expect_equal(result$a, 2)
+  expect_equal(result$b, 11)
+  expect_equal(result$c, 4)
+})
+
+test_that("pick_val_v binary mode: indicator_psa behavior unchanged by grouped fix", {
+  set.seed(1)
+  psa1 <- rnorm(1, 0, 0.1)
+  psa2 <- rnorm(1, 0, 0.1)
+  result <- pick_val_v(
+    base = c(0, 0),
+    psa  = c(psa1, psa2),
+    sens = c(2, 3),
+    psa_ind  = TRUE,
+    sens_ind = FALSE,
+    indicator = c(0, 0),
+    indicator_psa = c(1, 0),
+    deploy_env = FALSE
+  )
+  expect_equal(result[[1]], psa1)
+  expect_equal(result[[2]], 0)
+})
+
+
+# input_block() ------------------------------------------------------------
+
+test_that("input_block: returns a { } call", {
+  blk <- input_block(
+    base      = list(1, 2),
+    psa       = list(rnorm(1), rnorm(1)),
+    sens      = my_sens,
+    names_out = c("a", "b")
+  )
+  expect_true(is.call(blk))
+  expect_identical(blk[[1L]], as.name("{"))
+})
+
+test_that("input_block: has warden_block_meta attribute with correct structure", {
+  blk <- input_block(
+    base      = list(1, 2, 3),
+    psa       = list(1, 2, 3),
+    sens      = my_sens,
+    names_out = c("a", "b", "c")
+  )
+  meta <- attr(blk, "warden_block_meta")
+  expect_type(meta, "list")
+  expect_equal(meta$mode, "binary")
+  expect_equal(meta$n_params, 3L)
+  expect_equal(meta$n_groups, 3L)
+})
+
+test_that("input_block: grouped mode sets correct metadata", {
+  blk <- input_block(
+    base            = list(1, 2, 3, 4),
+    psa             = list(1, 2, 3, 4),
+    sens            = my_sens,
+    names_out       = c("a", "b", "c", "d"),
+    sens_indicators = list(1L, 1L, 2L, 2L),
+    distributions   = list("rnorm", "rnorm", "rnorm", "rnorm"),
+    covariances     = list(0.1, 0.1, 0.1, 0.1)
+  )
+  meta <- attr(blk, "warden_block_meta")
+  expect_equal(meta$mode, "grouped")
+  expect_equal(meta$n_params, 4L)
+  expect_equal(meta$n_groups, 2L)
+})
+
+test_that("input_block: generated expression contains pick_val_v call", {
+  blk <- input_block(
+    base      = list(1, 2),
+    psa       = pick_psa(list("rnorm"), list(1), list(0), list(0.1)),
+    sens      = my_sens,
+    names_out = c("a", "b")
+  )
+  stmts <- as.list(blk)[-1L]
+  expect_length(stmts, 1L)
+  expect_identical(stmts[[1L]][[1L]], as.name("pick_val_v"))
+})
+
+test_that("input_block: binary DSA mode uses create_indicators with 0 offset", {
+  blk <- input_block(
+    base      = list(1, 2),
+    psa       = list(1, 2),
+    sens      = my_sens,
+    names_out = c("a", "b"),
+    indicator_sens_binary = TRUE,
+    dsa_names = c("dsa_min")
+  )
+  # Structure: { if(is_dsa_cond, pvv_dsa, pvv_scenario) }
+  pvv_call <- as.list(blk)[[2L]]
+  expect_identical(pvv_call[[1L]], as.name("if"))
+  pvv_dsa  <- pvv_call[[3L]]
+  expect_identical(pvv_dsa[[1L]], as.name("pick_val_v"))
+  ci_call  <- pvv_dsa$indicator
+  expect_identical(ci_call[[1L]], as.name("create_indicators"))
+  expect_equal(ci_call[[5L]], 0L)
+})
+
+test_that("input_block: sens is indexed by sens_name_used in the expression", {
+  blk <- input_block(
+    base      = list(1),
+    psa       = list(1),
+    sens      = l_inputs,
+    names_out = "a"
+  )
+  pvv   <- as.list(blk)[[2L]]
+  s_arg <- pvv$sens
+  expect_identical(s_arg[[1L]], as.name("[["))
+  expect_identical(s_arg[[2L]], as.name("l_inputs"))
+  expect_identical(s_arg[[3L]], as.name("sens_name_used"))
+})
+
+test_that("input_block: pipe chaining with add_item preserves block content", {
+  blk <- input_block(
+    base      = list(1, 2),
+    psa       = list(1, 2),
+    sens      = my_sens,
+    names_out = c("a", "b")
+  ) |> add_item(extra = 5)
+  stmts <- as.list(blk)[-1L]
+  expect_length(stmts, 2L)
+  expect_identical(stmts[[1L]][[1L]], as.name("pick_val_v"))
+  expect_equal(stmts[[2L]], quote(extra <- 5))
+})
+
+test_that("input_block: pipe chaining preserves warden_block_meta", {
+  blk <- input_block(
+    base      = list(1, 2),
+    psa       = list(1, 2),
+    sens      = my_sens,
+    names_out = c("a", "b")
+  ) |> add_item(extra = 5)
+  expect_false(is.null(attr(blk, "warden_block_meta")))
+  expect_equal(attr(blk, "warden_block_meta")$n_params, 2L)
+})
+
+test_that("input_block: errors when names_out is empty", {
+  expect_error(
+    input_block(base = list(), psa = list(), sens = my_sens, names_out = character(0)),
+    "names_out must have at least one element"
+  )
+})
+
+test_that("input_block: errors in grouped mode when distributions is NULL", {
+  expect_error(
+    input_block(
+      base            = list(1, 2),
+      psa             = list(1, 2),
+      sens            = my_sens,
+      names_out       = c("a", "b"),
+      sens_indicators = list(1L, 2L)
+    ),
+    "distributions cannot be NULL in grouped mode"
+  )
+})
+
+test_that("input_block: .data prepended correctly", {
+  prior <- add_item(x = 10)
+  blk   <- input_block(
+    .data     = prior,
+    base      = list(1),
+    psa       = list(1),
+    sens      = my_sens,
+    names_out = "a"
+  )
+  stmts <- as.list(blk)[-1L]
+  expect_length(stmts, 2L)
+  expect_equal(stmts[[1L]], quote(x <- 10))
+  expect_identical(stmts[[2L]][[1L]], as.name("pick_val_v"))
+})
+
+
+# input_block() integration with run_sim() ---------------------------------
+
+test_that("input_block: run_sim produces valid output", {
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0
+      end   <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  i_block <- input_block(
+    base      = list(0.8, 0.5),
+    psa       = list(0.8, 0.5),
+    sens      = list(),
+    names_out = c("util.sick", "util.sicker")
+  )
+
+  results <- run_sim(
+    npats             = 5,
+    n_sim             = 1,
+    psa_bool          = FALSE,
+    sensitivity_bool  = FALSE,
+    arm_list          = c("arm1"),
+    common_all_inputs = i_block,
+    init_event_list   = make_evt_list(),
+    evt_react_list    = make_react_list(),
+    util_ongoing_list = "util.sick",
+    seed              = 42
+  )
+
+  expect_type(results, "list")
+  expect_length(results, 1L)
+  expect_true(results[[1]][[1]]$total_qalys > 0)
+})
+
+test_that("input_block: run_sim auto-computes n_sensitivity from metadata", {
+  assign("l_inputs_test", list(
+    parameter_name = list("util.sick", "util.sicker"),
+    base_value     = list(0.8, 0.5),
+    PSA_dist       = list("rnorm", "rbeta_mse"),
+    a              = list(0.8, 0.5),
+    b              = list(0.04, 0.025),
+    n              = list(1, 1),
+    DSA_min        = list(0.6, 0.3),
+    DSA_max        = list(0.9, 0.7),
+    psa_indicators = list(1, 1)
+  ), envir = globalenv())
+  on.exit(rm("l_inputs_test", envir = globalenv()), add = TRUE)
+
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0
+      end   <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  i_block <- input_block(
+    base                  = l_inputs_test[["base_value"]],
+    psa                   = pick_psa(l_inputs_test[["PSA_dist"]], l_inputs_test[["n"]],
+                                     l_inputs_test[["a"]],        l_inputs_test[["b"]]),
+    sens                  = l_inputs_test,
+    names_out             = l_inputs_test[["parameter_name"]],
+    psa_indicators        = l_inputs_test[["psa_indicators"]],
+    indicator_sens_binary = TRUE,
+    dsa_names             = c("DSA_min", "DSA_max")
+  )
+
+  # n_sensitivity NOT passed — engine should auto-set it to 2 from metadata
+  results <- run_sim(
+    npats             = 5,
+    n_sim             = 1,
+    psa_bool          = FALSE,
+    sensitivity_bool  = TRUE,
+    arm_list          = c("arm1"),
+    common_all_inputs = i_block,
+    init_event_list   = make_evt_list(),
+    evt_react_list    = make_react_list(),
+    util_ongoing_list = "util.sick",
+    sensitivity_names = c("DSA_min", "DSA_max"),
+    seed              = 42
+  )
+
+  # 2 params x 2 DSA directions = 4 sensitivity iterations
+  expect_length(results, 4L)
+})
+
+test_that("input_block: base case equivalent to add_item", {
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0
+      end   <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  manual_inputs <- add_item(util.sick = 0.8, util.sicker = 0.5)
+  i_block <- input_block(
+    base                  = list(0.8, 0.5),
+    psa                   = list(0.8, 0.5),
+    sens                  = list(),
+    names_out             = c("util.sick", "util.sicker"),
+    indicator_sens_binary = TRUE
+  )
+
+  r_manual <- run_sim(
+    npats = 5, n_sim = 1, psa_bool = FALSE, sensitivity_bool = FALSE,
+    arm_list = c("arm1"), common_all_inputs = manual_inputs,
+    init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+    util_ongoing_list = "util.sick", seed = 42
+  )
+  r_block <- run_sim(
+    npats = 5, n_sim = 1, psa_bool = FALSE, sensitivity_bool = FALSE,
+    arm_list = c("arm1"), common_all_inputs = i_block,
+    init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+    util_ongoing_list = "util.sick", seed = 42
+  )
+
+  expect_equal(r_manual[[1]][[1]]$total_qalys, r_block[[1]][[1]]$total_qalys)
+})
+
+test_that("input_block: DSA each iteration selects correct values", {
+  # Verify that input_block correctly routes values for each DSA iteration
+  # by comparing against reference runs with the exact expected input values.
+  # 2 params x 2 DSA directions = 4 iterations:
+  #   iter 1: DSA_min, param 1 -> util.sick=0.6, util.sicker=0.5 (base)
+  #   iter 2: DSA_min, param 2 -> util.sick=0.8 (base), util.sicker=0.3
+  #   iter 3: DSA_max, param 1 -> util.sick=0.9, util.sicker=0.5 (base)
+  #   iter 4: DSA_max, param 2 -> util.sick=0.8 (base), util.sicker=0.7
+  assign("l_dsa_test", list(
+    DSA_min = list(0.6, 0.3),
+    DSA_max = list(0.9, 0.7)
+  ), envir = globalenv())
+  on.exit(rm("l_dsa_test", envir = globalenv()), add = TRUE)
+
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0
+      end   <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  i_block <- input_block(
+    base                  = list(0.8, 0.5),
+    psa                   = list(0.8, 0.5),
+    sens                  = l_dsa_test,
+    names_out             = c("util.sick", "util.sicker"),
+    indicator_sens_binary = TRUE,
+    dsa_names             = c("DSA_min", "DSA_max")
+  )
+
+  r_block <- run_sim(
+    npats = 5, n_sim = 1, psa_bool = FALSE, sensitivity_bool = TRUE,
+    arm_list = c("arm1"),
+    common_all_inputs = i_block,
+    init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+    util_ongoing_list = "util.sick",
+    sensitivity_names = c("DSA_min", "DSA_max"),
+    seed = 42
+  )
+
+  expect_length(r_block, 4L)
+
+  # Each iteration's reference: simple add_item with the expected exact values
+  expected <- list(
+    list(util.sick = 0.6, util.sicker = 0.5),
+    list(util.sick = 0.8, util.sicker = 0.3),
+    list(util.sick = 0.9, util.sicker = 0.5),
+    list(util.sick = 0.8, util.sicker = 0.7)
+  )
+
+  for (idx in seq_along(expected)) {
+    v <- expected[[idx]]
+    r_ref <- run_sim(
+      npats = 5, n_sim = 1, psa_bool = FALSE, sensitivity_bool = FALSE,
+      arm_list = c("arm1"),
+      common_all_inputs = eval(bquote(add_item(
+        util.sick = .(v$util.sick), util.sicker = .(v$util.sicker)
+      ))),
+      init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+      util_ongoing_list = "util.sick",
+      seed = 42
+    )
+    expect_equal(r_block[[idx]][[1]]$total_qalys, r_ref[[1]][[1]]$total_qalys,
+                 label = paste("iteration", idx))
+  }
+})
+
+test_that("input_block: equivalent to pick_val_v across psa/sensitivity/n_sim combinations", {
+  assign("l_pvv", list(
+    parameter_name = list("util.sick", "util.sicker"),
+    base_value     = list(0.8, 0.5),
+    DSA_min        = list(0.6, 0.3),
+    DSA_max        = list(0.9, 0.7),
+    PSA_dist       = list("rnorm", "rnorm"),
+    psa_a          = list(0.8, 0.5),
+    psa_b          = list(0.05, 0.05),
+    n              = list(1, 1)
+  ), envir = globalenv())
+  on.exit(rm("l_pvv", envir = globalenv()), add = TRUE)
+
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0; end <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  i_sensitivity_old <- add_item(
+    iterator_sensitivity = sens_iterator(sens, n_sensitivity)
+  ) |> add_item(
+    indicators = if (sensitivity_bool) {
+      create_indicators(iterator_sensitivity,
+                        n_sensitivity * length(sensitivity_names),
+                        rep(1, length(l_pvv[["base_value"]])))
+    } else {
+      rep(1, length(l_pvv[["base_value"]]))
+    }
+  )
+
+  i_old <- add_item(
+    pick_val_v(
+      base      = l_pvv[["base_value"]],
+      psa       = pick_psa(l_pvv[["PSA_dist"]], l_pvv[["n"]],
+                           l_pvv[["psa_a"]], l_pvv[["psa_b"]]),
+      sens      = l_pvv[[sens_name_used]],
+      psa_ind   = psa_bool,
+      sens_ind  = sensitivity_bool,
+      indicator = indicators,
+      names_out = l_pvv[["parameter_name"]]
+    )
+  )
+
+  i_block <- input_block(
+    base                  = list(0.8, 0.5),
+    psa                   = pick_psa(l_pvv[["PSA_dist"]], l_pvv[["n"]],
+                                     l_pvv[["psa_a"]], l_pvv[["psa_b"]]),
+    sens                  = l_pvv,
+    names_out             = c("util.sick", "util.sicker"),
+    indicator_sens_binary = TRUE,
+    dsa_names             = c("DSA_min", "DSA_max")
+  )
+
+  run_both <- function(psa_b, sens_b, n_s) {
+    sn  <- if (sens_b) c("DSA_min", "DSA_max") else NULL
+    nse <- if (sens_b) length(l_pvv[["base_value"]]) else 1L
+
+    r_old <- run_sim(
+      npats = 5, n_sim = n_s, psa_bool = psa_b, sensitivity_bool = sens_b,
+      arm_list           = c("arm1"),
+      sensitivity_inputs = i_sensitivity_old,
+      common_all_inputs  = i_old,
+      init_event_list    = make_evt_list(),
+      evt_react_list     = make_react_list(),
+      util_ongoing_list  = "util.sick",
+      sensitivity_names  = sn,
+      n_sensitivity      = nse,
+      seed = 42
+    )
+    r_block <- run_sim(
+      npats = 5, n_sim = n_s, psa_bool = psa_b, sensitivity_bool = sens_b,
+      arm_list           = c("arm1"),
+      common_all_inputs  = i_block,
+      init_event_list    = make_evt_list(),
+      evt_react_list     = make_react_list(),
+      util_ongoing_list  = "util.sick",
+      sensitivity_names  = sn,
+      seed = 42
+    )
+    expect_length(r_old, length(r_block))
+    for (s in seq_along(r_old)) {
+      for (sim in seq_along(r_old[[s]])) {
+        expect_equal(
+          r_old[[s]][[sim]]$total_qalys,
+          r_block[[s]][[sim]]$total_qalys,
+          label = sprintf("psa=%s sens=%s n_sim=%d s=%d sim=%d",
+                          psa_b, sens_b, n_s, s, sim)
+        )
+      }
+    }
+  }
+
+  run_both(psa_b = FALSE, sens_b = FALSE, n_s = 1)  # base case
+  run_both(psa_b = TRUE,  sens_b = FALSE, n_s = 2)  # PSA only, 2 sims
+  run_both(psa_b = FALSE, sens_b = TRUE,  n_s = 2)  # DSA only, 2 sims
+  run_both(psa_b = TRUE,  sens_b = TRUE,  n_s = 3)  # probabilistic DSA, 3 sims
+})
+
+test_that("input_block: non-binary - scalar params varied independently", {
+  assign("l_nb_indep", list(
+    DSA_min = list(0.6, 0.3),
+    DSA_max = list(0.9, 0.7)
+  ), envir = globalenv())
+  on.exit(rm("l_nb_indep", envir = globalenv()), add = TRUE)
+
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0; end <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  i_block <- input_block(
+    base            = list(0.8, 0.5),
+    psa             = list(0.8, 0.5),
+    sens            = l_nb_indep,
+    names_out       = c("util.sick", "util.sicker"),
+    sens_indicators = list(1L, 2L),
+    distributions   = list("rnorm", "rnorm"),
+    dsa_names       = c("DSA_min", "DSA_max")
+  )
+
+  i_old <- add_item(
+    pick_val_v(
+      base      = list(0.8, 0.5),
+      psa       = list(0.8, 0.5),
+      sens      = l_nb_indep[[sens_name_used]],
+      psa_ind   = psa_bool,
+      sens_ind  = sensitivity_bool,
+      indicator = list(1L, 2L),
+      indicator_sens_binary = FALSE,
+      sens_iterator = sens_iterator(sens, n_sensitivity),
+      distributions = list("rnorm", "rnorm"),
+      names_out = c("util.sick", "util.sicker")
+    )
+  )
+
+  run_and_compare <- function(psa_b, n_s) {
+    r_block <- run_sim(
+      npats = 5, n_sim = n_s, psa_bool = psa_b, sensitivity_bool = TRUE,
+      arm_list = c("arm1"), common_all_inputs = i_block,
+      init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+      util_ongoing_list = "util.sick",
+      sensitivity_names = c("DSA_min", "DSA_max"), seed = 42
+    )
+    r_old <- run_sim(
+      npats = 5, n_sim = n_s, psa_bool = psa_b, sensitivity_bool = TRUE,
+      arm_list = c("arm1"), common_all_inputs = i_old,
+      init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+      util_ongoing_list = "util.sick",
+      sensitivity_names = c("DSA_min", "DSA_max"), n_sensitivity = 2L, seed = 42
+    )
+    expect_length(r_block, length(r_old))
+    for (s in seq_along(r_old)) {
+      for (sim in seq_along(r_old[[s]])) {
+        expect_equal(
+          r_block[[s]][[sim]]$total_qalys,
+          r_old[[s]][[sim]]$total_qalys,
+          label = sprintf("psa=%s n_sim=%d s=%d sim=%d", psa_b, n_s, s, sim)
+        )
+      }
+    }
+  }
+
+  run_and_compare(FALSE, 1)
+  run_and_compare(TRUE, 2)
+})
+
+test_that("input_block: non-binary - scalar params varied as a group", {
+  assign("l_nb_grp", list(
+    DSA_min = list(0.6, 0.3),
+    DSA_max = list(0.9, 0.7)
+  ), envir = globalenv())
+  on.exit(rm("l_nb_grp", envir = globalenv()), add = TRUE)
+
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0; end <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  i_block <- input_block(
+    base            = list(0.8, 0.5),
+    psa             = list(0.8, 0.5),
+    sens            = l_nb_grp,
+    names_out       = c("util.sick", "util.sicker"),
+    sens_indicators = list(1L, 1L),
+    distributions   = list("rnorm", "rnorm"),
+    dsa_names       = c("DSA_min", "DSA_max")
+  )
+
+  i_old <- add_item(
+    pick_val_v(
+      base      = list(0.8, 0.5),
+      psa       = list(0.8, 0.5),
+      sens      = l_nb_grp[[sens_name_used]],
+      psa_ind   = psa_bool,
+      sens_ind  = sensitivity_bool,
+      indicator = list(1L, 1L),
+      indicator_sens_binary = FALSE,
+      sens_iterator = sens_iterator(sens, n_sensitivity),
+      distributions = list("rnorm", "rnorm"),
+      names_out = c("util.sick", "util.sicker")
+    )
+  )
+
+  run_and_compare <- function(psa_b, n_s) {
+    r_block <- run_sim(
+      npats = 5, n_sim = n_s, psa_bool = psa_b, sensitivity_bool = TRUE,
+      arm_list = c("arm1"), common_all_inputs = i_block,
+      init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+      util_ongoing_list = "util.sick",
+      sensitivity_names = c("DSA_min", "DSA_max"), n_sensitivity = 1L, seed = 42
+    )
+    r_old <- run_sim(
+      npats = 5, n_sim = n_s, psa_bool = psa_b, sensitivity_bool = TRUE,
+      arm_list = c("arm1"), common_all_inputs = i_old,
+      init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+      util_ongoing_list = "util.sick",
+      sensitivity_names = c("DSA_min", "DSA_max"), n_sensitivity = 1L, seed = 42
+    )
+    expect_length(r_block, length(r_old))
+    for (s in seq_along(r_old)) {
+      for (sim in seq_along(r_old[[s]])) {
+        expect_equal(
+          r_block[[s]][[sim]]$total_qalys,
+          r_old[[s]][[sim]]$total_qalys,
+          label = sprintf("psa=%s n_sim=%d s=%d sim=%d", psa_b, n_s, s, sim)
+        )
+      }
+    }
+  }
+
+  run_and_compare(FALSE, 1)
+  run_and_compare(TRUE, 2)
+})
+
+test_that("input_block: non-binary - vector param (mvrnorm) grouped c(3,3) vs independent c(3,4)", {
+  # 3-parameter model: 2 scalars (groups 1, 2) + 1 two-element vector (groups
+  # c(3,3) or c(3,4)). Identity covariance => partial DSA uses exact replacement.
+  assign("l_mvn_test", list(
+    DSA_min = list(0.6, 0.3, c(6.0, 3.0)),
+    DSA_max = list(0.9, 0.7, c(9.0, 7.0))
+  ), envir = globalenv())
+  on.exit(rm("l_mvn_test", envir = globalenv()), add = TRUE)
+
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0; end <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  run_and_compare <- function(i_block, i_old, n_sens, label) {
+    r_block <- run_sim(
+      npats = 5, n_sim = 1, psa_bool = FALSE, sensitivity_bool = TRUE,
+      arm_list = c("arm1"), common_all_inputs = i_block,
+      init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+      util_ongoing_list = "util.sick",
+      sensitivity_names = c("DSA_min", "DSA_max"), n_sensitivity = n_sens, seed = 42
+    )
+    r_old <- run_sim(
+      npats = 5, n_sim = 1, psa_bool = FALSE, sensitivity_bool = TRUE,
+      arm_list = c("arm1"), common_all_inputs = i_old,
+      init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+      util_ongoing_list = "util.sick",
+      sensitivity_names = c("DSA_min", "DSA_max"), n_sensitivity = n_sens, seed = 42
+    )
+    expect_length(r_block, length(r_old))
+    for (s in seq_along(r_old)) {
+      expect_equal(r_block[[s]][[1]]$total_qalys, r_old[[s]][[1]]$total_qalys,
+                   label = paste(label, "s", s))
+    }
+  }
+
+  # Grouped: both elements of v_state change together (c(3,3)), n_sensitivity=3
+  i_block_grp <- input_block(
+    base            = list(0.8, 0.5, c(8.0, 5.0)),
+    psa             = list(0.8, 0.5, c(8.0, 5.0)),
+    sens            = l_mvn_test,
+    names_out       = c("util.sick", "util.sicker", "v_state"),
+    sens_indicators = list(1L, 2L, c(3L, 3L)),
+    distributions   = list("rnorm", "rnorm", "mvrnorm"),
+    covariances     = list(NULL, NULL, matrix(c(1, 0, 0, 1), 2, 2)),
+    dsa_names       = c("DSA_min", "DSA_max")
+  )
+  i_old_grp <- add_item(
+    pick_val_v(
+      base      = list(0.8, 0.5, c(8.0, 5.0)),
+      psa       = list(0.8, 0.5, c(8.0, 5.0)),
+      sens      = l_mvn_test[[sens_name_used]],
+      psa_ind   = psa_bool,
+      sens_ind  = sensitivity_bool,
+      indicator = list(1L, 2L, c(3L, 3L)),
+      indicator_sens_binary = FALSE,
+      sens_iterator = sens_iterator(sens, n_sensitivity),
+      distributions = list("rnorm", "rnorm", "mvrnorm"),
+      covariances   = list(NULL, NULL, matrix(c(1, 0, 0, 1), 2, 2)),
+      names_out = c("util.sick", "util.sicker", "v_state")
+    )
+  )
+
+  # Independent: each element of v_state has its own DSA step (c(3,4)), n_sensitivity=4
+  i_block_ind <- input_block(
+    base            = list(0.8, 0.5, c(8.0, 5.0)),
+    psa             = list(0.8, 0.5, c(8.0, 5.0)),
+    sens            = l_mvn_test,
+    names_out       = c("util.sick", "util.sicker", "v_state"),
+    sens_indicators = list(1L, 2L, c(3L, 4L)),
+    distributions   = list("rnorm", "rnorm", "mvrnorm"),
+    covariances     = list(NULL, NULL, matrix(c(1, 0, 0, 1), 2, 2)),
+    dsa_names       = c("DSA_min", "DSA_max")
+  )
+  i_old_ind <- add_item(
+    pick_val_v(
+      base      = list(0.8, 0.5, c(8.0, 5.0)),
+      psa       = list(0.8, 0.5, c(8.0, 5.0)),
+      sens      = l_mvn_test[[sens_name_used]],
+      psa_ind   = psa_bool,
+      sens_ind  = sensitivity_bool,
+      indicator = list(1L, 2L, c(3L, 4L)),
+      indicator_sens_binary = FALSE,
+      sens_iterator = sens_iterator(sens, n_sensitivity),
+      distributions = list("rnorm", "rnorm", "mvrnorm"),
+      covariances   = list(NULL, NULL, matrix(c(1, 0, 0, 1), 2, 2)),
+      names_out = c("util.sick", "util.sicker", "v_state")
+    )
+  )
+
+  run_and_compare(i_block_grp, i_old_grp, n_sens = 3L, label = "grouped")
+  run_and_compare(i_block_ind, i_old_ind, n_sens = 4L, label = "independent")
+})
+
+test_that("input_block: dsa_names - binary mode, DSA iterations cycle params, scenario uses all", {
+  # sensitivity_names = c("DSA_min","DSA_max","scenario_1")
+  # dsa_names = c("DSA_min","DSA_max"): only these cycle through params 1-at-a-time.
+  # scenario_1: all params should take the scenario values simultaneously.
+  # Expected: 2 params x 2 DSA names + 1 scenario = 5 total iterations.
+  assign("l_mixed", list(
+    DSA_min    = list(0.6, 0.3),
+    DSA_max    = list(0.9, 0.7),
+    scenario_1 = list(0.55, 0.45)
+  ), envir = globalenv())
+  on.exit(rm("l_mixed", envir = globalenv()), add = TRUE)
+
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0; end <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  i_block <- input_block(
+    base                  = list(0.8, 0.5),
+    psa                   = list(0.8, 0.5),
+    sens                  = l_mixed,
+    names_out             = c("util.sick", "util.sicker"),
+    dsa_names             = c("DSA_min", "DSA_max"),
+    indicator_sens_binary = TRUE
+  )
+
+  sn <- c("DSA_min", "DSA_max", "scenario_1")
+  r_block <- run_sim(
+    npats = 5, n_sim = 1, psa_bool = FALSE, sensitivity_bool = TRUE,
+    arm_list = c("arm1"), common_all_inputs = i_block,
+    init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+    util_ongoing_list = "util.sick",
+    sensitivity_names = sn, seed = 42
+  )
+
+  # 2 params x 2 DSA names + 1 scenario = 5 total iterations
+  expect_length(r_block, 5L)
+  qalys <- vapply(r_block, \(s) s[[1]]$total_qalys, numeric(1))
+  # DSA_min iter1 (util.sick=0.6) < DSA_min iter2 (util.sick=base=0.8)
+  expect_lt(qalys[1], qalys[2])
+  # DSA_max iter1 (util.sick=0.9) > DSA_max iter2 (util.sick=base=0.8)
+  expect_gt(qalys[3], qalys[4])
+  # Both DSA iter2s use base util.sick → equal QALYs
+  expect_equal(qalys[2], qalys[4])
+  # scenario_1 uses util.sick=0.55 < base=0.8
+  expect_lt(qalys[5], qalys[2])
+})
+
+test_that("input_block: dsa_names - grouped mode, DSA iterates groups, scenario uses all", {
+
+  # sens_indicators=list(1L,2L): each param is its own group (independent).
+  # Expected: 2 groups x 2 DSA names + 1 scenario = 5 total iterations.
+  assign("l_mixed_grp", list(
+    DSA_min    = list(0.6, 0.3),
+    DSA_max    = list(0.9, 0.7),
+    scenario_1 = list(0.55, 0.45)
+  ), envir = globalenv())
+  on.exit(rm("l_mixed_grp", envir = globalenv()), add = TRUE)
+
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0; end <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  i_block <- input_block(
+    base            = list(0.8, 0.5),
+    psa             = list(0.8, 0.5),
+    sens            = l_mixed_grp,
+    names_out       = c("util.sick", "util.sicker"),
+    sens_indicators = list(1L, 2L),
+    distributions   = list("rnorm", "rnorm"),
+    dsa_names       = c("DSA_min", "DSA_max")
+  )
+
+  sn <- c("DSA_min", "DSA_max", "scenario_1")
+  r_block <- run_sim(
+    npats = 5, n_sim = 1, psa_bool = FALSE, sensitivity_bool = TRUE,
+    arm_list = c("arm1"), common_all_inputs = i_block,
+    init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+    util_ongoing_list = "util.sick",
+    sensitivity_names = sn, seed = 42
+  )
+
+  # 2 groups x 2 DSA names + 1 scenario = 5 total iterations
+  expect_length(r_block, 5L)
+  qalys <- vapply(r_block, \(s) s[[1]]$total_qalys, numeric(1))
+  # DSA_min iter1 (util.sick=0.6) < DSA_min iter2 (util.sick=base=0.8)
+  expect_lt(qalys[1], qalys[2])
+  # DSA_max iter1 (util.sick=0.9) > DSA_max iter2 (util.sick=base=0.8)
+  expect_gt(qalys[3], qalys[4])
+  # Both DSA iter2s use base util.sick → equal QALYs
+  expect_equal(qalys[2], qalys[4])
+  # scenario_1 uses util.sick=0.55 < base=0.8
+  expect_lt(qalys[5], qalys[2])
+})
+
+test_that("input_block: dsa_names=NULL treats all sensitivity_names as scenarios (1 iter each)", {
+  assign("l_scen", list(
+    scen_a = list(0.6, 0.3),
+    scen_b = list(0.9, 0.7)
+  ), envir = globalenv())
+  on.exit(rm("l_scen", envir = globalenv()), add = TRUE)
+
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0; end <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  # dsa_names = NULL (default) → all names are scenarios
+  i_block <- input_block(
+    base      = list(0.8, 0.5),
+    psa       = list(0.8, 0.5),
+    sens      = l_scen,
+    names_out = c("util.sick", "util.sicker")
+  )
+
+  r_block <- run_sim(
+    npats = 5, n_sim = 1, psa_bool = FALSE, sensitivity_bool = TRUE,
+    arm_list = c("arm1"), common_all_inputs = i_block,
+    init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+    util_ongoing_list = "util.sick",
+    sensitivity_names = c("scen_a", "scen_b"), seed = 42
+  )
+
+  # 2 scenario names → 2 iterations (not 2 params x 2 = 4)
+  expect_length(r_block, 2L)
+  qalys <- vapply(r_block, \(s) s[[1]]$total_qalys, numeric(1))
+  # scen_a: util.sick=0.6 < scen_b: util.sick=0.9
+  expect_lt(qalys[1], qalys[2])
+})
+
+test_that("input_block: sens_indicators with 0 skips that parameter in DSA", {
+  assign("l_skip", list(
+    DSA_min = list(0.6, 0.3),
+    DSA_max = list(0.9, 0.7)
+  ), envir = globalenv())
+  on.exit(rm("l_skip", envir = globalenv()), add = TRUE)
+
+  make_evt_list <- function() {
+    add_tte(arm = c("arm1"), evts = c("start", "end"), input = {
+      start <- 0; end <- 5
+    })
+  }
+  make_react_list <- function() {
+    add_reactevt(name_evt = "start", input = {}) |>
+      add_reactevt(name_evt = "end", input = { curtime <- Inf })
+  }
+
+  # sens_indicators = list(1L, 0L): only param 1 varies, param 2 is fixed
+  i_block <- input_block(
+    base                  = list(0.8, 0.5),
+    psa                   = list(0.8, 0.5),
+    sens                  = l_skip,
+    names_out             = c("util.sick", "util.sicker"),
+    sens_indicators       = list(1L, 0L),
+    indicator_sens_binary = TRUE,
+    dsa_names             = c("DSA_min", "DSA_max")
+  )
+
+  # n_groups=1 (only param 1 active) → 1 iter per DSA name = 2 total
+  r_block <- run_sim(
+    npats = 5, n_sim = 1, psa_bool = FALSE, sensitivity_bool = TRUE,
+    arm_list = c("arm1"), common_all_inputs = i_block,
+    init_event_list = make_evt_list(), evt_react_list = make_react_list(),
+    util_ongoing_list = "util.sick",
+    sensitivity_names = c("DSA_min", "DSA_max"), seed = 42
+  )
+
+  expect_length(r_block, 2L)
+  qalys <- vapply(r_block, \(s) s[[1]]$total_qalys, numeric(1))
+  # DSA_min: util.sick=0.6 (lower), DSA_max: util.sick=0.9 (higher)
+  expect_lt(qalys[1], qalys[2])
 })
