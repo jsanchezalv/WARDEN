@@ -1,4 +1,4 @@
-# Remove Events for a Patient
+# Remove events for a patient
 
 Removes one or more events from the queue for the given patient.
 

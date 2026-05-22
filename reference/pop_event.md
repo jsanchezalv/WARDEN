@@ -1,4 +1,4 @@
-# Remove the Next Event from the Queue
+# Remove the next event from the queue
 
 Removes the next scheduled event from the queue. Not needed by user.
 

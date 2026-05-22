@@ -1,4 +1,4 @@
-# Create a Discrete Resource
+# Create a discrete resource
 
 Creates a discrete resource management system for discrete event
 simulations. This system manages a fixed number of identical resource

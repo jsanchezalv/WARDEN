@@ -88,34 +88,34 @@ appropriate citation.
 - [`add_tte()`](https://jsanchezalv.github.io/WARDEN/reference/add_tte.md)
   : Define events and the initial event time
 - [`new_event()`](https://jsanchezalv.github.io/WARDEN/reference/new_event.md)
-  : Add Events to the Queue for a Patient
+  : Add events to the queue for a patient
 - [`modify_event()`](https://jsanchezalv.github.io/WARDEN/reference/modify_event.md)
-  : Modify or Add Events for a Patient
+  : Modify or add events for a patient
 - [`remove_event()`](https://jsanchezalv.github.io/WARDEN/reference/remove_event.md)
-  : Remove Events for a Patient
+  : Remove events for a patient
 - [`get_event()`](https://jsanchezalv.github.io/WARDEN/reference/get_event.md)
   : Get a specific event time
 - [`has_event()`](https://jsanchezalv.github.io/WARDEN/reference/has_event.md)
-  : Check if a Patient Has a Specific Event
+  : Check if a patient has a specific event in the queue
 - [`next_event()`](https://jsanchezalv.github.io/WARDEN/reference/next_event.md)
-  : Get the Next Event(s) in the Queue
+  : Get the next events in the queue
 - [`next_event_pt()`](https://jsanchezalv.github.io/WARDEN/reference/next_event_pt.md)
-  : Get the Next Event(s) in the Queue for a specific patient
+  : Get the next events in the queue for a specific patient
 - [`queue_empty()`](https://jsanchezalv.github.io/WARDEN/reference/queue_empty.md)
-  : Check if the Event Queue is Empty
+  : Check if the event queue is empty
 - [`queue_size()`](https://jsanchezalv.github.io/WARDEN/reference/queue_size.md)
   : Get the Size of the Event Queue
 - [`queue_create()`](https://jsanchezalv.github.io/WARDEN/reference/queue_create.md)
   : Create a New Event Queue
 - [`pop_event()`](https://jsanchezalv.github.io/WARDEN/reference/pop_event.md)
-  : Remove the Next Event from the Queue
+  : Remove the next event from the queue
 - [`pop_and_return_event()`](https://jsanchezalv.github.io/WARDEN/reference/pop_and_return_event.md)
-  : Pop and Return the Next Event
+  : Pop and return the next event
 
 ### Resource Constrained Specific Functions
 
 - [`resource_discrete()`](https://jsanchezalv.github.io/WARDEN/reference/resource_discrete.md)
-  : Create a Discrete Resource
+  : Create a discrete resource
 - [`shared_input()`](https://jsanchezalv.github.io/WARDEN/reference/shared_input.md)
   : Shared input object
 - [`discrete_resource_clone()`](https://jsanchezalv.github.io/WARDEN/reference/discrete_resource_clone.md)
@@ -141,6 +141,9 @@ appropriate citation.
 - [`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
   : Select which values should be applied in the corresponding loop for
   several values (vector or list).
+
+- [`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
+  : Build an input block for automatic parameter selection
 
 - [`replicate_profiles()`](https://jsanchezalv.github.io/WARDEN/reference/replicate_profiles.md)
   : Replicate profiles data.frame
@@ -172,8 +175,8 @@ appropriate citation.
 - [`luck_adj()`](https://jsanchezalv.github.io/WARDEN/reference/luck_adj.md)
   : Perform luck adjustment
 - [`qtimecov()`](https://jsanchezalv.github.io/WARDEN/reference/qtimecov.md)
-  : Draw Time-to-Event with Time-Dependent Covariates and Luck
-  Adjustment
+  : Draw time-to-event with time-dependent covariates and luck
+  adjustment
 - [`adj_val()`](https://jsanchezalv.github.io/WARDEN/reference/adj_val.md)
   : Adjusted Value Calculation
 
@@ -217,7 +220,7 @@ appropriate citation.
 - [`rcond_gompertz()`](https://jsanchezalv.github.io/WARDEN/reference/rcond_gompertz.md)
   : Draw from a conditional Gompertz distribution (lower bound only)
 - [`rcond_gompertz_lu()`](https://jsanchezalv.github.io/WARDEN/reference/rcond_gompertz_lu.md)
-  : Draw from a Conditional Gompertz distribution (lower and upper
+  : Draw from a conditional Gompertz distribution (lower and upper
   bound)
 - [`rdirichlet()`](https://jsanchezalv.github.io/WARDEN/reference/rdirichlet.md)
   : Draw from a dirichlet distribution based on number of counts in

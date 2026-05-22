@@ -1,4 +1,4 @@
-# Get the Next Event(s) in the Queue
+# Get the next events in the queue
 
 Retrieves the next `n` events (without removing them).
 

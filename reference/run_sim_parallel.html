@@ -261,8 +261,7 @@ Note that this will make the progress bar not correct, as a set of patients that
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="add_item.html">add_item</a></span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="add_item.html">add_item</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>util.sick <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
 <span class="r-in"><span>util.sicker <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
 <span class="r-in"><span>cost.sick <span class="op">=</span> <span class="fl">3000</span>,</span></span>
@@ -292,13 +291,13 @@ Note that this will make the progress bar not correct, as a set of patients that
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">evt_react_list</span> <span class="op">&lt;-</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"sick"</span>,</span></span>
-<span class="r-in"><span>             input <span class="op">=</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>             input <span class="op">=</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"sicker"</span>,</span></span>
 <span class="r-in"><span>               input <span class="op">=</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="va">util.sicker</span></span></span>
 <span class="r-in"><span>                 <span class="va">c_default</span> <span class="op">&lt;-</span> <span class="va">cost.sicker</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span></span></span>
 <span class="r-in"><span>                 <span class="va">fl.sick</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></span>
-<span class="r-in"><span>               <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>               <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"death"</span>,</span></span>
 <span class="r-in"><span>               input <span class="op">=</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>                 <span class="va">q_default</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></span>
@@ -325,8 +324,8 @@ Note that this will make the progress bar not correct, as a set of patients that
 <span class="r-in"><span>ncores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Analysis number: 1</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation number: 1</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Time to run analysis 1: 0.67s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Total time to run: 0.67s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Time to run analysis 1: 0.47s</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Total time to run: 0.47s</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Simulation finalized; </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]</span>

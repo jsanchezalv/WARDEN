@@ -1,6 +1,6 @@
-# Draw from a Conditional Gompertz distribution (lower and upper bound)
+# Draw from a conditional Gompertz distribution (lower and upper bound)
 
-Draw from a Conditional Gompertz distribution (lower and upper bound)
+Draw from a conditional Gompertz distribution (lower and upper bound)
 
 ## Usage
 

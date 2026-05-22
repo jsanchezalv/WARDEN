@@ -1,4 +1,4 @@
-# Add Events to the Queue for a Patient
+# Add events to the queue for a patient
 
 Adds one or more events for a given patient to the queue.
 

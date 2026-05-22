@@ -1,6 +1,6 @@
-# Check if a Patient Has a Specific Event
+# Check if a patient has a specific event in the queue
 
-Check if a Patient Has a Specific Event
+Check if a patient has a specific event in the queue
 
 ## Usage
 

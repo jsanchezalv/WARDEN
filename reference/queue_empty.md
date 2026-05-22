@@ -1,6 +1,6 @@
-# Check if the Event Queue is Empty
+# Check if the event queue is empty
 
-Check if the Event Queue is Empty
+Check if the event queue is empty
 
 ## Usage
 

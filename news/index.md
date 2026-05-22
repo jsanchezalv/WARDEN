@@ -10,6 +10,27 @@ CRAN release: 2026-03-18
   the LHS of `|>` is naturally routed to `.data` without relying on
   magrittr’s `.` symbol. Existing code using `%>%`, `input=`, or named
   `...` arguments is unaffected (#TODO).
+- [`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
+  is a new helper that builds a complete
+  [`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
+  expression from explicit `base`, `psa`, `sens`, and `names_out`
+  arguments. The `binary` and `dsa_indicators` parameters have been
+  renamed to `indicator_sens_binary` and `sens_indicators` respectively
+  to align with
+  [`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md).
+  The `dsa_names` argument now defaults to `NULL`, meaning all
+  `sensitivity_names` are treated as scenarios (one iteration per name);
+  supply `dsa_names` explicitly to designate which names are DSA
+  directions. Setting an entry in `sens_indicators` to `0` now
+  permanently excludes that parameter from variation in both DSA and
+  scenario analyses, and the engine automatically deduces
+  `n_sensitivity` from the number of active parameters/groups.
+- [`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
+  now correctly respects `indicator_psa` in grouped mode
+  (`indicator_sens_binary = FALSE`). Previously, when `sens_bool = TRUE`
+  and `psa_bool = TRUE`, all parameters drew from PSA regardless of
+  `indicator_psa`; parameters with `indicator_psa = 0` now correctly
+  draw from `base`.
 
 ## WARDEN 2.0.1
 

@@ -1,4 +1,4 @@
-# Get the Next Event(s) in the Queue for a specific patient
+# Get the next events in the queue for a specific patient
 
 Retrieves the next `n` events (without removing them).
 

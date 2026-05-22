@@ -1,4 +1,4 @@
-# Modify or Add Events for a Patient
+# Modify or add events for a patient
 
 Modifies existing event times, or adds new events if `create_if_missing`
 is TRUE.

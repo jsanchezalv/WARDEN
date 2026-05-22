@@ -1,4 +1,4 @@
-# Pop and Return the Next Event
+# Pop and return the next event
 
 Removes the next event from the queue and returns its details. Not
 needed by user.

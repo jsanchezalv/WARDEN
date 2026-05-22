@@ -8,11 +8,10 @@ defines inputs for a simulation.
 
 - Unnamed args are inserted raw/unevaluated. If an unnamed arg is a
   [`{}`](https://rdrr.io/r/base/Paren.html) block, its statements are
-  spliced (flattened). `add_item(pick_val_v(...))`
+  spliced (flattened). e.g., `add_item(pick_val_v(...))`
 
-- Works with magrittr pipes: a leading `.` (the LHS) is resolved to its
-  value; if that value is a [`{}`](https://rdrr.io/r/base/Paren.html)
-  block (or list of expressions), it becomes the starting block.
+- Works with both `|>` (native pipe) and `%>%` (magrittr): the LHS is
+  passed to `.data` and becomes the starting block.
 
 - input argument can be used to handle alternative `add_item2` method,
   e.g. `add_item(input = {a <- 5})`
@@ -20,20 +19,20 @@ defines inputs for a simulation.
 ## Usage
 
 ``` r
-add_item(..., .data = NULL, input)
+add_item(.data = NULL, ..., input)
 ```
 
 ## Arguments
 
+- .data:
+
+  Optional: an existing [`{}`](https://rdrr.io/r/base/Paren.html) block
+  (or list of expressions) to start from. Receives the LHS value when
+  using `|>` or `%>%`.
+
 - ...:
 
   Unevaluated arguments. Named → `name <- expr`; unnamed → raw expr.
-
-- .data:
-
-  Optional named argument: an existing
-  [`{}`](https://rdrr.io/r/base/Paren.html) block (or list of
-  expressions) to start from.
 
 - input:
 
@@ -48,8 +47,6 @@ object) ready for `load_inputs()`.
 ## Examples
 
 ``` r
-library(magrittr)
-
 add_item(input = {fl.idfs <-  0})
 #> {
 #>     fl.idfs <- 0
