@@ -4,22 +4,22 @@
 
 ```
 # To run code
-Files/R/R-4.2.3/bin/Rscript.exe -e "devtools::load_all(); code"
+"/c/Program Files/R/R-4.2.3/bin/Rscript.exe" -e "devtools::load_all(); code"
 
 # To run all tests
-Files/R/R-4.2.3/bin/Rscript.exe -e "devtools::test()"
+"/c/Program Files/R/R-4.2.3/bin/Rscript.exe" -e "devtools::test()"
 
-# To run all tests for files starting with {name}
-Files/R/R-4.2.3/bin/Rscript.exe -e "devtools::test(filter = '^{name}')"
+# To run all tests for files starting with {name} (e.g., 'input_f')
+"/c/Program Files/R/R-4.2.3/bin/Rscript.exe" -e "devtools::test(filter = '{name}')"
 
 # To redocument the package
-Files/R/R-4.2.3/bin/Rscript.exe -e "devtools::document()"
+"/c/Program Files/R/R-4.2.3/bin/Rscript.exe" -e "devtools::document()"
 
 # To check pkgdown documentation
-Files/R/R-4.2.3/bin/Rscript.exe -e "pkgdown::check_pkgdown()"
+"/c/Program Files/R/R-4.2.3/bin/Rscript.exe" -e "pkgdown::check_pkgdown()"
 
 # To check the package with R CMD check
-Files/R/R-4.2.3/bin/Rscript.exe -e "devtools::check()"
+"/c/Program Files/R/R-4.2.3/bin/Rscript.exe" -e "devtools::check()"
 
 ```
 
@@ -84,15 +84,6 @@ Keep it under 5k tokens total.
 
 If it becomes impossible to keep all relevant info under 5k tokens, split less critical sections into separate files under the .claude/ directory. For example, if there are details about a future system version (e.g., MK2), create a separate markdown file like .claude/CLAUDE-2.md instead of bloating CLAUDE.md.
 
-Don't do large indexing files, as gargabe-collection occurs on the connection and exclude .html files.
-options:
-  files_search:
-    extensions: ["R", "Rmd", "qmd"]
-    exclusions: ["html", "docs/",".git/",".github/"]
-    
-Avoid using "btw_tool_files_search" as it takes a super long time to search and it does not work well, so just grab directly the files and read them.
-
-    
 ### TODO
 
 - Update parallel engine with Mori package
@@ -161,8 +152,9 @@ Key features:
 - `sens_iterator()` [L115–120]: Iterate through DSA/scenario combinations
 - `pick_psa()` [L192–203]: Draw PSA samples from a distribution function
 - `pick_val_v()` [L265–357]: Select values across base/sensitivity/PSA with a vector of options
-- `add_item()` [L406–457]: Add named items to the input list (does not support native pipe `|>`)
-- `add_item2()` [L475–489] *(deprecated)*: Older item-adding variant (now merged into `add_item()`)
+- `input_block()` [L439–531]: Build a `{}` block calling `pick_val_v`; `binary=TRUE` = 0/1 indicators per param, `binary=FALSE` (default) = grouped integer DSA labels via `dsa_indicators`
+- `add_item()` [L534–590]: Add named items to the input list (does not support native pipe `|>`)
+- `add_item2()` [L552–566] *(deprecated)*: Older item-adding variant (now merged into `add_item()`)
 - `modify_item()` [L521–536] *(deprecated)*: Modify items in input list (no longer needed)
 - `modify_item_seq()` [L572–597] *(deprecated)*: Sequential item modification (no longer needed)
 - `queue_create()` [L610–612]: Create Rcpp-backed priority event queue
@@ -230,8 +222,8 @@ Key features:
 
 - `tests/testthat/test-input_f.R` — tests for `R/input_f.R` (add_item, queue functions, event wrappers, etc.)
 - `tests/testthat/test-resource_discrete.R` — tests for `resource_discrete()` and constrained DES
-- `tests/testthat/test_queues.R` — tests for event queue operations (new_event, modify_event, etc.)
-- `tests/testthat/test_model_runs.R` — integration tests for full model runs (run_sim, run_sim_parallel)
+- `tests/testthat/test-queues.R` — tests for event queue operations (new_event, modify_event, etc.)
+- `tests/testthat/test-model_runs.R` — integration tests for full model runs (run_sim, run_sim_parallel)
 
 ### Code style & naming conventions
 

@@ -594,7 +594,11 @@ static SEXP get_dotptr_from_env(SEXP wrapper_env) {
     Rcpp::stop("Expected a resource wrapper environment.");
   }
   SEXP sym = Rf_install(".ptr");
+#if R_version >= R_Version(4,5,0)
+  SEXP v = R_findVarInFrame(wrapper_env, sym);
+#else
   SEXP v = Rf_findVarInFrame(wrapper_env, sym);
+#endif
   if (v == R_UnboundValue || TYPEOF(v) != EXTPTRSXP) {
     Rcpp::stop("Wrapper is missing a valid '.ptr' external pointer.");
   }

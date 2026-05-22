@@ -10,7 +10,18 @@
       "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::check\\(\\)\")",
       "Bash(Files/R/R-4.2.3/bin/Rscript.exe -e \"devtools::test\\(filter = '^test-input_f'\\)\")",
       "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::test\\(filter = '^test-input_f'\\)\")",
-      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::test\\(filter = 'input_f'\\)\")"
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::test\\(filter = 'input_f'\\)\")",
+      "Bash(\"Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::document\\(\\)\")",
+      "Bash(C:/Users/Sanchjx33/OneDrive - AbbVie Inc \\(O365\\)/Documentos/WARDEN/Files/R/R-4.2.3/bin/Rscript.exe *)",
+      "Bash(/c/Program Files/R/R-4.2.3/bin/Rscript.exe *)",
+      "Read(//proc/**)",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::check\\(vignettes = FALSE\\)\")",
+      "Bash('/c/Program Files/R/R-4.2.3/bin/Rscript.exe' -e ' *)",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"x <- quote\\({f\\(a=1\\)}\\); cat\\(class\\(x\\), '\\\\n'\\); cat\\(paste\\(names\\(x\\), collapse=','\\), '\\\\n'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::load_all\\(quiet=TRUE\\); x <- add_item\\(util.sick=0.8, util.sicker=0.5\\); cat\\('class:', class\\(x\\), '\\\\n'\\); cat\\('names:', paste\\(names\\(x\\), collapse=','\\), '\\\\n'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::load_all\\(quiet=TRUE\\); manual <- add_item\\(input={pick_val_v\\(base=list\\(0.8\\),psa=list\\(0.8\\),sens=list\\(\\),psa_ind=FALSE,sens_ind=TRUE,indicator=create_indicators\\(1,1,1\\),names_out='a'\\)}\\); cat\\(class\\(manual\\), '\\\\n'\\); cat\\(deparse\\(manual\\), '\\\\n'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::load_all\\(quiet=TRUE\\); assign\\('n_s', 2, envir=globalenv\\(\\)\\); manual <- add_item\\(input={pick_val_v\\(base=list\\(0.8,0.5\\),psa=list\\(0.8,0.5\\),sens=list\\(\\),psa_ind=FALSE,sens_ind=TRUE,indicator=create_indicators\\(sens_iterator\\(1,n_s\\),n_s,c\\(1,1\\),0\\),names_out=c\\('a','b'\\)\\)}\\); cat\\('class:', class\\(manual\\), '\\\\n'\\); cat\\('names:', paste\\(names\\(manual\\),collapse=','\\), '\\\\n'\\); cat\\('OK\\\\n'\\)\")",
+      "Bash(\"/c/Program Files/R/R-4.2.3/bin/Rscript.exe\" -e \"devtools::load_all\\(\\); grep -n 'length_sensitivities\\\\|sens_name_used\\\\|n_elem_before\\\\|all_inputs_args' R/run_sim_parallel.R\")"
     ]
   }
 }
