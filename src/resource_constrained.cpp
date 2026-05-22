@@ -593,17 +593,17 @@ static SEXP get_dotptr_from_env(SEXP wrapper_env) {
   if (!Rf_isEnvironment(wrapper_env)) {
     Rcpp::stop("Expected a resource wrapper environment.");
   }
-  SEXP sym = Rf_install(".ptr");
-#if R_VERSION >= R_Version(4,5,0)
-  SEXP v = R_findVarInFrame(wrapper_env, sym);
-#else
-  SEXP v = Rf_findVarInFrame(wrapper_env, sym);
-#endif
-  if (v == R_UnboundValue || TYPEOF(v) != EXTPTRSXP) {
+  Rcpp::Environment env(wrapper_env);
+  if (!env.exists(".ptr")) {
+    Rcpp::stop("Wrapper is missing a valid '.ptr' external pointer.");
+  }
+  SEXP v = env[".ptr"];
+  if (TYPEOF(v) != EXTPTRSXP) {
     Rcpp::stop("Wrapper is missing a valid '.ptr' external pointer.");
   }
   return v;
-}
+} 
+
 
 // [[Rcpp::export]]
 Rcpp::List discrete_resource_clone_xptrs_cpp(SEXP wrapper_env, int n = 1) {
