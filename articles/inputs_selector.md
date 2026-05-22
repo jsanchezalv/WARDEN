@@ -1,6 +1,7 @@
 # How to Use the Automatic Input Selector
 
 ``` r
+
 library("dplyr")
 #> 
 #> Attaching package: 'dplyr'
@@ -28,6 +29,7 @@ library("WARDEN")
 ```
 
 ``` r
+
 options(scipen = 999)
 options(digits=3)
 options(tibble.print_max = 50)
@@ -81,15 +83,15 @@ set of parameters, with some base case values, PSA parameters, DSA,
 scenario, and whether the parameter would be active on a PSA (vector of
 0 and 1s):
 
-| parameter_name | base_value       | PSA_dist   | a                 | b                  | n   | DSA_min           | DSA_max            | scenario_1        | scenario_2         | psa_indicators |
-|:---------------|:-----------------|:-----------|:------------------|:-------------------|:----|:------------------|:-------------------|:------------------|:-------------------|:---------------|
-| util.sick      | 0.8              | rnorm      | 0.8               | 0.16               | 1   | 0.6               | 0.9                | 0.6               | 0.9                | 1              |
-| util.sicker    | 0.5              | rbeta_mse  | 0.5               | 0.1                | 1   | 0.3               | 0.7                | 0.3               | 0.7                | 1              |
-| cost.sick      | 3000             | rgamma_mse | 3000              | 600                | 1   | 1000              | 5000               | 1000              | 5000               | 1              |
-| cost.sicker    | 7000             | rgamma_mse | 7000              | 1400               | 1   | 5000              | 9000               | 5000              | 9000               | 1              |
-| cost.int       | 1000             | rgamma_mse | 1000              | 200                | 1   | 800               | 2000               | 800               | 2000               | 0              |
-| coef_noint     | -1.6094379124341 | rnorm      | -1.6094379124341  | 0.32188758248682   | 1   | -2.30258509299405 | -0.916290731874155 | -2.30258509299405 | -0.916290731874155 | 0              |
-| HR_int         | 0.8              | rlnorm     | -0.22314355131421 | 0.0446287102628419 | 1   | 0.5               | 0.9                | 0.5               | 0.9                | 0              |
+| parameter_name | base_value | PSA_dist | a | b | n | DSA_min | DSA_max | scenario_1 | scenario_2 | psa_indicators |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| util.sick | 0.8 | rnorm | 0.8 | 0.16 | 1 | 0.6 | 0.9 | 0.6 | 0.9 | 1 |
+| util.sicker | 0.5 | rbeta_mse | 0.5 | 0.1 | 1 | 0.3 | 0.7 | 0.3 | 0.7 | 1 |
+| cost.sick | 3000 | rgamma_mse | 3000 | 600 | 1 | 1000 | 5000 | 1000 | 5000 | 1 |
+| cost.sicker | 7000 | rgamma_mse | 7000 | 1400 | 1 | 5000 | 9000 | 5000 | 9000 | 1 |
+| cost.int | 1000 | rgamma_mse | 1000 | 200 | 1 | 800 | 2000 | 800 | 2000 | 0 |
+| coef_noint | -1.6094379124341 | rnorm | -1.6094379124341 | 0.32188758248682 | 1 | -2.30258509299405 | -0.916290731874155 | -2.30258509299405 | -0.916290731874155 | 0 |
+| HR_int | 0.8 | rlnorm | -0.22314355131421 | 0.0446287102628419 | 1 | 0.5 | 0.9 | 0.5 | 0.9 | 0 |
 
 ### The basic setup
 
@@ -114,6 +116,7 @@ finally we indicate that for the PSA, the first 4 will be included and
 the remaining 3 will not (defaulting to the base values).
 
 ``` r
+
 
   pick_val_v(base        = l_inputs[["base_value"]],
              psa         = pick_psa(
@@ -203,6 +206,7 @@ function. We first run it as a deterministic analysis.
 
 ``` r
 
+
 sens <- 1
 n_sensitivity <- length(l_inputs[[1]])
 sensitivity_names <- c("DSA_min", "DSA_max")
@@ -242,6 +246,7 @@ as.data.frame(
 Now it’s very easy to switch to probabilistic analysis.
 
 ``` r
+
 #PSA
 psa_bool <- TRUE
 as.data.frame(
@@ -267,6 +272,7 @@ as.data.frame(
 And it’s very easy to switch to probabilistic scenario analysis.
 
 ``` r
+
 #Probabilistic DSA, first parameter being varied as sens = 1
 psa_bool <- TRUE
 sensitivity_bool <- TRUE
@@ -306,16 +312,17 @@ simply use the `sens_iterator` function.
 
 ``` r
 
+
 rm(sens, sens_name_used, sensitivity_bool, psa_bool) #remove global objects that may confuse program
 
 i_sensitivity <-add_item(
   iterator_sensitivity = sens_iterator(sens,n_sensitivity)
-  ) %>%add_item(
+  ) |>add_item(
             indicators = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){  create_indicators(iterator_sensitivity,n_sensitivity*length(sensitivity_names),rep(1,length(l_inputs[[1]]))) #only for DSA we use this approach
               }else{rep(1,length(l_inputs[[1]]))}
                               ) 
 
-i_simple <- add_item() %>%
+i_simple <- add_item() |>
   add_item(
     pick_val_v(
       base = l_inputs[["base_value"]],
@@ -345,7 +352,7 @@ init_event_list <-
 
 evt_react_list <-
   add_reactevt(name_evt = "a1",
-               input = {})  %>%
+               input = {})  |>
   add_reactevt(name_evt = "b1",
                input = {
                  q_default = 0
@@ -371,13 +378,13 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
-#> Time to run analysis 1: 0.06s
+#> Time to run simulation 1: 0.07s
+#> Time to run analysis 1: 0.07s
 #> Total time to run: 0.07s
 #> Simulation finalized;
 
-summary_results_sim(results[[1]])  %>%
-  kable() %>%
+summary_results_sim(results[[1]])  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
@@ -412,6 +419,7 @@ summary_results_sim(results[[1]])  %>%
 
 ``` r
 
+
 results <- run_sim(  
   npats=5,                              
   n_sim=2,                                  
@@ -434,12 +442,12 @@ results <- run_sim(
 #> Time to run simulation 1: 0.06s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.06s
-#> Time to run analysis 1: 0.12s
-#> Total time to run: 0.12s
+#> Time to run analysis 1: 0.13s
+#> Total time to run: 0.13s
 #> Simulation finalized;
 
-summary_results_sim(results[[1]])  %>%
-  kable() %>%
+summary_results_sim(results[[1]])  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
@@ -473,6 +481,7 @@ summary_results_sim(results[[1]])  %>%
 | dq_default_undisc | 0 (0; 0)               | 0 (0; 0)                |
 
 ``` r
+
 #DSA analyses, we set n_sensitivity to 7 as we need to iterate over all the parameters
 results <- run_sim(  
   npats=5,                               
@@ -494,89 +503,89 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.08s
+#> Time to run simulation 1: 0.09s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 1: 0.14s
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 1: 0.16s
 #> Analysis number: 2
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 2: 0.13s
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 2: 0.14s
 #> Analysis number: 3
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.08s
-#> Time to run analysis 3: 0.15s
+#> Time to run analysis 3: 0.16s
 #> Analysis number: 4
-#> Simulation number: 1
-#> Time to run simulation 1: 0.06s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 4: 0.13s
-#> Analysis number: 5
-#> Simulation number: 1
-#> Time to run simulation 1: 0.06s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 5: 0.13s
-#> Analysis number: 6
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 6: 0.13s
-#> Analysis number: 7
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 4: 0.14s
+#> Analysis number: 5
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 7: 0.13s
-#> Analysis number: 8
-#> Simulation number: 1
-#> Time to run simulation 1: 0.06s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 8: 0.13s
+#> Time to run analysis 5: 0.14s
+#> Analysis number: 6
+#> Simulation number: 1
+#> Time to run simulation 1: 0.08s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 6: 0.15s
+#> Analysis number: 7
+#> Simulation number: 1
+#> Time to run simulation 1: 0.07s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 7: 0.14s
+#> Analysis number: 8
+#> Simulation number: 1
+#> Time to run simulation 1: 0.07s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 8: 0.14s
 #> Analysis number: 9
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 9: 0.13s
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 9: 0.14s
 #> Analysis number: 10
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 10: 0.13s
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 10: 0.14s
 #> Analysis number: 11
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 11: 0.13s
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 11: 0.14s
 #> Analysis number: 12
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 12: 0.13s
-#> Analysis number: 13
-#> Simulation number: 1
-#> Time to run simulation 1: 0.06s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 13: 0.13s
+#> Time to run analysis 12: 0.14s
+#> Analysis number: 13
+#> Simulation number: 1
+#> Time to run simulation 1: 0.07s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 13: 0.14s
 #> Analysis number: 14
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 14: 0.13s
-#> Total time to run: 1.86s
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 14: 0.14s
+#> Total time to run: 1.99s
 #> Simulation finalized;
 
 summary_results_sens(results)
@@ -595,29 +604,30 @@ summary_results_sens(results)
 #> 1120:  noint       14       DSA_max dutil.sicker              0 (0; 0)
 
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)  %>%
-  kable() %>%
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 | sensitivity | util.sick | util.sicker | cost.sick | cost.sicker | cost.int | coef_noint | HR_int |
-|------------:|----------:|------------:|----------:|------------:|---------:|-----------:|-------:|
-|           1 |     0.600 |       0.554 |      4038 |        8633 |     1000 |     -1.609 |    0.8 |
-|           2 |     0.597 |       0.300 |      4038 |        8633 |     1000 |     -1.609 |    0.8 |
-|           3 |     0.597 |       0.554 |      1000 |        8633 |     1000 |     -1.609 |    0.8 |
-|           4 |     0.597 |       0.554 |      4038 |        5000 |     1000 |     -1.609 |    0.8 |
-|           5 |     0.597 |       0.554 |      4038 |        8633 |      800 |     -1.609 |    0.8 |
-|           6 |     0.597 |       0.554 |      4038 |        8633 |     1000 |     -2.303 |    0.8 |
-|           7 |     0.597 |       0.554 |      4038 |        8633 |     1000 |     -1.609 |    0.5 |
-|           8 |     0.900 |       0.554 |      4038 |        8633 |     1000 |     -1.609 |    0.8 |
-|           9 |     0.597 |       0.700 |      4038 |        8633 |     1000 |     -1.609 |    0.8 |
-|          10 |     0.597 |       0.554 |      5000 |        8633 |     1000 |     -1.609 |    0.8 |
-|          11 |     0.597 |       0.554 |      4038 |        9000 |     1000 |     -1.609 |    0.8 |
-|          12 |     0.597 |       0.554 |      4038 |        8633 |     2000 |     -1.609 |    0.8 |
-|          13 |     0.597 |       0.554 |      4038 |        8633 |     1000 |     -0.916 |    0.8 |
-|          14 |     0.597 |       0.554 |      4038 |        8633 |     1000 |     -1.609 |    0.9 |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 0.600 | 0.554 | 4038 | 8633 | 1000 | -1.609 | 0.8 |
+| 2 | 0.597 | 0.300 | 4038 | 8633 | 1000 | -1.609 | 0.8 |
+| 3 | 0.597 | 0.554 | 1000 | 8633 | 1000 | -1.609 | 0.8 |
+| 4 | 0.597 | 0.554 | 4038 | 5000 | 1000 | -1.609 | 0.8 |
+| 5 | 0.597 | 0.554 | 4038 | 8633 | 800 | -1.609 | 0.8 |
+| 6 | 0.597 | 0.554 | 4038 | 8633 | 1000 | -2.303 | 0.8 |
+| 7 | 0.597 | 0.554 | 4038 | 8633 | 1000 | -1.609 | 0.5 |
+| 8 | 0.900 | 0.554 | 4038 | 8633 | 1000 | -1.609 | 0.8 |
+| 9 | 0.597 | 0.700 | 4038 | 8633 | 1000 | -1.609 | 0.8 |
+| 10 | 0.597 | 0.554 | 5000 | 8633 | 1000 | -1.609 | 0.8 |
+| 11 | 0.597 | 0.554 | 4038 | 9000 | 1000 | -1.609 | 0.8 |
+| 12 | 0.597 | 0.554 | 4038 | 8633 | 2000 | -1.609 | 0.8 |
+| 13 | 0.597 | 0.554 | 4038 | 8633 | 1000 | -0.916 | 0.8 |
+| 14 | 0.597 | 0.554 | 4038 | 8633 | 1000 | -1.609 | 0.9 |
 
 ``` r
+
 #Scenario analyses, we set n_sensitivity to 1 as we don't have to iterate over all parameters, each scenario is run only once
 results <- run_sim(  
   npats=5,                               
@@ -639,17 +649,17 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
+#> Time to run simulation 2: 0.07s
 #> Time to run analysis 1: 0.13s
 #> Analysis number: 2
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
-#> Time to run analysis 2: 0.13s
-#> Total time to run: 0.26s
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 2: 0.14s
+#> Total time to run: 0.28s
 #> Simulation finalized;
 
 summary_results_sens(results)
@@ -670,15 +680,15 @@ summary_results_sens(results)
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)  %>%
-  kable() %>%
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 | sensitivity | util.sick | util.sicker | cost.sick | cost.sicker | cost.int | coef_noint | HR_int |
-|------------:|----------:|------------:|----------:|------------:|---------:|-----------:|-------:|
-|           1 |       0.6 |         0.3 |      1000 |        5000 |      800 |     -2.303 |    0.5 |
-|           2 |       0.9 |         0.7 |      5000 |        9000 |     2000 |     -0.916 |    0.9 |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 0.6 | 0.3 | 1000 | 5000 | 800 | -2.303 | 0.5 |
+| 2 | 0.9 | 0.7 | 5000 | 9000 | 2000 | -0.916 | 0.9 |
 
 ### Parameters spread across different levels
 
@@ -703,6 +713,7 @@ example.
 
 ``` r
 
+
 #let's set the index to 8th (so it would correspond to the patient level indicator)
 create_indicators(8,20,c(1,1,1,1,1,1,1),0) #all 0s
 #> [1] 0 0 0 0 0 0 0
@@ -717,6 +728,7 @@ they will have no impact but we can still see they are really being
 varied. We still need to create specific indicators for each category.
 
 ``` r
+
 
 l_inputs_pat <- list(parameter_name = list("age","sex"),
                  base_value = list(60,1),
@@ -733,7 +745,7 @@ l_inputs_pat <- list(parameter_name = list("age","sex"),
 
 i_sensitivity <- add_item(
   iterator_sensitivity = sens_iterator(sens,n_sensitivity) #resets back to 1 if it goes over n_sensitivity
-  ) %>%
+  ) |>
   add_item(
             indicators = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){
               create_indicators(iterator_sensitivity, 
@@ -742,7 +754,7 @@ i_sensitivity <- add_item(
             }else{
                 rep(1,length(l_inputs[[1]]))
               }
-          ) %>%
+          ) |>
   add_item(
             indicators_pat = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){
               create_indicators(iterator_sensitivity,
@@ -756,7 +768,7 @@ i_sensitivity <- add_item(
 
 
   
-i_pat <- add_item() %>%
+i_pat <- add_item() |>
   add_item(
     pick_val_v(
       base = l_inputs_pat[["base_value"]],
@@ -796,9 +808,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.08s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
+#> Time to run simulation 2: 0.08s
 #> Time to run analysis 1: 0.15s
 #> Analysis number: 2
 #> Simulation number: 1
@@ -810,8 +822,8 @@ results <- run_sim(
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
-#> Time to run analysis 3: 0.14s
+#> Time to run simulation 2: 0.08s
+#> Time to run analysis 3: 0.15s
 #> Analysis number: 4
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
@@ -822,26 +834,26 @@ results <- run_sim(
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.08s
+#> Time to run simulation 2: 0.07s
 #> Time to run analysis 5: 0.14s
 #> Analysis number: 6
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.08s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 6: 0.14s
+#> Time to run analysis 6: 0.15s
 #> Analysis number: 7
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 7: 0.14s
+#> Time to run analysis 7: 0.15s
 #> Analysis number: 8
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.08s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 8: 0.14s
+#> Time to run analysis 8: 0.15s
 #> Analysis number: 9
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
@@ -864,20 +876,20 @@ results <- run_sim(
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
-#> Time to run analysis 12: 0.14s
+#> Time to run simulation 2: 0.08s
+#> Time to run analysis 12: 0.15s
 #> Analysis number: 13
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 13: 0.14s
+#> Time to run analysis 13: 0.15s
 #> Analysis number: 14
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
-#> Time to run analysis 14: 0.14s
+#> Time to run simulation 2: 0.08s
+#> Time to run analysis 14: 0.15s
 #> Analysis number: 15
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
@@ -888,21 +900,21 @@ results <- run_sim(
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
-#> Time to run analysis 16: 0.14s
+#> Time to run simulation 2: 0.08s
+#> Time to run analysis 16: 0.16s
 #> Analysis number: 17
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.08s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 17: 0.14s
+#> Time to run analysis 17: 0.15s
 #> Analysis number: 18
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 18: 0.14s
-#> Total time to run: 2.54s
+#> Time to run analysis 18: 0.15s
+#> Total time to run: 2.68s
 #> Simulation finalized;
 
 summary_results_sens(results)
@@ -924,31 +936,31 @@ summary_results_sens(results)
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean)  %>%
-  kable() %>%
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean)  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 | sensitivity | util.sick | util.sicker | cost.sick | cost.sicker | cost.int | coef_noint | HR_int | age | sex |
-|------------:|----------:|------------:|----------:|------------:|---------:|-----------:|-------:|----:|----:|
-|           1 |       0.6 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
-|           2 |       0.8 |         0.3 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
-|           3 |       0.8 |         0.5 |      1000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
-|           4 |       0.8 |         0.5 |      3000 |        5000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
-|           5 |       0.8 |         0.5 |      3000 |        7000 |      800 |     -1.609 |    0.8 |  60 |   1 |
-|           6 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -2.303 |    0.8 |  60 |   1 |
-|           7 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.5 |  60 |   1 |
-|           8 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  30 |   1 |
-|           9 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   0 |
-|          10 |       0.9 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
-|          11 |       0.8 |         0.7 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
-|          12 |       0.8 |         0.5 |      5000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
-|          13 |       0.8 |         0.5 |      3000 |        9000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
-|          14 |       0.8 |         0.5 |      3000 |        7000 |     2000 |     -1.609 |    0.8 |  60 |   1 |
-|          15 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -0.916 |    0.8 |  60 |   1 |
-|          16 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.9 |  60 |   1 |
-|          17 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  80 |   1 |
-|          18 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 0.6 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 |
+| 2 | 0.8 | 0.3 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 |
+| 3 | 0.8 | 0.5 | 1000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 |
+| 4 | 0.8 | 0.5 | 3000 | 5000 | 1000 | -1.609 | 0.8 | 60 | 1 |
+| 5 | 0.8 | 0.5 | 3000 | 7000 | 800 | -1.609 | 0.8 | 60 | 1 |
+| 6 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -2.303 | 0.8 | 60 | 1 |
+| 7 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.5 | 60 | 1 |
+| 8 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 30 | 1 |
+| 9 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 0 |
+| 10 | 0.9 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 |
+| 11 | 0.8 | 0.7 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 |
+| 12 | 0.8 | 0.5 | 5000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 |
+| 13 | 0.8 | 0.5 | 3000 | 9000 | 1000 | -1.609 | 0.8 | 60 | 1 |
+| 14 | 0.8 | 0.5 | 3000 | 7000 | 2000 | -1.609 | 0.8 | 60 | 1 |
+| 15 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -0.916 | 0.8 | 60 | 1 |
+| 16 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.9 | 60 | 1 |
+| 17 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 80 | 1 |
+| 18 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 |
 
 ### Multiple parameters covaried
 
@@ -966,6 +978,7 @@ which parameters are covaried. We also need to make sure to adjust
 to the new number of dsa iterations (5).
 
 ``` r
+
 
 l_inputs <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
                  base_value = list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
@@ -1000,7 +1013,7 @@ i_sensitivity <- add_item(
   ) 
 
 
-i_simple <- add_item() %>%
+i_simple <- add_item() |>
   add_item(
     pick_val_v(
       base = l_inputs[["base_value"]],
@@ -1022,7 +1035,7 @@ i_simple <- add_item() %>%
       )
     )
   
-i_pat <- add_item() %>%
+i_pat <- add_item() |>
   add_item(
     pick_val_v(
       base = l_inputs_pat[["base_value"]],
@@ -1069,37 +1082,37 @@ results <- run_sim(
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 1: 0.14s
+#> Time to run analysis 1: 0.15s
 #> Analysis number: 2
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.08s
-#> Time to run analysis 2: 0.14s
+#> Time to run analysis 2: 0.16s
 #> Analysis number: 3
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 3: 0.14s
+#> Time to run analysis 3: 0.15s
 #> Analysis number: 4
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.08s
+#> Time to run simulation 2: 0.07s
 #> Time to run analysis 4: 0.15s
 #> Analysis number: 5
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.08s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 5: 0.14s
+#> Time to run analysis 5: 0.15s
 #> Analysis number: 6
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 6: 0.14s
+#> Time to run analysis 6: 0.15s
 #> Analysis number: 7
 #> Simulation number: 1
 #> Time to run simulation 1: 0.08s
@@ -1111,20 +1124,20 @@ results <- run_sim(
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 8: 0.14s
+#> Time to run analysis 8: 0.15s
 #> Analysis number: 9
 #> Simulation number: 1
-#> Time to run simulation 1: 0.08s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
+#> Time to run simulation 2: 0.08s
 #> Time to run analysis 9: 0.15s
 #> Analysis number: 10
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 10: 0.14s
-#> Total time to run: 1.42s
+#> Time to run analysis 10: 0.15s
+#> Total time to run: 1.5s
 #> Simulation finalized;
 
 summary_results_sens(results)
@@ -1146,23 +1159,23 @@ summary_results_sens(results)
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean)  %>%
-  kable() %>%
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean)  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 | sensitivity | util.sick | util.sicker | cost.sick | cost.sicker | cost.int | coef_noint | HR_int | age | sex |
-|------------:|----------:|------------:|----------:|------------:|---------:|-----------:|-------:|----:|----:|
-|           1 |       0.6 |         0.3 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
-|           2 |       0.8 |         0.5 |      1000 |        5000 |      800 |     -1.609 |    0.8 |  60 |   1 |
-|           3 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -2.303 |    0.8 |  60 |   1 |
-|           4 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.5 |  60 |   1 |
-|           5 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  30 |   0 |
-|           6 |       0.9 |         0.7 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 |
-|           7 |       0.8 |         0.5 |      5000 |        9000 |     2000 |     -1.609 |    0.8 |  60 |   1 |
-|           8 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -0.916 |    0.8 |  60 |   1 |
-|           9 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.9 |  60 |   1 |
-|          10 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  80 |   1 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 0.6 | 0.3 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 |
+| 2 | 0.8 | 0.5 | 1000 | 5000 | 800 | -1.609 | 0.8 | 60 | 1 |
+| 3 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -2.303 | 0.8 | 60 | 1 |
+| 4 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.5 | 60 | 1 |
+| 5 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 30 | 0 |
+| 6 | 0.9 | 0.7 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 |
+| 7 | 0.8 | 0.5 | 5000 | 9000 | 2000 | -1.609 | 0.8 | 60 | 1 |
+| 8 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -0.916 | 0.8 | 60 | 1 |
+| 9 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.9 | 60 | 1 |
+| 10 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 80 | 1 |
 
 ### Parameters that are vectors
 
@@ -1175,6 +1188,7 @@ by now it should be straightforward to switch to probabilistic DSA,
 deterministic case, or standard PSA.
 
 ``` r
+
 
 l_inputs_pat <- list(parameter_name = list("age","sex", "v_state"),
                  base_value = list(60,1, c(10,20)),
@@ -1215,7 +1229,7 @@ results <- run_sim(
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 1: 0.14s
+#> Time to run analysis 1: 0.15s
 #> Analysis number: 2
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
@@ -1224,10 +1238,10 @@ results <- run_sim(
 #> Time to run analysis 2: 0.15s
 #> Analysis number: 3
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.08s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 3: 0.14s
+#> Time to run analysis 3: 0.16s
 #> Analysis number: 4
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
@@ -1239,50 +1253,50 @@ results <- run_sim(
 #> Time to run simulation 1: 0.08s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 5: 0.15s
+#> Time to run analysis 5: 0.16s
 #> Analysis number: 6
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 6: 0.14s
+#> Time to run analysis 6: 0.15s
 #> Analysis number: 7
 #> Simulation number: 1
-#> Time to run simulation 1: 0.08s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
-#> Time to run analysis 7: 0.15s
+#> Time to run simulation 2: 0.08s
+#> Time to run analysis 7: 0.16s
 #> Analysis number: 8
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 8: 0.14s
+#> Time to run analysis 8: 0.15s
 #> Analysis number: 9
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.08s
-#> Time to run analysis 9: 0.14s
+#> Time to run analysis 9: 0.15s
 #> Analysis number: 10
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 10: 0.14s
+#> Time to run analysis 10: 0.15s
 #> Analysis number: 11
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.08s
-#> Time to run analysis 11: 0.14s
+#> Time to run simulation 2: 0.07s
+#> Time to run analysis 11: 0.15s
 #> Analysis number: 12
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.08s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 12: 0.14s
-#> Total time to run: 1.7s
+#> Time to run analysis 12: 0.16s
+#> Total time to run: 1.82s
 #> Simulation finalized;
 
 summary_results_sens(results)
@@ -1315,23 +1329,23 @@ v_state_avg <- tibble( v_state =
     )
   )
 
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean) %>%
-  bind_cols(v_state_avg)  %>%
-  kable() %>%
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int","age","sex"),mean) |>
+  bind_cols(v_state_avg)  |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 | sensitivity | util.sick | util.sicker | cost.sick | cost.sicker | cost.int | coef_noint | HR_int | age | sex | v_state |
-|------------:|----------:|------------:|----------:|------------:|---------:|-----------:|-------:|----:|----:|:--------|
-|           1 |       0.6 |         0.3 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 | 10, 20  |
-|           2 |       0.8 |         0.5 |      1000 |        5000 |      800 |     -1.609 |    0.8 |  60 |   1 | 10, 20  |
-|           3 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -2.303 |    0.8 |  60 |   1 | 10, 20  |
-|           4 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.5 |  60 |   1 | 10, 20  |
-|           5 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  30 |   0 | 10, 20  |
-|           6 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 | 5, 10   |
-|           7 |       0.9 |         0.7 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 | 10, 20  |
-|           8 |       0.8 |         0.5 |      5000 |        9000 |     2000 |     -1.609 |    0.8 |  60 |   1 | 10, 20  |
-|           9 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -0.916 |    0.8 |  60 |   1 | 10, 20  |
-|          10 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.9 |  60 |   1 | 10, 20  |
-|          11 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  80 |   1 | 10, 20  |
-|          12 |       0.8 |         0.5 |      3000 |        7000 |     1000 |     -1.609 |    0.8 |  60 |   1 | 15, 25  |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---|
+| 1 | 0.6 | 0.3 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 | 10, 20 |
+| 2 | 0.8 | 0.5 | 1000 | 5000 | 800 | -1.609 | 0.8 | 60 | 1 | 10, 20 |
+| 3 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -2.303 | 0.8 | 60 | 1 | 10, 20 |
+| 4 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.5 | 60 | 1 | 10, 20 |
+| 5 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 30 | 0 | 10, 20 |
+| 6 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 | 5, 10 |
+| 7 | 0.9 | 0.7 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 | 10, 20 |
+| 8 | 0.8 | 0.5 | 5000 | 9000 | 2000 | -1.609 | 0.8 | 60 | 1 | 10, 20 |
+| 9 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -0.916 | 0.8 | 60 | 1 | 10, 20 |
+| 10 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.9 | 60 | 1 | 10, 20 |
+| 11 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 80 | 1 | 10, 20 |
+| 12 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 | 15, 25 |

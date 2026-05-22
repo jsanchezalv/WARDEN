@@ -11,6 +11,7 @@ check the original model for details on functions, parameters etc.
 ### Main options
 
 ``` r
+
 library(WARDEN)
 
 library(dplyr)
@@ -48,12 +49,13 @@ uncertainty of parameters to draw distributions. Furthermore, utilities
 and costs also have a distribution.
 
 ``` r
+
 #Each patient is identified through "i"
 #Items used in the model should be unnamed numeric/vectors! otherwise if they are processed by model it can lead to strangely named outcomes
 #In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.
 
 #Put objects here that do not change on any patient or intervention loop
-common_all_inputs <- add_item() %>%
+common_all_inputs <- add_item() |>
   add_item( #utilities
   pick_val_v(
     base =  util.data$value,
@@ -73,7 +75,7 @@ common_all_inputs <- add_item() %>%
     indicator = rep(0, nrow(cost.data)),
     names_out =cost.data$name
   )
-) %>%
+) |>
   add_item( #parameter uncertainty, alternative approach to using pick_val_v, it also does work
     coef11_psa = ifelse(psa_bool,rnorm(1,2,0.1),2),
     coef12_psa = ifelse(psa_bool,rnorm(1,3,0.1),3),
@@ -129,6 +131,7 @@ parameters are not a simple number but the objects created as part of
 `common_all_inputs`.
 
 ``` r
+
 init_event_list <- 
   add_tte(arm="int",
                evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc","ae","2ndline_mbc"),
@@ -180,7 +183,7 @@ init_event_list <-
     os <- min(os.mbc,os.early,nat.os.s)
     
 
-  }) %>%  add_tte(arm="noint",
+  }) |>  add_tte(arm="noint",
                        evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc"),
                        other_inp = c("os.early","os.mbc"),                       
                        input={  #reference strategy
@@ -238,9 +241,10 @@ which now also uses a random parameter if the PSA option is active.
 
 ``` r
 
+
 evt_react_list <-
   add_reactevt(name_evt = "start",
-               input = { }) %>%
+               input = { }) |>
   add_reactevt(name_evt = "ttot",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -253,7 +257,7 @@ evt_react_list <-
                  c_default <- cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline
                  fl.mbcs.ontx <-  0 #Flag that patient is now off-treatment
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "ttot.beva",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -266,7 +270,7 @@ evt_react_list <-
                  c_default <- cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline
                 fl.tx.beva <- 0 #Flag that patient is now off-treatment
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "progression.mbc",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -282,7 +286,7 @@ evt_react_list <-
                  
                  new_event(c("2ndline_mbc" = curtime + qexp(rnd_stream_mbc$draw_n(), 0.08)/12))
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "idfs",
                input = {
                  q_default = if (fl.idfs==1) {
@@ -295,7 +299,7 @@ evt_react_list <-
                  c_default <- if(arm=="noint"){cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs}else{(cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs}
                  fl.idfs <- 0
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "ttot.early",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -315,7 +319,7 @@ evt_react_list <-
                      new_event(c("ae" = curtime + 0.0001))
                      n_ae <- n_ae - 1
                  }
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "remission",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -328,7 +332,7 @@ evt_react_list <-
                  c_default <- cost.recurrence * fl.recurrence
                  fl.remission <- 1
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "recurrence",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -344,7 +348,7 @@ evt_react_list <-
                  fl.mbcs <- 1
                  fl.mbcs.progression.mbc <- 1 #ad-hoc for plot
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "start.early.mbc",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -358,7 +362,7 @@ evt_react_list <-
                  fl.mbcs <- 1
                  fl.mbcs.progression.mbc <- 1
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "2ndline_mbc",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -377,7 +381,7 @@ evt_react_list <-
                      new_event(c("ae" = curtime + 0.0001))
                      n_ae <- n_ae - 1
                  }
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "ae",
                input = {
                  if (n_ae>0) {
@@ -396,7 +400,7 @@ evt_react_list <-
                  c_ae <- cost.ae
                  
                  modify_event(c("os" =max(get_event("os") - 0.125,curtime +0.0001) ))#each AE brings forward death by 1.5 months
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "os",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -420,6 +424,7 @@ evt_react_list <-
 Costs and utilities are introduced below.
 
 ``` r
+
 
 util_ongoing <- "q_default"
 
@@ -464,6 +469,7 @@ especially relevant when running a PSA, which would require
 
 ``` r
 
+
 sample_sizes <- c(50,100,500,1000)
 
 sim_size_df <- NULL
@@ -490,14 +496,14 @@ for (sample_size in sample_sizes) {
                    extract_psa_result(results[[1]],"total_lys"),
                    extract_psa_result(results[[1]],"total_qalys"))
   
-  loop_df <- rbind(loop_df %>%
+  loop_df <- rbind(loop_df |>
                      pivot_longer(cols=c("int","noint"),names_to="arm"),
-                   loop_df %>%
-                     mutate(dif = int - noint) %>%
-                     group_by(simulation) %>%
-                     transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", arm="noint") %>%
-                     relocate(element, arm) %>%
-                     ungroup() %>%
+                   loop_df |>
+                     mutate(dif = int - noint) |>
+                     group_by(simulation) |>
+                     transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", arm="noint") |>
+                     relocate(element, arm) |>
+                     ungroup() |>
                      distinct())
     
 
@@ -553,6 +559,7 @@ compare the true PSA to the structural uncertainty with 1,000 patients.
 
 ``` r
 
+
 sample_sizes <- 1000
 
 sim_size_psa_df <- NULL
@@ -579,14 +586,14 @@ for (sample_size in sample_sizes) {
                    extract_psa_result(results[[1]],"total_lys"),
                    extract_psa_result(results[[1]],"total_qalys"))
   
-  loop_psa_df <- rbind(loop_psa_df %>%
+  loop_psa_df <- rbind(loop_psa_df |>
                      pivot_longer(cols=c("int","noint"),names_to="arm"),
-                   loop_psa_df %>%
-                     mutate(dif = int - noint) %>%
-                     group_by(simulation) %>%
-                     transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", arm="noint") %>%
-                     relocate(element, arm) %>%
-                     ungroup() %>%
+                   loop_psa_df |>
+                     mutate(dif = int - noint) |>
+                     group_by(simulation) |>
+                     transmute(value = dif[element=="total_costs"]/dif[element=="total_qalys"],element = "ICUR", arm="noint") |>
+                     relocate(element, arm) |>
+                     ungroup() |>
                      distinct())
   
   loop_psa_df$sample_size  <-  sample_size
@@ -621,6 +628,7 @@ pay and the results of our PSA to generate the CEAC and CEAF plots.
 
 ``` r
 
+
 wtp <- seq(from=0,to=150000,by=1000)
 ceac_out <-ceac_des(wtp,results)
 
@@ -637,6 +645,7 @@ ggplot(ceac_out,aes(x=wtp,y=prob_best,group=comparator,col=comparator)) +
 ![](example_uncertainty_files/figure-html/ceac_ceaf-1.png)
 
 ``` r
+
 
 
 
@@ -658,6 +667,7 @@ Similarly to `ceac_des`, the function `evpi_des` also allows to compute
 the EVPI.
 
 ``` r
+
 
 evpi_out <-evpi_des(wtp,results)
 

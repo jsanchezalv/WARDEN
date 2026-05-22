@@ -15,6 +15,7 @@ default).
 ### Main options
 
 ``` r
+
 library(WARDEN)
 library(flexsurv)
 #> Loading required package: survival
@@ -41,11 +42,20 @@ if(!require(readxl)){
     library(readxl)
 }
 #> Loading required package: readxl
+#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+#> logical.return = TRUE, : there is no package called 'readxl'
+#> Installing package into '/home/runner/work/_temp/Library'
+#> (as 'lib' is unspecified)
+#> also installing the dependencies 'rematch', 'hms', 'prettyunits', 'cellranger', 'cpp11', 'progress'
 if(!require(here)){
     install.packages("here")
     library(here)
 }
 #> Loading required package: here
+#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+#> logical.return = TRUE, : there is no package called 'here'
+#> Installing package into '/home/runner/work/_temp/Library'
+#> (as 'lib' is unspecified)
 #> here() starts at /home/runner/work/WARDEN/WARDEN
 
 # Age in year (continuous)
@@ -129,7 +139,7 @@ j <- which(list_coef$first_event_coef_m$covariate %in% "TC")
 list_coef$first_event_coef_f[j, c("first_event_nonfatal_CBVD", "first_event_nonCVD_death")] <- 0
 
 
-list_coef <- lapply(list_coef, function(x) x %>% keep(is.numeric) %>% as.matrix())
+list_coef <- lapply(list_coef, function(x) x |> keep(is.numeric) |> as.matrix())
 
 list_u_norms <-
   list(
@@ -281,6 +291,7 @@ nl_RCS <- list(
 ```
 
 ``` r
+
 options(scipen = 999)
 options(digits=3)
 options(tibble.print_max = 50)
@@ -314,6 +325,7 @@ level inputs.
 We also create 3 ad-hoc functions to handle the restricted cube spline.
 
 ``` r
+
 
 #helper functions for the restricted cube
 
@@ -598,6 +610,7 @@ unique_pt_inputs <- add_item(input = {
 We set up event times.
 
 ``` r
+
 init_event_list <- 
   add_tte(arm=c("int","comp"), evts = c("start","event_1","event_2"), input={
   start <- 0
@@ -628,6 +641,7 @@ etc, and it would make the model more transparent, easier to read, debug
 and understand.
 
 ``` r
+
 evt_react_list <-
   add_reactevt(name_evt = "start",
                input = {
@@ -668,7 +682,7 @@ evt_react_list <-
                       vectorized_f = TRUE
                  )
                  q_total <- adj_factor - disu * as.integer(arm=="int")
-               }) %>% 
+               }) |> 
   add_reactevt(name_evt = "event_1",
                input = {
               if(status_1>2){ #if death stop
@@ -737,7 +751,7 @@ evt_react_list <-
                 q_total <- adj_factor - v_du[status_1] 
               }
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "event_2", #which is death
                input = {
                  curtime <- Inf
@@ -747,6 +761,7 @@ evt_react_list <-
 ### Costs and Utilities
 
 ``` r
+
 
 util_ongoing <- "q_total"
 
@@ -761,6 +776,7 @@ Note that because of the patient-level loop approach, this model is 2x
 slower to run than the original one (37 seconds vs. 77 seconds).
 
 ``` r
+
 results <- run_sim(  
   npats=30000,                              
   n_sim=1,                                  
@@ -778,9 +794,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 74.66s
-#> Time to run analysis 1: 74.66s
-#> Total time to run: 74.67s
+#> Time to run simulation 1: 76.83s
+#> Time to run analysis 1: 76.83s
+#> Total time to run: 76.83s
 #> Simulation finalized;
 ```
 
@@ -789,6 +805,7 @@ results <- run_sim(
 #### Summary of Example Results
 
 ``` r
+
 
 
 summary_results_det(results[[1]][[1]], arm ="int", wtp = 20000) #print first simulation
@@ -822,23 +839,23 @@ summary_results_det(results[[1]][[1]], arm ="int", wtp = 20000) #print first sim
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
-| pat_id | arm | total_lys | total_qalys | total_costs | total_lys_undisc | total_qalys_undisc | total_costs_undisc |  cost | q_total | cost_undisc | nexttime | number_events | simulation | sensitivity |
-|-------:|:----|----------:|------------:|------------:|-----------------:|-------------------:|-------------------:|------:|--------:|------------:|---------:|--------------:|-----------:|------------:|
-|      1 | int |     15.82 |       12.09 |       41097 |            22.84 |              17.46 |              59338 | 41097 |   12.09 |       59338 |     45.7 |             2 |          1 |           1 |
-|      2 | int |     11.08 |        8.78 |       13798 |            13.95 |              11.06 |              17373 | 13798 |    8.78 |       17373 |     27.9 |             2 |          1 |           1 |
-|      3 | int |     18.51 |       14.24 |       27839 |            29.43 |              22.41 |              53728 | 27839 |   14.24 |       53728 |     74.7 |             3 |          1 |           1 |
-|      4 | int |     12.34 |        9.74 |        9681 |            16.05 |              12.66 |              13111 |  9681 |    9.74 |       13111 |     47.8 |             3 |          1 |           1 |
-|      5 | int |      6.86 |        5.46 |        6210 |             7.83 |               6.23 |               7084 |  6210 |    5.46 |        7084 |     15.7 |             2 |          1 |           1 |
-|      6 | int |     11.40 |        8.48 |       24454 |            14.48 |              10.67 |              34045 | 24454 |    8.48 |       34045 |     35.8 |             3 |          1 |           1 |
-|      7 | int |     19.17 |       14.37 |       33911 |            31.32 |              23.23 |              67431 | 33911 |   14.37 |       67431 |     85.6 |             3 |          1 |           1 |
-|      8 | int |     16.55 |       12.62 |       25637 |            24.50 |              18.68 |              37942 | 25637 |   12.62 |       37942 |     49.0 |             2 |          1 |           1 |
-|      9 | int |      9.58 |        7.50 |       14430 |            11.62 |               9.07 |              19255 | 14430 |    7.50 |       19255 |     31.9 |             3 |          1 |           1 |
-|     10 | int |      5.57 |        3.86 |       20422 |             6.18 |               4.28 |              22692 | 20422 |    3.86 |       22692 |     12.4 |             3 |          1 |           1 |
+| pat_id | arm | total_lys | total_qalys | total_costs | total_lys_undisc | total_qalys_undisc | total_costs_undisc | cost | q_total | cost_undisc | nexttime | number_events | simulation | sensitivity |
+|---:|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | int | 15.82 | 12.09 | 41097 | 22.84 | 17.46 | 59338 | 41097 | 12.09 | 59338 | 45.7 | 2 | 1 | 1 |
+| 2 | int | 11.08 | 8.78 | 13798 | 13.95 | 11.06 | 17373 | 13798 | 8.78 | 17373 | 27.9 | 2 | 1 | 1 |
+| 3 | int | 18.51 | 14.24 | 27839 | 29.43 | 22.41 | 53728 | 27839 | 14.24 | 53728 | 74.7 | 3 | 1 | 1 |
+| 4 | int | 12.34 | 9.74 | 9681 | 16.05 | 12.66 | 13111 | 9681 | 9.74 | 13111 | 47.8 | 3 | 1 | 1 |
+| 5 | int | 6.86 | 5.46 | 6210 | 7.83 | 6.23 | 7084 | 6210 | 5.46 | 7084 | 15.7 | 2 | 1 | 1 |
+| 6 | int | 11.40 | 8.48 | 24454 | 14.48 | 10.67 | 34045 | 24454 | 8.48 | 34045 | 35.8 | 3 | 1 | 1 |
+| 7 | int | 19.17 | 14.37 | 33911 | 31.32 | 23.23 | 67431 | 33911 | 14.37 | 67431 | 85.6 | 3 | 1 | 1 |
+| 8 | int | 16.55 | 12.62 | 25637 | 24.50 | 18.68 | 37942 | 25637 | 12.62 | 37942 | 49.0 | 2 | 1 | 1 |
+| 9 | int | 9.58 | 7.50 | 14430 | 11.62 | 9.07 | 19255 | 14430 | 7.50 | 19255 | 31.9 | 3 | 1 | 1 |
+| 10 | int | 5.57 | 3.86 | 20422 | 6.18 | 4.28 | 22692 | 20422 | 3.86 | 22692 | 12.4 | 3 | 1 | 1 |
 
 We can see that the ICER stabilizes pretty quickly, with the ICUR
 changing in absolute terms less than 500 GBP after 2,500 patients
@@ -846,17 +863,18 @@ simulated.
 
 ``` r
 
-merged_ipd <- psa_ipd  %>%
-  group_by(arm) %>%
+
+merged_ipd <- psa_ipd  |>
+  group_by(arm) |>
   mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
-         cumul_total_costs = cumsum(total_costs)/pat_id) %>%
-  transmute(pat_id, arm, cumul_total_qalys, cumul_total_costs) %>%
-  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
+         cumul_total_costs = cumsum(total_costs)/pat_id) |>
+  transmute(pat_id, arm, cumul_total_qalys, cumul_total_costs) |>
+  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) |>
   mutate(inc_costs = cumul_total_costs_int - cumul_total_costs_comp,
          inc_qalys = cumul_total_qalys_int - cumul_total_qalys_comp,
          ICUR = inc_costs/ inc_qalys)
 
-merged_ipd_results <- merged_ipd %>% select(pat_id,inc_costs,inc_qalys,ICUR) %>%  slice(seq(1, n(), by = 50))
+merged_ipd_results <- merged_ipd |> select(pat_id,inc_costs,inc_qalys,ICUR) |>  slice(seq(1, n(), by = 50))
 
 
 ggplot(merged_ipd_results, aes(x=pat_id,y=ICUR))+
@@ -873,6 +891,7 @@ ggplot(merged_ipd_results, aes(x=pat_id,y=ICUR))+
 ``` r
 
 
+
 ggplot(merged_ipd_results, aes(x=pat_id,y=inc_costs))+
     geom_line(linewidth=1.1) +
     ylim(0,1000)+
@@ -885,6 +904,7 @@ ggplot(merged_ipd_results, aes(x=pat_id,y=inc_costs))+
 ![](example_ScotCVD_LinBriggs_files/figure-html/post-processing_analysis-2.png)
 
 ``` r
+
 
 
 ggplot(merged_ipd_results, aes(x=pat_id,y=inc_qalys))+

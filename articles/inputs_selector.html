@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="How to Use the Automatic Input Selector">
 <!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZEDNGW5QRP"></script><script>
@@ -82,9 +82,9 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">March 20, 2026</h4>
+            <h4 data-toc-skip class="date">May 22, 2026</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/v2.0.2/vignettes/articles/inputs_selector.Rmd" class="external-link"><code>vignettes/articles/inputs_selector.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/inputs_selector.Rmd" class="external-link"><code>vignettes/articles/inputs_selector.Rmd</code></a></small>
       <div class="d-none name"><code>inputs_selector.Rmd</code></div>
     </div>
 
@@ -644,12 +644,12 @@ for that we simply use the <code>sens_iterator</code> function.</p>
 <span></span>
 <span><span class="va">i_sensitivity</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>  iterator_sensitivity <span class="op">=</span> <span class="fu"><a href="../reference/sens_iterator.html">sens_iterator</a></span><span class="op">(</span><span class="va">sens</span>,<span class="va">n_sensitivity</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>            indicators <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">sensitivity_bool</span>  <span class="op">&amp;</span> <span class="va">sens_name_used</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>  <span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="va">iterator_sensitivity</span>,<span class="va">n_sensitivity</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sensitivity_names</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co">#only for DSA we use this approach</span></span>
 <span>              <span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">}</span></span>
 <span>                              <span class="op">)</span> </span>
 <span></span>
-<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
 <span>      base <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -679,7 +679,7 @@ for that we simply use the <code>sens_iterator</code> function.</p>
 <span></span>
 <span><span class="va">evt_react_list</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"a1"</span>,</span>
-<span>               input <span class="op">=</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>               input <span class="op">=</span> <span class="op">{</span><span class="op">}</span><span class="op">)</span>  <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"b1"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
 <span>                 <span class="va">q_default</span> <span class="op">=</span> <span class="fl">0</span></span>
@@ -705,13 +705,13 @@ for that we simply use the <code>sens_iterator</code> function.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.07s</span></span>
 <span><span class="co">#&gt; Total time to run: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>  <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -1037,12 +1037,12 @@ dq_default_undisc
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.12s</span></span>
-<span><span class="co">#&gt; Total time to run: 0.12s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.13s</span></span>
+<span><span class="co">#&gt; Total time to run: 0.13s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>  <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -1366,89 +1366,89 @@ dq_default_undisc
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.09s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.16s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 2: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 2: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 0.16s</span></span>
 <span><span class="co">#&gt; Analysis number: 4</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 4: 0.13s</span></span>
-<span><span class="co">#&gt; Analysis number: 5</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 5: 0.13s</span></span>
-<span><span class="co">#&gt; Analysis number: 6</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.13s</span></span>
-<span><span class="co">#&gt; Analysis number: 7</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 4: 0.14s</span></span>
+<span><span class="co">#&gt; Analysis number: 5</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 7: 0.13s</span></span>
-<span><span class="co">#&gt; Analysis number: 8</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 8: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run analysis 5: 0.14s</span></span>
+<span><span class="co">#&gt; Analysis number: 6</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 0.15s</span></span>
+<span><span class="co">#&gt; Analysis number: 7</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 7: 0.14s</span></span>
+<span><span class="co">#&gt; Analysis number: 8</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 8: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 9</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 9: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 9: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 10: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 10: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 11</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 11: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 11: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 12</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 12: 0.13s</span></span>
-<span><span class="co">#&gt; Analysis number: 13</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 13: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run analysis 12: 0.14s</span></span>
+<span><span class="co">#&gt; Analysis number: 13</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 13: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 14: 0.13s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.86s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 14: 0.14s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.99s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
@@ -1467,8 +1467,8 @@ dq_default_undisc
 <span><span class="co">#&gt; 1120:  noint       14       DSA_max dutil.sicker              0 (0; 0)</span></span>
 <span></span>
 <span><span class="va">data_sensitivity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_depth.html" class="external-link">map_depth</a></span><span class="op">(</span><span class="va">results</span>,<span class="fl">2</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">data_sensitivity</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html" class="external-link">summarise_at</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span><span class="op">)</span>,<span class="va">mean</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">data_sensitivity</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html" class="external-link">summarise_at</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span><span class="op">)</span>,<span class="va">mean</span><span class="op">)</span>  <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -1886,17 +1886,17 @@ HR_int
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 1: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
-<span><span class="co">#&gt; Time to run analysis 2: 0.13s</span></span>
-<span><span class="co">#&gt; Total time to run: 0.26s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 2: 0.14s</span></span>
+<span><span class="co">#&gt; Total time to run: 0.28s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
@@ -1917,8 +1917,8 @@ HR_int
 <span><span class="va">data_sensitivity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_depth.html" class="external-link">map_depth</a></span><span class="op">(</span><span class="va">results</span>,<span class="fl">2</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">data_sensitivity</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html" class="external-link">summarise_at</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span><span class="op">)</span>,<span class="va">mean</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">data_sensitivity</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html" class="external-link">summarise_at</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span><span class="op">)</span>,<span class="va">mean</span><span class="op">)</span>  <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -2051,7 +2051,7 @@ category.</p>
 <span></span>
 <span><span class="va">i_sensitivity</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>  iterator_sensitivity <span class="op">=</span> <span class="fu"><a href="../reference/sens_iterator.html">sens_iterator</a></span><span class="op">(</span><span class="va">sens</span>,<span class="va">n_sensitivity</span><span class="op">)</span> <span class="co">#resets back to 1 if it goes over n_sensitivity</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>            indicators <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">sensitivity_bool</span>  <span class="op">&amp;</span> <span class="va">sens_name_used</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span>              <span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="va">iterator_sensitivity</span>, </span>
@@ -2060,7 +2060,7 @@ category.</p>
 <span>            <span class="op">}</span><span class="kw">else</span><span class="op">{</span></span>
 <span>                <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span>              <span class="op">}</span></span>
-<span>          <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>          <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>            indicators_pat <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">sensitivity_bool</span>  <span class="op">&amp;</span> <span class="va">sens_name_used</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span>              <span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="va">iterator_sensitivity</span>,</span>
@@ -2074,7 +2074,7 @@ category.</p>
 <span></span>
 <span></span>
 <span>  </span>
-<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
 <span>      base <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -2114,9 +2114,9 @@ category.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
 <span><span class="co">#&gt; Time to run analysis 1: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
@@ -2128,8 +2128,8 @@ category.</p>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -2140,26 +2140,26 @@ category.</p>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 5: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 6</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 7: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 7: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 8</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 8: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 8: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 9</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -2182,20 +2182,20 @@ category.</p>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 12: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run analysis 12: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 13</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 13: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 13: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 14: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run analysis 14: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 15</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -2206,21 +2206,21 @@ category.</p>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 16: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run analysis 16: 0.16s</span></span>
 <span><span class="co">#&gt; Analysis number: 17</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 17: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 17: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 18</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 18: 0.14s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.54s</span></span>
+<span><span class="co">#&gt; Time to run analysis 18: 0.15s</span></span>
+<span><span class="co">#&gt; Total time to run: 2.68s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
@@ -2242,8 +2242,8 @@ category.</p>
 <span><span class="va">data_sensitivity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_depth.html" class="external-link">map_depth</a></span><span class="op">(</span><span class="va">results</span>,<span class="fl">2</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">data_sensitivity</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html" class="external-link">summarise_at</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span>,<span class="st">"age"</span>,<span class="st">"sex"</span><span class="op">)</span>,<span class="va">mean</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">data_sensitivity</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html" class="external-link">summarise_at</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span>,<span class="st">"age"</span>,<span class="st">"sex"</span><span class="op">)</span>,<span class="va">mean</span><span class="op">)</span>  <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -2907,7 +2907,7 @@ number of dsa iterations (5).</p>
 <span>  <span class="op">)</span> </span>
 <span></span>
 <span></span>
-<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
 <span>      base <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -2929,7 +2929,7 @@ number of dsa iterations (5).</p>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  </span>
-<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
 <span>      base <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -2976,37 +2976,37 @@ number of dsa iterations (5).</p>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
-<span><span class="co">#&gt; Time to run analysis 2: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 2: 0.16s</span></span>
 <span><span class="co">#&gt; Analysis number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 4: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 5</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 5: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 5: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 6</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
@@ -3018,20 +3018,20 @@ number of dsa iterations (5).</p>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 8: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 8: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 9</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
 <span><span class="co">#&gt; Time to run analysis 9: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 10: 0.14s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.42s</span></span>
+<span><span class="co">#&gt; Time to run analysis 10: 0.15s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.5s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
@@ -3053,8 +3053,8 @@ number of dsa iterations (5).</p>
 <span><span class="va">data_sensitivity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_depth.html" class="external-link">map_depth</a></span><span class="op">(</span><span class="va">results</span>,<span class="fl">2</span>, <span class="st">"merged_df"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">data_sensitivity</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html" class="external-link">summarise_at</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span>,<span class="st">"age"</span>,<span class="st">"sex"</span><span class="op">)</span>,<span class="va">mean</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">data_sensitivity</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html" class="external-link">summarise_at</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span>,<span class="st">"age"</span>,<span class="st">"sex"</span><span class="op">)</span>,<span class="va">mean</span><span class="op">)</span>  <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -3464,7 +3464,7 @@ probabilistic DSA, deterministic case, or standard PSA.</p>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -3473,10 +3473,10 @@ probabilistic DSA, deterministic case, or standard PSA.</p>
 <span><span class="co">#&gt; Time to run analysis 2: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 3</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 0.16s</span></span>
 <span><span class="co">#&gt; Analysis number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -3488,50 +3488,50 @@ probabilistic DSA, deterministic case, or standard PSA.</p>
 <span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 5: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run analysis 5: 0.16s</span></span>
 <span><span class="co">#&gt; Analysis number: 6</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 7: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run analysis 7: 0.16s</span></span>
 <span><span class="co">#&gt; Analysis number: 8</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 8: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 8: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 9</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
-<span><span class="co">#&gt; Time to run analysis 9: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 9: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 10: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 10: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 11</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
-<span><span class="co">#&gt; Time to run analysis 11: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run analysis 11: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 12</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 12: 0.14s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.7s</span></span>
+<span><span class="co">#&gt; Time to run analysis 12: 0.16s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.82s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
@@ -3564,9 +3564,9 @@ probabilistic DSA, deterministic case, or standard PSA.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="va">data_sensitivity</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html" class="external-link">summarise_at</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span>,<span class="st">"age"</span>,<span class="st">"sex"</span><span class="op">)</span>,<span class="va">mean</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="va">v_state_avg</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">data_sensitivity</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html" class="external-link">summarise_at</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span>,<span class="st">"age"</span>,<span class="st">"sex"</span><span class="op">)</span>,<span class="va">mean</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="va">v_state_avg</span><span class="op">)</span>  <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>

@@ -4,7 +4,12 @@
 
 CRAN release: 2026-03-18
 
-\*debug mode now works as intended
+- [`add_item()`](https://jsanchezalv.github.io/WARDEN/reference/add_item.md)
+  now works correctly with the native pipe (`|>`). The `.data` argument
+  has been moved to the first position (`.data = NULL, ..., input`), so
+  the LHS of `|>` is naturally routed to `.data` without relying on
+  magrittr’s `.` symbol. Existing code using `%>%`, `input=`, or named
+  `...` arguments is unaffected (#TODO).
 
 ## WARDEN 2.0.1
 

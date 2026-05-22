@@ -31,6 +31,7 @@ intervention
 ## Examples
 
 ``` r
+
 res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
 ), total_lys = c(int = 9.04687362556945, noint = 9.04687362556945
 ), total_qalys = c(int = 6.20743830697466, noint = 6.18115138126336

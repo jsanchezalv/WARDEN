@@ -17,6 +17,7 @@ treatment waning, changes in covariates (like weight, BMI, etc), etc.
 ### Main options
 
 ``` r
+
 library(WARDEN)
 library(flexsurv)
 #> Loading required package: survival
@@ -41,6 +42,7 @@ library(tidyr)
 ```
 
 ``` r
+
 options(scipen = 999)
 options(digits=3)
 options(tibble.print_max = 50)
@@ -63,6 +65,7 @@ cost at every cycle, including time 0.
 ### Inputs
 
 ``` r
+
 
 common_all_inputs <-add_item(input = {
   u_bs <- 0.8
@@ -101,7 +104,7 @@ evt_react_list <-
                  new_rate <- bs_rate
                  q_default <- u_bs * u_age[min(100,floor(curtime + bs_age))]
                  cost_trt <- cost_trt_ins
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "cycle",
                input = {
                  # if(curtime >= 100 - bs_age){
@@ -124,7 +127,7 @@ evt_react_list <-
               ttdeath <- qcond_exp(luck, rate = new_rate) + curtime
               modify_event(c(death = max(curtime, ttdeath)))
 
-               })%>%
+               })|>
   add_reactevt(name_evt = "death",
                input = {
                  curtime <- Inf
@@ -151,9 +154,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 16.59s
-#> Time to run analysis 1: 16.59s
-#> Total time to run: 16.59s
+#> Time to run simulation 1: 16.63s
+#> Time to run analysis 1: 16.63s
+#> Total time to run: 16.64s
 #> Simulation finalized;
 ```
 
@@ -191,18 +194,18 @@ results <- run_sim(
     #> time_cov             0.00     0.00
     #> dtime_cov            0.00     0.00
 
-| pat_id | arm   | total_lys | total_qalys | total_costs | total_lys_undisc | total_qalys_undisc | total_costs_undisc | cost_trt | q_default | q_default_undisc | cost_trt_undisc | nexttime | number_events |  luck | time_cov | simulation | sensitivity |
-|-------:|:------|----------:|------------:|------------:|-----------------:|-------------------:|-------------------:|---------:|----------:|-----------------:|----------------:|---------:|--------------:|------:|---------:|-----------:|------------:|
-|      1 | int   |      8.73 |        5.44 |        4717 |            10.10 |               6.28 |               5000 |     4717 |      5.44 |             6.28 |            5000 |     75.2 |            12 | 0.005 |    0.000 |          1 |           1 |
-|      1 | noint |      6.56 |        4.12 |        2359 |             7.29 |               4.57 |               2500 |     2359 |      4.12 |             4.57 |            2500 |     42.6 |             9 | 0.020 |    0.000 |          1 |           1 |
-|      2 | int   |     17.85 |       11.09 |        4717 |            25.37 |              15.61 |               5000 |     4717 |     11.09 |            15.61 |            5000 |    375.7 |            27 | 0.020 |    0.000 |          1 |           1 |
-|      2 | noint |     14.28 |        9.03 |        2359 |            18.55 |              11.66 |               2500 |     2359 |      9.03 |            11.66 |            2500 |    208.1 |            20 | 0.040 |    0.000 |          1 |           1 |
-|      3 | int   |      4.74 |        2.98 |        4717 |             5.11 |               3.21 |               5000 |     4717 |      2.98 |             3.21 |            5000 |     25.2 |             7 | 0.006 |    0.000 |          1 |           1 |
-|      3 | noint |      3.47 |        2.19 |        1914 |             3.66 |               2.31 |               2000 |     1914 |      2.19 |             2.31 |            2000 |     13.3 |             5 | 0.045 |    0.000 |          1 |           1 |
-|      4 | int   |     12.88 |        8.09 |        4717 |            16.21 |              10.14 |               5000 |     4717 |      8.09 |            10.14 |            5000 |    168.4 |            18 | 0.011 |    0.000 |          1 |           1 |
-|      4 | noint |      9.85 |        6.27 |        2359 |            11.64 |               7.39 |               2500 |     2359 |      6.27 |             7.39 |            2500 |     89.3 |            13 | 0.045 |    0.000 |          1 |           1 |
-|      5 | int   |     20.75 |       11.95 |        4717 |            32.15 |              18.19 |               5000 |     4717 |     11.95 |            18.19 |            5000 |    592.3 |            34 | 0.012 |    0.001 |          1 |           1 |
-|      5 | noint |     17.94 |       10.50 |        2359 |            25.56 |              14.79 |               2500 |     2359 |     10.50 |            14.79 |            2500 |    376.1 |            27 | 0.051 |    0.001 |          1 |           1 |
+| pat_id | arm | total_lys | total_qalys | total_costs | total_lys_undisc | total_qalys_undisc | total_costs_undisc | cost_trt | q_default | q_default_undisc | cost_trt_undisc | nexttime | number_events | luck | time_cov | simulation | sensitivity |
+|---:|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | int | 8.73 | 5.44 | 4717 | 10.10 | 6.28 | 5000 | 4717 | 5.44 | 6.28 | 5000 | 75.2 | 12 | 0.005 | 0.000 | 1 | 1 |
+| 1 | noint | 6.56 | 4.12 | 2359 | 7.29 | 4.57 | 2500 | 2359 | 4.12 | 4.57 | 2500 | 42.6 | 9 | 0.020 | 0.000 | 1 | 1 |
+| 2 | int | 17.85 | 11.09 | 4717 | 25.37 | 15.61 | 5000 | 4717 | 11.09 | 15.61 | 5000 | 375.7 | 27 | 0.020 | 0.000 | 1 | 1 |
+| 2 | noint | 14.28 | 9.03 | 2359 | 18.55 | 11.66 | 2500 | 2359 | 9.03 | 11.66 | 2500 | 208.1 | 20 | 0.040 | 0.000 | 1 | 1 |
+| 3 | int | 4.74 | 2.98 | 4717 | 5.11 | 3.21 | 5000 | 4717 | 2.98 | 3.21 | 5000 | 25.2 | 7 | 0.006 | 0.000 | 1 | 1 |
+| 3 | noint | 3.47 | 2.19 | 1914 | 3.66 | 2.31 | 2000 | 1914 | 2.19 | 2.31 | 2000 | 13.3 | 5 | 0.045 | 0.000 | 1 | 1 |
+| 4 | int | 12.88 | 8.09 | 4717 | 16.21 | 10.14 | 5000 | 4717 | 8.09 | 10.14 | 5000 | 168.4 | 18 | 0.011 | 0.000 | 1 | 1 |
+| 4 | noint | 9.85 | 6.27 | 2359 | 11.64 | 7.39 | 2500 | 2359 | 6.27 | 7.39 | 2500 | 89.3 | 13 | 0.045 | 0.000 | 1 | 1 |
+| 5 | int | 20.75 | 11.95 | 4717 | 32.15 | 18.19 | 5000 | 4717 | 11.95 | 18.19 | 5000 | 592.3 | 34 | 0.012 | 0.001 | 1 | 1 |
+| 5 | noint | 17.94 | 10.50 | 2359 | 25.56 | 14.79 | 2500 | 2359 | 10.50 | 14.79 | 2500 | 376.1 | 27 | 0.051 | 0.001 | 1 | 1 |
 
 ## Model avoiding cycles
 
@@ -237,6 +240,7 @@ instead of instantaneous costs at every year.
 ### Inputs
 
 ``` r
+
 
 common_all_inputs <-add_item(input = {
   u_bs <- 0.8
@@ -288,7 +292,7 @@ evt_react_list <-
                    discount = drq
                    )
                  q_default <- u_bs * adj_factor
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "death",
                input = {
                  curtime <- Inf
@@ -315,9 +319,9 @@ results2 <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 4.53s
-#> Time to run analysis 1: 4.53s
-#> Total time to run: 4.54s
+#> Time to run simulation 1: 4.63s
+#> Time to run analysis 1: 4.63s
+#> Total time to run: 4.64s
 #> Simulation finalized;
 ```
 
@@ -361,15 +365,15 @@ results2 <- run_sim(
     #> time_cov                     0.00      0.00
     #> dtime_cov                    0.00      0.00
 
-| pat_id | arm   | total_lys | total_qalys | total_costs | total_lys_undisc | total_qalys_undisc | total_costs_undisc | cost_trt | cost_trt_cycle_l | cost_trt_cycle_starttime | cost_trt_max_cycles | q_default | q_default_undisc | cost_trt_undisc | nexttime | number_events |  luck | time_cov | simulation | sensitivity |
-|-------:|:------|----------:|------------:|------------:|-----------------:|-------------------:|-------------------:|---------:|-----------------:|-------------------------:|--------------------:|----------:|-----------------:|----------------:|---------:|--------------:|------:|---------:|-----------:|------------:|
-|      1 | int   |      8.73 |        5.44 |        4717 |            10.10 |               6.29 |               5000 |     4717 |                2 |                        0 |                  10 |      5.44 |             6.29 |            5000 |    20.20 |             2 | 0.403 |    0.000 |          1 |           1 |
-|      1 | noint |      6.56 |        4.12 |        2359 |             7.29 |               4.58 |               2500 |     2359 |                2 |                        0 |                  10 |      4.12 |             4.58 |            2500 |    14.57 |             2 | 0.403 |    0.000 |          1 |           1 |
-|      2 | int   |     17.85 |       11.09 |        4717 |            25.37 |              15.77 |               5000 |     4717 |                2 |                        0 |                  10 |     11.09 |            15.77 |            5000 |    50.74 |             2 | 0.736 |    0.000 |          1 |           1 |
-|      2 | noint |     14.28 |        9.03 |        2359 |            18.55 |              11.73 |               2500 |     2359 |                2 |                        0 |                  10 |      9.03 |            11.73 |            2500 |    37.10 |             2 | 0.736 |    0.000 |          1 |           1 |
-|      3 | int   |      4.74 |        2.98 |        4717 |             5.11 |               3.21 |               5000 |     4717 |                2 |                        0 |                  10 |      2.98 |             3.21 |            5000 |    10.22 |             2 | 0.226 |    0.000 |          1 |           1 |
-|      3 | noint |      3.47 |        2.19 |        1914 |             3.66 |               2.31 |               2000 |     1914 |                2 |                        0 |                  10 |      2.19 |             2.31 |            2000 |     7.32 |             2 | 0.226 |    0.000 |          1 |           1 |
-|      4 | int   |     12.88 |        8.09 |        4717 |            16.21 |              10.18 |               5000 |     4717 |                2 |                        0 |                  10 |      8.09 |            10.18 |            5000 |    32.41 |             2 | 0.560 |    0.000 |          1 |           1 |
-|      4 | noint |      9.85 |        6.27 |        2359 |            11.64 |               7.41 |               2500 |     2359 |                2 |                        0 |                  10 |      6.27 |             7.41 |            2500 |    23.29 |             2 | 0.560 |    0.000 |          1 |           1 |
-|      5 | int   |     20.75 |       11.95 |        4717 |            32.15 |              18.51 |               5000 |     4717 |                2 |                        0 |                  10 |     11.95 |            18.51 |            5000 |    64.31 |             2 | 0.877 |    0.001 |          1 |           1 |
-|      5 | noint |     17.94 |       10.50 |        2359 |            25.56 |              14.96 |               2500 |     2359 |                2 |                        0 |                  10 |     10.50 |            14.96 |            2500 |    51.12 |             2 | 0.877 |    0.001 |          1 |           1 |
+| pat_id | arm | total_lys | total_qalys | total_costs | total_lys_undisc | total_qalys_undisc | total_costs_undisc | cost_trt | cost_trt_cycle_l | cost_trt_cycle_starttime | cost_trt_max_cycles | q_default | q_default_undisc | cost_trt_undisc | nexttime | number_events | luck | time_cov | simulation | sensitivity |
+|---:|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | int | 8.73 | 5.44 | 4717 | 10.10 | 6.29 | 5000 | 4717 | 2 | 0 | 10 | 5.44 | 6.29 | 5000 | 20.20 | 2 | 0.403 | 0.000 | 1 | 1 |
+| 1 | noint | 6.56 | 4.12 | 2359 | 7.29 | 4.58 | 2500 | 2359 | 2 | 0 | 10 | 4.12 | 4.58 | 2500 | 14.57 | 2 | 0.403 | 0.000 | 1 | 1 |
+| 2 | int | 17.85 | 11.09 | 4717 | 25.37 | 15.77 | 5000 | 4717 | 2 | 0 | 10 | 11.09 | 15.77 | 5000 | 50.74 | 2 | 0.736 | 0.000 | 1 | 1 |
+| 2 | noint | 14.28 | 9.03 | 2359 | 18.55 | 11.73 | 2500 | 2359 | 2 | 0 | 10 | 9.03 | 11.73 | 2500 | 37.10 | 2 | 0.736 | 0.000 | 1 | 1 |
+| 3 | int | 4.74 | 2.98 | 4717 | 5.11 | 3.21 | 5000 | 4717 | 2 | 0 | 10 | 2.98 | 3.21 | 5000 | 10.22 | 2 | 0.226 | 0.000 | 1 | 1 |
+| 3 | noint | 3.47 | 2.19 | 1914 | 3.66 | 2.31 | 2000 | 1914 | 2 | 0 | 10 | 2.19 | 2.31 | 2000 | 7.32 | 2 | 0.226 | 0.000 | 1 | 1 |
+| 4 | int | 12.88 | 8.09 | 4717 | 16.21 | 10.18 | 5000 | 4717 | 2 | 0 | 10 | 8.09 | 10.18 | 5000 | 32.41 | 2 | 0.560 | 0.000 | 1 | 1 |
+| 4 | noint | 9.85 | 6.27 | 2359 | 11.64 | 7.41 | 2500 | 2359 | 2 | 0 | 10 | 6.27 | 7.41 | 2500 | 23.29 | 2 | 0.560 | 0.000 | 1 | 1 |
+| 5 | int | 20.75 | 11.95 | 4717 | 32.15 | 18.51 | 5000 | 4717 | 2 | 0 | 10 | 11.95 | 18.51 | 5000 | 64.31 | 2 | 0.877 | 0.001 | 1 | 1 |
+| 5 | noint | 17.94 | 10.50 | 2359 | 25.56 | 14.96 | 2500 | 2359 | 2 | 0 | 10 | 10.50 | 14.96 | 2500 | 51.12 | 2 | 0.877 | 0.001 | 1 | 1 |

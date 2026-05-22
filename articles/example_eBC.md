@@ -13,6 +13,7 @@ efficient coding can have a substantial impact on performance.
 ### Main options
 
 ``` r
+
 library(WARDEN)
 
 library(purrr)
@@ -47,6 +48,7 @@ each disease stage.
 The dummy data for costs and utility is generated below.
 
 ``` r
+
 #Utilities
 df_util <- data.frame( name = c("util.idfs.ontx" ,"util.idfs.offtx" ,"util.remission" ,"util.recurrence" ,"util.mbc.progression.mbc" ,"util.mbc.pps"),
                          value = c(0.75, 0.8,0.9,0.7,0.6,0.5),
@@ -61,7 +63,7 @@ df_cost <- data.frame( name = c("cost.idfs.tx" ,"cost.recurrence" ,"cost.mbc.tx"
                          value = c(40000,5000,3000,10000,30000,
                                    10000,20000,30000,20000,1000),
                          stringsAsFactors = FALSE
-) %>%
+) |>
   mutate(se= value/5)
 ```
 
@@ -104,6 +106,7 @@ are intermediary (i.e., not utilities/costs that appear in
 `ongoing_inputs` and such), it would cause no trouble.
 
 ``` r
+
 #Each patient is identified through "i"
 #Items used in the model should be unnamed numeric/vectors! otherwise if they are processed by model it can lead to strangely named outcomes
 #In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.
@@ -204,6 +207,7 @@ However, other, non-initial events can be defined in the reactions part
 seen in the section below.
 
 ``` r
+
 init_event_list <- 
   add_tte(arm="int",
                evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc","ae","2ndline_mbc"),
@@ -255,7 +259,7 @@ init_event_list <-
     os <- min(os.mbc,os.early,nat.os.s)
     
 
-  }) %>%  add_tte(arm="noint",
+  }) |>  add_tte(arm="noint",
                        evts = c("start","ttot", "ttot.beva","progression.mbc", "os","idfs","ttot.early","remission","recurrence","start.early.mbc"),
                        other_inp = c("os.early","os.mbc"),                       
                        input={  #reference strategy
@@ -328,16 +332,16 @@ also call any other input/item that has been created before or create
 new ones. For example, we could even modify a cost/utility item by
 changing it directly, e.g. through `cost.idfs.tx <- 500)`.
 
-| Item          | What does it do                                                       |
-|---------------|-----------------------------------------------------------------------|
-| `curtime`     | Current event time (numeric)                                          |
-| `prevtime`    | Time of the previous event (numeric)                                  |
+| Item | What does it do |
+|----|----|
+| `curtime` | Current event time (numeric) |
+| `prevtime` | Time of the previous event (numeric) |
 | `cur_evtlist` | External pointer of C++ events that is yet to happen for that patient |
-| `evt`         | Current event being processed (character)                             |
-| `i`           | Patient being iterated (numeric)                                      |
-| `arm`         | Intervention being iterated (character)                               |
-| `simulation`  | Simulation being iterated (numeric)                                   |
-| `sens`        | Sensitivity analysis being iterated (numeric)                         |
+| `evt` | Current event being processed (character) |
+| `i` | Patient being iterated (numeric) |
+| `arm` | Intervention being iterated (character) |
+| `simulation` | Simulation being iterated (numeric) |
+| `sens` | Sensitivity analysis being iterated (numeric) |
 
 The functions to add/modify events and inputs use named vectors or
 lists. Whenever several inputs/events are added or modified, it’s
@@ -400,9 +404,10 @@ default.
 
 ``` r
 
+
 evt_react_list <-
   add_reactevt(name_evt = "start",
-               input = { }) %>%
+               input = { }) |>
   add_reactevt(name_evt = "ttot",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -415,7 +420,7 @@ evt_react_list <-
                  c_default <- cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline
                  fl.mbcs.ontx <-  0 #Flag that patient is now off-treatment
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "ttot.beva",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -428,7 +433,7 @@ evt_react_list <-
                  c_default <- cost.mbc.tx  * fl.mbcs.ontx + cost.mbc.progression.mbc * fl.mbcs.progression.mbc + cost.mbc.pps * (1-fl.mbcs.progression.mbc) + cost.2ndline*fl.mbcs_2ndline
                 fl.tx.beva <- 0 #Flag that patient is now off-treatment
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "progression.mbc",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -444,7 +449,7 @@ evt_react_list <-
                  
                  new_event(c("2ndline_mbc" = curtime + qexp(rnd_stream_mbc$draw_n(), 0.08)/12))
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "idfs",
                input = {
                  q_default = if (fl.idfs==1) {
@@ -457,7 +462,7 @@ evt_react_list <-
                  c_default <- if(arm=="noint"){cost.idfs.txnoint* fl.idfs.ontx  + cost.idfs}else{(cost.idfs.tx) * fl.idfs.ontx + cost.tx.beva * fl.tx.beva + cost.idfs}
                  fl.idfs <- 0
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "ttot.early",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -477,7 +482,7 @@ evt_react_list <-
                      new_event(c("ae" = curtime + 0.0001))
                      n_ae <- n_ae - 1
                  }
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "remission",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -490,7 +495,7 @@ evt_react_list <-
                  c_default <- cost.recurrence * fl.recurrence
                  fl.remission <- 1
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "recurrence",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -506,7 +511,7 @@ evt_react_list <-
                  fl.mbcs <- 1
                  fl.mbcs.progression.mbc <- 1 #ad-hoc for plot
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "start.early.mbc",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -520,7 +525,7 @@ evt_react_list <-
                  fl.mbcs <- 1
                  fl.mbcs.progression.mbc <- 1
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "2ndline_mbc",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -539,7 +544,7 @@ evt_react_list <-
                      new_event(c("ae" = curtime + 0.0001))
                      n_ae <- n_ae - 1
                  }
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "ae",
                input = {
                  if (n_ae>0) {
@@ -558,7 +563,7 @@ evt_react_list <-
                  c_ae <- cost.ae
                  
                  modify_event(c("os" =max(get_event("os") - 0.125,curtime +0.0001) ))#each AE brings forward death by 1.5 months
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "os",
                input = {
                  q_default <- if (fl.idfs==1) {
@@ -591,12 +596,14 @@ function. \## Utilities
 
 ``` r
 
+
 util_ongoing <- "q_default"
 ```
 
 ### Costs
 
 ``` r
+
 
 
 cost_ongoing <- "c_default"
@@ -629,6 +636,7 @@ interaction between events can have a substantial impact on the running
 time of the model.
 
 ``` r
+
 #Logic is: per patient, per intervention, per event, react to that event.
 results <- run_sim(  
   npats=2000,                              # number of patients to be simulated
@@ -652,9 +660,9 @@ results <- run_sim(
           )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 3.37s
-#> Time to run analysis 1: 3.37s
-#> Total time to run: 3.38s
+#> Time to run simulation 1: 3.41s
+#> Time to run analysis 1: 3.41s
+#> Total time to run: 3.42s
 #> Simulation finalized;
 ```
 
@@ -670,6 +678,7 @@ intervals). We can also use the individual patient data generated by the
 simulation, which we collect here to plot in the `psa_ipd` object.
 
 ``` r
+
 
 
 summary_results_det(results[[1]][[1]]) 
@@ -789,23 +798,23 @@ summary_results_sim(results[[1]])
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
-| evtname    |   evttime |  prevtime | pat_id | arm | total_lys | total_qalys | total_costs | total_costs_undisc | total_qalys_undisc | total_lys_undisc |       lys |     qalys |        costs | lys_undisc | qalys_undisc | costs_undisc | os.early |   os.mbc | nat.os.s | sex_pt |    c_default |     c_ae | q_default | c_default_undisc | q_default_undisc | c_ae_undisc |  nexttime | simulation | sensitivity |
-|:-----------|----------:|----------:|-------:|:----|----------:|------------:|------------:|-------------------:|-------------------:|-----------------:|----------:|----------:|-------------:|-----------:|-------------:|-------------:|---------:|---------:|---------:|:-------|-------------:|---------:|----------:|-----------------:|-----------------:|------------:|----------:|-----------:|------------:|
-| start      |  0.000000 |  0.000000 |      1 | int |  14.14495 |    12.15104 |    403257.6 |           474554.5 |           15.87365 |         18.31841 | 4.4250507 | 3.3187880 | 2.655030e+05 |  4.7424489 |    3.5568366 |    284546.93 | 18.44341 | 23.56778 | 41.31053 | female | 2.655030e+05 |   0.0000 | 3.3187880 |        284546.93 |        3.5568366 |           0 |  4.742449 |          1 |           1 |
-| ttot.early |  4.742449 |  0.000000 |      1 | int |  14.14495 |    12.15104 |    403257.6 |           474554.5 |           15.87365 |         18.31841 | 0.0000869 | 0.0000652 | 5.215197e+00 |  0.0001000 |    0.0000750 |         6.00 | 18.44341 | 23.56778 | 41.31053 | female | 5.215197e+00 |   0.0000 | 0.0000652 |             6.00 |        0.0000750 |           0 |  4.742549 |          1 |           1 |
-| ae         |  4.742549 |  4.742449 |      1 | int |  14.14495 |    12.15104 |    403257.6 |           474554.5 |           15.87365 |         18.31841 | 0.8435090 | 0.8435090 | 2.026991e+04 |  0.9846357 |    0.9846357 |     23646.62 | 18.44341 | 23.56778 | 41.31053 | female | 1.940071e+04 | 869.1982 | 0.8435090 |         22646.62 |        0.9846357 |        1000 |  5.727184 |          1 |           1 |
-| idfs       |  5.727184 |  4.742549 |      1 | int |  14.14495 |    12.15104 |    403257.6 |           474554.5 |           15.87365 |         18.31841 | 0.0000000 | 0.0000000 | 0.000000e+00 |  0.0000000 |    0.0000000 |         0.00 | 18.44341 | 23.56778 | 41.31053 | female | 0.000000e+00 |   0.0000 | 0.0000000 |             0.00 |        0.0000000 |           0 |  5.727184 |          1 |           1 |
-| remission  |  5.727184 |  5.727184 |      1 | int |  14.14495 |    12.15104 |    403257.6 |           474554.5 |           15.87365 |         18.31841 | 2.0261310 | 1.8235179 | 0.000000e+00 |  2.4892484 |    2.2403236 |         0.00 | 18.44341 | 23.56778 | 41.31053 | female | 0.000000e+00 |   0.0000 | 1.8235179 |             0.00 |        2.2403236 |           0 |  8.216433 |          1 |           1 |
-| ttot.beva  |  8.216433 |  5.727184 |      1 | int |  14.14495 |    12.15104 |    403257.6 |           474554.5 |           15.87365 |         18.31841 | 5.1077998 | 4.5970198 | 1.174794e+05 |  7.2328252 |    6.5095426 |    166354.98 | 18.44341 | 23.56778 | 41.31053 | female | 1.174794e+05 |   0.0000 | 4.5970198 |        166354.98 |        6.5095426 |           0 | 15.449258 |          1 |           1 |
-| recurrence | 15.449258 |  8.216433 |      1 | int |  14.14495 |    12.15104 |    403257.6 |           474554.5 |           15.87365 |         18.31841 | 1.7423769 | 1.5681392 | 0.000000e+00 |  2.8691519 |    2.5822367 |         0.00 | 18.44341 | 23.56778 | 41.31053 | female | 0.000000e+00 |   0.0000 | 1.5681392 |             0.00 |        2.5822367 |           0 | 18.318410 |          1 |           1 |
-| os         | 18.318410 | 15.449258 |      1 | int |  14.14495 |    12.15104 |    403257.6 |           474554.5 |           15.87365 |         18.31841 | 0.0000000 | 0.0000000 | 0.000000e+00 |  0.0000000 |    0.0000000 |         0.00 | 18.44341 | 23.56778 | 41.31053 | female | 0.000000e+00 |   0.0000 | 0.0000000 |             0.00 |        0.0000000 |           0 | 18.318410 |          1 |           1 |
-| start      |  0.000000 |  0.000000 |      2 | int |  12.79480 |    10.75476 |    362284.3 |           402550.9 |           13.65504 |         16.07424 | 4.7538198 | 3.5653648 | 2.852292e+05 |  5.1228222 |    3.8421166 |    307369.33 | 16.19924 |      Inf | 37.44090 | female | 2.852292e+05 |   0.0000 | 3.5653648 |        307369.33 |        3.8421166 |           0 |  5.122822 |          1 |           1 |
-| ttot.beva  |  5.122822 |  0.000000 |      2 | int |  12.79480 |    10.75476 |    362284.3 |           402550.9 |           13.65504 |         16.07424 | 1.5157562 | 1.1368171 | 3.486239e+04 |  1.8111969 |    1.3583977 |     41657.53 | 16.19924 |      Inf | 37.44090 | female | 3.486239e+04 |   0.0000 | 1.1368171 |         41657.53 |        1.3583977 |           0 |  6.934019 |          1 |           1 |
+| evtname | evttime | prevtime | pat_id | arm | total_lys | total_qalys | total_costs | total_costs_undisc | total_qalys_undisc | total_lys_undisc | lys | qalys | costs | lys_undisc | qalys_undisc | costs_undisc | os.early | os.mbc | nat.os.s | sex_pt | c_default | c_ae | q_default | c_default_undisc | q_default_undisc | c_ae_undisc | nexttime | simulation | sensitivity |
+|:---|---:|---:|---:|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| start | 0.000000 | 0.000000 | 1 | int | 14.14495 | 12.15104 | 403257.6 | 474554.5 | 15.87365 | 18.31841 | 4.4250507 | 3.3187880 | 2.655030e+05 | 4.7424489 | 3.5568366 | 284546.93 | 18.44341 | 23.56778 | 41.31053 | female | 2.655030e+05 | 0.0000 | 3.3187880 | 284546.93 | 3.5568366 | 0 | 4.742449 | 1 | 1 |
+| ttot.early | 4.742449 | 0.000000 | 1 | int | 14.14495 | 12.15104 | 403257.6 | 474554.5 | 15.87365 | 18.31841 | 0.0000869 | 0.0000652 | 5.215197e+00 | 0.0001000 | 0.0000750 | 6.00 | 18.44341 | 23.56778 | 41.31053 | female | 5.215197e+00 | 0.0000 | 0.0000652 | 6.00 | 0.0000750 | 0 | 4.742549 | 1 | 1 |
+| ae | 4.742549 | 4.742449 | 1 | int | 14.14495 | 12.15104 | 403257.6 | 474554.5 | 15.87365 | 18.31841 | 0.8435090 | 0.8435090 | 2.026991e+04 | 0.9846357 | 0.9846357 | 23646.62 | 18.44341 | 23.56778 | 41.31053 | female | 1.940071e+04 | 869.1982 | 0.8435090 | 22646.62 | 0.9846357 | 1000 | 5.727184 | 1 | 1 |
+| idfs | 5.727184 | 4.742549 | 1 | int | 14.14495 | 12.15104 | 403257.6 | 474554.5 | 15.87365 | 18.31841 | 0.0000000 | 0.0000000 | 0.000000e+00 | 0.0000000 | 0.0000000 | 0.00 | 18.44341 | 23.56778 | 41.31053 | female | 0.000000e+00 | 0.0000 | 0.0000000 | 0.00 | 0.0000000 | 0 | 5.727184 | 1 | 1 |
+| remission | 5.727184 | 5.727184 | 1 | int | 14.14495 | 12.15104 | 403257.6 | 474554.5 | 15.87365 | 18.31841 | 2.0261310 | 1.8235179 | 0.000000e+00 | 2.4892484 | 2.2403236 | 0.00 | 18.44341 | 23.56778 | 41.31053 | female | 0.000000e+00 | 0.0000 | 1.8235179 | 0.00 | 2.2403236 | 0 | 8.216433 | 1 | 1 |
+| ttot.beva | 8.216433 | 5.727184 | 1 | int | 14.14495 | 12.15104 | 403257.6 | 474554.5 | 15.87365 | 18.31841 | 5.1077998 | 4.5970198 | 1.174794e+05 | 7.2328252 | 6.5095426 | 166354.98 | 18.44341 | 23.56778 | 41.31053 | female | 1.174794e+05 | 0.0000 | 4.5970198 | 166354.98 | 6.5095426 | 0 | 15.449258 | 1 | 1 |
+| recurrence | 15.449258 | 8.216433 | 1 | int | 14.14495 | 12.15104 | 403257.6 | 474554.5 | 15.87365 | 18.31841 | 1.7423769 | 1.5681392 | 0.000000e+00 | 2.8691519 | 2.5822367 | 0.00 | 18.44341 | 23.56778 | 41.31053 | female | 0.000000e+00 | 0.0000 | 1.5681392 | 0.00 | 2.5822367 | 0 | 18.318410 | 1 | 1 |
+| os | 18.318410 | 15.449258 | 1 | int | 14.14495 | 12.15104 | 403257.6 | 474554.5 | 15.87365 | 18.31841 | 0.0000000 | 0.0000000 | 0.000000e+00 | 0.0000000 | 0.0000000 | 0.00 | 18.44341 | 23.56778 | 41.31053 | female | 0.000000e+00 | 0.0000 | 0.0000000 | 0.00 | 0.0000000 | 0 | 18.318410 | 1 | 1 |
+| start | 0.000000 | 0.000000 | 2 | int | 12.79480 | 10.75476 | 362284.3 | 402550.9 | 13.65504 | 16.07424 | 4.7538198 | 3.5653648 | 2.852292e+05 | 5.1228222 | 3.8421166 | 307369.33 | 16.19924 | Inf | 37.44090 | female | 2.852292e+05 | 0.0000 | 3.5653648 | 307369.33 | 3.8421166 | 0 | 5.122822 | 1 | 1 |
+| ttot.beva | 5.122822 | 0.000000 | 2 | int | 12.79480 | 10.75476 | 362284.3 | 402550.9 | 13.65504 | 16.07424 | 1.5157562 | 1.1368171 | 3.486239e+04 | 1.8111969 | 1.3583977 | 41657.53 | 16.19924 | Inf | 37.44090 | female | 3.486239e+04 | 0.0000 | 1.1368171 | 41657.53 | 1.3583977 | 0 | 6.934019 | 1 | 1 |
 
 We can also check what has been the absolute number of events per
 strategy.
@@ -843,10 +852,11 @@ simulation.
 
 ``` r
 
-data_plot <- results[[1]][[1]]$merged_df %>%
-  filter(evtname != "start") %>%
-  group_by(arm,evtname,simulation) %>%
-  mutate(median = median(evttime)) %>%
+
+data_plot <- results[[1]][[1]]$merged_df |>
+  filter(evtname != "start") |>
+  group_by(arm,evtname,simulation) |>
+  mutate(median = median(evttime)) |>
   ungroup()
 
 #Density
@@ -869,11 +879,12 @@ vs. remission and cure or recurrence).
 
 ``` r
 
+
 data_qaly_cost<- psa_ipd[,.SD[1],by=.(pat_id,arm,simulation)][,.(arm,qaly=total_qalys,cost=total_costs,pat_id,simulation)]
 data_qaly_cost[,ps_id:=paste(pat_id,simulation,sep="_")]
 
 
-mean_data_qaly_cost <- data_qaly_cost %>% group_by(arm) %>% summarise(across(where(is.numeric),mean))
+mean_data_qaly_cost <- data_qaly_cost |> group_by(arm) |> summarise(across(where(is.numeric),mean))
 
 ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = arm)) + 
   geom_point(alpha=0.15,shape = 21) +

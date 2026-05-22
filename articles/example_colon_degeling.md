@@ -21,6 +21,7 @@ able to reduce the number of simulations needed to achieve convergence.
 ### Main options
 
 ``` r
+
 library(WARDEN)
 library(flexsurv)
 #> Loading required package: survival
@@ -120,6 +121,7 @@ fit_R_D$cov <- structure(c(0.00464605840970939, -0.000117142438483793, 0.0001171
 ```
 
 ``` r
+
 options(scipen = 999)
 options(digits=3)
 options(tibble.print_max = 50)
@@ -142,6 +144,7 @@ analysis, showcasing as well how
 function can be used to have everything done at once.
 
 ``` r
+
 
 common_all_inputs <-add_item(input = {
                       drc         <- 0.04 
@@ -252,6 +255,7 @@ interested in replicating the final results, we focus on the key events
 and interactions. We have relabeled “TTR” as “advanced”.
 
 ``` r
+
 init_event_list <- 
   add_tte(arm=c("one","two"), evts = c("trt_cycle","monitor_cycle","advanced","death") , other_inp ="fl_adv",input={
     trt_cycle <- 0
@@ -302,6 +306,7 @@ treatment cycle). For the sake of replication, we keep that
 interpretation here.
 
 ``` r
+
 evt_react_list <-
   add_reactevt(name_evt = "trt_cycle",
                input = {
@@ -321,7 +326,7 @@ evt_react_list <-
                      modify_event(c(monitor_cycle = t_adjuvant_cycle + curtime))
                    }
                    
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "monitor_cycle",
                input = {
                  MonitorCycles <- MonitorCycles + 1
@@ -331,7 +336,7 @@ evt_react_list <-
                  if(MonitorCycles<n_max_monitor_cycles){
                   new_event(c(monitor_cycle = curtime + t_monitor_cycle))
                  }
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "advanced",
                input = {
                  modify_event(c(trt_cycle = Inf, monitor_cycle = Inf)) #remove the trt_cycle and monitor_cycle event
@@ -356,7 +361,7 @@ evt_react_list <-
                 q_total <- u_advanced
                 cost_advanced <- c_advanced
                  
-               })%>%
+               })|>
   add_reactevt(name_evt = "death",
                input = {
                  curtime   <- Inf #exits simulation, no need to remove other evts
@@ -366,6 +371,7 @@ evt_react_list <-
 ### Costs and Utilities
 
 ``` r
+
 
 util_ongoing <- "q_total"
 
@@ -380,6 +386,7 @@ For the sake of reducing running times of this vignette, we have pre-run
 all results, so we leave a small run only to showcase results.
 
 ``` r
+
 results <- run_sim(  
   npats=5000,                               # number of patients to be simulated
   n_sim=1,                                  # number of simulations to run
@@ -397,9 +404,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 14s
-#> Time to run analysis 1: 14s
-#> Total time to run: 14s
+#> Time to run simulation 1: 14.59s
+#> Time to run analysis 1: 14.59s
+#> Total time to run: 14.6s
 #> Simulation finalized;
 ```
 
@@ -408,6 +415,7 @@ results <- run_sim(
 #### Summary of Example Results
 
 ``` r
+
 
 
 summary_results_det(results[[1]][[1]], arm ="two") #print first simulation
@@ -449,23 +457,23 @@ summary_results_det(results[[1]][[1]], arm ="two") #print first simulation
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 | pat_id | arm | total_lys | total_qalys | total_costs | total_lys_undisc | total_qalys_undisc | total_costs_undisc | cost_adj | cost_monitor | cost_advanced | q_total | cost_adj_undisc | cost_monitor_undisc | cost_advanced_undisc | nexttime | number_events | simulation | sensitivity |
-|-------:|:----|----------:|------------:|------------:|-----------------:|-------------------:|-------------------:|---------:|-------------:|--------------:|--------:|----------------:|--------------------:|---------------------:|---------:|--------------:|-----------:|------------:|
-|      1 | one |      8.91 |        7.05 |       59980 |             9.56 |               7.57 |              61000 |    55454 |         4526 |             0 |    7.05 |           56000 |                5000 |                    0 |    34.59 |            16 |          1 |           1 |
-|      2 | one |      2.29 |        1.60 |       92205 |             2.33 |               1.63 |              95000 |    53476 |          978 |         37751 |    1.60 |           54000 |                1000 |                40000 |     9.32 |            13 |          1 |           1 |
-|      3 | one |      3.63 |        2.52 |       90270 |             3.73 |               2.59 |              94000 |    51495 |         1918 |         36858 |    2.52 |           52000 |                2000 |                40000 |    14.29 |            14 |          1 |           1 |
-|      4 | one |      6.79 |        4.80 |       93183 |             7.16 |               5.05 |             100000 |    55463 |         3691 |         34029 |    4.80 |           56000 |                4000 |                40000 |    29.35 |            16 |          1 |           1 |
-|      5 | one |      4.35 |        3.30 |       93393 |             4.50 |               3.41 |             100000 |    55427 |         3691 |         34275 |    3.30 |           56000 |                4000 |                40000 |    23.84 |            16 |          1 |           1 |
-|      6 | one |      6.77 |        4.11 |       78980 |             7.13 |               4.33 |              80000 |    39685 |            0 |         39295 |    4.11 |           40000 |                   0 |                40000 |    16.34 |            10 |          1 |           1 |
-|      7 | one |     21.75 |       17.33 |       58012 |            26.28 |              20.96 |              59000 |    53485 |         4526 |             0 |   17.33 |           54000 |                5000 |                    0 |    68.05 |            16 |          1 |           1 |
-|      8 | one |     11.28 |        8.95 |       59967 |            12.34 |               9.80 |              61000 |    55441 |         4526 |             0 |    8.95 |           56000 |                5000 |                    0 |    40.16 |            16 |          1 |           1 |
-|      9 | one |      4.05 |        2.59 |       92638 |             4.18 |               2.67 |              95000 |    53441 |          978 |         38220 |    2.59 |           54000 |                1000 |                40000 |    12.69 |            13 |          1 |           1 |
-|     10 | one |     27.70 |       16.78 |       98424 |            35.71 |              21.59 |             101000 |    59378 |          978 |         38068 |   16.78 |           60000 |                1000 |                40000 |    75.85 |            13 |          1 |           1 |
+|---:|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | one | 8.91 | 7.05 | 59980 | 9.56 | 7.57 | 61000 | 55454 | 4526 | 0 | 7.05 | 56000 | 5000 | 0 | 34.59 | 16 | 1 | 1 |
+| 2 | one | 2.29 | 1.60 | 92205 | 2.33 | 1.63 | 95000 | 53476 | 978 | 37751 | 1.60 | 54000 | 1000 | 40000 | 9.32 | 13 | 1 | 1 |
+| 3 | one | 3.63 | 2.52 | 90270 | 3.73 | 2.59 | 94000 | 51495 | 1918 | 36858 | 2.52 | 52000 | 2000 | 40000 | 14.29 | 14 | 1 | 1 |
+| 4 | one | 6.79 | 4.80 | 93183 | 7.16 | 5.05 | 100000 | 55463 | 3691 | 34029 | 4.80 | 56000 | 4000 | 40000 | 29.35 | 16 | 1 | 1 |
+| 5 | one | 4.35 | 3.30 | 93393 | 4.50 | 3.41 | 100000 | 55427 | 3691 | 34275 | 3.30 | 56000 | 4000 | 40000 | 23.84 | 16 | 1 | 1 |
+| 6 | one | 6.77 | 4.11 | 78980 | 7.13 | 4.33 | 80000 | 39685 | 0 | 39295 | 4.11 | 40000 | 0 | 40000 | 16.34 | 10 | 1 | 1 |
+| 7 | one | 21.75 | 17.33 | 58012 | 26.28 | 20.96 | 59000 | 53485 | 4526 | 0 | 17.33 | 54000 | 5000 | 0 | 68.05 | 16 | 1 | 1 |
+| 8 | one | 11.28 | 8.95 | 59967 | 12.34 | 9.80 | 61000 | 55441 | 4526 | 0 | 8.95 | 56000 | 5000 | 0 | 40.16 | 16 | 1 | 1 |
+| 9 | one | 4.05 | 2.59 | 92638 | 4.18 | 2.67 | 95000 | 53441 | 978 | 38220 | 2.59 | 54000 | 1000 | 40000 | 12.69 | 13 | 1 | 1 |
+| 10 | one | 27.70 | 16.78 | 98424 | 35.71 | 21.59 | 101000 | 59378 | 978 | 38068 | 16.78 | 60000 | 1000 | 40000 | 75.85 | 13 | 1 | 1 |
 
 ## Rethinking the Approach
 
@@ -487,6 +495,7 @@ running speed (roughly twice as fast) while providing the same model
 structure.
 
 ``` r
+
 unique_pt_inputs2 <- add_item(input = {
     n_tox <- 0
     q_total <- u_adjuvant
@@ -570,7 +579,7 @@ evt_react_list <-
                    q_total <- u_adjuvant - prop_tox*u_dis_tox
   
                    
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "monitoring",
                input = {
                  cost_adj <- 0
@@ -581,7 +590,7 @@ evt_react_list <-
 
                  q_total <- u_diseasefree
                  
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "advanced",
                input = {
                  
@@ -609,7 +618,7 @@ evt_react_list <-
                  
                  cost_advanced <- c_advanced
                  q_total <- u_advanced
-               })%>%
+               })|>
   add_reactevt(name_evt = "death",
                input = {
                  curtime <- Inf #exits simulation, no need to remove other evts
@@ -640,9 +649,9 @@ results2 <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 6.52s
-#> Time to run analysis 1: 6.52s
-#> Total time to run: 6.53s
+#> Time to run simulation 1: 6.59s
+#> Time to run analysis 1: 6.59s
+#> Total time to run: 6.59s
 #> Simulation finalized;
 ```
 
@@ -732,17 +741,17 @@ seconds.
     #> dq_total_undisc                   2.42      0.00
 
 | pat_id | arm | total_lys | total_qalys | total_costs | total_lys_undisc | total_qalys_undisc | total_costs_undisc | cost_advanced | cost_tox | cost_adj | cost_monitor | cost_tox_cycle_l | cost_adj_cycle_l | cost_monitor_cycle_l | cost_tox_cycle_starttime | cost_adj_cycle_starttime | cost_monitor_cycle_starttime | cost_tox_max_cycles | cost_adj_max_cycles | cost_monitor_max_cycles | q_total | cost_advanced_undisc | cost_tox_undisc | cost_adj_undisc | cost_monitor_undisc | nexttime | number_events | n_tox | simulation | sensitivity |
-|-------:|:----|----------:|------------:|------------:|-----------------:|-------------------:|-------------------:|--------------:|---------:|---------:|-------------:|-----------------:|-----------------:|---------------------:|-------------------------:|-------------------------:|-----------------------------:|--------------------:|--------------------:|------------------------:|--------:|---------------------:|----------------:|----------------:|--------------------:|---------:|--------------:|------:|-----------:|------------:|
-|      1 | one |      8.91 |        7.04 |       59950 |             9.56 |               7.56 |              61000 |             0 |     5939 |    49495 |         4516 |            0.173 |            0.173 |                    3 |                        0 |                        0 |                         2.27 |                  30 |                  30 |                      15 |    7.04 |                    0 |            6000 |           50000 |                5000 |    19.75 |             3 |     3 |          1 |           1 |
-|      1 | two |      8.91 |        7.04 |      160919 |             9.56 |               7.56 |             163000 |             0 |     7919 |   148484 |         4516 |            0.173 |            0.173 |                    3 |                        0 |                        0 |                         2.27 |                  30 |                  30 |                      15 |    7.04 |                    0 |            8000 |          150000 |                5000 |    19.75 |             3 |     4 |          1 |           1 |
-|      2 | one |      2.29 |        1.59 |       92181 |             2.33 |               1.62 |              95000 |         37751 |     3960 |    49495 |          975 |            0.231 |            0.231 |                    4 |                        0 |                        0 |                         2.90 |                  40 |                  40 |                      20 |    1.59 |                40000 |            4000 |           50000 |                1000 |     6.78 |             4 |     2 |          1 |           1 |
-|      2 | two |     26.83 |       21.37 |      160919 |            34.25 |              27.31 |             163000 |             0 |     7919 |   148484 |         4516 |            0.173 |            0.173 |                    3 |                        0 |                        0 |                         2.27 |                  30 |                  30 |                      15 |   21.37 |                    0 |            8000 |          150000 |                5000 |    69.13 |             3 |     4 |          1 |           1 |
-|      3 | one |      3.63 |        2.52 |       90246 |             3.73 |               2.58 |              94000 |         36858 |     1980 |    49495 |         1913 |            0.231 |            0.231 |                    4 |                        0 |                        0 |                         2.90 |                  40 |                  40 |                      20 |    2.52 |                40000 |            2000 |           50000 |                2000 |    10.18 |             4 |     1 |          1 |           1 |
-|      3 | two |      3.62 |        2.55 |      196715 |             3.73 |               2.62 |             202000 |         36419 |     9899 |   148484 |         1913 |            0.231 |            0.231 |                    4 |                        0 |                        0 |                         2.90 |                  40 |                  40 |                      20 |    2.55 |                40000 |           10000 |          150000 |                2000 |    10.48 |             4 |     5 |          1 |           1 |
-|      4 | one |      6.79 |        4.79 |       93146 |             7.16 |               5.04 |             100000 |         34029 |     5939 |    49495 |         3682 |            0.231 |            0.231 |                    4 |                        0 |                        0 |                         2.90 |                  40 |                  40 |                      20 |    4.79 |                40000 |            6000 |           50000 |                4000 |    19.08 |             4 |     3 |          1 |           1 |
-|      4 | two |      6.86 |        4.95 |      192173 |             7.24 |               5.21 |             201000 |         33234 |     5939 |   148484 |         4516 |            0.231 |            0.231 |                    4 |                        0 |                        0 |                         2.90 |                  40 |                  40 |                      20 |    4.95 |                40000 |            6000 |          150000 |                5000 |    19.83 |             4 |     3 |          1 |           1 |
-|      5 | one |      4.35 |        3.29 |       93391 |             4.50 |               3.40 |             100000 |         34275 |     5939 |    49495 |         3682 |            0.231 |            0.231 |                    4 |                        0 |                        0 |                         2.90 |                  40 |                  40 |                      20 |    3.29 |                40000 |            6000 |           50000 |                4000 |    13.57 |             4 |     3 |          1 |           1 |
-|      5 | two |      4.78 |        3.65 |      193594 |             4.96 |               3.79 |             202000 |         33509 |     7919 |   148484 |         3682 |            0.231 |            0.231 |                    4 |                        0 |                        0 |                         2.90 |                  40 |                  40 |                      20 |    3.65 |                40000 |            8000 |          150000 |                4000 |    15.06 |             4 |     4 |          1 |           1 |
+|---:|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | one | 8.91 | 7.04 | 59950 | 9.56 | 7.56 | 61000 | 0 | 5939 | 49495 | 4516 | 0.173 | 0.173 | 3 | 0 | 0 | 2.27 | 30 | 30 | 15 | 7.04 | 0 | 6000 | 50000 | 5000 | 19.75 | 3 | 3 | 1 | 1 |
+| 1 | two | 8.91 | 7.04 | 160919 | 9.56 | 7.56 | 163000 | 0 | 7919 | 148484 | 4516 | 0.173 | 0.173 | 3 | 0 | 0 | 2.27 | 30 | 30 | 15 | 7.04 | 0 | 8000 | 150000 | 5000 | 19.75 | 3 | 4 | 1 | 1 |
+| 2 | one | 2.29 | 1.59 | 92181 | 2.33 | 1.62 | 95000 | 37751 | 3960 | 49495 | 975 | 0.231 | 0.231 | 4 | 0 | 0 | 2.90 | 40 | 40 | 20 | 1.59 | 40000 | 4000 | 50000 | 1000 | 6.78 | 4 | 2 | 1 | 1 |
+| 2 | two | 26.83 | 21.37 | 160919 | 34.25 | 27.31 | 163000 | 0 | 7919 | 148484 | 4516 | 0.173 | 0.173 | 3 | 0 | 0 | 2.27 | 30 | 30 | 15 | 21.37 | 0 | 8000 | 150000 | 5000 | 69.13 | 3 | 4 | 1 | 1 |
+| 3 | one | 3.63 | 2.52 | 90246 | 3.73 | 2.58 | 94000 | 36858 | 1980 | 49495 | 1913 | 0.231 | 0.231 | 4 | 0 | 0 | 2.90 | 40 | 40 | 20 | 2.52 | 40000 | 2000 | 50000 | 2000 | 10.18 | 4 | 1 | 1 | 1 |
+| 3 | two | 3.62 | 2.55 | 196715 | 3.73 | 2.62 | 202000 | 36419 | 9899 | 148484 | 1913 | 0.231 | 0.231 | 4 | 0 | 0 | 2.90 | 40 | 40 | 20 | 2.55 | 40000 | 10000 | 150000 | 2000 | 10.48 | 4 | 5 | 1 | 1 |
+| 4 | one | 6.79 | 4.79 | 93146 | 7.16 | 5.04 | 100000 | 34029 | 5939 | 49495 | 3682 | 0.231 | 0.231 | 4 | 0 | 0 | 2.90 | 40 | 40 | 20 | 4.79 | 40000 | 6000 | 50000 | 4000 | 19.08 | 4 | 3 | 1 | 1 |
+| 4 | two | 6.86 | 4.95 | 192173 | 7.24 | 5.21 | 201000 | 33234 | 5939 | 148484 | 4516 | 0.231 | 0.231 | 4 | 0 | 0 | 2.90 | 40 | 40 | 20 | 4.95 | 40000 | 6000 | 150000 | 5000 | 19.83 | 4 | 3 | 1 | 1 |
+| 5 | one | 4.35 | 3.29 | 93391 | 4.50 | 3.40 | 100000 | 34275 | 5939 | 49495 | 3682 | 0.231 | 0.231 | 4 | 0 | 0 | 2.90 | 40 | 40 | 20 | 3.29 | 40000 | 6000 | 50000 | 4000 | 13.57 | 4 | 3 | 1 | 1 |
+| 5 | two | 4.78 | 3.65 | 193594 | 4.96 | 3.79 | 202000 | 33509 | 7919 | 148484 | 3682 | 0.231 | 0.231 | 4 | 0 | 0 | 2.90 | 40 | 40 | 20 | 3.65 | 40000 | 8000 | 150000 | 4000 | 15.06 | 4 | 4 | 1 | 1 |
 
 ![](example_colon_degeling_files/figure-html/unnamed-chunk-2-1.png)![](example_colon_degeling_files/figure-html/unnamed-chunk-2-2.png)![](example_colon_degeling_files/figure-html/unnamed-chunk-2-3.png)
 
@@ -754,6 +763,7 @@ function. We just showcase this, and will not run it for the sake of
 saving computation time.
 
 ``` r
+
 
 thetaToProb <- function(x) unname(exp(x) / (1 + exp(x)))
 
@@ -918,8 +928,8 @@ results_psa <- run_sim_parallel(
 #> Simulation number: 3
 #> Simulation number: 4
 #> Simulation number: 5
-#> Time to run analysis 1: 7.61s
-#> Total time to run: 7.61s
+#> Time to run analysis 1: 8.1s
+#> Total time to run: 8.1s
 #> Simulation finalized;
   
 summary_results_sim(results_psa[[1]], arm ="two") 

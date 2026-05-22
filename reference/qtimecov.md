@@ -79,6 +79,7 @@ which would make computations faster.
 ## Examples
 
 ``` r
+
 param_fun_factory <- function(p0, p1, p2, p3) {
   function(.time) p0 + p1*.time + p2*.time^2 + p3*(floor(.time) + 1)
 }

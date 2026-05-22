@@ -10,6 +10,7 @@ run a model with constrained resources.
 ### Main options
 
 ``` r
+
 library(WARDEN)
 
 library(dplyr)
@@ -32,6 +33,7 @@ library(purrr)
 ```
 
 ``` r
+
 options(scipen = 999)
 options(digits=3)
 options(tibble.print_max = 50)
@@ -88,6 +90,7 @@ tracked, but in constrained is much harder to do so or would violate
 CRAN norms).
 
 ``` r
+
 #We don't need to use sensitivity_inputs here, so we don't add that object
 
 #Put objects here that do not change on any patient or intervention loop
@@ -130,6 +133,7 @@ unique_pt_inputs <- add_item(fl.sick = 1,
 Nothing changes here relative to the standard approach.
 
 ``` r
+
 init_event_list <- 
   add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={
     sick <- 0
@@ -170,6 +174,7 @@ beds count, time in a queue for patients who queued, and also whether
 the patient had to queue or not.
 
 ``` r
+
 evt_react_list <-
   add_reactevt(name_evt = "sick",
                input = {
@@ -177,7 +182,7 @@ evt_react_list <-
                  value_accum <- shared_accumulator$value()
                  beds_free <- beds$n_free()
                  time_in_queue <- NA
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "sicker",
                input = {
                  success_blocking_bed <- beds$attempt_block()
@@ -192,7 +197,7 @@ evt_react_list <-
                  q_default <- util.sicker
                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
                  fl.sick   <- 0 
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "death",
                input = {
                  beds$attempt_free() #remove from using or from the queue
@@ -216,12 +221,14 @@ evt_react_list <-
 
 ``` r
 
+
 util_ongoing <- "q_default"
 ```
 
 ### Costs
 
 ``` r
+
 
 cost_ongoing <- "c_default"
 ```
@@ -234,6 +241,7 @@ The model is executed in exactly the same way as before, but we just
 need to add `constrained = TRUE` to the arguments of `run_sim`.
 
 ``` r
+
 #Logic is: per patient, per intervention, per event, react to that event.
 results <- run_sim(  
   npats=1000,                               # number of patients to be simulated
@@ -253,9 +261,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 1.02s
-#> Time to run analysis 1: 1.02s
-#> Total time to run: 1.03s
+#> Time to run simulation 1: 1s
+#> Time to run analysis 1: 1s
+#> Total time to run: 1.01s
 #> Simulation finalized;
 ```
 
@@ -264,6 +272,7 @@ results <- run_sim(
 ### Summary of Results
 
 ``` r
+
 
 
 summary_results_det(results[[1]][[1]]) #print first simulation
@@ -305,23 +314,23 @@ summary_results_det(results[[1]][[1]]) #print first simulation
 
 psa_ipd <- bind_rows(map(results[[1]], "merged_df")) 
 
-psa_ipd[1:10,] %>%
-  kable() %>%
+psa_ipd[1:10,] |>
+  kable() |>
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
-| evtname | evttime | prevtime | pat_id | arm | total_lys | total_qalys | total_costs | total_costs_undisc | total_qalys_undisc | total_lys_undisc |    lys | qalys | costs | lys_undisc | qalys_undisc | costs_undisc | beds_free | had_to_queue | time_in_queue | value_accum | c_default | q_default | c_default_undisc | q_default_undisc | nexttime | simulation | sensitivity |
-|:--------|--------:|---------:|-------:|:----|----------:|------------:|------------:|-------------------:|-------------------:|-----------------:|-------:|------:|------:|-----------:|-------------:|-------------:|----------:|-------------:|--------------:|------------:|----------:|----------:|-----------------:|-----------------:|---------:|-----------:|------------:|
-| sick    |   0.000 |    0.000 |      1 | int |     10.34 |        8.27 |       41358 |              51112 |              10.22 |            12.78 | 10.339 | 8.272 | 41358 |     12.778 |       10.222 |        51112 |       650 |            0 |            NA |           1 |     41358 |     8.272 |            51112 |           10.222 |   12.778 |          1 |           1 |
-| death   |  12.778 |    0.000 |      1 | int |     10.34 |        8.27 |       41358 |              51112 |              10.22 |            12.78 |  0.000 | 0.000 |     0 |      0.000 |        0.000 |            0 |       313 |            0 |            NA |           1 |         0 |     0.000 |                0 |            0.000 |   12.778 |          1 |           1 |
-| sick    |   0.000 |    0.000 |      2 | int |      7.75 |        4.14 |       58485 |              68551 |               4.78 |             9.02 |  0.887 | 0.710 |  3549 |      0.901 |        0.721 |         3604 |       650 |            0 |            NA |           2 |      3549 |     0.710 |             3604 |            0.721 |    0.901 |          1 |           1 |
-| sicker  |   0.901 |    0.000 |      2 | int |      7.75 |        4.14 |       58485 |              68551 |               4.78 |             9.02 |  6.867 | 3.434 | 54937 |      8.118 |        4.059 |        64947 |       521 |            0 |            NA |           2 |     54937 |     3.434 |            64947 |            4.059 |    9.019 |          1 |           1 |
-| death   |   9.019 |    0.901 |      2 | int |      7.75 |        4.14 |       58485 |              68551 |               4.78 |             9.02 |  0.000 | 0.000 |     0 |      0.000 |        0.000 |            0 |        32 |            0 |            NA |           2 |         0 |     0.000 |                0 |            0.000 |    9.019 |          1 |           1 |
-| sick    |   0.000 |    0.000 |      3 | int |     10.94 |        5.57 |       86287 |             108582 |               6.96 |            13.73 |  0.317 | 0.253 |  1266 |      0.318 |        0.255 |         1273 |       650 |            0 |            NA |           3 |      1266 |     0.253 |             1273 |            0.255 |    0.318 |          1 |           1 |
-| sicker  |   0.318 |    0.000 |      3 | int |     10.94 |        5.57 |       86287 |             108582 |               6.96 |            13.73 | 10.628 | 5.314 | 85020 |     13.414 |        6.707 |       107309 |       609 |            0 |            NA |           3 |     85020 |     5.314 |           107309 |            6.707 |   13.732 |          1 |           1 |
-| death   |  13.732 |    0.318 |      3 | int |     10.94 |        5.57 |       86287 |             108582 |               6.96 |            13.73 |  0.000 | 0.000 |     0 |      0.000 |        0.000 |            0 |       405 |            0 |            NA |           3 |         0 |     0.000 |                0 |            0.000 |   13.732 |          1 |           1 |
-| sick    |   0.000 |    0.000 |      4 | int |      8.61 |        5.24 |       56449 |              68546 |               6.10 |            10.22 |  3.116 | 2.493 | 12463 |      3.296 |        2.637 |        13183 |       650 |            0 |            NA |           4 |     12463 |     2.493 |            13183 |            2.637 |    3.296 |          1 |           1 |
-| sicker  |   3.296 |    0.000 |      4 | int |      8.61 |        5.24 |       56449 |              68546 |               6.10 |            10.22 |  5.498 | 2.749 | 43986 |      6.920 |        3.460 |        55363 |       266 |            0 |            NA |           4 |     43986 |     2.749 |            55363 |            3.460 |   10.216 |          1 |           1 |
+| evtname | evttime | prevtime | pat_id | arm | total_lys | total_qalys | total_costs | total_costs_undisc | total_qalys_undisc | total_lys_undisc | lys | qalys | costs | lys_undisc | qalys_undisc | costs_undisc | beds_free | had_to_queue | time_in_queue | value_accum | c_default | q_default | c_default_undisc | q_default_undisc | nexttime | simulation | sensitivity |
+|:---|---:|---:|---:|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| sick | 0.000 | 0.000 | 1 | int | 10.34 | 8.27 | 41358 | 51112 | 10.22 | 12.78 | 10.339 | 8.272 | 41358 | 12.778 | 10.222 | 51112 | 650 | 0 | NA | 1 | 41358 | 8.272 | 51112 | 10.222 | 12.778 | 1 | 1 |
+| death | 12.778 | 0.000 | 1 | int | 10.34 | 8.27 | 41358 | 51112 | 10.22 | 12.78 | 0.000 | 0.000 | 0 | 0.000 | 0.000 | 0 | 313 | 0 | NA | 1 | 0 | 0.000 | 0 | 0.000 | 12.778 | 1 | 1 |
+| sick | 0.000 | 0.000 | 2 | int | 7.75 | 4.14 | 58485 | 68551 | 4.78 | 9.02 | 0.887 | 0.710 | 3549 | 0.901 | 0.721 | 3604 | 650 | 0 | NA | 2 | 3549 | 0.710 | 3604 | 0.721 | 0.901 | 1 | 1 |
+| sicker | 0.901 | 0.000 | 2 | int | 7.75 | 4.14 | 58485 | 68551 | 4.78 | 9.02 | 6.867 | 3.434 | 54937 | 8.118 | 4.059 | 64947 | 521 | 0 | NA | 2 | 54937 | 3.434 | 64947 | 4.059 | 9.019 | 1 | 1 |
+| death | 9.019 | 0.901 | 2 | int | 7.75 | 4.14 | 58485 | 68551 | 4.78 | 9.02 | 0.000 | 0.000 | 0 | 0.000 | 0.000 | 0 | 32 | 0 | NA | 2 | 0 | 0.000 | 0 | 0.000 | 9.019 | 1 | 1 |
+| sick | 0.000 | 0.000 | 3 | int | 10.94 | 5.57 | 86287 | 108582 | 6.96 | 13.73 | 0.317 | 0.253 | 1266 | 0.318 | 0.255 | 1273 | 650 | 0 | NA | 3 | 1266 | 0.253 | 1273 | 0.255 | 0.318 | 1 | 1 |
+| sicker | 0.318 | 0.000 | 3 | int | 10.94 | 5.57 | 86287 | 108582 | 6.96 | 13.73 | 10.628 | 5.314 | 85020 | 13.414 | 6.707 | 107309 | 609 | 0 | NA | 3 | 85020 | 5.314 | 107309 | 6.707 | 13.732 | 1 | 1 |
+| death | 13.732 | 0.318 | 3 | int | 10.94 | 5.57 | 86287 | 108582 | 6.96 | 13.73 | 0.000 | 0.000 | 0 | 0.000 | 0.000 | 0 | 405 | 0 | NA | 3 | 0 | 0.000 | 0 | 0.000 | 13.732 | 1 | 1 |
+| sick | 0.000 | 0.000 | 4 | int | 8.61 | 5.24 | 56449 | 68546 | 6.10 | 10.22 | 3.116 | 2.493 | 12463 | 3.296 | 2.637 | 13183 | 650 | 0 | NA | 4 | 12463 | 2.493 | 13183 | 2.637 | 3.296 | 1 | 1 |
+| sicker | 3.296 | 0.000 | 4 | int | 8.61 | 5.24 | 56449 | 68546 | 6.10 | 10.22 | 5.498 | 2.749 | 43986 | 6.920 | 3.460 | 55363 | 266 | 0 | NA | 4 | 43986 | 2.749 | 55363 | 3.460 | 10.216 | 1 | 1 |
 
 We can also check the evolution of the free beds over time per arm. As
 it can be seen, 650 beds is just enough for the `int` arm to handle all
@@ -355,6 +364,7 @@ the model outputs change when resources are constrained vs. when they
 are not.
 
 ``` r
+
 #Logic is: per patient, per intervention, per event, react to that event.
 results <- run_sim(  
   npats=1000,                               # number of patients to be simulated
@@ -374,9 +384,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.84s
-#> Time to run analysis 1: 0.84s
-#> Total time to run: 0.85s
+#> Time to run simulation 1: 0.87s
+#> Time to run analysis 1: 0.87s
+#> Total time to run: 0.87s
 #> Simulation finalized;
 
 summary_results_det(results[[1]][[1]]) #print first simulation
@@ -420,6 +430,7 @@ the constraint does not bind (e.g., with 1000+ beds) then the results
 are also equivalent to `constrained = FALSE`.
 
 ``` r
+
 common_all_inputs <-add_item(input = {
                       util.sick   <- 0.8
                       util.sicker <- 0.5
@@ -456,9 +467,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.91s
-#> Time to run analysis 1: 0.91s
-#> Total time to run: 0.91s
+#> Time to run simulation 1: 0.97s
+#> Time to run analysis 1: 0.97s
+#> Total time to run: 0.97s
 #> Simulation finalized;
 
 summary_results_det(results[[1]][[1]]) #print first simulation
@@ -498,6 +509,7 @@ summary_results_det(results[[1]][[1]]) #print first simulation
 ### Inputs
 
 ``` r
+
 #Load some data
 list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
                               base_value = list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
@@ -524,7 +536,7 @@ common_all_inputs <- add_item(
                        indicator   = indicators,
                        names_out   = list_par[["parameter_name"]]
                        )
-            ) %>%
+            ) |>
   add_item(input = {
     random_seed_sicker_i = sample(1:1000,1000,replace = FALSE) #we don't add this variable to the sensitivity analysis
     beds <- resource_discrete(1000)
@@ -546,6 +558,7 @@ in the previous section taking value 1 for all the variables altered in
 the scenario, and 0 otherwise.
 
 ``` r
+
 results <- run_sim(  
   npats=100,                               # number of patients to be simulated
   n_sim=1,                                  # number of simulations to run
@@ -567,61 +580,61 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.38s
-#> Time to run analysis 1: 0.38s
+#> Time to run simulation 1: 0.16s
+#> Time to run analysis 1: 0.17s
 #> Analysis number: 2
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
-#> Time to run analysis 2: 0.15s
+#> Time to run simulation 1: 0.18s
+#> Time to run analysis 2: 0.18s
 #> Analysis number: 3
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
-#> Time to run analysis 3: 0.15s
+#> Time to run simulation 1: 0.18s
+#> Time to run analysis 3: 0.18s
 #> Analysis number: 4
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
-#> Time to run analysis 4: 0.15s
+#> Time to run simulation 1: 0.18s
+#> Time to run analysis 4: 0.18s
 #> Analysis number: 5
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
-#> Time to run analysis 5: 0.15s
+#> Time to run simulation 1: 0.18s
+#> Time to run analysis 5: 0.18s
 #> Analysis number: 6
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
-#> Time to run analysis 6: 0.15s
+#> Time to run simulation 1: 0.17s
+#> Time to run analysis 6: 0.17s
 #> Analysis number: 7
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
-#> Time to run analysis 7: 0.15s
+#> Time to run simulation 1: 0.39s
+#> Time to run analysis 7: 0.39s
 #> Analysis number: 8
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
+#> Time to run simulation 1: 0.15s
 #> Time to run analysis 8: 0.15s
 #> Analysis number: 9
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
-#> Time to run analysis 9: 0.15s
+#> Time to run simulation 1: 0.16s
+#> Time to run analysis 9: 0.16s
 #> Analysis number: 10
 #> Simulation number: 1
 #> Time to run simulation 1: 0.15s
 #> Time to run analysis 10: 0.15s
 #> Analysis number: 11
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 11: 0.14s
+#> Time to run simulation 1: 0.15s
+#> Time to run analysis 11: 0.16s
 #> Analysis number: 12
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
-#> Time to run analysis 12: 0.15s
+#> Time to run simulation 1: 0.16s
+#> Time to run analysis 12: 0.16s
 #> Analysis number: 13
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
+#> Time to run simulation 1: 0.15s
 #> Time to run analysis 13: 0.15s
 #> Analysis number: 14
 #> Simulation number: 1
-#> Time to run simulation 1: 0.18s
+#> Time to run simulation 1: 0.17s
 #> Time to run analysis 14: 0.18s
-#> Total time to run: 2.35s
+#> Total time to run: 2.55s
 #> Simulation finalized;
 ```
 
@@ -632,10 +645,11 @@ corresponding parameter value.
 
 ``` r
 
+
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),mean)
 #> # A tibble: 14 × 8
 #>    sensitivity util.sick util.sicker cost.sick cost.sicker cost.int coef_noint
 #>          <int>     <dbl>       <dbl>     <dbl>       <dbl>    <dbl>      <dbl>
@@ -661,6 +675,7 @@ data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.
 The model is executed as before, just activating the psa_bool option
 
 ``` r
+
 results <- run_sim(  
   npats=100,                               
   n_sim=6,                                  
@@ -682,51 +697,37 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.16s
+#> Time to run simulation 1: 0.17s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.16s
+#> Time to run simulation 2: 0.17s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.15s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.16s
+#> Time to run simulation 4: 0.17s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.15s
+#> Time to run simulation 5: 0.16s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.16s
-#> Time to run analysis 1: 0.95s
+#> Time to run simulation 6: 0.17s
+#> Time to run analysis 1: 0.98s
 #> Analysis number: 2
 #> Simulation number: 1
-#> Time to run simulation 1: 0.16s
+#> Time to run simulation 1: 0.17s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.15s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.16s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.16s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.15s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.16s
-#> Time to run analysis 2: 0.95s
-#> Analysis number: 3
-#> Simulation number: 1
-#> Time to run simulation 1: 0.16s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.16s
+#> Time to run simulation 2: 0.17s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.15s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.16s
+#> Time to run simulation 4: 0.17s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.16s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.15s
-#> Time to run analysis 3: 0.95s
-#> Analysis number: 4
+#> Time to run analysis 2: 0.97s
+#> Analysis number: 3
 #> Simulation number: 1
 #> Time to run simulation 1: 0.16s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.16s
+#> Time to run simulation 2: 0.17s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.15s
 #> Simulation number: 4
@@ -735,8 +736,8 @@ results <- run_sim(
 #> Time to run simulation 5: 0.16s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.16s
-#> Time to run analysis 4: 0.97s
-#> Analysis number: 5
+#> Time to run analysis 3: 0.98s
+#> Analysis number: 4
 #> Simulation number: 1
 #> Time to run simulation 1: 0.16s
 #> Simulation number: 2
@@ -746,125 +747,55 @@ results <- run_sim(
 #> Simulation number: 4
 #> Time to run simulation 4: 0.17s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.2s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.16s
-#> Time to run analysis 5: 1.02s
-#> Analysis number: 6
-#> Simulation number: 1
-#> Time to run simulation 1: 0.18s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.15s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.18s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.18s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.15s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.18s
-#> Time to run analysis 6: 1.02s
-#> Analysis number: 7
-#> Simulation number: 1
-#> Time to run simulation 1: 0.17s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.16s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.18s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.18s
-#> Simulation number: 5
 #> Time to run simulation 5: 0.16s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.18s
-#> Time to run analysis 7: 1.03s
-#> Analysis number: 8
+#> Time to run simulation 6: 0.16s
+#> Time to run analysis 4: 0.98s
+#> Analysis number: 5
 #> Simulation number: 1
-#> Time to run simulation 1: 0.18s
+#> Time to run simulation 1: 0.16s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.16s
+#> Time to run simulation 2: 0.17s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.18s
+#> Time to run simulation 3: 0.16s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.18s
+#> Time to run simulation 4: 0.2s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.17s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.16s
-#> Time to run analysis 8: 1.04s
-#> Analysis number: 9
+#> Time to run simulation 6: 0.18s
+#> Time to run analysis 5: 1.05s
+#> Analysis number: 6
 #> Simulation number: 1
-#> Time to run simulation 1: 0.18s
+#> Time to run simulation 1: 0.16s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.18s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.17s
+#> Time to run simulation 3: 0.18s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.16s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.18s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.18s
-#> Time to run analysis 9: 1.05s
-#> Analysis number: 10
+#> Time to run analysis 6: 1.04s
+#> Analysis number: 7
 #> Simulation number: 1
-#> Time to run simulation 1: 0.18s
+#> Time to run simulation 1: 0.16s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.23s
+#> Time to run simulation 2: 0.19s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.16s
+#> Time to run simulation 3: 0.18s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.18s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.17s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.17s
-#> Time to run analysis 10: 1.09s
-#> Analysis number: 11
-#> Simulation number: 1
-#> Time to run simulation 1: 0.19s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.17s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.17s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.18s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.17s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.18s
-#> Time to run analysis 11: 1.06s
-#> Analysis number: 12
-#> Simulation number: 1
-#> Time to run simulation 1: 0.18s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.18s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.16s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.18s
+#> Time to run simulation 4: 0.16s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.18s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.18s
-#> Time to run analysis 12: 1.08s
-#> Analysis number: 13
+#> Time to run analysis 7: 1.05s
+#> Analysis number: 8
 #> Simulation number: 1
-#> Time to run simulation 1: 0.18s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.18s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.21s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.18s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.17s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.18s
-#> Time to run analysis 13: 1.11s
-#> Analysis number: 14
-#> Simulation number: 1
-#> Time to run simulation 1: 0.19s
+#> Time to run simulation 1: 0.17s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.17s
 #> Simulation number: 3
@@ -872,11 +803,95 @@ results <- run_sim(
 #> Simulation number: 4
 #> Time to run simulation 4: 0.19s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.18s
+#> Time to run simulation 5: 0.17s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.17s
-#> Time to run analysis 14: 1.09s
-#> Total time to run: 14.41s
+#> Time to run analysis 8: 1.06s
+#> Analysis number: 9
+#> Simulation number: 1
+#> Time to run simulation 1: 0.18s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.18s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.18s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.18s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.21s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.18s
+#> Time to run analysis 9: 1.12s
+#> Analysis number: 10
+#> Simulation number: 1
+#> Time to run simulation 1: 0.19s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.17s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.19s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.19s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.16s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.19s
+#> Time to run analysis 10: 1.1s
+#> Analysis number: 11
+#> Simulation number: 1
+#> Time to run simulation 1: 0.19s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.17s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.19s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.19s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.17s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.19s
+#> Time to run analysis 11: 1.1s
+#> Analysis number: 12
+#> Simulation number: 1
+#> Time to run simulation 1: 0.19s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.18s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.18s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.19s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.19s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.18s
+#> Time to run analysis 12: 1.12s
+#> Analysis number: 13
+#> Simulation number: 1
+#> Time to run simulation 1: 0.19s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.19s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.19s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.21s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.18s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.2s
+#> Time to run analysis 13: 1.16s
+#> Analysis number: 14
+#> Simulation number: 1
+#> Time to run simulation 1: 0.19s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.19s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.18s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.2s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.19s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.19s
+#> Time to run analysis 14: 1.15s
+#> Total time to run: 14.87s
 #> Simulation finalized;
 ```
 
@@ -889,10 +904,11 @@ how beds are allocated.
 
 ``` r
 
+
 data_sensitivity <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_sensitivity %>% group_by(sensitivity) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int", "beds_free"),mean)
+data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int", "beds_free"),mean)
 #> # A tibble: 14 × 9
 #>    sensitivity util.sick util.sicker cost.sick cost.sicker cost.int coef_noint
 #>          <int>     <dbl>       <dbl>     <dbl>       <dbl>    <dbl>      <dbl>
@@ -920,6 +936,7 @@ deactivating the `sensitivity_bool` and removing sensitivity_names and
 setting `n_sensitivity = 1`
 
 ``` r
+
 common_all_inputs <-add_item(input = {
                       util.sick   <- 0.8
                       util.sicker <- 0.5
@@ -965,21 +982,21 @@ results <- run_sim(
 #> Simulation number: 3
 #> Time to run simulation 3: 0.16s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.16s
+#> Time to run simulation 4: 0.18s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.15s
+#> Time to run simulation 5: 0.16s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.18s
+#> Time to run simulation 6: 0.16s
 #> Simulation number: 7
 #> Time to run simulation 7: 0.16s
 #> Simulation number: 8
-#> Time to run simulation 8: 0.15s
+#> Time to run simulation 8: 0.17s
 #> Simulation number: 9
-#> Time to run simulation 9: 0.17s
+#> Time to run simulation 9: 0.16s
 #> Simulation number: 10
-#> Time to run simulation 10: 0.16s
-#> Time to run analysis 1: 1.62s
-#> Total time to run: 1.62s
+#> Time to run simulation 10: 0.17s
+#> Time to run analysis 1: 1.66s
+#> Total time to run: 1.66s
 #> Simulation finalized;
 ```
 
@@ -991,10 +1008,11 @@ changing over time per simulation.
 
 ``` r
 
+
 data_simulation <- bind_rows(map_depth(results,2, "merged_df"))
 
 #Check mean value across iterations as PSA is off
-data_simulation %>% group_by(simulation) %>% summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int", "beds_free"),mean)
+data_simulation |> group_by(simulation) |> summarise_at(c("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int", "beds_free"),mean)
 #> # A tibble: 10 × 9
 #>    simulation util.sick util.sicker cost.sick cost.sicker cost.int coef_noint
 #>         <int>     <dbl>       <dbl>     <dbl>       <dbl>    <dbl>      <dbl>

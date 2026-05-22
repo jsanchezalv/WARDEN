@@ -79,6 +79,7 @@ those (see the `vignette("example_ssd_stream")` vignette for more
 information). WARDEN uses L’Ecuyer-CMRG random number generator.
 
 ``` r
+
 #Code can be writing directly as an expression which will be evaluated at the right time
 add_reactevt(name_evt = "event_1", input = {
   a  <- 1

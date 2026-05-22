@@ -56,6 +56,7 @@ site](https://cran.r-project.org/package=WARDEN).
 `WARDEN` can now be installed directly from CRAN or this repo via
 
 ``` r
+
 install.packages("WARDEN") #CRAN version 
 
 # install.packages("devtools")

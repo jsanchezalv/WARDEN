@@ -3,6 +3,7 @@
 ## Main options
 
 ``` r
+
 library(WARDEN)
 
 library(dplyr)
@@ -27,11 +28,17 @@ if(!require(randtoolbox)){
     library(randtoolbox)
 }
 #> Loading required package: randtoolbox
+#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+#> logical.return = TRUE, : there is no package called 'randtoolbox'
+#> Installing package into '/home/runner/work/_temp/Library'
+#> (as 'lib' is unspecified)
+#> also installing the dependency 'rngWELL'
 #> Loading required package: rngWELL
 #> This is randtoolbox. For an overview, type 'help("randtoolbox")'.
 ```
 
 ``` r
+
 options(scipen = 999)
 options(digits=3)
 options(tibble.print_max = 50)
@@ -60,6 +67,7 @@ This vignette explores how one can use sobol sequences to accelerate
 convergence and reduce the number of profiles needed.
 
 ``` r
+
 
 n_points <- 500
 
@@ -94,6 +102,7 @@ generated from a uniform variable, and another generated from a sobol
 sequence.
 
 ``` r
+
 randtoolbox::sobol(1,2, init = TRUE) #initialize
 #>      [,1] [,2]
 #> [1,]  0.5  0.5
@@ -111,11 +120,11 @@ common_all_inputs <-add_item(
                       drq = 0.035
                       )
 
-common_all_inputs_unif <- common_all_inputs %>%
+common_all_inputs_unif <- common_all_inputs |>
   add_item(random_n = runif(N),
            random_n_death = runif(N)) #we draw N random uniform samples
 
-common_all_inputs_sobol <- common_all_inputs %>%
+common_all_inputs_sobol <- common_all_inputs |>
   add_item(random_sobol = (randtoolbox::sobol(N,2, init = TRUE) + matrix(rep(runif(2), each = N), nrow = N, byrow = TRUE)) %% 1,
            random_n = random_sobol[,1],
            random_n_death = random_sobol[,2])  #we draw n sobol sequences, we need to do a small trick as scrambling and seeds are temporarely deactivated within the randtoolbox package
@@ -134,6 +143,7 @@ unique_pt_inputs <- add_item(fl.sick = 1,
 Time to event for the exponential is drawn using the random number
 
 ``` r
+
 init_event_list <- 
   add_tte(arm=c("noint","int"), evts = c("sick","sicker","death") ,input={
     sick <- 0
@@ -145,15 +155,16 @@ init_event_list <-
 ### Add Reaction to Those Events
 
 ``` r
+
 evt_react_list <-
   add_reactevt(name_evt = "sick",
-               input = {}) %>%
+               input = {}) |>
   add_reactevt(name_evt = "sicker",
                input = {
                  q_default <- util.sicker
                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
                  fl.sick <- 0
-               }) %>%
+               }) |>
   add_reactevt(name_evt = "death",
                input = {
                  q_default <- 0
@@ -168,12 +179,14 @@ evt_react_list <-
 
 ``` r
 
+
 util_ongoing <- "q_default"
 ```
 
 ### Costs
 
 ``` r
+
 
 cost_ongoing <- "c_default"
 ```
@@ -186,6 +199,7 @@ We run both versions of the model for a few simulations to showcase the
 different speed of convergence.
 
 ``` r
+
 results_unif <- run_sim(  
   npats=N,                               
   n_sim=sims,                                  
@@ -204,17 +218,17 @@ results_unif <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.34s
+#> Time to run simulation 1: 0.55s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.35s
+#> Time to run simulation 2: 0.33s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.32s
+#> Time to run simulation 3: 0.34s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.33s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.33s
-#> Time to run analysis 1: 1.67s
-#> Total time to run: 1.68s
+#> Time to run simulation 5: 0.34s
+#> Time to run analysis 1: 1.89s
+#> Total time to run: 1.89s
 #> Simulation finalized;
 
 results_sobol <- run_sim(  
@@ -237,15 +251,15 @@ results_sobol <- run_sim(
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
 #> Time to run simulation 1: 0.34s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.34s
+#> Time to run simulation 2: 0.35s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.34s
+#> Time to run simulation 3: 0.35s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.34s
+#> Time to run simulation 4: 0.35s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.4s
-#> Time to run analysis 1: 1.75s
-#> Total time to run: 1.76s
+#> Time to run simulation 5: 0.35s
+#> Time to run analysis 1: 1.73s
+#> Total time to run: 1.73s
 #> Simulation finalized;
 ```
 
@@ -261,6 +275,7 @@ It can clearly be seen that the random uniform approach makes the model
 converge much more slowly than the sobol sequences.
 
 ``` r
+
 
 
 summary_results_sim(results_unif[[1]]) 
@@ -321,15 +336,15 @@ summary_results_sim(results_sobol[[1]])
 #> dq_default_undisc                0 (0; 0)    0.229 (0.227; 0.231)
 
 
-det_ipd_unif <- bind_rows(map(results_unif[[1]], "merged_df")) %>% mutate(type = "unif")
-det_ipd_sobol <- bind_rows(map(results_sobol[[1]], "merged_df")) %>% mutate(type = "sobol")
+det_ipd_unif <- bind_rows(map(results_unif[[1]], "merged_df")) |> mutate(type = "unif")
+det_ipd_sobol <- bind_rows(map(results_sobol[[1]], "merged_df")) |> mutate(type = "sobol")
 
-merged_ipd <- rbind(det_ipd_unif,det_ipd_sobol) %>%
-  group_by(arm, type, simulation) %>%
+merged_ipd <- rbind(det_ipd_unif,det_ipd_sobol) |>
+  group_by(arm, type, simulation) |>
   mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
-         cumul_total_costs = cumsum(total_costs)/pat_id) %>%
-  transmute(type, pat_id, arm, simulation, cumul_total_qalys, cumul_total_costs) %>%
-  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
+         cumul_total_costs = cumsum(total_costs)/pat_id) |>
+  transmute(type, pat_id, arm, simulation, cumul_total_qalys, cumul_total_costs) |>
+  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) |>
   mutate(inc_costs = cumul_total_costs_int - cumul_total_costs_noint,
          inc_qalys = cumul_total_qalys_int - cumul_total_qalys_noint,
          ICER = inc_costs/ inc_qalys) 
@@ -350,6 +365,7 @@ ggplot(merged_ipd, aes(x=pat_id,y=ICER, colour = type, fill = as.factor(simulati
 ### Model Execution
 
 ``` r
+
 #Load some data
 list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","cost.sicker","cost.int","coef_noint","HR_int"),
                               base_value = list(0.8,0.5,3000,7000,1000,log(0.2),0.8),
@@ -369,7 +385,7 @@ sensitivity_inputs <-add_item(
 
 common_all_inputs <-  add_item(
   random_sobol_psa = (randtoolbox::sobol(1,7, init = TRUE) + matrix(rep(runif(7), each = 1), nrow = 1, byrow = TRUE)) %% 1
-  ) %>% 
+  ) |> 
   add_item(
             pick_val_v(base        = list_par[["base_value"]],
                        psa         = pick_psa(list_par[["PSA_dist"]],random_sobol_psa,list_par[["a"]],list_par[["b"]]),
@@ -381,11 +397,11 @@ common_all_inputs <-  add_item(
                        )
             ) 
 
-common_all_inputs_unif <- common_all_inputs %>%
+common_all_inputs_unif <- common_all_inputs |>
   add_item(random_n = runif(N),
            random_n_death = runif(N)) #we draw N random uniform samples
 
-common_all_inputs_sobol <- common_all_inputs %>%
+common_all_inputs_sobol <- common_all_inputs |>
   add_item(random_sobol = (randtoolbox::sobol(N,2, init = TRUE) + matrix(rep(runif(2), each = N), nrow = N, byrow = TRUE)) %% 1,
            random_n = random_sobol[,1],
            random_n_death = random_sobol[,2])  #we draw n sobol sequences, we need to do a small trick as scrambling and seeds are temporarely deactivated within the randtoolbox package
@@ -411,17 +427,17 @@ results_unif_psa <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.36s
+#> Time to run simulation 1: 0.35s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.36s
+#> Time to run simulation 2: 0.35s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.36s
+#> Time to run simulation 3: 0.35s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.37s
+#> Time to run simulation 4: 0.41s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.57s
-#> Time to run analysis 1: 2.03s
-#> Total time to run: 2.03s
+#> Time to run simulation 5: 0.37s
+#> Time to run analysis 1: 1.83s
+#> Total time to run: 1.84s
 #> Simulation finalized;
 
 results_sobol_psa <- run_sim(  
@@ -443,17 +459,17 @@ results_sobol_psa <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.32s
+#> Time to run simulation 1: 0.38s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.33s
+#> Time to run simulation 2: 0.37s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.33s
+#> Time to run simulation 3: 0.38s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.33s
+#> Time to run simulation 4: 0.37s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.33s
-#> Time to run analysis 1: 1.64s
-#> Total time to run: 1.64s
+#> Time to run simulation 5: 0.36s
+#> Time to run analysis 1: 1.86s
+#> Total time to run: 1.86s
 #> Simulation finalized;
 ```
 
@@ -469,6 +485,7 @@ It can clearly be seen that the random uniform approach makes the model
 converge much more slowly than the sobol sequences.
 
 ``` r
+
 
 
 summary_results_sim(results_unif_psa[[1]]) 
@@ -529,15 +546,15 @@ summary_results_sim(results_sobol_psa[[1]])
 #> dq_default_undisc                0 (0; 0)    0.244 (0.111; 0.289)
 
 
-psa_ipd_unif <- bind_rows(map(results_unif_psa[[1]], "merged_df")) %>% mutate(type = "unif")
-psa_ipd_sobol <- bind_rows(map(results_sobol_psa[[1]], "merged_df")) %>% mutate(type = "sobol")
+psa_ipd_unif <- bind_rows(map(results_unif_psa[[1]], "merged_df")) |> mutate(type = "unif")
+psa_ipd_sobol <- bind_rows(map(results_sobol_psa[[1]], "merged_df")) |> mutate(type = "sobol")
 
-merged_ipd_psa <- rbind(psa_ipd_unif,psa_ipd_sobol) %>%
-  group_by(arm, type, simulation) %>%
+merged_ipd_psa <- rbind(psa_ipd_unif,psa_ipd_sobol) |>
+  group_by(arm, type, simulation) |>
   mutate(cumul_total_qalys = cumsum(total_qalys)/pat_id,
-         cumul_total_costs = cumsum(total_costs)/pat_id) %>%
-  transmute(type, pat_id, arm, simulation, cumul_total_qalys, cumul_total_costs) %>%
-  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) %>%
+         cumul_total_costs = cumsum(total_costs)/pat_id) |>
+  transmute(type, pat_id, arm, simulation, cumul_total_qalys, cumul_total_costs) |>
+  tidyr::pivot_wider(names_from = arm, values_from = c(cumul_total_qalys,cumul_total_costs)) |>
   mutate(inc_costs = cumul_total_costs_int - cumul_total_costs_noint,
          inc_qalys = cumul_total_qalys_int - cumul_total_qalys_noint,
          ICER = inc_costs/ inc_qalys) 
