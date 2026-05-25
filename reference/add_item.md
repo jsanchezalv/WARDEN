@@ -44,6 +44,17 @@ add_item(.data = NULL, ..., input)
 A single [`{}`](https://rdrr.io/r/base/Paren.html) call (language
 object) ready for `load_inputs()`.
 
+## Details
+
+**Pipe chaining**: when using `|>` or `%>%`, the LHS is matched to
+`.data` and used as the starting block. This works correctly when the
+LHS is a variable, an `add_item()` call, or an
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
+call. Any other call (e.g. a custom builder function) is captured
+unevaluated as a statement rather than used as the starting block;
+assign the result to a variable first:
+`blk <- my_builder(); add_item(.data = blk, x = 1)`.
+
 ## Examples
 
 ``` r

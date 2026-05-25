@@ -108,6 +108,15 @@ to start from. Receives the LHS value when using <code>|&gt;</code> or <code>%&g
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A single <code><a href="https://rdrr.io/r/base/Paren.html" class="external-link">{}</a></code> call (language object) ready for <code>load_inputs()</code>.</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><strong>Pipe chaining</strong>: when using <code>|&gt;</code> or <code>%&gt;%</code>, the LHS is matched to <code>.data</code>
+and used as the starting block. This works correctly when the LHS is a
+variable, an <code>add_item()</code> call, or an <code><a href="input_block.html">input_block()</a></code> call. Any other call
+(e.g. a custom builder function) is captured unevaluated as a statement
+rather than used as the starting block; assign the result to a variable
+first: <code>blk &lt;- my_builder(); add_item(.data = blk, x = 1)</code>.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

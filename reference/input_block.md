@@ -51,7 +51,7 @@ input_block(
 
 - names_out:
 
-  Character vector of output parameter names.
+  Character vector or list of strings of output parameter names.
 
 - psa_indicators:
 
