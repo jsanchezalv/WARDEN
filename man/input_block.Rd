@@ -29,7 +29,7 @@ input_block(
 \item{sens}{The sensitivity data object (e.g. \code{l_inputs}). At runtime the
 engine indexes it as \code{sens[[sens_name_used]]} to pick the active column.}
 
-\item{names_out}{Character vector of output parameter names.}
+\item{names_out}{Character vector or list of strings of output parameter names.}
 
 \item{psa_indicators}{List of 0/1 indicators controlling which parameters
 draw from PSA. \code{NULL} means all parameters draw from PSA.}

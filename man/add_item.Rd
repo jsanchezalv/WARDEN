@@ -29,6 +29,14 @@ passed to \code{.data} and becomes the starting block.
 e.g. \code{add_item(input = {a <- 5})}
 }
 }
+\details{
+\strong{Pipe chaining}: when using \verb{|>} or \verb{\%>\%}, the LHS is matched to \code{.data}
+and used as the starting block. This works correctly when the LHS is a
+variable, an \code{add_item()} call, or an \code{input_block()} call. Any other call
+(e.g. a custom builder function) is captured unevaluated as a statement
+rather than used as the starting block; assign the result to a variable
+first: \verb{blk <- my_builder(); add_item(.data = blk, x = 1)}.
+}
 \examples{
 add_item(input = {fl.idfs <-  0})
 add_item(input = {

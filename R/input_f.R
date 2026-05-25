@@ -411,7 +411,7 @@ pick_val_v <- function(base,
 #'   `pick_psa(...)`), evaluated at runtime per simulation.
 #' @param sens The sensitivity data object (e.g. `l_inputs`). At runtime the
 #'   engine indexes it as `sens[[sens_name_used]]` to pick the active column.
-#' @param names_out Character vector of output parameter names.
+#' @param names_out Character vector or list of strings of output parameter names.
 #' @param psa_indicators List of 0/1 indicators controlling which parameters
 #'   draw from PSA. `NULL` means all parameters draw from PSA.
 #' @param sens_indicators List of indicators, one entry per parameter (may be
@@ -623,7 +623,15 @@ input_block <- function(.data = NULL,
 #' @param input Optional unevaluated expression or `{}` block to splice in.
 #'
 #' @return A single `{}` call (language object) ready for `load_inputs()`.
-#' 
+#'
+#' @details
+#' **Pipe chaining**: when using `|>` or `%>%`, the LHS is matched to `.data`
+#' and used as the starting block. This works correctly when the LHS is a
+#' variable, an `add_item()` call, or an `input_block()` call. Any other call
+#' (e.g. a custom builder function) is captured unevaluated as a statement
+#' rather than used as the starting block; assign the result to a variable
+#' first: `blk <- my_builder(); add_item(.data = blk, x = 1)`.
+#'
 #' @examples
 #' add_item(input = {fl.idfs <-  0})
 #' add_item(input = {
@@ -654,7 +662,6 @@ add_item <- function(.data = NULL, ..., input) {
   mc   <- match.call(expand.dots = FALSE)
   dots <- mc$...
   
-  # Helper: coerce various starters into a { } block list
   as_block_list <- function(x) {
     if (is.null(x)) {
       list(as.name("{"))
@@ -667,7 +674,6 @@ add_item <- function(.data = NULL, ..., input) {
     }
   }
   
-  # 1) Start from .data if provided.
   # Use mc$.data (unevaluated) to decide how to treat the argument:
   #   - NULL/missing            → start a fresh {} block
   #   - symbol (variable name)  → evaluate: it holds a prior block (pipe LHS)
@@ -706,7 +712,6 @@ add_item <- function(.data = NULL, ..., input) {
     }
   }
 
-  # 2) Process remaining ... : named -> assignment; unnamed -> raw/splice
   if (!is.null(dots)) {
     dn <- names(dots)
     for (i in seq_along(dots)) {
@@ -720,13 +725,11 @@ add_item <- function(.data = NULL, ..., input) {
     }
   }
 
-  # 3) Optional input=
   if (!missing(input)) {
     input_sub <- substitute(input)
     built <- c(built, splice_or_keep(input_sub))
   }
 
-  # 4) Return a proper { ... } call; carry warden_block_meta from prior block
   result <- as.call(c(block_elems, built))
   if (!is.null(.meta)) attr(result, "warden_block_meta") <- .meta
   result

@@ -307,26 +307,18 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
         if (!is.null(.meta$dsa_names)) {
           .all_dsa_names <- union(.all_dsa_names, .meta$dsa_names)
           n_sensitivity <- .meta$n_groups
+          message("n_sensitivity auto-detected as ", n_sensitivity, " from input_block metadata")
         }
       }
     }
   }
-  rm(all_inputs_args)
 
   # Build per-sensitivity iteration schedule
   if (!is.null(sensitivity_names) && !is.null(.all_dsa_names)) {
     # Mixed DSA + scenario: DSA names get n_sensitivity slots, others get 1
-    .sched_name <- character(0)
-    .sched_iter <- integer(0)
-    for (.sn in sensitivity_names) {
-      if (.sn %in% .all_dsa_names) {
-        .sched_name <- c(.sched_name, rep(.sn, n_sensitivity))
-        .sched_iter <- c(.sched_iter, seq_len(n_sensitivity))
-      } else {
-        .sched_name <- c(.sched_name, .sn)
-        .sched_iter <- c(.sched_iter, 1L)
-      }
-    }
+    .lens       <- ifelse(sensitivity_names %in% .all_dsa_names, n_sensitivity, 1L)
+    .sched_name <- rep(sensitivity_names, .lens)
+    .sched_iter <- unlist(lapply(.lens, seq_len))
     length_sensitivities <- length(.sched_name)
   } else if (.meta_found && !is.null(sensitivity_names)) {
     # input_block present but dsa_names = NULL: all names are scenarios (1 each)
