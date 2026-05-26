@@ -420,9 +420,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.74s
-#> Time to run analysis 1: 0.74s
-#> Total time to run: 0.75s
+#> Time to run simulation 1: 0.76s
+#> Time to run analysis 1: 0.76s
+#> Total time to run: 0.77s
 #> Simulation finalized;
 ```
 
@@ -644,49 +644,10 @@ ggplot(data_qaly_cost,aes(x=qaly, y = cost, col = arm)) +
 
 ### Inputs
 
-In this case, inputs must be created first to change across sensitivity
-analysis. To do so, the item list `sensitivity_inputs` can be used. In
-this case, we also use
-[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
-which allows the model to automatically pick the relevant value (no PSA,
-PSA or sensitivity analysis) based on the corresponding boolean flags of
-psa_bool and sensitivity_bool. In this case we also use the `sens`
-iterator for each sensitivity analysis and the `n_sensitivity` which is
-an argument in
-[`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md).
-
-Note that we have then just changed how the inputs are handled in
-common_all_inputs, but the same could be done with unique_pt_inputs, but
-in those cases, as the inputs change per patient, the
-[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)function
-should be applied within unique_pt_inputs to make sure they are
-evaluated when it correspond.
-
-Note that for the psa we are directly calling the distributions and
-passing the parameters.Note also that the `sens_name_used` is
-automatically computed by the engine and is accessible to the user (it’s
-the name of the sensitivity analysis, e.g., “scenario 1”).
-
-The indicator parameter in
-[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
-is used to determine which parameters are left “as is” and which ones
-are to be substituted with the sensitivity value. There are two ways to
-do this, either by setting it in a binary way (1 or 0), or by using the
-indicator as the number of the parameter values to be varied (useful
-when several parameters are varied at the same time, or only specific
-values of a vector are varied). This can be set by using
-`indicator_sens_binary` argument.
-
-Note that
-[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
-can be directly loaded as parameters (in fact, a named list will be
-loaded directly by R). A small tweak is needed if it’s the first item
-added, in which the item list must be initiated by using
-[`add_item()`](https://jsanchezalv.github.io/WARDEN/reference/add_item.md)
-(see below). Note that one can use a list of lists in the case where the
-base_value or any of the other parameters are vectors instead of
-elements of length 1. In this case, we showcase a list but it could also
-use a data.frame.
+We use
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
+(from WARDEN v2.02) to simplify the approach on how to automatically
+manage PSA and DSA.
 
 `pick_psa` can be used to select the correct PSA distributions.
 
@@ -703,36 +664,18 @@ list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","co
                               scenario_1=list(0.6,0.3,1000,5000,800,log(0.1),log(0.03),0.5),
                               scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),log(0.2),log(0.1),0.9)
                               )
-
-sensitivity_inputs <-add_item(
-            indicators = if(sensitivity_bool){ create_indicators(sens,n_sensitivity*length(sensitivity_names),rep(1,length(list_par[[1]])))}else{
-                                rep(1,length(list_par[[1]]))} #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max, if not sensitivity analysis, then we activate all of them, i.e., in a PSA)
-                              )
-
-common_all_inputs <- add_item(
-            pick_val_v(base        = list_par[["base_value"]],
+common_all_inputs <- input_block(
+                       base        = list_par[["base_value"]],
                        psa         = pick_psa(list_par[["PSA_dist"]],rep(1,length(list_par[["PSA_dist"]])),list_par[["a"]],list_par[["b"]]),
-                       sens        = list_par[[sens_name_used]],
-                       psa_ind     = psa_bool,
-                       sens_ind    = sensitivity_bool,
-                       indicator   = indicators,
-                       names_out   = list_par[["parameter_name"]]
-                       )
+                       sens        = list_par,
+                       names_out   = list_par[["parameter_name"]],
+                       dsa_names   = c("DSA_min","DSA_max")
             ) |>
   add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE),
            random_seed_death_i <- runif(npats)) #we don't add these variables to the sensitivity analysis
 ```
 
 ### Model Execution
-
-The model is executed as before, just adding the `sensitivity_inputs`,
-`sensitivity_names`, `sensitivity_bool` and `n_sensitivity` arguments.
-Note that the total number of sensitivity iterations is given not by
-n_sensitivity, but by n_sensitivity \* length(sensitivity_names), so in
-this case it will be 2 x n_sensitivity, or 2 x 7 = 14. For two scenario
-analysis it would be 2 x 1 = 2, with the `indicators` variable defined
-in the previous section taking value 1 for all the variables altered in
-the scenario, and 0 otherwise.
 
 ``` r
 
@@ -748,12 +691,11 @@ results <- run_sim(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  sensitivity_inputs = sensitivity_inputs,
   sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = length(list_par[[1]]),
   input_out = unlist(list_par[["parameter_name"]])
 )
+#> n_sensitivity auto-detected as 8 from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
 #> Time to run simulation 1: 0.14s
@@ -800,26 +742,133 @@ results <- run_sim(
 #> Time to run analysis 11: 0.15s
 #> Analysis number: 12
 #> Simulation number: 1
-#> Time to run simulation 1: 0.19s
-#> Time to run analysis 12: 0.19s
+#> Time to run simulation 1: 0.2s
+#> Time to run analysis 12: 0.2s
 #> Analysis number: 13
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 13: 0.14s
+#> Time to run simulation 1: 0.15s
+#> Time to run analysis 13: 0.15s
 #> Analysis number: 14
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
-#> Time to run analysis 14: 0.15s
+#> Time to run simulation 1: 0.16s
+#> Time to run analysis 14: 0.16s
 #> Analysis number: 15
 #> Simulation number: 1
 #> Time to run simulation 1: 0.15s
-#> Time to run analysis 15: 0.15s
+#> Time to run analysis 15: 0.16s
 #> Analysis number: 16
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 16: 0.14s
-#> Total time to run: 2.42s
+#> Time to run simulation 1: 0.15s
+#> Time to run analysis 16: 0.15s
+#> Total time to run: 2.46s
 #> Simulation finalized;
+```
+
+Alternative deprecated approach using pick_val_v and setting manually
+iterators
+
+This approach does not use
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md),
+but instead needs to set manually the iterators as part of the
+sensitivity inputs, and then declare `pick_val_V()` and the relevant
+arguments in
+[`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md)
+It has been left as a valid approach to make sure older models using
+WARDEN will still run.
+
+In this case, inputs must be created first to change across sensitivity
+analysis. To do so, the item list `sensitivity_inputs` can be used. In
+this case, we also use
+[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
+which allows the model to automatically pick the relevant value (no PSA,
+PSA or sensitivity analysis) based on the corresponding boolean flags of
+psa_bool and sensitivity_bool. In this case we also use the `sens`
+iterator for each sensitivity analysis and the `n_sensitivity` which is
+an argument in
+[`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md).
+
+Note that we have then just changed how the inputs are handled in
+common_all_inputs, but the same could be done with unique_pt_inputs, but
+in those cases, as the inputs change per patient, the
+[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)function
+should be applied within unique_pt_inputs to make sure they are
+evaluated when it correspond.
+
+Note that for the psa we are directly calling the distributions and
+passing the parameters.Note also that the `sens_name_used` is
+automatically computed by the engine and is accessible to the user (it’s
+the name of the sensitivity analysis, e.g., “scenario 1”).
+
+The indicator parameter in
+[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
+is used to determine which parameters are left “as is” and which ones
+are to be substituted with the sensitivity value. There are two ways to
+do this, either by setting it in a binary way (1 or 0), or by using the
+indicator as the number of the parameter values to be varied (useful
+when several parameters are varied at the same time, or only specific
+values of a vector are varied). This can be set by using
+`indicator_sens_binary` argument.
+
+Note that
+[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
+can be directly loaded as parameters (in fact, a named list will be
+loaded directly by R). A small tweak is needed if it’s the first item
+added, in which the item list must be initiated by using
+[`add_item()`](https://jsanchezalv.github.io/WARDEN/reference/add_item.md)
+(see below). Note that one can use a list of lists in the case where the
+base_value or any of the other parameters are vectors instead of
+elements of length 1. In this case, we showcase a list but it could also
+use a data.frame.
+
+The model is executed as before, just adding the `sensitivity_inputs`,
+`sensitivity_names`, `sensitivity_bool` and `n_sensitivity` arguments.
+Note that the total number of sensitivity iterations is given not by
+n_sensitivity, but by n_sensitivity \* length(sensitivity_names), so in
+this case it will be 2 x n_sensitivity, or 2 x 7 = 14. For two scenario
+analysis it would be 2 x 1 = 2, with the `indicators` variable defined
+in the previous section taking value 1 for all the variables altered in
+the scenario, and 0 otherwise.
+
+``` r
+
+
+#ALTERNATIVE, OLD APPROACH
+
+sensitivity_inputs <-add_item(
+            indicators = if(sensitivity_bool){ create_indicators(sens,n_sensitivity*length(sensitivity_names),rep(1,length(list_par[[1]])))}else{
+                                rep(1,length(list_par[[1]]))} #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max, if not sensitivity analysis, then we activate all of them, i.e., in a PSA)
+                              )
+
+common_all_inputs <- add_item(
+            pick_val_v(base        = list_par[["base_value"]],
+                       psa         = pick_psa(list_par[["PSA_dist"]],rep(1,length(list_par[["PSA_dist"]])),list_par[["a"]],list_par[["b"]]),
+                       sens        = list_par[[sens_name_used]],
+                       psa_ind     = psa_bool,
+                       sens_ind    = sensitivity_bool,
+                       indicator   = indicators,
+                       names_out   = list_par[["parameter_name"]]
+                       )
+            ) |>
+  add_item(random_seed_sicker_i = sample(1:1000,1000,replace = FALSE),
+           random_seed_death_i <- runif(npats))
+results <- run_sim(
+  npats=100,                               # number of patients to be simulated
+  n_sim=1,                                  # number of simulations to run
+  psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
+  arm_list = c("int", "noint"),             # intervention list
+  common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
+  common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
+  unique_pt_inputs = unique_pt_inputs,      # inputs that change within a simulation between interventions
+  init_event_list = init_event_list,        # initial event list
+  evt_react_list = evt_react_list,          # reaction of events
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  sensitivity_inputs = sensitivity_inputs,
+  sensitivity_names = c("DSA_min","DSA_max"),
+  sensitivity_bool = TRUE,
+  n_sensitivity = length(list_par[[1]]),
+  input_out = unlist(list_par[["parameter_name"]])
+)
 ```
 
 ### Check results
@@ -837,22 +886,22 @@ data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.si
 #> # A tibble: 16 × 9
 #>    sensitivity util.sick util.sicker cost.sick cost.sicker cost.int coef_noint
 #>          <int>     <dbl>       <dbl>     <dbl>       <dbl>    <dbl>      <dbl>
-#>  1           1       0.6         0.5      3000        7000     1000      -1.61
-#>  2           2       0.8         0.3      3000        7000     1000      -1.61
-#>  3           3       0.8         0.5      1000        7000     1000      -1.61
-#>  4           4       0.8         0.5      3000        5000     1000      -1.61
-#>  5           5       0.8         0.5      3000        7000      800      -1.61
-#>  6           6       0.8         0.5      3000        7000     1000      -2.30
-#>  7           7       0.8         0.5      3000        7000     1000      -1.61
-#>  8           8       0.8         0.5      3000        7000     1000      -1.61
-#>  9           9       0.8         0.5      3000        7000     1000      -1.61
-#> 10          10       0.8         0.5      3000        7000     1000      -1.61
-#> 11          11       0.8         0.5      3000        7000     1000      -1.61
-#> 12          12       0.8         0.5      3000        7000     1000      -1.61
-#> 13          13       0.8         0.5      3000        7000     1000      -1.61
-#> 14          14       0.8         0.5      3000        7000     1000      -1.61
-#> 15          15       0.8         0.5      3000        7000     1000      -1.61
-#> 16          16       0.8         0.5      3000        7000     1000      -1.61
+#>  1           1       0.6         0.5      3000        7000     1000     -1.61 
+#>  2           2       0.8         0.3      3000        7000     1000     -1.61 
+#>  3           3       0.8         0.5      1000        7000     1000     -1.61 
+#>  4           4       0.8         0.5      3000        5000     1000     -1.61 
+#>  5           5       0.8         0.5      3000        7000      800     -1.61 
+#>  6           6       0.8         0.5      3000        7000     1000     -2.30 
+#>  7           7       0.8         0.5      3000        7000     1000     -1.61 
+#>  8           8       0.8         0.5      3000        7000     1000     -1.61 
+#>  9           9       0.9         0.5      3000        7000     1000     -1.61 
+#> 10          10       0.8         0.7      3000        7000     1000     -1.61 
+#> 11          11       0.8         0.5      5000        7000     1000     -1.61 
+#> 12          12       0.8         0.5      3000        9000     1000     -1.61 
+#> 13          13       0.8         0.5      3000        7000     2000     -1.61 
+#> 14          14       0.8         0.5      3000        7000     1000     -0.916
+#> 15          15       0.8         0.5      3000        7000     1000     -1.61 
+#> 16          16       0.8         0.5      3000        7000     1000     -1.61 
 #> # ℹ 2 more variables: coef_death <dbl>, HR_int <dbl>
 ```
 
@@ -874,29 +923,28 @@ results <- run_sim(
   evt_react_list = evt_react_list,          
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  sensitivity_inputs = sensitivity_inputs,
-  sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = length(list_par[[1]]),
+  sensitivity_names = c("DSA_min","DSA_max"),
   input_out = unlist(list_par[["parameter_name"]])
 )
+#> n_sensitivity auto-detected as 8 from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
+#> Time to run simulation 1: 0.16s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.34s
+#> Time to run simulation 2: 0.37s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.13s
+#> Time to run simulation 3: 0.14s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.14s
+#> Time to run simulation 4: 0.15s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.14s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.14s
-#> Time to run analysis 1: 1.07s
+#> Time to run analysis 1: 1.11s
 #> Analysis number: 2
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
+#> Time to run simulation 1: 0.15s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.14s
 #> Simulation number: 3
@@ -906,41 +954,41 @@ results <- run_sim(
 #> Simulation number: 5
 #> Time to run simulation 5: 0.15s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.14s
-#> Time to run analysis 2: 0.86s
+#> Time to run simulation 6: 0.15s
+#> Time to run analysis 2: 0.88s
 #> Analysis number: 3
 #> Simulation number: 1
 #> Time to run simulation 1: 0.14s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.15s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.13s
+#> Time to run simulation 3: 0.14s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.15s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.14s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.15s
-#> Time to run analysis 3: 0.85s
+#> Time to run simulation 6: 0.14s
+#> Time to run analysis 3: 0.86s
 #> Analysis number: 4
 #> Simulation number: 1
 #> Time to run simulation 1: 0.15s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.14s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.14s
+#> Time to run simulation 3: 0.15s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.14s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.15s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.15s
-#> Time to run analysis 4: 0.87s
+#> Time to run analysis 4: 0.88s
 #> Analysis number: 5
 #> Simulation number: 1
 #> Time to run simulation 1: 0.14s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.14s
+#> Time to run simulation 2: 0.15s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.14s
 #> Simulation number: 4
@@ -949,36 +997,22 @@ results <- run_sim(
 #> Time to run simulation 5: 0.15s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.14s
-#> Time to run analysis 5: 0.86s
+#> Time to run analysis 5: 0.88s
 #> Analysis number: 6
 #> Simulation number: 1
 #> Time to run simulation 1: 0.15s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.15s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.13s
+#> Time to run simulation 3: 0.14s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.14s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.15s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.14s
-#> Time to run analysis 6: 0.86s
+#> Time to run analysis 6: 0.87s
 #> Analysis number: 7
-#> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.14s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.13s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.14s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.14s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.17s
-#> Time to run analysis 7: 0.88s
-#> Analysis number: 8
 #> Simulation number: 1
 #> Time to run simulation 1: 0.14s
 #> Simulation number: 2
@@ -986,26 +1020,40 @@ results <- run_sim(
 #> Simulation number: 3
 #> Time to run simulation 3: 0.14s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.15s
+#> Time to run simulation 4: 0.14s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.15s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.17s
+#> Time to run analysis 7: 0.89s
+#> Analysis number: 8
+#> Simulation number: 1
+#> Time to run simulation 1: 0.14s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.16s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.14s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.16s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.16s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.15s
+#> Time to run analysis 8: 0.9s
+#> Analysis number: 9
+#> Simulation number: 1
+#> Time to run simulation 1: 0.15s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.14s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.16s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.16s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.14s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.15s
-#> Time to run analysis 8: 0.88s
-#> Analysis number: 9
-#> Simulation number: 1
-#> Time to run simulation 1: 0.16s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.14s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.15s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.15s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.15s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.16s
-#> Time to run analysis 9: 0.91s
+#> Time to run analysis 9: 0.92s
 #> Analysis number: 10
 #> Simulation number: 1
 #> Time to run simulation 1: 0.15s
@@ -1016,38 +1064,38 @@ results <- run_sim(
 #> Simulation number: 4
 #> Time to run simulation 4: 0.15s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.15s
+#> Time to run simulation 5: 0.14s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.15s
+#> Time to run simulation 6: 0.16s
 #> Time to run analysis 10: 0.92s
 #> Analysis number: 11
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
+#> Time to run simulation 1: 0.16s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.14s
+#> Time to run simulation 2: 0.15s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.15s
+#> Time to run simulation 3: 0.14s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.15s
+#> Time to run simulation 4: 0.16s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.16s
+#> Time to run simulation 5: 0.18s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.17s
-#> Time to run analysis 11: 0.93s
+#> Time to run simulation 6: 0.16s
+#> Time to run analysis 11: 0.95s
 #> Analysis number: 12
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
+#> Time to run simulation 1: 0.16s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.16s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.15s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.15s
+#> Time to run simulation 4: 0.16s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.15s
+#> Time to run simulation 5: 0.16s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.16s
-#> Time to run analysis 12: 0.91s
+#> Time to run simulation 6: 0.15s
+#> Time to run analysis 12: 0.94s
 #> Analysis number: 13
 #> Simulation number: 1
 #> Time to run simulation 1: 0.15s
@@ -1056,12 +1104,12 @@ results <- run_sim(
 #> Simulation number: 3
 #> Time to run simulation 3: 0.16s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.14s
+#> Time to run simulation 4: 0.15s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.16s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.16s
-#> Time to run analysis 13: 0.93s
+#> Time to run analysis 13: 0.95s
 #> Analysis number: 14
 #> Simulation number: 1
 #> Time to run simulation 1: 0.15s
@@ -1072,15 +1120,15 @@ results <- run_sim(
 #> Simulation number: 4
 #> Time to run simulation 4: 0.15s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.15s
+#> Time to run simulation 5: 0.16s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.16s
-#> Time to run analysis 14: 0.93s
+#> Time to run analysis 14: 0.95s
 #> Analysis number: 15
 #> Simulation number: 1
 #> Time to run simulation 1: 0.16s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.17s
+#> Time to run simulation 2: 0.18s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.15s
 #> Simulation number: 4
@@ -1089,22 +1137,22 @@ results <- run_sim(
 #> Time to run simulation 5: 0.16s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.16s
-#> Time to run analysis 15: 0.95s
+#> Time to run analysis 15: 0.98s
 #> Analysis number: 16
 #> Simulation number: 1
-#> Time to run simulation 1: 0.15s
+#> Time to run simulation 1: 0.16s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.16s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.16s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.35s
+#> Time to run simulation 4: 0.36s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.14s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.14s
-#> Time to run analysis 16: 1.11s
-#> Total time to run: 14.73s
+#> Time to run simulation 6: 0.15s
+#> Time to run analysis 16: 1.13s
+#> Total time to run: 14.99s
 #> Simulation finalized;
 ```
 
@@ -1123,30 +1171,29 @@ data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.si
 #> # A tibble: 16 × 9
 #>    sensitivity util.sick util.sicker cost.sick cost.sicker cost.int coef_noint
 #>          <int>     <dbl>       <dbl>     <dbl>       <dbl>    <dbl>      <dbl>
-#>  1           1     0.6         0.579     3162.       7968.    1063.      -1.62
-#>  2           2     0.724       0.3       3162.       7968.    1063.      -1.62
-#>  3           3     0.724       0.579     1000        7968.    1063.      -1.62
-#>  4           4     0.724       0.579     3162.       5000     1063.      -1.62
-#>  5           5     0.724       0.579     3162.       7968.     800       -1.62
-#>  6           6     0.726       0.578     3152.       7955.    1066.      -2.30
-#>  7           7     0.723       0.580     3158.       7972.    1062.      -1.62
-#>  8           8     0.724       0.579     3161.       7967.    1064.      -1.62
-#>  9           9     0.724       0.579     3162.       7968.    1063.      -1.62
-#> 10          10     0.724       0.579     3162.       7968.    1063.      -1.62
-#> 11          11     0.724       0.579     3162.       7968.    1063.      -1.62
-#> 12          12     0.724       0.579     3162.       7968.    1063.      -1.62
-#> 13          13     0.724       0.579     3162.       7968.    1063.      -1.62
-#> 14          14     0.724       0.579     3162.       7968.    1063.      -1.62
-#> 15          15     0.724       0.579     3162.       7968.    1063.      -1.62
-#> 16          16     0.724       0.579     3162.       7968.    1063.      -1.62
+#>  1           1     0.6         0.579     3162.       7968.    1063.     -1.62 
+#>  2           2     0.724       0.3       3162.       7968.    1063.     -1.62 
+#>  3           3     0.724       0.579     1000        7968.    1063.     -1.62 
+#>  4           4     0.724       0.579     3162.       5000     1063.     -1.62 
+#>  5           5     0.724       0.579     3162.       7968.     800      -1.62 
+#>  6           6     0.726       0.578     3152.       7955.    1066.     -2.30 
+#>  7           7     0.723       0.580     3158.       7972.    1062.     -1.62 
+#>  8           8     0.724       0.579     3161.       7967.    1064.     -1.62 
+#>  9           9     0.9         0.579     3162.       7968.    1063.     -1.62 
+#> 10          10     0.724       0.7       3162.       7968.    1063.     -1.62 
+#> 11          11     0.724       0.579     5000        7968.    1063.     -1.62 
+#> 12          12     0.724       0.579     3162.       9000     1063.     -1.62 
+#> 13          13     0.724       0.579     3162.       7968.    2000      -1.62 
+#> 14          14     0.725       0.578     3150.       7961.    1067.     -0.916
+#> 15          15     0.723       0.580     3157.       7972.    1063.     -1.62 
+#> 16          16     0.724       0.579     3161.       7967.    1064.     -1.62 
 #> # ℹ 2 more variables: coef_death <dbl>, HR_int <dbl>
 ```
 
 ### Model Execution, Simple PSA
 
 The model is executed as before, just activating the psa_bool option and
-deactivating the sensitivity_bool and removing sensitivity_names and
-setting n_sensitivity = 1
+deactivating the sensitivity_bool and removing sensitivity_names
 
 ``` r
 
@@ -1162,34 +1209,32 @@ results <- run_sim(
   evt_react_list = evt_react_list,          
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  sensitivity_inputs = sensitivity_inputs,
   sensitivity_bool = FALSE,
-  n_sensitivity = 1,
   input_out = unlist(list_par[["parameter_name"]])
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.34s
+#> Time to run simulation 1: 0.35s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.14s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.14s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.14s
+#> Time to run simulation 4: 0.15s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.14s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.14s
+#> Time to run simulation 6: 0.15s
 #> Simulation number: 7
 #> Time to run simulation 7: 0.14s
 #> Simulation number: 8
 #> Time to run simulation 8: 0.14s
 #> Simulation number: 9
-#> Time to run simulation 9: 0.14s
+#> Time to run simulation 9: 0.15s
 #> Simulation number: 10
 #> Time to run simulation 10: 0.14s
-#> Time to run analysis 1: 1.61s
-#> Total time to run: 1.61s
+#> Time to run analysis 1: 1.66s
+#> Total time to run: 1.66s
 #> Simulation finalized;
 ```
 

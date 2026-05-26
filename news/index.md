@@ -11,6 +11,14 @@ CRAN release: 2026-03-18
   magrittr’s `.` symbol. Existing code using `%>%`, `input=`, or named
   `...` arguments is unaffected (#TODO).
 - [`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
+  and
+  [`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md)
+  now correctly handle multiple blocks spanning different simulation
+  levels (e.g., `common_all_inputs` and `common_pt_inputs`):
+  `n_sensitivity` is summed across all blocks, and binary-mode parameter
+  offsets are injected automatically so each block activates at the
+  right DSA iteration.
+- [`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
   is a new helper that builds a complete
   [`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
   expression from explicit `base`, `psa`, `sens`, and `names_out`

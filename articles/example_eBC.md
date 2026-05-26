@@ -112,30 +112,19 @@ are intermediary (i.e., not utilities/costs that appear in
 #In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.
 
 #Put objects here that do not change on any patient or intervention loop
-common_all_inputs <- add_item(input={ 
-  #utilities
-        pick_val_v(
-            base =  df_util$value,
-            psa = MASS::mvrnorm(1,df_util$value,diag(df_util$se^2)),
-            sens = df_util$value,
-            psa_ind = psa_bool,
-            sens_ind = sensitivity_bool,
-            indicator = rep(0, nrow(df_util)),
-            names_out =df_util$name,
-            deploy_env=TRUE
-        )
-  #costs
-        pick_val_v(
-            base =  df_cost$value,
-            psa = rgamma_mse(1,df_cost$value,df_cost$se),
-            sens = df_cost$value,
-            psa_ind = psa_bool,
-            sens_ind = sensitivity_bool,
-            indicator = rep(0, nrow(df_cost)),
-            names_out =df_cost$name,
-            deploy_env=TRUE
-        )
-        })
+common_all_inputs <-
+  input_block(base            = df_util$value,
+              psa             = MASS::mvrnorm(1, df_util$value, diag(df_util$se^2)),
+              sens            = NULL,
+              names_out       = df_util$name,
+              sens_indicators = rep(0L, nrow(df_util)),
+              indicator_sens_binary = TRUE) |>
+  input_block(base            = df_cost$value,
+              psa             = rgamma_mse(1, df_cost$value, df_cost$se),
+              sens            = NULL,
+              names_out       = df_cost$name,
+              sens_indicators = rep(0L, nrow(df_cost)),
+              indicator_sens_binary = TRUE)
 #Put objects here that do not change as we loop through interventions for a patient
 common_pt_inputs <- add_item(input={ 
     sex_pt <- ifelse(rbinom(1,1,p=0.01),"male","female")
@@ -660,9 +649,9 @@ results <- run_sim(
           )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 3.42s
-#> Time to run analysis 1: 3.42s
-#> Total time to run: 3.43s
+#> Time to run simulation 1: 3.39s
+#> Time to run analysis 1: 3.39s
+#> Total time to run: 3.39s
 #> Simulation finalized;
 ```
 

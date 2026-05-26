@@ -55,27 +55,19 @@ and costs also have a distribution.
 #In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.
 
 #Put objects here that do not change on any patient or intervention loop
-common_all_inputs <- add_item() |>
-  add_item( #utilities
-  pick_val_v(
-    base =  util.data$value,
-    psa = MASS::mvrnorm(1,util.data$value,diag(util.data$se^2)),
-    sens = util.data$value,
-    psa_ind = psa_bool,
-    sens_ind = sensitivity_bool,
-    indicator = rep(0, nrow(util.data)),
-    names_out =util.data$name
-  ),#costs
-  pick_val_v(
-    base =  cost.data$value,
-    psa = rgamma_mse(1,cost.data$value,cost.data$se),
-    sens = cost.data$value,
-    psa_ind = psa_bool,
-    sens_ind = sensitivity_bool,
-    indicator = rep(0, nrow(cost.data)),
-    names_out =cost.data$name
-  )
-) |>
+common_all_inputs <-
+  input_block(base            = util.data$value,
+              psa             = MASS::mvrnorm(1, util.data$value, diag(util.data$se^2)),
+              sens            = NULL,
+              names_out       = util.data$name,
+              sens_indicators = rep(0L, nrow(util.data)),
+              indicator_sens_binary = TRUE) |>
+  input_block(base            = cost.data$value,
+              psa             = rgamma_mse(1, cost.data$value, cost.data$se),
+              sens            = NULL,
+              names_out       = cost.data$name,
+              sens_indicators = rep(0L, nrow(cost.data)),
+              indicator_sens_binary = TRUE) |>
   add_item( #parameter uncertainty, alternative approach to using pick_val_v, it also does work
     coef11_psa = ifelse(psa_bool,rnorm(1,2,0.1),2),
     coef12_psa = ifelse(psa_bool,rnorm(1,3,0.1),3),

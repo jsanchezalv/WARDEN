@@ -101,27 +101,22 @@ in order for it to provide the correct results.
 ``` r
 
 #Put objects here that do not change on any patient or intervention loop, for example costs and utilities
-common_all_inputs <- add_item(max_n_cycles = 30) |>
-  add_item( #utilities
-     pick_val_v(base        = util.data$value,
-                psa         = pick_psa(rep("rbeta_mse",nrow(util.data)),rep(1,nrow(util.data)),util.data$value,util.data$se),
-                sens        = util.data$value,
-                psa_ind     = psa_bool,
-                sens_ind    = sensitivity_bool,
-                indicator   = rep(0, nrow(util.data)),
-                names_out   = util.data[,"name"]
-                )
-     ) |>
-  add_item( #costs
-    pick_val_v(base         = cost.data$value,
-                psa         = pick_psa(rep("rgamma_mse",nrow(cost.data)),rep(1,nrow(cost.data)),cost.data$value,cost.data$se),
-                sens        = cost.data$value,
-                psa_ind     = psa_bool,
-                sens_ind    = sensitivity_bool,
-                indicator   = rep(0, nrow(cost.data)),
-                names_out   = cost.data[,"name"]
-                )
-    )
+common_all_inputs <-
+  add_item(max_n_cycles = 30) |>
+  input_block(base            = util.data$value,
+              psa             = pick_psa(rep("rbeta_mse", nrow(util.data)), rep(1, nrow(util.data)),
+                                         util.data$value, util.data$se),
+              sens            = NULL,
+              names_out       = util.data[, "name"],
+              sens_indicators = rep(0L, nrow(util.data)),
+              indicator_sens_binary = TRUE) |>
+  input_block(base            = cost.data$value,
+              psa             = pick_psa(rep("rgamma_mse", nrow(cost.data)), rep(1, nrow(cost.data)),
+                                         cost.data$value, cost.data$se),
+              sens            = NULL,
+              names_out       = cost.data[, "name"],
+              sens_indicators = rep(0L, nrow(cost.data)),
+              indicator_sens_binary = TRUE)
 
 
 #Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)
@@ -290,9 +285,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.09s
-#> Time to run analysis 1: 0.09s
-#> Total time to run: 0.1s
+#> Time to run simulation 1: 0.08s
+#> Time to run analysis 1: 0.08s
+#> Total time to run: 0.08s
 #> Simulation finalized;
 ```
 

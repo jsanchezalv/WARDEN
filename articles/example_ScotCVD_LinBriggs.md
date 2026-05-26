@@ -484,55 +484,45 @@ l_CVD_inputs <- list(parameter_name = list(
                  )
 
 
-common_all_inputs <-add_item(input = {
-                      drc       <- disc
-                      drq       <- disc
-                      ldleffect <- 0.26
-                      hdleffect <- 1.04 
-                      cost_tx    <- 13
-                      cost      <- 0
-                      disu      <- 0.001
-                      f1        <- 0.96
-                      multi_m   <- 0.99
-                      multi_f   <- 1.05
-                      time_horizon <- tm
-                      
-                      #patient level (not needed to have the stats part since sd is 0 except for SIMD, but we leave it as example since it does not impact results)
-                      age_v      <- rnorm(npats, list_age$mean, list_age$sd)
-                      SIMD_v     <- rbeta_mse(npats, list_SIMD$mean/100, list_SIMD$sd/100)
-                      Diabetes_v <- rbinom(npats, 1, list_Diabetes$prop)
-                      FH_v       <- rbinom(npats, 1, list_FH$prop)
-                      CPD_v      <- rgamma_mse(npats, list_CPD$mean, list_CPD$sd)
-                      SBP_v      <- rnorm(npats, list_SBP$mean, list_SBP$sd)
-                      TC_v       <- rnorm(npats, list_TC$mean, list_TC$sd)
-                      HDL_v      <- rnorm(npats, list_HDL$mean, list_HDL$sd)
-                      sex_v      <- rbinom(npats, 1, list_sex$prop)
-                      status_v   <- rep(0, npats)
-                      
-                      # CVD coefs
-                      pick_val_v(
-                        base= l_CVD_inputs[["base_value"]],
-                        psa = pick_psa(
-                            l_CVD_inputs[["PSA_dist"]],
-                            l_CVD_inputs[["n"]],
-                            l_CVD_inputs[["a"]],
-                            l_CVD_inputs[["b"]]),
-                        psa_ind     = psa_bool,
-                        sens_ind    = FALSE, 
-                        names_out   = l_CVD_inputs[["parameter_name"]],
-                        indicator   = rep(1,12), 
-                        indicator_psa = l_CVD_inputs[["psa_indicators"]],
-                        deploy_env = TRUE
-                      ) 
-                      
-                      ldleffect <- 0.26 
-                      hdleffect <- 1.04 
-                      disu <- 0.001
-                      odd_seq <- seq(1,10,2)
-                      even_seq <- seq(2,10,2)
-                      q_total <- 0
-                      
-})  
+common_all_inputs <-
+  add_item(input = {
+    drc       <- disc
+    drq       <- disc
+    ldleffect <- 0.26
+    hdleffect <- 1.04
+    cost_tx   <- 13
+    cost      <- 0
+    disu      <- 0.001
+    f1        <- 0.96
+    multi_m   <- 0.99
+    multi_f   <- 1.05
+    time_horizon <- tm
+    age_v      <- rnorm(npats, list_age$mean, list_age$sd)
+    SIMD_v     <- rbeta_mse(npats, list_SIMD$mean/100, list_SIMD$sd/100)
+    Diabetes_v <- rbinom(npats, 1, list_Diabetes$prop)
+    FH_v       <- rbinom(npats, 1, list_FH$prop)
+    CPD_v      <- rgamma_mse(npats, list_CPD$mean, list_CPD$sd)
+    SBP_v      <- rnorm(npats, list_SBP$mean, list_SBP$sd)
+    TC_v       <- rnorm(npats, list_TC$mean, list_TC$sd)
+    HDL_v      <- rnorm(npats, list_HDL$mean, list_HDL$sd)
+    sex_v      <- rbinom(npats, 1, list_sex$prop)
+    status_v   <- rep(0, npats)
+  }) |>
+  input_block(base            = l_CVD_inputs[["base_value"]],
+              psa             = pick_psa(l_CVD_inputs[["PSA_dist"]],
+                                         l_CVD_inputs[["n"]],
+                                         l_CVD_inputs[["a"]],
+                                         l_CVD_inputs[["b"]]),
+              sens            = NULL,
+              names_out       = l_CVD_inputs[["parameter_name"]],
+              psa_indicators  = l_CVD_inputs[["psa_indicators"]],
+              sens_indicators = rep(0L, 12),
+              indicator_sens_binary = TRUE) |>
+  add_item(input = {
+    odd_seq <- seq(1, 10, 2)
+    even_seq <- seq(2, 10, 2)
+    q_total  <- 0
+  })
 
 
 common_pt_inputs <- add_item(input={
@@ -785,9 +775,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 76.37s
-#> Time to run analysis 1: 76.37s
-#> Total time to run: 76.38s
+#> Time to run simulation 1: 75.43s
+#> Time to run analysis 1: 75.43s
+#> Total time to run: 75.43s
 #> Simulation finalized;
 ```
 

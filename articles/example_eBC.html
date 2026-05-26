@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">May 25, 2026</h4>
+            <h4 data-toc-skip class="date">May 26, 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_eBC.Rmd" class="external-link"><code>vignettes/articles/example_eBC.Rmd</code></a></small>
       <div class="d-none name"><code>example_eBC.Rmd</code></div>
@@ -198,30 +198,19 @@ trouble.</p>
 <span><span class="co">#In this case, util_v is a named vector, but it's not processed by the model. We extract unnamed numerics from it.</span></span>
 <span></span>
 <span><span class="co">#Put objects here that do not change on any patient or intervention loop</span></span>
-<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span> </span>
-<span>  <span class="co">#utilities</span></span>
-<span>        <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
-<span>            base <span class="op">=</span>  <span class="va">df_util</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>            psa <span class="op">=</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">df_util</span><span class="op">$</span><span class="va">value</span>,<span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">df_util</span><span class="op">$</span><span class="va">se</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>            sens <span class="op">=</span> <span class="va">df_util</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>            psa_ind <span class="op">=</span> <span class="va">psa_bool</span>,</span>
-<span>            sens_ind <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
-<span>            indicator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_util</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>            names_out <span class="op">=</span><span class="va">df_util</span><span class="op">$</span><span class="va">name</span>,</span>
-<span>            deploy_env<span class="op">=</span><span class="cn">TRUE</span></span>
-<span>        <span class="op">)</span></span>
-<span>  <span class="co">#costs</span></span>
-<span>        <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
-<span>            base <span class="op">=</span>  <span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>            psa <span class="op">=</span> <span class="fu"><a href="../reference/rgamma_mse.html">rgamma_mse</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>,<span class="va">df_cost</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,</span>
-<span>            sens <span class="op">=</span> <span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>            psa_ind <span class="op">=</span> <span class="va">psa_bool</span>,</span>
-<span>            sens_ind <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
-<span>            indicator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_cost</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>            names_out <span class="op">=</span><span class="va">df_cost</span><span class="op">$</span><span class="va">name</span>,</span>
-<span>            deploy_env<span class="op">=</span><span class="cn">TRUE</span></span>
-<span>        <span class="op">)</span></span>
-<span>        <span class="op">}</span><span class="op">)</span></span>
+<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span>base            <span class="op">=</span> <span class="va">df_util</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>              psa             <span class="op">=</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">df_util</span><span class="op">$</span><span class="va">value</span>, <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">df_util</span><span class="op">$</span><span class="va">se</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>              sens            <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>              names_out       <span class="op">=</span> <span class="va">df_util</span><span class="op">$</span><span class="va">name</span>,</span>
+<span>              sens_indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0L</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_util</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>              indicator_sens_binary <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span>base            <span class="op">=</span> <span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>              psa             <span class="op">=</span> <span class="fu"><a href="../reference/rgamma_mse.html">rgamma_mse</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">df_cost</span><span class="op">$</span><span class="va">value</span>, <span class="va">df_cost</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,</span>
+<span>              sens            <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>              names_out       <span class="op">=</span> <span class="va">df_cost</span><span class="op">$</span><span class="va">name</span>,</span>
+<span>              sens_indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0L</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df_cost</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>              indicator_sens_binary <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#Put objects here that do not change as we loop through interventions for a patient</span></span>
 <span><span class="va">common_pt_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input<span class="op">=</span><span class="op">{</span> </span>
 <span>    <span class="va">sex_pt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,p<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span>,<span class="st">"male"</span>,<span class="st">"female"</span><span class="op">)</span></span>
@@ -754,9 +743,9 @@ time of the model.</p>
 <span>          <span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 3.42s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 3.42s</span></span>
-<span><span class="co">#&gt; Total time to run: 3.43s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 3.39s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 3.39s</span></span>
+<span><span class="co">#&gt; Total time to run: 3.39s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>

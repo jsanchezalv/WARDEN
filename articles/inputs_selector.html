@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">May 25, 2026</h4>
+            <h4 data-toc-skip class="date">May 26, 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/inputs_selector.Rmd" class="external-link"><code>vignettes/articles/inputs_selector.Rmd</code></a></small>
       <div class="d-none name"><code>inputs_selector.Rmd</code></div>
@@ -123,23 +123,24 @@ Alvarez</h4>
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>This document explains how to use the set of functions related to
-automatic input selector, particularly <code><a href="../reference/pick_val_v.html">pick_val_v()</a></code>,
-<code><a href="../reference/pick_psa.html">pick_psa()</a></code>, and <code><a href="../reference/create_indicators.html">create_indicators()</a></code>, so that
-the model takes care of everything in terms of running a deterministic
-analysis, DSA, PSA, probabilistic DSA, or scenario analyses.</p>
-<p>We use <code>add_item</code> for all the examples below, in previous
-versions of WARDEN we distinguished between add_item and add_item2, but
-now the behavior has been integrated into a single function that can
-handle both approaches of adding inputs.</p>
+automatic input selector, particularly <code><a href="../reference/input_block.html">input_block()</a></code>,
+<code><a href="../reference/pick_val_v.html">pick_val_v()</a></code>, <code><a href="../reference/pick_psa.html">pick_psa()</a></code>, and
+<code><a href="../reference/create_indicators.html">create_indicators()</a></code>, so that the model takes care of
+everything in terms of running a deterministic analysis, DSA, PSA,
+probabilistic DSA, or scenario analyses.</p>
+<p>We use <code><a href="../reference/add_item.html">add_item()</a></code> for all the examples below, in
+previous versions of WARDEN we distinguished between add_item and
+add_item2, but now the behavior has been integrated into a single
+function that can handle both approaches of adding inputs.</p>
 <div class="section level3">
 <h3 id="in-a-nutshell">In a Nutshell<a class="anchor" aria-label="anchor" href="#in-a-nutshell"></a>
 </h3>
-<p>The key function is <code><a href="../reference/pick_val_v.html">pick_val_v()</a></code>. This function
-essentially hides a loop, which iterates over each of the inputs and
-depending on whether the parameter is a vector or single length, and
-whether the PSA or scenario flags are active, proceeds to select the
-right value. It also can consider multiple parameters being covaried at
-the same time in a scenario or DSA analysis.</p>
+<p>The key function <code><a href="../reference/pick_val_v.html">pick_val_v()</a></code>. This function essentially
+hides a loop, which iterates over each of the inputs and depending on
+whether the parameter is a vector or single length, and whether the PSA
+or scenario flags are active, proceeds to select the right value. It
+also can consider multiple parameters being covaried at the same time in
+a scenario or DSA analysis.</p>
 <p>The <code><a href="../reference/pick_psa.html">pick_psa()</a></code> function is a wrapper that just calls the
 corresponding function from its first argument, so it can be used to
 draw from distributions. The recommendation is to use the “r” functions
@@ -150,10 +151,13 @@ appropiately.</p>
 generate a vector of 0 and 1 and is used for scenario analyses and DSA,
 as e.g., in a DSA we need to iterate over the corresponding
 parameters.</p>
-<p>We can start with a simple example, see the data below, where we have
-a set of parameters, with some base case values, PSA parameters, DSA,
-scenario, and whether the parameter would be active on a PSA (vector of
-0 and 1s):</p>
+<p>The function <code><a href="../reference/input_block.html">input_block()</a></code> is essentially a wrapper for
+<code><a href="../reference/pick_val_v.html">pick_val_v()</a></code> which will make sure to call the correct
+parameters, sensitivity analysis required, etc.</p>
+<p>For now, we can start with a simple example, see the data below,
+where we have a set of parameters, with some base case values, PSA
+parameters, DSA, scenario, and whether the parameter would be active on
+a PSA (vector of 0 and 1s):</p>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead><tr>
 <th style="text-align:left;">
@@ -522,8 +526,12 @@ only for scenario/DSA analyses (so when
 it to all 1s (with length equal to the number of vectors) whenever we
 are not in a scenario analysis, and otherwise we use the
 <code>create_indicators</code> function that takes a few extra
-arguments.</p>
-<p><code><a href="../reference/create_indicators.html">create_indicators()</a></code> creates a vector of 0 and 1s, taking
+arguments. Alternatively, the user does not need to worry about the
+indicators as it will be taken care by the <code><a href="../reference/input_block.html">input_block()</a></code>
+function (see below).</p>
+<p>If the user wants to use the legacy option with
+<code><a href="../reference/pick_val_v.html">pick_val_v()</a></code> instead of <code><a href="../reference/input_block.html">input_block()</a></code>, then
+<code><a href="../reference/create_indicators.html">create_indicators()</a></code> creates a vector of 0 and 1s, taking
 value 1 at the right index that is going to be varied. It takes a few
 extra objects that are given automatically by the model:
 <code>sens</code>, <code>n_sensitivity</code>, and
@@ -631,44 +639,28 @@ We first run it as a deterministic analysis.</p>
 </h3>
 <p>We now use this setup in a very simple model, where we run a
 deterministic, probabilistic, probabilistic DSA and deterministic
-scenario analysis. Note that the <code>sens</code> iterator needs to be
-adjusted, as it just measures the total number of sensitivity
-iterations. If we have 2 sensitivities with 7 parameters each, sens will
-go from 1 to 14. As we have only 7 parameters, we need to create the
-<code>iterator_sensitivity</code> variable to “reset” the index back to
-1, 2, 3… when it goes over 7, so that covers DSA_min and DSA_max, and
-for that we simply use the <code>sens_iterator</code> function.</p>
+scenario analysis. With <code><a href="../reference/input_block.html">input_block()</a></code>, the
+<code>n_sensitivity</code> and <code>sensitivity_names</code> for DSA
+are auto-detected from the block’s metadata — no manual
+<code>i_sensitivity</code> or <code>sens_iterator</code> setup is
+needed. For scenario analyses, <code>sensitivity_names</code> must still
+be provided explicitly in <code><a href="../reference/run_sim.html">run_sim()</a></code> to understand which
+sensitivity analysis should be run, but <code>n_sensitivity</code> is
+auto-calculated.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">sens</span>, <span class="va">sens_name_used</span>, <span class="va">sensitivity_bool</span>, <span class="va">psa_bool</span><span class="op">)</span> <span class="co">#remove global objects that may confuse program</span></span>
 <span></span>
-<span><span class="va">i_sensitivity</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>  iterator_sensitivity <span class="op">=</span> <span class="fu"><a href="../reference/sens_iterator.html">sens_iterator</a></span><span class="op">(</span><span class="va">sens</span>,<span class="va">n_sensitivity</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>            indicators <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">sensitivity_bool</span>  <span class="op">&amp;</span> <span class="va">sens_name_used</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>  <span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="va">iterator_sensitivity</span>,<span class="va">n_sensitivity</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sensitivity_names</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co">#only for DSA we use this approach</span></span>
-<span>              <span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">}</span></span>
-<span>                              <span class="op">)</span> </span>
+<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span></span>
+<span>  base           <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa            <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  sens           <span class="op">=</span> <span class="va">l_inputs</span>,</span>
+<span>  names_out      <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa_indicators <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  dsa_names      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
-<span>      base <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      psa <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span></span>
-<span>        <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>      sens          <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>, <span class="co">#e.g., sens_name_used = "DSA_min"</span></span>
-<span>      psa_ind       <span class="op">=</span> <span class="va">psa_bool</span>, <span class="co">#FALSE</span></span>
-<span>      sens_ind      <span class="op">=</span> <span class="va">sensitivity_bool</span>, <span class="co">#FALSE</span></span>
-<span>      indicator     <span class="op">=</span> <span class="va">indicators</span>, <span class="co">#all 1s, or a vector of 1 1 and the rest 0s.</span></span>
-<span>      names_out     <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      indicator_psa <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span> </span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">i_arm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="va">util.sick</span>,</span>
-<span>           c_default <span class="op">=</span> <span class="va">cost.sick</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="va">i_arm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>q_default <span class="op">=</span> <span class="va">util.sick</span>,</span>
+<span>         c_default <span class="op">=</span> <span class="va">cost.sick</span> <span class="op">+</span> <span class="kw">if</span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span><span class="op">{</span><span class="va">cost.int</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="fl">0</span><span class="op">}</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="va">init_event_list</span> <span class="op">&lt;-</span> </span>
@@ -707,7 +699,7 @@ for that we simply use the <code>sens_iterator</code> function.</p>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Time to run analysis 1: 0.06s</span></span>
-<span><span class="co">#&gt; Total time to run: 0.06s</span></span>
+<span><span class="co">#&gt; Total time to run: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>  <span class="op">|&gt;</span></span>
@@ -1015,22 +1007,18 @@ dq_default_undisc
 </table>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
-<span>  npats<span class="op">=</span><span class="fl">5</span>,                              </span>
-<span>  n_sim<span class="op">=</span><span class="fl">2</span>,                                  </span>
-<span>  psa_bool <span class="op">=</span> <span class="cn">TRUE</span>,                         </span>
-<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,             </span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span></span>
+<span>  npats<span class="op">=</span><span class="fl">5</span>,</span>
+<span>  n_sim<span class="op">=</span><span class="fl">2</span>,</span>
+<span>  psa_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,</span>
 <span>  common_all_inputs <span class="op">=</span> <span class="va">i_simple</span>,</span>
 <span>  unique_pt_inputs  <span class="op">=</span> <span class="va">i_arm</span>,</span>
-<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,        </span>
-<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,         </span>
+<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,</span>
+<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,</span>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
-<span>  ipd <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  sensitivity_inputs <span class="op">=</span> <span class="va">i_sensitivity</span>, <span class="co">#this argument can also be removed since it's not used</span></span>
-<span>  sensitivity_names <span class="op">=</span> <span class="cn">NULL</span>,           <span class="co">#this argument can also be removed since it's not used</span></span>
-<span>  sensitivity_bool <span class="op">=</span> <span class="cn">FALSE</span>,           <span class="co">#this argument can also be removed since it's not used</span></span>
-<span>  n_sensitivity <span class="op">=</span> <span class="fl">1</span>                   <span class="co">#this argument can also be removed since it's not used</span></span>
+<span>  ipd <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
@@ -1345,25 +1333,24 @@ dq_default_undisc
 </tbody>
 </table>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#DSA analyses, we set n_sensitivity to 7 as we need to iterate over all the parameters</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
-<span>  npats<span class="op">=</span><span class="fl">5</span>,                               </span>
-<span>  n_sim<span class="op">=</span><span class="fl">2</span>,                                 </span>
-<span>  psa_bool <span class="op">=</span> <span class="cn">TRUE</span>,                        </span>
-<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,             </span>
+<code class="sourceCode R"><span><span class="co"># DSA analyses — n_sensitivity and sensitivity_names auto-detected from input_block() metadata</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span></span>
+<span>  npats<span class="op">=</span><span class="fl">5</span>,</span>
+<span>  n_sim<span class="op">=</span><span class="fl">2</span>,</span>
+<span>  psa_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,</span>
 <span>  common_all_inputs <span class="op">=</span> <span class="va">i_simple</span>,</span>
 <span>  unique_pt_inputs  <span class="op">=</span> <span class="va">i_arm</span>,</span>
-<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,       </span>
-<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,         </span>
+<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,</span>
+<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,</span>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
 <span>  ipd <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  sensitivity_inputs <span class="op">=</span> <span class="va">i_sensitivity</span>,</span>
-<span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>,<span class="st">"DSA_max"</span><span class="op">)</span>,</span>
 <span>  sensitivity_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="co">#7 parameters</span></span>
-<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> </span>
+<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; n_sensitivity auto-detected as 7 from input_block metadata</span></span>
+<span><span class="co">#&gt; sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
@@ -1372,7 +1359,7 @@ dq_default_undisc
 <span><span class="co">#&gt; Time to run analysis 1: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 2: 0.13s</span></span>
@@ -1390,19 +1377,19 @@ dq_default_undisc
 <span><span class="co">#&gt; Time to run analysis 4: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 5</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 5: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 6</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
 <span><span class="co">#&gt; Time to run analysis 6: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 7: 0.13s</span></span>
@@ -1420,7 +1407,7 @@ dq_default_undisc
 <span><span class="co">#&gt; Time to run analysis 9: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 10: 0.13s</span></span>
@@ -1434,13 +1421,13 @@ dq_default_undisc
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 12: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 13</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.06s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.06s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 13: 0.13s</span></span>
 <span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
@@ -1865,25 +1852,24 @@ HR_int
 </tbody>
 </table>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Scenario analyses, we set n_sensitivity to 1 as we don't have to iterate over all parameters, each scenario is run only once</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
-<span>  npats<span class="op">=</span><span class="fl">5</span>,                               </span>
-<span>  n_sim<span class="op">=</span><span class="fl">2</span>,                                 </span>
-<span>  psa_bool <span class="op">=</span> <span class="cn">TRUE</span>,                        </span>
-<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,             </span>
+<code class="sourceCode R"><span><span class="co"># Scenario analyses — n_sensitivity auto-detected as 1; sensitivity_names must be provided</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span></span>
+<span>  npats<span class="op">=</span><span class="fl">5</span>,</span>
+<span>  n_sim<span class="op">=</span><span class="fl">2</span>,</span>
+<span>  psa_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,</span>
 <span>  common_all_inputs <span class="op">=</span> <span class="va">i_simple</span>,</span>
 <span>  unique_pt_inputs  <span class="op">=</span> <span class="va">i_arm</span>,</span>
-<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,       </span>
-<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,         </span>
+<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,</span>
+<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,</span>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
 <span>  ipd <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  sensitivity_inputs <span class="op">=</span> <span class="va">i_sensitivity</span>,</span>
-<span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scenario_1"</span>,<span class="st">"scenario_2"</span><span class="op">)</span>,</span>
 <span>  sensitivity_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_sensitivity <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scenario_1"</span>, <span class="st">"scenario_2"</span><span class="op">)</span>,</span>
 <span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; n_sensitivity auto-detected as 7 from input_block metadata</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -2002,26 +1988,76 @@ HR_int
 </tr>
 </tbody>
 </table>
+<details><summary><strong>Alternative: legacy approach using
+<code>pick_val_v()</code></strong>
+</summary><p>Here we provide the legacy approach to the same model run.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Build sensitivity indicator object and pick_val_v-based input block</span></span>
+<span><span class="va">i_sensitivity</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>  iterator_sensitivity <span class="op">=</span> <span class="fu"><a href="../reference/sens_iterator.html">sens_iterator</a></span><span class="op">(</span><span class="va">sens</span>, <span class="va">n_sensitivity</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>  indicators <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">sensitivity_bool</span> <span class="op">&amp;</span> <span class="va">sens_name_used</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="va">iterator_sensitivity</span>, <span class="va">n_sensitivity</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sensitivity_names</span><span class="op">)</span>,</span>
+<span>                      <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">}</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
+<span>      base          <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      psa           <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>      sens          <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      psa_ind       <span class="op">=</span> <span class="va">psa_bool</span>,</span>
+<span>      sens_ind      <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
+<span>      indicator     <span class="op">=</span> <span class="va">indicators</span>,</span>
+<span>      names_out     <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      indicator_psa <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># PSA run</span></span>
+<span><span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>npats<span class="op">=</span><span class="fl">5</span>, n_sim<span class="op">=</span><span class="fl">2</span>, psa_bool<span class="op">=</span><span class="cn">TRUE</span>, arm_list<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span>
+<span>        common_all_inputs<span class="op">=</span><span class="va">i_simple</span>, unique_pt_inputs<span class="op">=</span><span class="va">i_arm</span>,</span>
+<span>        init_event_list<span class="op">=</span><span class="va">init_event_list</span>, evt_react_list<span class="op">=</span><span class="va">evt_react_list</span>,</span>
+<span>        util_ongoing_list<span class="op">=</span><span class="va">util_ongoing</span>, cost_ongoing_list<span class="op">=</span><span class="va">cost_ongoing</span>, ipd<span class="op">=</span><span class="fl">1</span>,</span>
+<span>        sensitivity_inputs<span class="op">=</span><span class="va">i_sensitivity</span>, sensitivity_names<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>        sensitivity_bool<span class="op">=</span><span class="cn">FALSE</span>, n_sensitivity<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># DSA run</span></span>
+<span><span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>npats<span class="op">=</span><span class="fl">5</span>, n_sim<span class="op">=</span><span class="fl">2</span>, psa_bool<span class="op">=</span><span class="cn">TRUE</span>, arm_list<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span>
+<span>        common_all_inputs<span class="op">=</span><span class="va">i_simple</span>, unique_pt_inputs<span class="op">=</span><span class="va">i_arm</span>,</span>
+<span>        init_event_list<span class="op">=</span><span class="va">init_event_list</span>, evt_react_list<span class="op">=</span><span class="va">evt_react_list</span>,</span>
+<span>        util_ongoing_list<span class="op">=</span><span class="va">util_ongoing</span>, cost_ongoing_list<span class="op">=</span><span class="va">cost_ongoing</span>, ipd<span class="op">=</span><span class="fl">1</span>,</span>
+<span>        sensitivity_inputs<span class="op">=</span><span class="va">i_sensitivity</span>, sensitivity_names<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>,<span class="st">"DSA_max"</span><span class="op">)</span>,</span>
+<span>        sensitivity_bool<span class="op">=</span><span class="cn">TRUE</span>, n_sensitivity<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        input_out<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Scenario run</span></span>
+<span><span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>npats<span class="op">=</span><span class="fl">5</span>, n_sim<span class="op">=</span><span class="fl">2</span>, psa_bool<span class="op">=</span><span class="cn">TRUE</span>, arm_list<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span>
+<span>        common_all_inputs<span class="op">=</span><span class="va">i_simple</span>, unique_pt_inputs<span class="op">=</span><span class="va">i_arm</span>,</span>
+<span>        init_event_list<span class="op">=</span><span class="va">init_event_list</span>, evt_react_list<span class="op">=</span><span class="va">evt_react_list</span>,</span>
+<span>        util_ongoing_list<span class="op">=</span><span class="va">util_ongoing</span>, cost_ongoing_list<span class="op">=</span><span class="va">cost_ongoing</span>, ipd<span class="op">=</span><span class="fl">1</span>,</span>
+<span>        sensitivity_inputs<span class="op">=</span><span class="va">i_sensitivity</span>, sensitivity_names<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scenario_1"</span>,<span class="st">"scenario_2"</span><span class="op">)</span>,</span>
+<span>        sensitivity_bool<span class="op">=</span><span class="cn">TRUE</span>, n_sensitivity<span class="op">=</span><span class="fl">1</span>,</span>
+<span>        input_out<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</details>
 </div>
 <div class="section level3">
 <h3 id="parameters-spread-across-different-levels">Parameters spread across different levels<a class="anchor" aria-label="anchor" href="#parameters-spread-across-different-levels"></a>
 </h3>
 <p>What happens when we have inputs not only at a single level (e.g.,
 patient level), but also at simulation, patient, arm, etc levels? In
-that case, we can still use <code><a href="../reference/pick_val_v.html">pick_val_v()</a></code> to handle things
-for us, but we need to be careful with the indicators, particularly in
-the DSA. For example, if we have 10 parameters, of which 7 are set at
-simulation level and 3 at patient level, <code>pick_val_V()</code> at
-the simulation level will want an indicator vector of length 7 and at
-patient level of length 3. In the DSA, as we need to iterate at each
-parameter, we need to be aware of which index is being currently run, as
-there is the risk of varying the first parameters of both simulation and
-patient level at the same time. <code><a href="../reference/create_indicators.html">create_indicators()</a></code> can
-handle this for us by telling it how many parameters have gone “before”
-(i.e. which ones are higher in the hierarchy, so for simulation level in
-this case it would be 0, but for patient level it would be the previous
-7 parameters set at the simulation level). See below this example.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+that case we can use <code><a href="../reference/input_block.html">input_block()</a></code> at each level, and the
+engine will automatically compute the right offsets and accumulate the
+total <code>n_sensitivity</code> across all blocks — no manual indicator
+tracking is needed.</p>
+<p>For example, if we have 7 parameters at simulation level and 2 at
+patient level, the engine knows the patient-level block starts at index
+8 and applies the correct <code>n_sens_before</code> offset internally.
+The <code><a href="../reference/create_indicators.html">create_indicators()</a></code> helper illustrates how the indexing
+works:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">#let's set the index to 8th (so it would correspond to the patient level indicator)</span></span>
 <span><span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="fl">8</span>,<span class="fl">20</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>,<span class="fl">0</span><span class="op">)</span> <span class="co">#all 0s</span></span>
@@ -2030,11 +2066,12 @@ this case it would be 0, but for patient level it would be the previous
 <span><span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="fl">8</span>,<span class="fl">20</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>,<span class="fl">7</span><span class="op">)</span> <span class="co">#first index is 1! because we know we are at index 8, and we have already gone through 7 iterations</span></span>
 <span><span class="co">#&gt; [1] 1 0 0</span></span></code></pre></div>
 <p>Let’s simply add a few parameters that are also now at the patient
-level. Note that as we are not using this parameters into the model,
-they will have no impact but we can still see they are really being
-varied. We still need to create specific indicators for each
-category.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+level. Note that as we are not using these parameters in the model, they
+will have no impact but we can still see they are really being varied.
+With <code><a href="../reference/input_block.html">input_block()</a></code> at each level,
+<code>n_sensitivity</code> and <code>sensitivity_names</code> are
+auto-detected and the DSA offsets are computed automatically.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">l_inputs_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>parameter_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"age"</span>,<span class="st">"sex"</span><span class="op">)</span>,</span>
 <span>                 base_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">60</span>,<span class="fl">1</span><span class="op">)</span>,</span>
@@ -2049,74 +2086,45 @@ category.</p>
 <span>                 psa_indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span>                 <span class="op">)</span></span>
 <span></span>
-<span><span class="va">i_sensitivity</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>  iterator_sensitivity <span class="op">=</span> <span class="fu"><a href="../reference/sens_iterator.html">sens_iterator</a></span><span class="op">(</span><span class="va">sens</span>,<span class="va">n_sensitivity</span><span class="op">)</span> <span class="co">#resets back to 1 if it goes over n_sensitivity</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>            indicators <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">sensitivity_bool</span>  <span class="op">&amp;</span> <span class="va">sens_name_used</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span>              <span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="va">iterator_sensitivity</span>, </span>
-<span>                                <span class="va">n_sensitivity</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sensitivity_names</span><span class="op">)</span>,</span>
-<span>                                <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> </span>
-<span>            <span class="op">}</span><span class="kw">else</span><span class="op">{</span></span>
-<span>                <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span>              <span class="op">}</span></span>
-<span>          <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>            indicators_pat <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">sensitivity_bool</span>  <span class="op">&amp;</span> <span class="va">sens_name_used</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span>              <span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="va">iterator_sensitivity</span>,</span>
-<span>                                <span class="va">n_sensitivity</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sensitivity_names</span><span class="op">)</span>,</span>
-<span>                                <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                                <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> </span>
-<span>            <span class="op">}</span><span class="kw">else</span><span class="op">{</span></span>
-<span>                <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span>              <span class="op">}</span></span>
-<span>          <span class="op">)</span> </span>
+<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span></span>
+<span>  base           <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa            <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  sens           <span class="op">=</span> <span class="va">l_inputs</span>,</span>
+<span>  names_out      <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa_indicators <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  dsa_names      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span></span>
+<span>  base           <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa            <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  sens           <span class="op">=</span> <span class="va">l_inputs_pat</span>,</span>
+<span>  names_out      <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa_indicators <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  dsa_names      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span>  </span>
-<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
-<span>      base <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      psa <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span></span>
-<span>        <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>      sens          <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>, <span class="co">#e.g., sens_name_used = "DSA_min"</span></span>
-<span>      psa_ind       <span class="op">=</span> <span class="va">psa_bool</span>, <span class="co">#FALSE</span></span>
-<span>      sens_ind      <span class="op">=</span> <span class="va">sensitivity_bool</span>, <span class="co">#TRUE</span></span>
-<span>      indicator     <span class="op">=</span> <span class="va">indicators_pat</span>, <span class="co">#all 1s, or a vector of 1 1 and the rest 0s.</span></span>
-<span>      names_out     <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      indicator_psa <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span> </span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
-<span>  npats<span class="op">=</span><span class="fl">5</span>,                               </span>
-<span>  n_sim<span class="op">=</span><span class="fl">2</span>,                                 </span>
-<span>  psa_bool <span class="op">=</span> <span class="cn">FALSE</span>,                        </span>
-<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,             </span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span></span>
+<span>  npats<span class="op">=</span><span class="fl">5</span>,</span>
+<span>  n_sim<span class="op">=</span><span class="fl">2</span>,</span>
+<span>  psa_bool <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,</span>
 <span>  common_all_inputs <span class="op">=</span> <span class="va">i_simple</span>,</span>
 <span>  unique_pt_inputs  <span class="op">=</span> <span class="va">i_arm</span>,</span>
-<span>  common_pt_inputs <span class="op">=</span> <span class="va">i_pat</span>,</span>
-<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,       </span>
-<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,         </span>
+<span>  common_pt_inputs  <span class="op">=</span> <span class="va">i_pat</span>,</span>
+<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,</span>
+<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,</span>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
 <span>  ipd <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  sensitivity_inputs <span class="op">=</span> <span class="va">i_sensitivity</span>,</span>
-<span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>,<span class="st">"DSA_max"</span><span class="op">)</span>,</span>
 <span>  sensitivity_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="co">#9 parameters</span></span>
-<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; n_sensitivity auto-detected as 9 from input_block metadata</span></span>
+<span><span class="co">#&gt; sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
 <span><span class="co">#&gt; Time to run analysis 1: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
@@ -2177,7 +2185,7 @@ category.</p>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 11: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run analysis 11: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 12</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -2210,7 +2218,7 @@ category.</p>
 <span><span class="co">#&gt; Time to run analysis 16: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 17</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 17: 0.15s</span></span>
@@ -2857,6 +2865,50 @@ sex
 </tr>
 </tbody>
 </table>
+<details><summary><strong>Alternative: legacy approach using
+<code>pick_val_v()</code></strong>
+</summary><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Manual tracking of n_sens_before and total n_sensitivity needed</span></span>
+<span><span class="va">i_sensitivity</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>  iterator_sensitivity <span class="op">=</span> <span class="fu"><a href="../reference/sens_iterator.html">sens_iterator</a></span><span class="op">(</span><span class="va">sens</span>, <span class="va">n_sensitivity</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>    indicators <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">sensitivity_bool</span> <span class="op">&amp;</span> <span class="va">sens_name_used</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="va">iterator_sensitivity</span>, <span class="va">n_sensitivity</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sensitivity_names</span><span class="op">)</span>,</span>
+<span>                        <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">}</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>    indicators_pat <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">sensitivity_bool</span> <span class="op">&amp;</span> <span class="va">sens_name_used</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="../reference/create_indicators.html">create_indicators</a></span><span class="op">(</span><span class="va">iterator_sensitivity</span>, <span class="va">n_sensitivity</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sensitivity_names</span><span class="op">)</span>,</span>
+<span>                        <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">}</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span>base <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>               psa <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>               sens <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>, psa_ind <span class="op">=</span> <span class="va">psa_bool</span>, sens_ind <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
+<span>               indicator <span class="op">=</span> <span class="va">indicators</span>, names_out <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>               indicator_psa <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span>base <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>               psa <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>               sens <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>, psa_ind <span class="op">=</span> <span class="va">psa_bool</span>, sens_ind <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
+<span>               indicator <span class="op">=</span> <span class="va">indicators_pat</span>, names_out <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>               indicator_psa <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>npats<span class="op">=</span><span class="fl">5</span>, n_sim<span class="op">=</span><span class="fl">2</span>, psa_bool<span class="op">=</span><span class="cn">FALSE</span>, arm_list<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>,<span class="st">"noint"</span><span class="op">)</span>,</span>
+<span>        common_all_inputs<span class="op">=</span><span class="va">i_simple</span>, unique_pt_inputs<span class="op">=</span><span class="va">i_arm</span>, common_pt_inputs<span class="op">=</span><span class="va">i_pat</span>,</span>
+<span>        init_event_list<span class="op">=</span><span class="va">init_event_list</span>, evt_react_list<span class="op">=</span><span class="va">evt_react_list</span>,</span>
+<span>        util_ongoing_list<span class="op">=</span><span class="va">util_ongoing</span>, cost_ongoing_list<span class="op">=</span><span class="va">cost_ongoing</span>, ipd<span class="op">=</span><span class="fl">1</span>,</span>
+<span>        sensitivity_inputs<span class="op">=</span><span class="va">i_sensitivity</span>, sensitivity_names<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>,<span class="st">"DSA_max"</span><span class="op">)</span>,</span>
+<span>        sensitivity_bool<span class="op">=</span><span class="cn">TRUE</span>, n_sensitivity<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        input_out<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</details>
 </div>
 <div class="section level3">
 <h3 id="multiple-parameters-covaried">Multiple parameters covaried<a class="anchor" aria-label="anchor" href="#multiple-parameters-covaried"></a>
@@ -2867,12 +2919,12 @@ their min and max value together, that can be done by switching from a
 0-1 vector to a vector which takes integer values to reflect the DSA
 scenario number. See below this applied, and we also assume that the
 utilities and costs are varied together. In this case, the indicators
-are simplified, as we only need 1) the correct index (provided by
-<code>iterator_sensitivity</code>) and 2) the dsa indicators index to
-understand which parameters are covaried. We also need to make sure to
-adjust <code>n_sensitivity</code> in <code><a href="../reference/run_sim.html">run_sim()</a></code> to the new
-number of dsa iterations (5).</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+are simplified, as we only need 1) the correct index and 2) the
+<code>dsa_indicators</code> index to understand which parameters are
+covaried. <code>n_sensitivity</code> is now auto-detected from the
+<code><a href="../reference/input_block.html">input_block()</a></code> metadata — no manual specification
+needed.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">l_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>parameter_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"util.sick"</span>,<span class="st">"util.sicker"</span>,<span class="st">"cost.sick"</span>,<span class="st">"cost.sicker"</span>,<span class="st">"cost.int"</span>,<span class="st">"coef_noint"</span>,<span class="st">"HR_int"</span><span class="op">)</span>,</span>
 <span>                 base_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">0.8</span>,<span class="fl">0.5</span>,<span class="fl">3000</span>,<span class="fl">7000</span>,<span class="fl">1000</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span>,<span class="fl">0.8</span><span class="op">)</span>,</span>
@@ -2902,81 +2954,55 @@ number of dsa iterations (5).</p>
 <span>                 dsa_indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">5</span><span class="op">)</span> <span class="co">#will be 5th analysis done</span></span>
 <span>                 <span class="op">)</span></span>
 <span></span>
-<span><span class="va">i_sensitivity</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>  iterator_sensitivity <span class="op">=</span> <span class="fu"><a href="../reference/sens_iterator.html">sens_iterator</a></span><span class="op">(</span><span class="va">sens</span>,<span class="va">n_sensitivity</span><span class="op">)</span> <span class="co">#resets back to 1 if it goes over n_sensitivity</span></span>
-<span>  <span class="op">)</span> </span>
+<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span></span>
+<span>  base                  <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa                   <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  sens                  <span class="op">=</span> <span class="va">l_inputs</span>,</span>
+<span>  names_out             <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa_indicators        <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  dsa_names             <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span>,</span>
+<span>  sens_indicators       <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  indicator_sens_binary <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  distributions         <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  covariances           <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span></span>
+<span>  base                  <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa                   <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  sens                  <span class="op">=</span> <span class="va">l_inputs_pat</span>,</span>
+<span>  names_out             <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa_indicators        <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  dsa_names             <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span>,</span>
+<span>  sens_indicators       <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  indicator_sens_binary <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  distributions         <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  covariances           <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
-<span>      base <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      psa <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span></span>
-<span>        <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>      sens          <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>, <span class="co">#e.g., sens_name_used = "DSA_min"</span></span>
-<span>      psa_ind       <span class="op">=</span> <span class="va">psa_bool</span>, <span class="co">#FALSE</span></span>
-<span>      sens_ind      <span class="op">=</span> <span class="va">sensitivity_bool</span>, <span class="co">#TRUE</span></span>
-<span>      indicator     <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span>, </span>
-<span>      sens_iterator <span class="op">=</span> <span class="va">iterator_sensitivity</span>,</span>
-<span>      indicator_sens_binary <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>      names_out     <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      indicator_psa <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span> ,</span>
-<span>      distributions <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      covariances   <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>  </span>
-<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
-<span>      base <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      psa <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span></span>
-<span>        <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>        <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>      sens          <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>, <span class="co">#e.g., sens_name_used = "DSA_min"</span></span>
-<span>      psa_ind       <span class="op">=</span> <span class="va">psa_bool</span>, <span class="co">#FALSE</span></span>
-<span>      sens_ind      <span class="op">=</span> <span class="va">sensitivity_bool</span>, <span class="co">#TRUE</span></span>
-<span>      indicator     <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span>, </span>
-<span>      sens_iterator <span class="op">=</span> <span class="va">iterator_sensitivity</span>,</span>
-<span>      indicator_sens_binary <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>      names_out     <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      indicator_psa <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      distributions <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>      covariances   <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
-<span>  npats<span class="op">=</span><span class="fl">5</span>,                               </span>
-<span>  n_sim<span class="op">=</span><span class="fl">2</span>,                                 </span>
-<span>  psa_bool <span class="op">=</span> <span class="cn">FALSE</span>,                        </span>
-<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,             </span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span></span>
+<span>  npats<span class="op">=</span><span class="fl">5</span>,</span>
+<span>  n_sim<span class="op">=</span><span class="fl">2</span>,</span>
+<span>  psa_bool <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,</span>
 <span>  common_all_inputs <span class="op">=</span> <span class="va">i_simple</span>,</span>
 <span>  unique_pt_inputs  <span class="op">=</span> <span class="va">i_arm</span>,</span>
 <span>  common_pt_inputs <span class="op">=</span> <span class="va">i_pat</span>,</span>
-<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,       </span>
-<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,         </span>
+<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,</span>
+<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,</span>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
 <span>  ipd <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  sensitivity_inputs <span class="op">=</span> <span class="va">i_sensitivity</span>,</span>
-<span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>,<span class="st">"DSA_max"</span><span class="op">)</span>,</span>
 <span>  sensitivity_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>, <span class="co">#5 parameters!!!</span></span>
-<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; n_sensitivity auto-detected as 5 from input_block metadata</span></span>
+<span><span class="co">#&gt; sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -3009,9 +3035,9 @@ number of dsa iterations (5).</p>
 <span><span class="co">#&gt; Time to run analysis 6: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 7: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 8</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
@@ -3031,7 +3057,7 @@ number of dsa iterations (5).</p>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 10: 0.14s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.47s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.48s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
@@ -3412,6 +3438,63 @@ sex
 </tr>
 </tbody>
 </table>
+<details><summary>
+Old approach using <code>pick_val_v()</code> directly
+</summary><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">i_sensitivity</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>  iterator_sensitivity <span class="op">=</span> <span class="fu"><a href="../reference/sens_iterator.html">sens_iterator</a></span><span class="op">(</span><span class="va">sens</span>, <span class="va">n_sensitivity</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">i_simple</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
+<span>      base <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      psa <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>      sens          <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      psa_ind       <span class="op">=</span> <span class="va">psa_bool</span>,</span>
+<span>      sens_ind      <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
+<span>      indicator     <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      sens_iterator <span class="op">=</span> <span class="va">iterator_sensitivity</span>,</span>
+<span>      indicator_sens_binary <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>      names_out     <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      indicator_psa <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      distributions <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      covariances   <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
+<span>      base <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      psa <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>      sens          <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      psa_ind       <span class="op">=</span> <span class="va">psa_bool</span>,</span>
+<span>      sens_ind      <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
+<span>      indicator     <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      sens_iterator <span class="op">=</span> <span class="va">iterator_sensitivity</span>,</span>
+<span>      indicator_sens_binary <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>      names_out     <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      indicator_psa <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      distributions <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      covariances   <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span></span>
+<span>  npats<span class="op">=</span><span class="fl">5</span>, n_sim<span class="op">=</span><span class="fl">2</span>, psa_bool <span class="op">=</span> <span class="cn">FALSE</span>, arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,</span>
+<span>  common_all_inputs <span class="op">=</span> <span class="va">i_simple</span>, unique_pt_inputs <span class="op">=</span> <span class="va">i_arm</span>, common_pt_inputs <span class="op">=</span> <span class="va">i_pat</span>,</span>
+<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>, evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,</span>
+<span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>, cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>, ipd <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  sensitivity_inputs <span class="op">=</span> <span class="va">i_sensitivity</span>,</span>
+<span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span>,</span>
+<span>  sensitivity_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>                  <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="co">#5 parameters</span></span>
+<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</details>
 </div>
 <div class="section level3">
 <h3 id="parameters-that-are-vectors">Parameters that are vectors<a class="anchor" aria-label="anchor" href="#parameters-that-are-vectors"></a>
@@ -3420,10 +3503,13 @@ sex
 is when some parameters are vectors instead of length 1. In this case,
 the approach is the same as the previous one, as those parameters would
 be varied together. We add to <code>l_inputs_pat</code> a new parameter
-of length 2 that will be a multivariate normal. Below it can be seen for
-a DSA, but by now it should be straightforward to switch to
-probabilistic DSA, deterministic case, or standard PSA.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+of length 2 that will be a multivariate normal. Because
+<code>l_inputs_pat</code> changes, we rebuild <code>i_pat</code>
+accordingly — <code>i_simple</code> and <code><a href="../reference/run_sim.html">run_sim()</a></code> are
+otherwise unchanged. Below it can be seen for a DSA, but by now it
+should be straightforward to switch to probabilistic DSA, deterministic
+case, or standard PSA.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">l_inputs_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>parameter_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"age"</span>,<span class="st">"sex"</span>, <span class="st">"v_state"</span><span class="op">)</span>,</span>
 <span>                 base_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">60</span>,<span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -3439,26 +3525,36 @@ probabilistic DSA, deterministic case, or standard PSA.</p>
 <span>                 dsa_indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">5</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>,<span class="fl">6</span><span class="op">)</span><span class="op">)</span></span>
 <span>                 <span class="op">)</span></span>
 <span></span>
+<span><span class="va">i_pat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span></span>
+<span>  base                  <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa                   <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  sens                  <span class="op">=</span> <span class="va">l_inputs_pat</span>,</span>
+<span>  names_out             <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  psa_indicators        <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  dsa_names             <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span>,</span>
+<span>  sens_indicators       <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  indicator_sens_binary <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  distributions         <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  covariances           <span class="op">=</span> <span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
-<span>  npats<span class="op">=</span><span class="fl">5</span>,                               </span>
-<span>  n_sim<span class="op">=</span><span class="fl">2</span>,                                 </span>
-<span>  psa_bool <span class="op">=</span> <span class="cn">FALSE</span>,                        </span>
-<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,             </span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span></span>
+<span>  npats<span class="op">=</span><span class="fl">5</span>,</span>
+<span>  n_sim<span class="op">=</span><span class="fl">2</span>,</span>
+<span>  psa_bool <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,</span>
 <span>  common_all_inputs <span class="op">=</span> <span class="va">i_simple</span>,</span>
 <span>  unique_pt_inputs  <span class="op">=</span> <span class="va">i_arm</span>,</span>
 <span>  common_pt_inputs <span class="op">=</span> <span class="va">i_pat</span>,</span>
-<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,       </span>
-<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,         </span>
+<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,</span>
+<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,</span>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
 <span>  ipd <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  sensitivity_inputs <span class="op">=</span> <span class="va">i_sensitivity</span>,</span>
-<span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>,<span class="st">"DSA_max"</span><span class="op">)</span>,</span>
 <span>  sensitivity_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"dsa_indicators"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>, <span class="co">#6 parameters!</span></span>
-<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">l_inputs_pat</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; n_sensitivity auto-detected as 6 from input_block metadata</span></span>
+<span><span class="co">#&gt; sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
@@ -3494,7 +3590,7 @@ probabilistic DSA, deterministic case, or standard PSA.</p>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 7</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
@@ -3511,11 +3607,11 @@ probabilistic DSA, deterministic case, or standard PSA.</p>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 9: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run analysis 9: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 10: 0.15s</span></span>
@@ -3524,14 +3620,14 @@ probabilistic DSA, deterministic case, or standard PSA.</p>
 <span><span class="co">#&gt; Time to run simulation 1: 0.07s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
-<span><span class="co">#&gt; Time to run analysis 11: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 11: 0.15s</span></span>
 <span><span class="co">#&gt; Analysis number: 12</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.07s</span></span>
 <span><span class="co">#&gt; Time to run analysis 12: 0.15s</span></span>
-<span><span class="co">#&gt; Total time to run: 1.77s</span></span>
+<span><span class="co">#&gt; Total time to run: 1.79s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/summary_results_sens.html">summary_results_sens</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>

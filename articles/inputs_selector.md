@@ -39,6 +39,7 @@ options(tibble.print_max = 50)
 
 This document explains how to use the set of functions related to
 automatic input selector, particularly
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md),
 [`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md),
 [`pick_psa()`](https://jsanchezalv.github.io/WARDEN/reference/pick_psa.md),
 and
@@ -47,14 +48,16 @@ so that the model takes care of everything in terms of running a
 deterministic analysis, DSA, PSA, probabilistic DSA, or scenario
 analyses.
 
-We use `add_item` for all the examples below, in previous versions of
-WARDEN we distinguished between add_item and add_item2, but now the
-behavior has been integrated into a single function that can handle both
-approaches of adding inputs.
+We use
+[`add_item()`](https://jsanchezalv.github.io/WARDEN/reference/add_item.md)
+for all the examples below, in previous versions of WARDEN we
+distinguished between add_item and add_item2, but now the behavior has
+been integrated into a single function that can handle both approaches
+of adding inputs.
 
 ### In a Nutshell
 
-The key function is
+The key function
 [`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md).
 This function essentially hides a loop, which iterates over each of the
 inputs and depending on whether the parameter is a vector or single
@@ -78,10 +81,17 @@ is a function that will generate a vector of 0 and 1 and is used for
 scenario analyses and DSA, as e.g., in a DSA we need to iterate over the
 corresponding parameters.
 
-We can start with a simple example, see the data below, where we have a
-set of parameters, with some base case values, PSA parameters, DSA,
-scenario, and whether the parameter would be active on a PSA (vector of
-0 and 1s):
+The function
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
+is essentially a wrapper for
+[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
+which will make sure to call the correct parameters, sensitivity
+analysis required, etc.
+
+For now, we can start with a simple example, see the data below, where
+we have a set of parameters, with some base case values, PSA parameters,
+DSA, scenario, and whether the parameter would be active on a PSA
+(vector of 0 and 1s):
 
 | parameter_name | base_value | PSA_dist | a | b | n | DSA_min | DSA_max | scenario_1 | scenario_2 | psa_indicators |
 |:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
@@ -179,8 +189,16 @@ and it will be used only for scenario/DSA analyses (so when
 `send_ind = sensitivity_bool = TRUE`). In this case, we set it to all 1s
 (with length equal to the number of vectors) whenever we are not in a
 scenario analysis, and otherwise we use the `create_indicators` function
-that takes a few extra arguments.
+that takes a few extra arguments. Alternatively, the user does not need
+to worry about the indicators as it will be taken care by the
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
+function (see below).
 
+If the user wants to use the legacy option with
+[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
+instead of
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md),
+then
 [`create_indicators()`](https://jsanchezalv.github.io/WARDEN/reference/create_indicators.md)
 creates a vector of 0 and 1s, taking value 1 at the right index that is
 going to be varied. It takes a few extra objects that are given
@@ -302,46 +320,31 @@ as.data.frame(
 
 We now use this setup in a very simple model, where we run a
 deterministic, probabilistic, probabilistic DSA and deterministic
-scenario analysis. Note that the `sens` iterator needs to be adjusted,
-as it just measures the total number of sensitivity iterations. If we
-have 2 sensitivities with 7 parameters each, sens will go from 1 to 14.
-As we have only 7 parameters, we need to create the
-`iterator_sensitivity` variable to “reset” the index back to 1, 2, 3…
-when it goes over 7, so that covers DSA_min and DSA_max, and for that we
-simply use the `sens_iterator` function.
+scenario analysis. With
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md),
+the `n_sensitivity` and `sensitivity_names` for DSA are auto-detected
+from the block’s metadata — no manual `i_sensitivity` or `sens_iterator`
+setup is needed. For scenario analyses, `sensitivity_names` must still
+be provided explicitly in
+[`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md)
+to understand which sensitivity analysis should be run, but
+`n_sensitivity` is auto-calculated.
 
 ``` r
 
 
 rm(sens, sens_name_used, sensitivity_bool, psa_bool) #remove global objects that may confuse program
 
-i_sensitivity <-add_item(
-  iterator_sensitivity = sens_iterator(sens,n_sensitivity)
-  ) |>add_item(
-            indicators = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){  create_indicators(iterator_sensitivity,n_sensitivity*length(sensitivity_names),rep(1,length(l_inputs[[1]]))) #only for DSA we use this approach
-              }else{rep(1,length(l_inputs[[1]]))}
-                              ) 
+i_simple <- input_block(
+  base           = l_inputs[["base_value"]],
+  psa            = pick_psa(l_inputs[["PSA_dist"]], l_inputs[["n"]], l_inputs[["a"]], l_inputs[["b"]]),
+  sens           = l_inputs,
+  names_out      = l_inputs[["parameter_name"]],
+  psa_indicators = l_inputs[["psa_indicators"]],
+  dsa_names      = c("DSA_min", "DSA_max"))
 
-i_simple <- add_item() |>
-  add_item(
-    pick_val_v(
-      base = l_inputs[["base_value"]],
-      psa = pick_psa(
-        l_inputs[["PSA_dist"]],
-        l_inputs[["n"]],
-        l_inputs[["a"]],
-        l_inputs[["b"]]),
-      sens          = l_inputs[[sens_name_used]], #e.g., sens_name_used = "DSA_min"
-      psa_ind       = psa_bool, #FALSE
-      sens_ind      = sensitivity_bool, #FALSE
-      indicator     = indicators, #all 1s, or a vector of 1 1 and the rest 0s.
-      names_out     = l_inputs[["parameter_name"]],
-      indicator_psa = l_inputs[["psa_indicators"]] 
-      )
-    )
-
-  i_arm <- add_item(q_default = util.sick,
-           c_default = cost.sick + if(arm=="int"){cost.int}else{0})
+i_arm <- add_item(q_default = util.sick,
+         c_default = cost.sick + if(arm=="int"){cost.int}else{0})
 
 
 init_event_list <- 
@@ -380,7 +383,7 @@ results <- run_sim(
 #> Simulation number: 1
 #> Time to run simulation 1: 0.06s
 #> Time to run analysis 1: 0.06s
-#> Total time to run: 0.06s
+#> Total time to run: 0.07s
 #> Simulation finalized;
 
 summary_results_sim(results[[1]])  |>
@@ -420,22 +423,18 @@ summary_results_sim(results[[1]])  |>
 ``` r
 
 
-results <- run_sim(  
-  npats=5,                              
-  n_sim=2,                                  
-  psa_bool = TRUE,                         
-  arm_list = c("int", "noint"),             
+results <- run_sim(
+  npats=5,
+  n_sim=2,
+  psa_bool = TRUE,
+  arm_list = c("int", "noint"),
   common_all_inputs = i_simple,
   unique_pt_inputs  = i_arm,
-  init_event_list = init_event_list,        
-  evt_react_list = evt_react_list,         
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  ipd = 1,
-  sensitivity_inputs = i_sensitivity, #this argument can also be removed since it's not used
-  sensitivity_names = NULL,           #this argument can also be removed since it's not used
-  sensitivity_bool = FALSE,           #this argument can also be removed since it's not used
-  n_sensitivity = 1                   #this argument can also be removed since it's not used
+  ipd = 1
 )
 #> Analysis number: 1
 #> Simulation number: 1
@@ -482,25 +481,24 @@ summary_results_sim(results[[1]])  |>
 
 ``` r
 
-#DSA analyses, we set n_sensitivity to 7 as we need to iterate over all the parameters
-results <- run_sim(  
-  npats=5,                               
-  n_sim=2,                                 
-  psa_bool = TRUE,                        
-  arm_list = c("int", "noint"),             
+# DSA analyses — n_sensitivity and sensitivity_names auto-detected from input_block() metadata
+results <- run_sim(
+  npats=5,
+  n_sim=2,
+  psa_bool = TRUE,
+  arm_list = c("int", "noint"),
   common_all_inputs = i_simple,
   unique_pt_inputs  = i_arm,
-  init_event_list = init_event_list,       
-  evt_react_list = evt_react_list,         
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   ipd = 1,
-  sensitivity_inputs = i_sensitivity,
-  sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = length(l_inputs[[1]]), #7 parameters
-  input_out = unlist(l_inputs[["parameter_name"]]) 
+  input_out = unlist(l_inputs[["parameter_name"]])
 )
+#> n_sensitivity auto-detected as 7 from input_block metadata
+#> sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
 #> Time to run simulation 1: 0.08s
@@ -509,7 +507,7 @@ results <- run_sim(
 #> Time to run analysis 1: 0.15s
 #> Analysis number: 2
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
 #> Time to run analysis 2: 0.13s
@@ -527,19 +525,19 @@ results <- run_sim(
 #> Time to run analysis 4: 0.13s
 #> Analysis number: 5
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.06s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
+#> Time to run simulation 2: 0.07s
 #> Time to run analysis 5: 0.13s
 #> Analysis number: 6
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
+#> Time to run simulation 2: 0.06s
 #> Time to run analysis 6: 0.14s
 #> Analysis number: 7
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
 #> Time to run analysis 7: 0.13s
@@ -557,7 +555,7 @@ results <- run_sim(
 #> Time to run analysis 9: 0.13s
 #> Analysis number: 10
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.06s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
 #> Time to run analysis 10: 0.13s
@@ -571,13 +569,13 @@ results <- run_sim(
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
+#> Time to run simulation 2: 0.07s
 #> Time to run analysis 12: 0.13s
 #> Analysis number: 13
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.06s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
+#> Time to run simulation 2: 0.07s
 #> Time to run analysis 13: 0.13s
 #> Analysis number: 14
 #> Simulation number: 1
@@ -628,25 +626,24 @@ data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.si
 
 ``` r
 
-#Scenario analyses, we set n_sensitivity to 1 as we don't have to iterate over all parameters, each scenario is run only once
-results <- run_sim(  
-  npats=5,                               
-  n_sim=2,                                 
-  psa_bool = TRUE,                        
-  arm_list = c("int", "noint"),             
+# Scenario analyses — n_sensitivity auto-detected as 1; sensitivity_names must be provided
+results <- run_sim(
+  npats=5,
+  n_sim=2,
+  psa_bool = TRUE,
+  arm_list = c("int", "noint"),
   common_all_inputs = i_simple,
   unique_pt_inputs  = i_arm,
-  init_event_list = init_event_list,       
-  evt_react_list = evt_react_list,         
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   ipd = 1,
-  sensitivity_inputs = i_sensitivity,
-  sensitivity_names = c("scenario_1","scenario_2"),
   sensitivity_bool = TRUE,
-  n_sensitivity = 1,
+  sensitivity_names = c("scenario_1", "scenario_2"),
   input_out = unlist(l_inputs[["parameter_name"]])
 )
+#> n_sensitivity auto-detected as 7 from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
@@ -690,26 +687,78 @@ data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.si
 | 1 | 0.6 | 0.3 | 1000 | 5000 | 800 | -2.303 | 0.5 |
 | 2 | 0.9 | 0.7 | 5000 | 9000 | 2000 | -0.916 | 0.9 |
 
+**Alternative: legacy approach using `pick_val_v()`**
+
+Here we provide the legacy approach to the same model run.
+
+``` r
+
+# Build sensitivity indicator object and pick_val_v-based input block
+i_sensitivity <- add_item(
+  iterator_sensitivity = sens_iterator(sens, n_sensitivity)
+) |> add_item(
+  indicators = if (sensitivity_bool & sens_name_used %in% c("DSA_min", "DSA_max")) {
+    create_indicators(iterator_sensitivity, n_sensitivity * length(sensitivity_names),
+                      rep(1, length(l_inputs[[1]])))
+  } else { rep(1, length(l_inputs[[1]])) }
+)
+
+i_simple <- add_item() |>
+  add_item(
+    pick_val_v(
+      base          = l_inputs[["base_value"]],
+      psa           = pick_psa(l_inputs[["PSA_dist"]], l_inputs[["n"]], l_inputs[["a"]], l_inputs[["b"]]),
+      sens          = l_inputs[[sens_name_used]],
+      psa_ind       = psa_bool,
+      sens_ind      = sensitivity_bool,
+      indicator     = indicators,
+      names_out     = l_inputs[["parameter_name"]],
+      indicator_psa = l_inputs[["psa_indicators"]]
+    )
+  )
+
+# PSA run
+run_sim(npats=5, n_sim=2, psa_bool=TRUE, arm_list=c("int","noint"),
+        common_all_inputs=i_simple, unique_pt_inputs=i_arm,
+        init_event_list=init_event_list, evt_react_list=evt_react_list,
+        util_ongoing_list=util_ongoing, cost_ongoing_list=cost_ongoing, ipd=1,
+        sensitivity_inputs=i_sensitivity, sensitivity_names=NULL,
+        sensitivity_bool=FALSE, n_sensitivity=1)
+
+# DSA run
+run_sim(npats=5, n_sim=2, psa_bool=TRUE, arm_list=c("int","noint"),
+        common_all_inputs=i_simple, unique_pt_inputs=i_arm,
+        init_event_list=init_event_list, evt_react_list=evt_react_list,
+        util_ongoing_list=util_ongoing, cost_ongoing_list=cost_ongoing, ipd=1,
+        sensitivity_inputs=i_sensitivity, sensitivity_names=c("DSA_min","DSA_max"),
+        sensitivity_bool=TRUE, n_sensitivity=length(l_inputs[[1]]),
+        input_out=unlist(l_inputs[["parameter_name"]]))
+
+# Scenario run
+run_sim(npats=5, n_sim=2, psa_bool=TRUE, arm_list=c("int","noint"),
+        common_all_inputs=i_simple, unique_pt_inputs=i_arm,
+        init_event_list=init_event_list, evt_react_list=evt_react_list,
+        util_ongoing_list=util_ongoing, cost_ongoing_list=cost_ongoing, ipd=1,
+        sensitivity_inputs=i_sensitivity, sensitivity_names=c("scenario_1","scenario_2"),
+        sensitivity_bool=TRUE, n_sensitivity=1,
+        input_out=unlist(l_inputs[["parameter_name"]]))
+```
+
 ### Parameters spread across different levels
 
 What happens when we have inputs not only at a single level (e.g.,
 patient level), but also at simulation, patient, arm, etc levels? In
-that case, we can still use
-[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
-to handle things for us, but we need to be careful with the indicators,
-particularly in the DSA. For example, if we have 10 parameters, of which
-7 are set at simulation level and 3 at patient level, `pick_val_V()` at
-the simulation level will want an indicator vector of length 7 and at
-patient level of length 3. In the DSA, as we need to iterate at each
-parameter, we need to be aware of which index is being currently run, as
-there is the risk of varying the first parameters of both simulation and
-patient level at the same time.
+that case we can use
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
+at each level, and the engine will automatically compute the right
+offsets and accumulate the total `n_sensitivity` across all blocks — no
+manual indicator tracking is needed.
+
+For example, if we have 7 parameters at simulation level and 2 at
+patient level, the engine knows the patient-level block starts at index
+8 and applies the correct `n_sens_before` offset internally. The
 [`create_indicators()`](https://jsanchezalv.github.io/WARDEN/reference/create_indicators.md)
-can handle this for us by telling it how many parameters have gone
-“before” (i.e. which ones are higher in the hierarchy, so for simulation
-level in this case it would be 0, but for patient level it would be the
-previous 7 parameters set at the simulation level). See below this
-example.
+helper illustrates how the indexing works:
 
 ``` r
 
@@ -723,9 +772,12 @@ create_indicators(8,20,c(1,1,1),7) #first index is 1! because we know we are at 
 ```
 
 Let’s simply add a few parameters that are also now at the patient
-level. Note that as we are not using this parameters into the model,
-they will have no impact but we can still see they are really being
-varied. We still need to create specific indicators for each category.
+level. Note that as we are not using these parameters in the model, they
+will have no impact but we can still see they are really being varied.
+With
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
+at each level, `n_sensitivity` and `sensitivity_names` are auto-detected
+and the DSA offsets are computed automatically.
 
 ``` r
 
@@ -743,74 +795,45 @@ l_inputs_pat <- list(parameter_name = list("age","sex"),
                  psa_indicators = as.list(rep(1,2))
                  )
 
-i_sensitivity <- add_item(
-  iterator_sensitivity = sens_iterator(sens,n_sensitivity) #resets back to 1 if it goes over n_sensitivity
-  ) |>
-  add_item(
-            indicators = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){
-              create_indicators(iterator_sensitivity, 
-                                n_sensitivity*length(sensitivity_names),
-                                rep(1,length(l_inputs[[1]]))) 
-            }else{
-                rep(1,length(l_inputs[[1]]))
-              }
-          ) |>
-  add_item(
-            indicators_pat = if(sensitivity_bool  & sens_name_used %in% c("DSA_min", "DSA_max")){
-              create_indicators(iterator_sensitivity,
-                                n_sensitivity*length(sensitivity_names),
-                                rep(1,length(l_inputs_pat[[1]])),
-                                length(l_inputs[[1]])) 
-            }else{
-                rep(1,length(l_inputs_pat[[1]]))
-              }
-          ) 
+i_simple <- input_block(
+  base           = l_inputs[["base_value"]],
+  psa            = pick_psa(l_inputs[["PSA_dist"]], l_inputs[["n"]], l_inputs[["a"]], l_inputs[["b"]]),
+  sens           = l_inputs,
+  names_out      = l_inputs[["parameter_name"]],
+  psa_indicators = l_inputs[["psa_indicators"]],
+  dsa_names      = c("DSA_min", "DSA_max"))
 
+i_pat <- input_block(
+  base           = l_inputs_pat[["base_value"]],
+  psa            = pick_psa(l_inputs_pat[["PSA_dist"]], l_inputs_pat[["n"]], l_inputs_pat[["a"]], l_inputs_pat[["b"]]),
+  sens           = l_inputs_pat,
+  names_out      = l_inputs_pat[["parameter_name"]],
+  psa_indicators = l_inputs_pat[["psa_indicators"]],
+  dsa_names      = c("DSA_min", "DSA_max"))
 
-  
-i_pat <- add_item() |>
-  add_item(
-    pick_val_v(
-      base = l_inputs_pat[["base_value"]],
-      psa = pick_psa(
-        l_inputs_pat[["PSA_dist"]],
-        l_inputs_pat[["n"]],
-        l_inputs_pat[["a"]],
-        l_inputs_pat[["b"]]),
-      sens          = l_inputs_pat[[sens_name_used]], #e.g., sens_name_used = "DSA_min"
-      psa_ind       = psa_bool, #FALSE
-      sens_ind      = sensitivity_bool, #TRUE
-      indicator     = indicators_pat, #all 1s, or a vector of 1 1 and the rest 0s.
-      names_out     = l_inputs_pat[["parameter_name"]],
-      indicator_psa = l_inputs_pat[["psa_indicators"]] 
-      )
-    )
-
-
-results <- run_sim(  
-  npats=5,                               
-  n_sim=2,                                 
-  psa_bool = FALSE,                        
-  arm_list = c("int", "noint"),             
+results <- run_sim(
+  npats=5,
+  n_sim=2,
+  psa_bool = FALSE,
+  arm_list = c("int", "noint"),
   common_all_inputs = i_simple,
   unique_pt_inputs  = i_arm,
-  common_pt_inputs = i_pat,
-  init_event_list = init_event_list,       
-  evt_react_list = evt_react_list,         
+  common_pt_inputs  = i_pat,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   ipd = 1,
-  sensitivity_inputs = i_sensitivity,
-  sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = length(l_inputs[[1]]) + length(l_inputs_pat[[1]]), #9 parameters
-  input_out = c(unlist(l_inputs[["parameter_name"]]),unlist(l_inputs_pat[["parameter_name"]]))
+  input_out = c(unlist(l_inputs[["parameter_name"]]), unlist(l_inputs_pat[["parameter_name"]]))
 )
+#> n_sensitivity auto-detected as 9 from input_block metadata
+#> sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
+#> Time to run simulation 2: 0.08s
 #> Time to run analysis 1: 0.15s
 #> Analysis number: 2
 #> Simulation number: 1
@@ -871,7 +894,7 @@ results <- run_sim(
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 11: 0.15s
+#> Time to run analysis 11: 0.14s
 #> Analysis number: 12
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
@@ -904,7 +927,7 @@ results <- run_sim(
 #> Time to run analysis 16: 0.14s
 #> Analysis number: 17
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.08s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
 #> Time to run analysis 17: 0.15s
@@ -962,6 +985,52 @@ data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.si
 | 17 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 80 | 1 |
 | 18 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 60 | 1 |
 
+**Alternative: legacy approach using `pick_val_v()`**
+
+``` r
+
+# Manual tracking of n_sens_before and total n_sensitivity needed
+i_sensitivity <- add_item(
+  iterator_sensitivity = sens_iterator(sens, n_sensitivity)
+) |>
+  add_item(
+    indicators = if (sensitivity_bool & sens_name_used %in% c("DSA_min", "DSA_max")) {
+      create_indicators(iterator_sensitivity, n_sensitivity * length(sensitivity_names),
+                        rep(1, length(l_inputs[[1]])))
+    } else { rep(1, length(l_inputs[[1]])) }
+  ) |>
+  add_item(
+    indicators_pat = if (sensitivity_bool & sens_name_used %in% c("DSA_min", "DSA_max")) {
+      create_indicators(iterator_sensitivity, n_sensitivity * length(sensitivity_names),
+                        rep(1, length(l_inputs_pat[[1]])), length(l_inputs[[1]]))
+    } else { rep(1, length(l_inputs_pat[[1]])) }
+  )
+
+i_simple <- add_item() |>
+  add_item(
+    pick_val_v(base = l_inputs[["base_value"]],
+               psa = pick_psa(l_inputs[["PSA_dist"]], l_inputs[["n"]], l_inputs[["a"]], l_inputs[["b"]]),
+               sens = l_inputs[[sens_name_used]], psa_ind = psa_bool, sens_ind = sensitivity_bool,
+               indicator = indicators, names_out = l_inputs[["parameter_name"]],
+               indicator_psa = l_inputs[["psa_indicators"]]))
+
+i_pat <- add_item() |>
+  add_item(
+    pick_val_v(base = l_inputs_pat[["base_value"]],
+               psa = pick_psa(l_inputs_pat[["PSA_dist"]], l_inputs_pat[["n"]], l_inputs_pat[["a"]], l_inputs_pat[["b"]]),
+               sens = l_inputs_pat[[sens_name_used]], psa_ind = psa_bool, sens_ind = sensitivity_bool,
+               indicator = indicators_pat, names_out = l_inputs_pat[["parameter_name"]],
+               indicator_psa = l_inputs_pat[["psa_indicators"]]))
+
+run_sim(npats=5, n_sim=2, psa_bool=FALSE, arm_list=c("int","noint"),
+        common_all_inputs=i_simple, unique_pt_inputs=i_arm, common_pt_inputs=i_pat,
+        init_event_list=init_event_list, evt_react_list=evt_react_list,
+        util_ongoing_list=util_ongoing, cost_ongoing_list=cost_ongoing, ipd=1,
+        sensitivity_inputs=i_sensitivity, sensitivity_names=c("DSA_min","DSA_max"),
+        sensitivity_bool=TRUE, n_sensitivity=length(l_inputs[[1]])+length(l_inputs_pat[[1]]),
+        input_out=c(unlist(l_inputs[["parameter_name"]]),unlist(l_inputs_pat[["parameter_name"]])))
+```
+
 ### Multiple parameters covaried
 
 WARDEN also allows to have parameters being changed together in the DSA,
@@ -970,12 +1039,11 @@ min and max value together, that can be done by switching from a 0-1
 vector to a vector which takes integer values to reflect the DSA
 scenario number. See below this applied, and we also assume that the
 utilities and costs are varied together. In this case, the indicators
-are simplified, as we only need 1) the correct index (provided by
-`iterator_sensitivity`) and 2) the dsa indicators index to understand
-which parameters are covaried. We also need to make sure to adjust
-`n_sensitivity` in
-[`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md)
-to the new number of dsa iterations (5).
+are simplified, as we only need 1) the correct index and 2) the
+`dsa_indicators` index to understand which parameters are covaried.
+`n_sensitivity` is now auto-detected from the
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
+metadata — no manual specification needed.
 
 ``` r
 
@@ -1008,81 +1076,55 @@ l_inputs_pat <- list(parameter_name = list("age","sex"),
                  dsa_indicators = list(5,5) #will be 5th analysis done
                  )
 
-i_sensitivity <- add_item(
-  iterator_sensitivity = sens_iterator(sens,n_sensitivity) #resets back to 1 if it goes over n_sensitivity
-  ) 
+i_simple <- input_block(
+  base                  = l_inputs[["base_value"]],
+  psa                   = pick_psa(l_inputs[["PSA_dist"]], l_inputs[["n"]], l_inputs[["a"]], l_inputs[["b"]]),
+  sens                  = l_inputs,
+  names_out             = l_inputs[["parameter_name"]],
+  psa_indicators        = l_inputs[["psa_indicators"]],
+  dsa_names             = c("DSA_min", "DSA_max"),
+  sens_indicators       = l_inputs[["dsa_indicators"]],
+  indicator_sens_binary = FALSE,
+  distributions         = l_inputs[["PSA_dist"]],
+  covariances           = l_inputs[["b"]])
+
+i_pat <- input_block(
+  base                  = l_inputs_pat[["base_value"]],
+  psa                   = pick_psa(l_inputs_pat[["PSA_dist"]], l_inputs_pat[["n"]], l_inputs_pat[["a"]], l_inputs_pat[["b"]]),
+  sens                  = l_inputs_pat,
+  names_out             = l_inputs_pat[["parameter_name"]],
+  psa_indicators        = l_inputs_pat[["psa_indicators"]],
+  dsa_names             = c("DSA_min", "DSA_max"),
+  sens_indicators       = l_inputs_pat[["dsa_indicators"]],
+  indicator_sens_binary = FALSE,
+  distributions         = l_inputs_pat[["PSA_dist"]],
+  covariances           = l_inputs_pat[["b"]])
 
 
-i_simple <- add_item() |>
-  add_item(
-    pick_val_v(
-      base = l_inputs[["base_value"]],
-      psa = pick_psa(
-        l_inputs[["PSA_dist"]],
-        l_inputs[["n"]],
-        l_inputs[["a"]],
-        l_inputs[["b"]]),
-      sens          = l_inputs[[sens_name_used]], #e.g., sens_name_used = "DSA_min"
-      psa_ind       = psa_bool, #FALSE
-      sens_ind      = sensitivity_bool, #TRUE
-      indicator     = l_inputs[["dsa_indicators"]], 
-      sens_iterator = iterator_sensitivity,
-      indicator_sens_binary = FALSE,
-      names_out     = l_inputs[["parameter_name"]],
-      indicator_psa = l_inputs[["psa_indicators"]] ,
-      distributions = l_inputs[["PSA_dist"]],
-      covariances   = l_inputs[["b"]]
-      )
-    )
-  
-i_pat <- add_item() |>
-  add_item(
-    pick_val_v(
-      base = l_inputs_pat[["base_value"]],
-      psa = pick_psa(
-        l_inputs_pat[["PSA_dist"]],
-        l_inputs_pat[["n"]],
-        l_inputs_pat[["a"]],
-        l_inputs_pat[["b"]]),
-      sens          = l_inputs_pat[[sens_name_used]], #e.g., sens_name_used = "DSA_min"
-      psa_ind       = psa_bool, #FALSE
-      sens_ind      = sensitivity_bool, #TRUE
-      indicator     = l_inputs_pat[["dsa_indicators"]], 
-      sens_iterator = iterator_sensitivity,
-      indicator_sens_binary = FALSE,
-      names_out     = l_inputs_pat[["parameter_name"]],
-      indicator_psa = l_inputs_pat[["psa_indicators"]],
-      distributions = l_inputs_pat[["PSA_dist"]],
-      covariances   = l_inputs_pat[["b"]]
-      )
-    )
-
-
-results <- run_sim(  
-  npats=5,                               
-  n_sim=2,                                 
-  psa_bool = FALSE,                        
-  arm_list = c("int", "noint"),             
+results <- run_sim(
+  npats=5,
+  n_sim=2,
+  psa_bool = FALSE,
+  arm_list = c("int", "noint"),
   common_all_inputs = i_simple,
   unique_pt_inputs  = i_arm,
   common_pt_inputs = i_pat,
-  init_event_list = init_event_list,       
-  evt_react_list = evt_react_list,         
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   ipd = 1,
-  sensitivity_inputs = i_sensitivity,
-  sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = length(unique(l_inputs[["dsa_indicators"]])) + length(unique(l_inputs_pat[["dsa_indicators"]])), #5 parameters!!!
-  input_out = c(unlist(l_inputs[["parameter_name"]]),unlist(l_inputs_pat[["parameter_name"]]))
+  input_out = c(unlist(l_inputs[["parameter_name"]]), unlist(l_inputs_pat[["parameter_name"]]))
 )
+#> n_sensitivity auto-detected as 5 from input_block metadata
+#> sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 1: 0.14s
+#> Time to run analysis 1: 0.15s
 #> Analysis number: 2
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
@@ -1115,9 +1157,9 @@ results <- run_sim(
 #> Time to run analysis 6: 0.14s
 #> Analysis number: 7
 #> Simulation number: 1
-#> Time to run simulation 1: 0.07s
+#> Time to run simulation 1: 0.08s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.08s
+#> Time to run simulation 2: 0.07s
 #> Time to run analysis 7: 0.15s
 #> Analysis number: 8
 #> Simulation number: 1
@@ -1137,7 +1179,7 @@ results <- run_sim(
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
 #> Time to run analysis 10: 0.14s
-#> Total time to run: 1.47s
+#> Total time to run: 1.48s
 #> Simulation finalized;
 
 summary_results_sens(results)
@@ -1177,15 +1219,77 @@ data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.si
 | 9 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.9 | 60 | 1 |
 | 10 | 0.8 | 0.5 | 3000 | 7000 | 1000 | -1.609 | 0.8 | 80 | 1 |
 
+Old approach using `pick_val_v()` directly
+
+``` r
+
+
+i_sensitivity <- add_item(
+  iterator_sensitivity = sens_iterator(sens, n_sensitivity)
+)
+
+i_simple <- add_item() |>
+  add_item(
+    pick_val_v(
+      base = l_inputs[["base_value"]],
+      psa = pick_psa(l_inputs[["PSA_dist"]], l_inputs[["n"]], l_inputs[["a"]], l_inputs[["b"]]),
+      sens          = l_inputs[[sens_name_used]],
+      psa_ind       = psa_bool,
+      sens_ind      = sensitivity_bool,
+      indicator     = l_inputs[["dsa_indicators"]],
+      sens_iterator = iterator_sensitivity,
+      indicator_sens_binary = FALSE,
+      names_out     = l_inputs[["parameter_name"]],
+      indicator_psa = l_inputs[["psa_indicators"]],
+      distributions = l_inputs[["PSA_dist"]],
+      covariances   = l_inputs[["b"]]
+    )
+  )
+
+i_pat <- add_item() |>
+  add_item(
+    pick_val_v(
+      base = l_inputs_pat[["base_value"]],
+      psa = pick_psa(l_inputs_pat[["PSA_dist"]], l_inputs_pat[["n"]], l_inputs_pat[["a"]], l_inputs_pat[["b"]]),
+      sens          = l_inputs_pat[[sens_name_used]],
+      psa_ind       = psa_bool,
+      sens_ind      = sensitivity_bool,
+      indicator     = l_inputs_pat[["dsa_indicators"]],
+      sens_iterator = iterator_sensitivity,
+      indicator_sens_binary = FALSE,
+      names_out     = l_inputs_pat[["parameter_name"]],
+      indicator_psa = l_inputs_pat[["psa_indicators"]],
+      distributions = l_inputs_pat[["PSA_dist"]],
+      covariances   = l_inputs_pat[["b"]]
+    )
+  )
+
+results <- run_sim(
+  npats=5, n_sim=2, psa_bool = FALSE, arm_list = c("int", "noint"),
+  common_all_inputs = i_simple, unique_pt_inputs = i_arm, common_pt_inputs = i_pat,
+  init_event_list = init_event_list, evt_react_list = evt_react_list,
+  util_ongoing_list = util_ongoing, cost_ongoing_list = cost_ongoing, ipd = 1,
+  sensitivity_inputs = i_sensitivity,
+  sensitivity_names = c("DSA_min", "DSA_max"),
+  sensitivity_bool = TRUE,
+  n_sensitivity = length(unique(unlist(l_inputs[["dsa_indicators"]]))) +
+                  length(unique(unlist(l_inputs_pat[["dsa_indicators"]]))), #5 parameters
+  input_out = c(unlist(l_inputs[["parameter_name"]]), unlist(l_inputs_pat[["parameter_name"]]))
+)
+```
+
 ### Parameters that are vectors
 
 Now we are ready to handle all cases. The only approach not shown yet is
 when some parameters are vectors instead of length 1. In this case, the
 approach is the same as the previous one, as those parameters would be
 varied together. We add to `l_inputs_pat` a new parameter of length 2
-that will be a multivariate normal. Below it can be seen for a DSA, but
-by now it should be straightforward to switch to probabilistic DSA,
-deterministic case, or standard PSA.
+that will be a multivariate normal. Because `l_inputs_pat` changes, we
+rebuild `i_pat` accordingly — `i_simple` and
+[`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md)
+are otherwise unchanged. Below it can be seen for a DSA, but by now it
+should be straightforward to switch to probabilistic DSA, deterministic
+case, or standard PSA.
 
 ``` r
 
@@ -1204,26 +1308,36 @@ l_inputs_pat <- list(parameter_name = list("age","sex", "v_state"),
                  dsa_indicators = list(5,5,c(6,6))
                  )
 
+i_pat <- input_block(
+  base                  = l_inputs_pat[["base_value"]],
+  psa                   = pick_psa(l_inputs_pat[["PSA_dist"]], l_inputs_pat[["n"]], l_inputs_pat[["a"]], l_inputs_pat[["b"]]),
+  sens                  = l_inputs_pat,
+  names_out             = l_inputs_pat[["parameter_name"]],
+  psa_indicators        = l_inputs_pat[["psa_indicators"]],
+  dsa_names             = c("DSA_min", "DSA_max"),
+  sens_indicators       = l_inputs_pat[["dsa_indicators"]],
+  indicator_sens_binary = FALSE,
+  distributions         = l_inputs_pat[["PSA_dist"]],
+  covariances           = l_inputs_pat[["b"]])
 
-results <- run_sim(  
-  npats=5,                               
-  n_sim=2,                                 
-  psa_bool = FALSE,                        
-  arm_list = c("int", "noint"),             
+results <- run_sim(
+  npats=5,
+  n_sim=2,
+  psa_bool = FALSE,
+  arm_list = c("int", "noint"),
   common_all_inputs = i_simple,
   unique_pt_inputs  = i_arm,
   common_pt_inputs = i_pat,
-  init_event_list = init_event_list,       
-  evt_react_list = evt_react_list,         
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   ipd = 1,
-  sensitivity_inputs = i_sensitivity,
-  sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = length(unique(l_inputs[["dsa_indicators"]])) + length(unique(l_inputs_pat[["dsa_indicators"]])), #6 parameters!
-  input_out = c(unlist(l_inputs[["parameter_name"]]),unlist(l_inputs_pat[["parameter_name"]]))
+  input_out = c(unlist(l_inputs[["parameter_name"]]), unlist(l_inputs_pat[["parameter_name"]]))
 )
+#> n_sensitivity auto-detected as 6 from input_block metadata
+#> sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
 #> Time to run simulation 1: 0.08s
@@ -1259,7 +1373,7 @@ results <- run_sim(
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 6: 0.15s
+#> Time to run analysis 6: 0.14s
 #> Analysis number: 7
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
@@ -1276,11 +1390,11 @@ results <- run_sim(
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
-#> Time to run analysis 9: 0.14s
+#> Time to run simulation 2: 0.08s
+#> Time to run analysis 9: 0.15s
 #> Analysis number: 10
 #> Simulation number: 1
-#> Time to run simulation 1: 0.08s
+#> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
 #> Time to run analysis 10: 0.15s
@@ -1289,14 +1403,14 @@ results <- run_sim(
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
-#> Time to run analysis 11: 0.14s
+#> Time to run analysis 11: 0.15s
 #> Analysis number: 12
 #> Simulation number: 1
 #> Time to run simulation 1: 0.08s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.07s
 #> Time to run analysis 12: 0.15s
-#> Total time to run: 1.77s
+#> Total time to run: 1.79s
 #> Simulation finalized;
 
 summary_results_sens(results)

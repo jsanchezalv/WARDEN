@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez and Valerie Aponte Ribero</h4>
             
-            <h4 data-toc-skip class="date">May 25, 2026</h4>
+            <h4 data-toc-skip class="date">May 26, 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_markov.Rmd" class="external-link"><code>vignettes/articles/example_markov.Rmd</code></a></small>
       <div class="d-none name"><code>example_markov.Rmd</code></div>
@@ -189,27 +189,22 @@ per state). This means more processing of the results data would be
 needed in order for it to provide the correct results.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Put objects here that do not change on any patient or intervention loop, for example costs and utilities</span></span>
-<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>max_n_cycles <span class="op">=</span> <span class="fl">30</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#utilities</span></span>
-<span>     <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span>base        <span class="op">=</span> <span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>                psa         <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"rbeta_mse"</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">)</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">)</span><span class="op">)</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">util.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,</span>
-<span>                sens        <span class="op">=</span> <span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>                psa_ind     <span class="op">=</span> <span class="va">psa_bool</span>,</span>
-<span>                sens_ind    <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
-<span>                indicator   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                names_out   <span class="op">=</span> <span class="va">util.data</span><span class="op">[</span>,<span class="st">"name"</span><span class="op">]</span></span>
-<span>                <span class="op">)</span></span>
-<span>     <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span> <span class="co">#costs</span></span>
-<span>    <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span>base         <span class="op">=</span> <span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>                psa         <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"rgamma_mse"</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">)</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">)</span><span class="op">)</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,<span class="va">cost.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,</span>
-<span>                sens        <span class="op">=</span> <span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>                psa_ind     <span class="op">=</span> <span class="va">psa_bool</span>,</span>
-<span>                sens_ind    <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
-<span>                indicator   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                names_out   <span class="op">=</span> <span class="va">cost.data</span><span class="op">[</span>,<span class="st">"name"</span><span class="op">]</span></span>
-<span>                <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
+<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>max_n_cycles <span class="op">=</span> <span class="fl">30</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span>base            <span class="op">=</span> <span class="va">util.data</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>              psa             <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"rbeta_mse"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                         <span class="va">util.data</span><span class="op">$</span><span class="va">value</span>, <span class="va">util.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,</span>
+<span>              sens            <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>              names_out       <span class="op">=</span> <span class="va">util.data</span><span class="op">[</span>, <span class="st">"name"</span><span class="op">]</span>,</span>
+<span>              sens_indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0L</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">util.data</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>              indicator_sens_binary <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span>base            <span class="op">=</span> <span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>              psa             <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"rgamma_mse"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                         <span class="va">cost.data</span><span class="op">$</span><span class="va">value</span>, <span class="va">cost.data</span><span class="op">$</span><span class="va">se</span><span class="op">)</span>,</span>
+<span>              sens            <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>              names_out       <span class="op">=</span> <span class="va">cost.data</span><span class="op">[</span>, <span class="st">"name"</span><span class="op">]</span>,</span>
+<span>              sens_indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0L</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cost.data</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>              indicator_sens_binary <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="co">#Put objects here that change as we loop through treatments for each patient (e.g. events can affect fl.tx, but events do not affect nat.os.s)</span></span>
@@ -370,9 +365,9 @@ to indicate <code>npats = 1</code>.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.09s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.09s</span></span>
-<span><span class="co">#&gt; Total time to run: 0.1s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.08s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.08s</span></span>
+<span><span class="co">#&gt; Total time to run: 0.08s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>

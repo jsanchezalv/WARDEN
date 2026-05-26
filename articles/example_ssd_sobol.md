@@ -215,7 +215,7 @@ results_unif <- run_sim(
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
 #> Time to run simulation 1: 0.38s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.39s
+#> Time to run simulation 2: 0.38s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.36s
 #> Simulation number: 4
@@ -246,15 +246,15 @@ results_sobol <- run_sim(
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
 #> Time to run simulation 1: 0.36s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.36s
+#> Time to run simulation 2: 0.39s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.37s
+#> Time to run simulation 3: 0.38s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.37s
+#> Time to run simulation 4: 0.38s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.59s
-#> Time to run analysis 1: 2.06s
-#> Total time to run: 2.06s
+#> Time to run simulation 5: 0.6s
+#> Time to run analysis 1: 2.11s
+#> Total time to run: 2.11s
 #> Simulation finalized;
 ```
 
@@ -373,24 +373,15 @@ list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","co
                               scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),0.9)
                               )
 
-sensitivity_inputs <-add_item(
-            indicators = if(sensitivity_bool){ create_indicators(sens,n_sensitivity*length(sensitivity_names),rep(1,length(list_par[[1]])))}else{
-                                rep(1,length(list_par[[1]]))} #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max, if not sensitivity analysis, then we activate all of them, i.e., in a PSA)
-                              )
-
-common_all_inputs <-  add_item(
-  random_sobol_psa = (randtoolbox::sobol(1,7, init = TRUE) + matrix(rep(runif(7), each = 1), nrow = 1, byrow = TRUE)) %% 1
-  ) |> 
+common_all_inputs <-
   add_item(
-            pick_val_v(base        = list_par[["base_value"]],
-                       psa         = pick_psa(list_par[["PSA_dist"]],random_sobol_psa,list_par[["a"]],list_par[["b"]]),
-                       sens        = list_par[[sens_name_used]],
-                       psa_ind     = psa_bool,
-                       sens_ind    = sensitivity_bool,
-                       indicator   = indicators,
-                       names_out   = list_par[["parameter_name"]]
-                       )
-            ) 
+    random_sobol_psa = (randtoolbox::sobol(1, 7, init = TRUE) + matrix(rep(runif(7), each = 1), nrow = 1, byrow = TRUE)) %% 1
+  ) |>
+  input_block(base      = list_par[["base_value"]],
+              psa       = pick_psa(list_par[["PSA_dist"]], random_sobol_psa, list_par[["a"]], list_par[["b"]]),
+              sens      = list_par,
+              names_out = list_par[["parameter_name"]],
+              dsa_names = c("DSA_min", "DSA_max"))
 
 common_all_inputs_unif <- common_all_inputs |>
   add_item(random_n = runif(N),
@@ -403,49 +394,16 @@ common_all_inputs_sobol <- common_all_inputs |>
 
 
 
-results_unif_psa <- run_sim(  
-  npats=N,                               
-  n_sim=sims,                                  
-  psa_bool = TRUE,                         
+results_unif_psa <- run_sim(
+  npats=N,
+  n_sim=sims,
+  psa_bool = TRUE,
   arm_list = c("int", "noint"),
-  sensitivity_inputs = sensitivity_inputs,
-  common_all_inputs = common_all_inputs_unif,    
-  common_pt_inputs = common_pt_inputs,       
-  unique_pt_inputs = unique_pt_inputs,       
-  init_event_list = init_event_list,        
-  evt_react_list = evt_react_list,          
-  util_ongoing_list = util_ongoing,
-  cost_ongoing_list = cost_ongoing,
-  ipd = 2,
-  seed = 1
-)
-#> Analysis number: 1
-#> Simulation number: 1
-#> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.35s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.34s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.34s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.34s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.35s
-#> Time to run analysis 1: 1.73s
-#> Total time to run: 1.73s
-#> Simulation finalized;
-
-results_sobol_psa <- run_sim(  
-  npats=N,                               
-  n_sim=sims,                                  
-  psa_bool = TRUE,                         
-  arm_list = c("int", "noint"), 
-  sensitivity_inputs = sensitivity_inputs,
-  common_all_inputs = common_all_inputs_sobol,    
-  common_pt_inputs = common_pt_inputs,       
-  unique_pt_inputs = unique_pt_inputs,       
-  init_event_list = init_event_list,        
-  evt_react_list = evt_react_list,          
+  common_all_inputs = common_all_inputs_unif,
+  common_pt_inputs = common_pt_inputs,
+  unique_pt_inputs = unique_pt_inputs,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   ipd = 2,
@@ -458,7 +416,38 @@ results_sobol_psa <- run_sim(
 #> Simulation number: 2
 #> Time to run simulation 2: 0.35s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.36s
+#> Time to run simulation 3: 0.34s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.35s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.35s
+#> Time to run analysis 1: 1.73s
+#> Total time to run: 1.73s
+#> Simulation finalized;
+
+results_sobol_psa <- run_sim(
+  npats=N,
+  n_sim=sims,
+  psa_bool = TRUE,
+  arm_list = c("int", "noint"),
+  common_all_inputs = common_all_inputs_sobol,
+  common_pt_inputs = common_pt_inputs,
+  unique_pt_inputs = unique_pt_inputs,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
+  util_ongoing_list = util_ongoing,
+  cost_ongoing_list = cost_ongoing,
+  ipd = 2,
+  seed = 1
+)
+#> Analysis number: 1
+#> Simulation number: 1
+#> Patient-arm data aggregated across events by selecting the last value for input_out items.
+#> Time to run simulation 1: 0.35s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.35s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.35s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.41s
 #> Simulation number: 5

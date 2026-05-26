@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">May 25, 2026</h4>
+            <h4 data-toc-skip class="date">May 26, 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_ssd_stream.Rmd" class="external-link"><code>vignettes/articles/example_ssd_stream.Rmd</code></a></small>
       <div class="d-none name"><code>example_ssd_stream.Rmd</code></div>
@@ -270,9 +270,9 @@ passed to the <code><a href="../reference/run_sim.html">run_sim()</a></code> fun
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.79s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 0.79s</span></span>
-<span><span class="co">#&gt; Total time to run: 0.79s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.81s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 0.81s</span></span>
+<span><span class="co">#&gt; Total time to run: 0.81s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
@@ -1371,30 +1371,22 @@ across simulations and analyses.</p>
 <span>                              scenario_2<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>,<span class="fl">0.7</span>,<span class="fl">5000</span>,<span class="fl">9000</span>,<span class="fl">2000</span>,<span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.4</span><span class="op">)</span>,<span class="fl">0.9</span><span class="op">)</span></span>
 <span>                              <span class="op">)</span></span>
 <span></span>
-<span><span class="va">sensitivity_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>            pos_indicator <span class="op">=</span> <span class="va">sens</span> <span class="op">-</span> <span class="va">n_sensitivity</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="op">(</span><span class="va">sens</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">n_sensitivity</span><span class="op">)</span>, <span class="co"># which position to use to put the value 1 in indicator</span></span>
-<span>            indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">$</span><span class="va">parameter_name</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="va">pos_indicator</span><span class="op">]</span>,<span class="fl">1</span>,<span class="va">pos_indicator</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="co">#vector of indicators, value 0 everywhere except at sens, where it takes value 1</span></span>
-<span>                              <span class="op">)</span></span>
-<span></span>
-<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span></span>
-<span>            <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span>base        <span class="op">=</span> <span class="va">df_par</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>                       psa         <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,<span class="va">df_par</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,<span class="va">df_par</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>                       sens        <span class="op">=</span> <span class="va">df_par</span><span class="op">[[</span><span class="va">sens_name_used</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>                       psa_ind     <span class="op">=</span> <span class="va">psa_bool</span>,</span>
-<span>                       sens_ind    <span class="op">=</span> <span class="va">sensitivity_bool</span>,</span>
-<span>                       indicator   <span class="op">=</span> <span class="va">indicators</span>,</span>
-<span>                       names_out   <span class="op">=</span> <span class="va">df_par</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span></span>
-<span>                       <span class="op">)</span></span>
-<span>            <span class="op">)</span></span></code></pre></div>
+<span><span class="va">common_all_inputs</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span>base      <span class="op">=</span> <span class="va">df_par</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>              psa       <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                                   <span class="va">df_par</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>, <span class="va">df_par</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>              sens      <span class="op">=</span> <span class="va">df_par</span>,</span>
+<span>              names_out <span class="op">=</span> <span class="va">df_par</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>              dsa_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>, <span class="st">"DSA_max"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="model-execution-1">Model Execution<a class="anchor" aria-label="anchor" href="#model-execution-1"></a>
 </h3>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
+<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span></span>
 <span>  npats<span class="op">=</span><span class="fl">100</span>,                               <span class="co"># number of patients to be simulated</span></span>
 <span>  n_sim<span class="op">=</span><span class="fl">1</span>,                                  <span class="co"># number of simulations to run</span></span>
-<span>  psa_bool <span class="op">=</span> <span class="cn">FALSE</span>,                         <span class="co"># use PSA or not. If n_sim &gt; 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  </span></span>
+<span>  psa_bool <span class="op">=</span> <span class="cn">FALSE</span>,                         <span class="co"># use PSA or not. If n_sim &gt; 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)</span></span>
 <span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,             <span class="co"># intervention list</span></span>
 <span>  common_all_inputs <span class="op">=</span> <span class="va">common_all_inputs</span>,    <span class="co"># inputs common that do not change within a simulation</span></span>
 <span>  common_pt_inputs <span class="op">=</span> <span class="va">common_pt_inputs</span>,      <span class="co"># inputs that change within a simulation but are not affected by the intervention</span></span>
@@ -1403,12 +1395,11 @@ across simulations and analyses.</p>
 <span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,          <span class="co"># reaction of events</span></span>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
-<span>  sensitivity_inputs <span class="op">=</span> <span class="va">sensitivity_inputs</span>,</span>
-<span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>,<span class="st">"DSA_max"</span><span class="op">)</span>,</span>
 <span>  sensitivity_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">$</span><span class="va">parameter_name</span><span class="op">)</span>,</span>
 <span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; n_sensitivity auto-detected as 7 from input_block metadata</span></span>
+<span><span class="co">#&gt; sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
@@ -1460,12 +1451,12 @@ across simulations and analyses.</p>
 <span><span class="co">#&gt; Analysis number: 13</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
-<span><span class="co">#&gt; Time to run analysis 13: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run analysis 13: 0.14s</span></span>
 <span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
 <span><span class="co">#&gt; Time to run analysis 14: 0.15s</span></span>
-<span><span class="co">#&gt; Total time to run: 2.09s</span></span>
+<span><span class="co">#&gt; Total time to run: 2.11s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -1504,24 +1495,23 @@ corresponding parameter value.</p>
 <p>The model is executed as before, just activating the psa_bool
 option</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span>  </span>
-<span>  npats<span class="op">=</span><span class="fl">100</span>,                               </span>
-<span>  n_sim<span class="op">=</span><span class="fl">6</span>,                                  </span>
-<span>  psa_bool <span class="op">=</span> <span class="cn">TRUE</span>,                         </span>
-<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,             </span>
-<span>  common_all_inputs <span class="op">=</span> <span class="va">common_all_inputs</span>,    </span>
-<span>  common_pt_inputs <span class="op">=</span> <span class="va">common_pt_inputs</span>,      </span>
-<span>  unique_pt_inputs <span class="op">=</span> <span class="va">unique_pt_inputs</span>,      </span>
-<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,        </span>
-<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,          </span>
+<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sim.html">run_sim</a></span><span class="op">(</span></span>
+<span>  npats<span class="op">=</span><span class="fl">100</span>,</span>
+<span>  n_sim<span class="op">=</span><span class="fl">6</span>,</span>
+<span>  psa_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  arm_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"int"</span>, <span class="st">"noint"</span><span class="op">)</span>,</span>
+<span>  common_all_inputs <span class="op">=</span> <span class="va">common_all_inputs</span>,</span>
+<span>  common_pt_inputs <span class="op">=</span> <span class="va">common_pt_inputs</span>,</span>
+<span>  unique_pt_inputs <span class="op">=</span> <span class="va">unique_pt_inputs</span>,</span>
+<span>  init_event_list <span class="op">=</span> <span class="va">init_event_list</span>,</span>
+<span>  evt_react_list <span class="op">=</span> <span class="va">evt_react_list</span>,</span>
 <span>  util_ongoing_list <span class="op">=</span> <span class="va">util_ongoing</span>,</span>
 <span>  cost_ongoing_list <span class="op">=</span> <span class="va">cost_ongoing</span>,</span>
-<span>  sensitivity_inputs <span class="op">=</span> <span class="va">sensitivity_inputs</span>,</span>
-<span>  sensitivity_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DSA_min"</span>,<span class="st">"DSA_max"</span><span class="op">)</span>,</span>
 <span>  sensitivity_bool <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_sensitivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">$</span><span class="va">parameter_name</span><span class="op">)</span>,</span>
 <span>  input_out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">df_par</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; n_sensitivity auto-detected as 7 from input_block metadata</span></span>
+<span><span class="co">#&gt; sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata</span></span>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
@@ -1532,13 +1522,13 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.35s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.36s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.13s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 1.09s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 1.1s</span></span>
 <span><span class="co">#&gt; Analysis number: 2</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
@@ -1546,25 +1536,11 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.14s</span></span>
-<span><span class="co">#&gt; Time to run analysis 2: 0.85s</span></span>
+<span><span class="co">#&gt; Time to run analysis 2: 0.87s</span></span>
 <span><span class="co">#&gt; Analysis number: 3</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.13s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.13s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.14s</span></span>
-<span><span class="co">#&gt; Time to run analysis 3: 0.84s</span></span>
-<span><span class="co">#&gt; Analysis number: 4</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.13s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
@@ -1572,12 +1548,26 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.13s</span></span>
-<span><span class="co">#&gt; Time to run analysis 4: 0.83s</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 3: 0.85s</span></span>
+<span><span class="co">#&gt; Analysis number: 4</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.15s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.14s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.14s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 4: 0.85s</span></span>
 <span><span class="co">#&gt; Analysis number: 5</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
@@ -1588,13 +1578,27 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.13s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.14s</span></span>
-<span><span class="co">#&gt; Time to run analysis 5: 0.84s</span></span>
+<span><span class="co">#&gt; Time to run analysis 5: 0.85s</span></span>
 <span><span class="co">#&gt; Analysis number: 6</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.13s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.14s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.14s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.14s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run analysis 6: 0.84s</span></span>
+<span><span class="co">#&gt; Analysis number: 7</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
@@ -1605,30 +1609,16 @@ option</p>
 <span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.14s</span></span>
-<span><span class="co">#&gt; Time to run analysis 6: 0.82s</span></span>
-<span><span class="co">#&gt; Analysis number: 7</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.13s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.14s</span></span>
 <span><span class="co">#&gt; Time to run analysis 7: 0.84s</span></span>
 <span><span class="co">#&gt; Analysis number: 8</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.16s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.17s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
@@ -1640,45 +1630,17 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.15s</span></span>
-<span><span class="co">#&gt; Time to run analysis 9: 0.89s</span></span>
-<span><span class="co">#&gt; Analysis number: 10</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.15s</span></span>
-<span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
-<span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
-<span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.15s</span></span>
-<span><span class="co">#&gt; Time to run analysis 10: 0.88s</span></span>
-<span><span class="co">#&gt; Analysis number: 11</span></span>
-<span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
-<span><span class="co">#&gt; Simulation number: 2</span></span>
-<span><span class="co">#&gt; Time to run simulation 2: 0.15s</span></span>
-<span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.17s</span></span>
-<span><span class="co">#&gt; Time to run analysis 11: 0.92s</span></span>
-<span><span class="co">#&gt; Analysis number: 12</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run analysis 9: 0.89s</span></span>
+<span><span class="co">#&gt; Analysis number: 10</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
@@ -1689,7 +1651,35 @@ option</p>
 <span><span class="co">#&gt; Time to run simulation 5: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.15s</span></span>
-<span><span class="co">#&gt; Time to run analysis 12: 0.9s</span></span>
+<span><span class="co">#&gt; Time to run analysis 10: 0.9s</span></span>
+<span><span class="co">#&gt; Analysis number: 11</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.15s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.15s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.14s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run analysis 11: 0.9s</span></span>
+<span><span class="co">#&gt; Analysis number: 12</span></span>
+<span><span class="co">#&gt; Simulation number: 1</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
+<span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 0.15s</span></span>
+<span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.18s</span></span>
+<span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
+<span><span class="co">#&gt; Simulation number: 5</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 0.16s</span></span>
+<span><span class="co">#&gt; Simulation number: 6</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run analysis 12: 0.95s</span></span>
 <span><span class="co">#&gt; Analysis number: 13</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
@@ -1698,27 +1688,27 @@ option</p>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
 <span><span class="co">#&gt; Time to run simulation 3: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
-<span><span class="co">#&gt; Time to run simulation 4: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.16s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
 <span><span class="co">#&gt; Time to run simulation 6: 0.16s</span></span>
-<span><span class="co">#&gt; Time to run analysis 13: 0.92s</span></span>
+<span><span class="co">#&gt; Time to run analysis 13: 0.93s</span></span>
 <span><span class="co">#&gt; Analysis number: 14</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 0.14s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 0.15s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
 <span><span class="co">#&gt; Time to run simulation 2: 0.16s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
-<span><span class="co">#&gt; Time to run simulation 3: 0.15s</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 0.16s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
 <span><span class="co">#&gt; Time to run simulation 4: 0.14s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
 <span><span class="co">#&gt; Time to run simulation 5: 0.16s</span></span>
 <span><span class="co">#&gt; Simulation number: 6</span></span>
-<span><span class="co">#&gt; Time to run simulation 6: 0.15s</span></span>
-<span><span class="co">#&gt; Time to run analysis 14: 0.91s</span></span>
-<span><span class="co">#&gt; Total time to run: 12.42s</span></span>
+<span><span class="co">#&gt; Time to run simulation 6: 0.16s</span></span>
+<span><span class="co">#&gt; Time to run analysis 14: 0.92s</span></span>
+<span><span class="co">#&gt; Total time to run: 12.59s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 <div class="section level3">
