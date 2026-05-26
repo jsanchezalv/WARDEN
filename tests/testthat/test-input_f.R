@@ -1403,7 +1403,7 @@ test_that("input_block: binary DSA mode uses create_indicators with 0 offset", {
   expect_identical(pvv_dsa[[1L]], as.name("pick_val_v"))
   ci_call  <- pvv_dsa$indicator
   expect_identical(ci_call[[1L]], as.name("create_indicators"))
-  expect_equal(ci_call[[5L]], 0L)
+  expect_equal(ci_call[[5L]], as.name("n_sens_before"))
 })
 
 test_that("input_block: sens is indexed by sens_name_used in the expression", {
@@ -2217,4 +2217,94 @@ test_that("input_block: sens_indicators with 0 skips that parameter in DSA", {
   qalys <- vapply(r_block, \(s) s[[1]]$total_qalys, numeric(1))
   # DSA_min: util.sick=0.6 (lower), DSA_max: util.sick=0.9 (higher)
   expect_lt(qalys[1], qalys[2])
+})
+
+
+# Multi-level input_block() -----------------------------------------------
+
+test_that("multi-level input_block(): n_sensitivity accumulated, n_sens_before injected (binary)", {
+  skip_on_cran()
+
+  cai <- input_block(
+    base      = c(0),
+    psa       = c(0),
+    sens      = list(DSA = c(99)),
+    names_out = "p1",
+    dsa_names = "DSA"
+  )
+  cpi <- input_block(
+    base      = c(0),
+    psa       = c(0),
+    sens      = list(DSA = c(99)),
+    names_out = "p2",
+    dsa_names = "DSA"
+  )
+  init_evt <- add_tte(arm = "a", evts = c("start", "death"), input = {
+    start <- 0; death <- 1
+  })
+  evt_react <- add_reactevt(name_evt = "start", input = {}) |>
+    add_reactevt(name_evt = "death", input = { curtime <- Inf })
+
+  suppressMessages(results <- run_sim(
+    npats = 3, n_sim = 1, psa_bool = FALSE, sensitivity_bool = TRUE,
+    arm_list = "a",
+    common_all_inputs = cai,
+    common_pt_inputs  = cpi,
+    init_event_list   = init_evt,
+    evt_react_list    = evt_react,
+    input_out         = c("p1", "p2"),
+    seed = 42
+  ))
+
+  expect_equal(length(results), 2)
+  expect_equal(results[[1]][[1]]$merged_df$p1[1], 99)  # iter 1: p1 at DSA
+  expect_equal(results[[1]][[1]]$merged_df$p2[1], 0)   # iter 1: p2 at base
+  expect_equal(results[[2]][[1]]$merged_df$p1[1], 0)   # iter 2: p1 at base
+  expect_equal(results[[2]][[1]]$merged_df$p2[1], 99)  # iter 2: p2 at DSA
+})
+
+test_that("multi-level input_block(): n_sensitivity accumulated (grouped)", {
+  skip_on_cran()
+
+  cai <- input_block(
+    base          = c(0, 0),
+    psa           = c(0, 0),
+    sens          = list(DSA = c(99, 88)),
+    names_out     = c("p1", "p2"),
+    dsa_names     = "DSA",
+    sens_indicators = c(1, 2),
+    distributions = c("rnorm", "rnorm"),
+    covariances   = list(0.01, 0.01)
+  )
+  cpi <- input_block(
+    base          = c(0),
+    psa           = c(0),
+    sens          = list(DSA = c(77)),
+    names_out     = "p3",
+    dsa_names     = "DSA",
+    sens_indicators = c(3),
+    distributions = c("rnorm"),
+    covariances   = list(0.01)
+  )
+  init_evt <- add_tte(arm = "a", evts = c("start", "death"), input = {
+    start <- 0; death <- 1
+  })
+  evt_react <- add_reactevt(name_evt = "start", input = {}) |>
+    add_reactevt(name_evt = "death", input = { curtime <- Inf })
+
+  suppressMessages(results <- run_sim(
+    npats = 3, n_sim = 1, psa_bool = FALSE, sensitivity_bool = TRUE,
+    arm_list = "a",
+    common_all_inputs = cai,
+    common_pt_inputs  = cpi,
+    init_event_list   = init_evt,
+    evt_react_list    = evt_react,
+    input_out         = c("p1", "p2", "p3"),
+    seed = 42
+  ))
+
+  expect_equal(length(results), 3)             # 2 + 1 = 3 total iterations
+  expect_equal(results[[3]][[1]]$merged_df$p1[1], 0)   # iter 3: p1 at base
+  expect_equal(results[[3]][[1]]$merged_df$p2[1], 0)   # iter 3: p2 at base
+  expect_equal(results[[3]][[1]]$merged_df$p3[1], 77)  # iter 3: p3 at DSA
 })

@@ -65,7 +65,7 @@ A \code{{}} language object (same type as \code{\link[=add_item]{add_item()}}) w
 schedule.
 }
 \description{
-Creates an unevaluated \code{{}} expression that calls \code{\link[=pick_val_v]{pick_val_v()}} with the
+Creates an unevaluated \code{{}} expression that calls \code{pick_val_v()} with the
 correct arguments for base case, PSA, DSA, and scenario analyses.
 The expression is meant to be passed directly to \code{run_sim()} or
 \code{run_sim_parallel()} as a \verb{*_inputs} argument.

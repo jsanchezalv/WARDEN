@@ -254,24 +254,15 @@ list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","co
                               scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),0.9)
                               )
 
-sensitivity_inputs <-add_item(
-            indicators = if(sensitivity_bool){ create_indicators(sens,n_sensitivity*length(sensitivity_names),rep(1,length(list_par[[1]])))}else{
-                                rep(1,length(list_par[[1]]))} #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max, if not sensitivity analysis, then we activate all of them, i.e., in a PSA)
-                              )
-
-common_all_inputs <-  add_item(
-  random_sobol_psa = (randtoolbox::sobol(1,7, init = TRUE) + matrix(rep(runif(7), each = 1), nrow = 1, byrow = TRUE)) %% 1
-  ) |> 
+common_all_inputs <-
   add_item(
-            pick_val_v(base        = list_par[["base_value"]],
-                       psa         = pick_psa(list_par[["PSA_dist"]],random_sobol_psa,list_par[["a"]],list_par[["b"]]),
-                       sens        = list_par[[sens_name_used]],
-                       psa_ind     = psa_bool,
-                       sens_ind    = sensitivity_bool,
-                       indicator   = indicators,
-                       names_out   = list_par[["parameter_name"]]
-                       )
-            ) 
+    random_sobol_psa = (randtoolbox::sobol(1, 7, init = TRUE) + matrix(rep(runif(7), each = 1), nrow = 1, byrow = TRUE)) %% 1
+  ) |>
+  input_block(base      = list_par[["base_value"]],
+              psa       = pick_psa(list_par[["PSA_dist"]], random_sobol_psa, list_par[["a"]], list_par[["b"]]),
+              sens      = list_par,
+              names_out = list_par[["parameter_name"]],
+              dsa_names = c("DSA_min", "DSA_max"))
 
 common_all_inputs_unif <- common_all_inputs |>
   add_item(random_n = runif(N),
@@ -284,34 +275,32 @@ common_all_inputs_sobol <- common_all_inputs |>
 
 
 
-results_unif_psa <- run_sim(  
-  npats=N,                               
-  n_sim=sims,                                  
-  psa_bool = TRUE,                         
+results_unif_psa <- run_sim(
+  npats=N,
+  n_sim=sims,
+  psa_bool = TRUE,
   arm_list = c("int", "noint"),
-  sensitivity_inputs = sensitivity_inputs,
-  common_all_inputs = common_all_inputs_unif,    
-  common_pt_inputs = common_pt_inputs,       
-  unique_pt_inputs = unique_pt_inputs,       
-  init_event_list = init_event_list,        
-  evt_react_list = evt_react_list,          
+  common_all_inputs = common_all_inputs_unif,
+  common_pt_inputs = common_pt_inputs,
+  unique_pt_inputs = unique_pt_inputs,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   ipd = 2,
   seed = 1
 )
 
-results_sobol_psa <- run_sim(  
-  npats=N,                               
-  n_sim=sims,                                  
-  psa_bool = TRUE,                         
-  arm_list = c("int", "noint"), 
-  sensitivity_inputs = sensitivity_inputs,
-  common_all_inputs = common_all_inputs_sobol,    
-  common_pt_inputs = common_pt_inputs,       
-  unique_pt_inputs = unique_pt_inputs,       
-  init_event_list = init_event_list,        
-  evt_react_list = evt_react_list,          
+results_sobol_psa <- run_sim(
+  npats=N,
+  n_sim=sims,
+  psa_bool = TRUE,
+  arm_list = c("int", "noint"),
+  common_all_inputs = common_all_inputs_sobol,
+  common_pt_inputs = common_pt_inputs,
+  unique_pt_inputs = unique_pt_inputs,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
   ipd = 2,

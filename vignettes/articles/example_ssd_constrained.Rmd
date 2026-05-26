@@ -324,38 +324,30 @@ list_par <- list(parameter_name = list("util.sick","util.sicker","cost.sick","co
                               scenario_2=list(0.9,0.7,5000,9000,2000,log(0.4),0.9)
                               )
 
-sensitivity_inputs <-add_item(
-            indicators = if(sensitivity_bool){ create_indicators(sens,n_sensitivity*length(sensitivity_names),rep(1,length(list_par[[1]])))}else{
-                                rep(1,length(list_par[[1]]))} #vector of indicators, value 0 everywhere except at sens, where it takes value 1 (for dsa_min and dsa_max, if not sensitivity analysis, then we activate all of them, i.e., in a PSA)
-                              )
-
-common_all_inputs <- add_item(
-            pick_val_v(base        = list_par[["base_value"]],
-                       psa         = pick_psa(list_par[["PSA_dist"]],rep(1,length(list_par[["PSA_dist"]])),list_par[["a"]],list_par[["b"]]),
-                       sens        = list_par[[sens_name_used]],
-                       psa_ind     = psa_bool,
-                       sens_ind    = sensitivity_bool,
-                       indicator   = indicators,
-                       names_out   = list_par[["parameter_name"]]
-                       )
-            ) |>
+common_all_inputs <-
+  input_block(base      = list_par[["base_value"]],
+              psa       = pick_psa(list_par[["PSA_dist"]], rep(1, length(list_par[["PSA_dist"]])),
+                                   list_par[["a"]], list_par[["b"]]),
+              sens      = list_par,
+              names_out = list_par[["parameter_name"]],
+              dsa_names = c("DSA_min", "DSA_max")) |>
   add_item(input = {
-    random_seed_sicker_i = sample(1:1000,1000,replace = FALSE) #we don't add this variable to the sensitivity analysis
+    random_seed_sicker_i = sample(1:1000, 1000, replace = FALSE)
     beds <- resource_discrete(1000)
     beds_free <- beds$n_free()
     shared_accumulator <- shared_input(0)
     value_accum <- shared_accumulator$value()
-    }) 
+  })
 
 ```
 ## Model Execution
-The model is executed as before, just adding the `sensitivity_inputs`, `sensitivity_names`, `sensitivity_bool` and `n_sensitivity` arguments. Note that the total number of sensitivity iterations is given not by n_sensitivity, but by n_sensitivity * length(sensitivity_names), so in this case it will be 2 x n_sensitivity, or 2 x 7 = 14. For two scenario analysis it would be 2 x 1 = 2, with the `indicators` variable defined in the previous section taking value 1 for all the variables altered in the scenario, and 0 otherwise.
+The model is executed as before, just adding `sensitivity_bool = TRUE`. The `n_sensitivity` and `sensitivity_names` arguments are auto-detected from the `input_block()` metadata — no manual configuration required.
 
 ```{r run_dsa}
-results <- run_sim(  
+results <- run_sim(
   npats=100,                               # number of patients to be simulated
   n_sim=1,                                  # number of simulations to run
-  psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
+  psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
   arm_list = c("int", "noint"),             # intervention list
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
   common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
@@ -364,11 +356,8 @@ results <- run_sim(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  sensitivity_inputs = sensitivity_inputs,
-  sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
   constrained = TRUE,
-  n_sensitivity = length(list_par[[1]]),
   input_out = unlist(list_par[["parameter_name"]])
 )
 
@@ -389,23 +378,20 @@ data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.si
 The model is executed as before, just activating the psa_bool option
 
 ```{r run_dsa_psa}
-results <- run_sim(  
-  npats=100,                               
-  n_sim=6,                                  
-  psa_bool = TRUE,                         
-  arm_list = c("int", "noint"),             
-  common_all_inputs = common_all_inputs,    
-  common_pt_inputs = common_pt_inputs,      
-  unique_pt_inputs = unique_pt_inputs,      
-  init_event_list = init_event_list,        
-  evt_react_list = evt_react_list,          
+results <- run_sim(
+  npats=100,
+  n_sim=6,
+  psa_bool = TRUE,
+  arm_list = c("int", "noint"),
+  common_all_inputs = common_all_inputs,
+  common_pt_inputs = common_pt_inputs,
+  unique_pt_inputs = unique_pt_inputs,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  sensitivity_inputs = sensitivity_inputs,
-  sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
   constrained = TRUE,
-  n_sensitivity = length(list_par[[1]]),
   input_out = c(unlist(list_par[["parameter_name"]]), "beds_free")
 )
 
@@ -423,7 +409,7 @@ data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.si
 
 ```
 ## Model Execution, Simple PSA
-The model is executed as before, just activating the psa_bool option and deactivating the `sensitivity_bool` and removing sensitivity_names and setting `n_sensitivity = 1`
+The model is executed as before, just activating the `psa_bool` option and deactivating `sensitivity_bool`.
 
 ```{r run_psa}
 common_all_inputs <-add_item(input = {
@@ -445,22 +431,20 @@ common_all_inputs <-add_item(input = {
 })  
 
 
-results <- run_sim(  
-  npats=100,                               
-  n_sim=10,                                  
-  psa_bool = TRUE,                         
-  arm_list = c("int", "noint"),             
-  common_all_inputs = common_all_inputs,    
-  common_pt_inputs = common_pt_inputs,      
-  unique_pt_inputs = unique_pt_inputs,      
-  init_event_list = init_event_list,        
-  evt_react_list = evt_react_list,          
+results <- run_sim(
+  npats=100,
+  n_sim=10,
+  psa_bool = TRUE,
+  arm_list = c("int", "noint"),
+  common_all_inputs = common_all_inputs,
+  common_pt_inputs = common_pt_inputs,
+  unique_pt_inputs = unique_pt_inputs,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  sensitivity_inputs = sensitivity_inputs,
   sensitivity_bool = FALSE,
   constrained = TRUE,
-  n_sensitivity = 1,
   input_out = c(unlist(list_par[["parameter_name"]]), "beds_free")
 )
 

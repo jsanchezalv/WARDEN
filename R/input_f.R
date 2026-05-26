@@ -374,7 +374,7 @@ pick_val_v <- function(base,
 
 #' Build an input block for automatic parameter selection
 #'
-#' Creates an unevaluated `{}` expression that calls [pick_val_v()] with the
+#' Creates an unevaluated `{}` expression that calls `pick_val_v()` with the
 #' correct arguments for base case, PSA, DSA, and scenario analyses.
 #' The expression is meant to be passed directly to `run_sim()` or
 #' `run_sim_parallel()` as a `*_inputs` argument.
@@ -555,7 +555,7 @@ input_block <- function(.data = NULL,
                                      as.name("sens_iter_local"),
                                      as.name("n_sensitivity"),
                                      elem_for_create,
-                                     0L),
+                                     as.name("n_sens_before")),
         indicator_psa         = psa_indicators,
         names_out             = names_out,
         indicator_sens_binary = TRUE

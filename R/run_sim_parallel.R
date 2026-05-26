@@ -294,23 +294,34 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   
   # Analysis loop ---------------------------------------------------------
 
-  # Auto-compute n_sensitivity and collect dsa_names from warden_block_meta
-  all_inputs_args <- list(sensitivity_inputs, common_all_inputs,
-                          common_pt_inputs, unique_pt_inputs)
-  .all_dsa_names <- NULL
-  .meta_found    <- FALSE
-  if (isTRUE(sensitivity_bool)) {
-    for (.blk in all_inputs_args) {
-      .meta <- attr(.blk, "warden_block_meta")
-      if (!is.null(.meta)) {
-        .meta_found <- TRUE
-        if (!is.null(.meta$dsa_names)) {
-          .all_dsa_names <- union(.all_dsa_names, .meta$dsa_names)
-          n_sensitivity <- .meta$n_groups
-          message("n_sensitivity auto-detected as ", n_sensitivity, " from input_block metadata")
-        }
+  # Auto-compute n_sensitivity, dsa_names, and per-block n_sens_before offsets
+  all_inputs_args     <- list(sensitivity_inputs, common_all_inputs,
+                              common_pt_inputs, unique_pt_inputs)
+  .all_dsa_names      <- NULL
+  .meta_found         <- FALSE
+  .n_sensitivity_auto <- 0L
+  .n_before_offsets   <- integer(4L)
+  .running_n          <- 0L
+  for (.k in seq_along(all_inputs_args)) {
+    .n_before_offsets[.k] <- .running_n
+    .meta_k <- attr(all_inputs_args[[.k]], "warden_block_meta")
+    if (!is.null(.meta_k) && !is.null(.meta_k$dsa_names)) {
+      if (isTRUE(sensitivity_bool)) {
+        .meta_found         <- TRUE
+        .all_dsa_names      <- union(.all_dsa_names, .meta_k$dsa_names)
+        .n_sensitivity_auto <- .n_sensitivity_auto + .meta_k$n_groups
       }
+      .running_n <- .running_n + .meta_k$n_groups
     }
+  }
+  if (isTRUE(sensitivity_bool) && .n_sensitivity_auto > 0L) {
+    n_sensitivity <- .n_sensitivity_auto
+    message("n_sensitivity auto-detected as ", n_sensitivity, " from input_block metadata")
+  }
+
+  if (.meta_found && is.null(sensitivity_names) && !is.null(.all_dsa_names)) {
+    sensitivity_names <- .all_dsa_names
+    message("sensitivity_names auto-set to c(", paste0('"', sensitivity_names, '"', collapse = ", "), ") from input_block metadata")
   }
 
   # Build per-sensitivity iteration schedule
@@ -441,6 +452,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     input_list_sens <- as.environment(input_list_sens)
     parent.env(input_list_sens) <- environment()
     input_list_sens$n_elem_before <- 0L
+    input_list_sens$n_sens_before <- .n_before_offsets[1L]
     .set_last_ctx(stage="Error in setup:sensitivity_inputs", sens=sens, .warden_ctx = .warden_ctx)
     
     # Draw Common parameters  -------------------------------
@@ -491,9 +503,10 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                            
       # input_list <- rlang::env_clone(input_list_sens , parent.env(input_list_sens))
       input_list <- new.env(parent = input_list_sens)
-      list2env(as.list(input_list_sens), input_list) 
+      list2env(as.list(input_list_sens), input_list)
       input_list$simulation <- simulation
-      
+      input_list$n_sens_before <- .n_before_offsets[2L]
+
       set.seed(simulation*1007*seed)
       .set_last_ctx(stage="setup:common_all_inputs", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
       
@@ -541,7 +554,9 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                                        input_list = input_list,
                                        pb = pb,
                                        seed = seed,
-                                       .warden_ctx = .warden_ctx)   
+                                       n_sens_before_common_pt = .n_before_offsets[3L],
+                                       n_sens_before_unique_pt = .n_before_offsets[4L],
+                                       .warden_ctx = .warden_ctx)
           }
         }, continue_on_error = continue_on_error)
         if(.skip_to_next){return(NULL)}

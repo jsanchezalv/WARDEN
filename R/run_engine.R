@@ -23,6 +23,8 @@ run_engine <- function(arm_list,
                             input_list = NULL,
                             pb = pb,
                             seed = seed,
+                            n_sens_before_common_pt = 0L,
+                            n_sens_before_unique_pt = 0L,
                        .warden_ctx = .warden_ctx) {
   
   # Initial set-up --------------------------
@@ -89,7 +91,8 @@ run_engine <- function(arm_list,
     list2env(as.list(input_list), input_list_pt) 
     
     input_list_pt$i <- i
-    
+    input_list_pt$n_sens_before <- n_sens_before_common_pt
+
     #Extract the inputs that are common for each patient across interventions
     if(!is.null(common_pt_inputs)){
         load_inputs(inputs = input_list_pt,list_uneval_inputs = common_pt_inputs)
@@ -123,9 +126,8 @@ run_engine <- function(arm_list,
       
       
       input_list_arm$arm <- arm
-      
-      
-      
+      input_list_arm$n_sens_before <- n_sens_before_unique_pt
+
       if(l_disres>0){
         which_arm <- which(arm==arm_list)
         for (obj in 1:l_disres) {

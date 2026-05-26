@@ -261,30 +261,22 @@ df_par <- list(parameter_name = c("util.sick","util.sicker","cost.sick","cost.si
                               scenario_2=c(0.9,0.7,5000,9000,2000,log(0.4),0.9)
                               )
 
-sensitivity_inputs <-add_item(
-            pos_indicator = sens - n_sensitivity*floor((sens-1)/n_sensitivity), # which position to use to put the value 1 in indicator
-            indicators = append(rep(0, length(df_par$parameter_name))[-pos_indicator],1,pos_indicator-1) #vector of indicators, value 0 everywhere except at sens, where it takes value 1
-                              )
-
-common_all_inputs <-add_item(
-            pick_val_v(base        = df_par[["base_value"]],
-                       psa         = pick_psa(df_par[["PSA_dist"]],rep(1,length(df_par[["PSA_dist"]])),df_par[["a"]],df_par[["b"]]),
-                       sens        = df_par[[sens_name_used]],
-                       psa_ind     = psa_bool,
-                       sens_ind    = sensitivity_bool,
-                       indicator   = indicators,
-                       names_out   = df_par[["parameter_name"]]
-                       )
-            )
+common_all_inputs <-
+  input_block(base      = df_par[["base_value"]],
+              psa       = pick_psa(df_par[["PSA_dist"]], rep(1, length(df_par[["PSA_dist"]])),
+                                   df_par[["a"]], df_par[["b"]]),
+              sens      = df_par,
+              names_out = df_par[["parameter_name"]],
+              dsa_names = c("DSA_min", "DSA_max"))
 
 ```
 ## Model Execution
 
 ```{r run_dsa}
-results <- run_sim(  
+results <- run_sim(
   npats=100,                               # number of patients to be simulated
   n_sim=1,                                  # number of simulations to run
-  psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)  
+  psa_bool = FALSE,                         # use PSA or not. If n_sim > 1 and psa_bool = FALSE, then difference in outcomes is due to sampling (number of pats simulated)
   arm_list = c("int", "noint"),             # intervention list
   common_all_inputs = common_all_inputs,    # inputs common that do not change within a simulation
   common_pt_inputs = common_pt_inputs,      # inputs that change within a simulation but are not affected by the intervention
@@ -293,10 +285,7 @@ results <- run_sim(
   evt_react_list = evt_react_list,          # reaction of events
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  sensitivity_inputs = sensitivity_inputs,
-  sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = length(df_par$parameter_name),
   input_out = c(df_par[["parameter_name"]])
 )
 
@@ -317,22 +306,19 @@ data_sensitivity |> group_by(sensitivity) |> summarise_at(c("util.sick","util.si
 The model is executed as before, just activating the psa_bool option
 
 ```{r run_dsa_psa}
-results <- run_sim(  
-  npats=100,                               
-  n_sim=6,                                  
-  psa_bool = TRUE,                         
-  arm_list = c("int", "noint"),             
-  common_all_inputs = common_all_inputs,    
-  common_pt_inputs = common_pt_inputs,      
-  unique_pt_inputs = unique_pt_inputs,      
-  init_event_list = init_event_list,        
-  evt_react_list = evt_react_list,          
+results <- run_sim(
+  npats=100,
+  n_sim=6,
+  psa_bool = TRUE,
+  arm_list = c("int", "noint"),
+  common_all_inputs = common_all_inputs,
+  common_pt_inputs = common_pt_inputs,
+  unique_pt_inputs = unique_pt_inputs,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list,
   util_ongoing_list = util_ongoing,
   cost_ongoing_list = cost_ongoing,
-  sensitivity_inputs = sensitivity_inputs,
-  sensitivity_names = c("DSA_min","DSA_max"),
   sensitivity_bool = TRUE,
-  n_sensitivity = length(df_par$parameter_name),
   input_out = c(df_par[["parameter_name"]])
 )
 
