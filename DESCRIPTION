@@ -1,6 +1,6 @@
 Package: WARDEN
 Title: Workflows for Health Technology Assessments in R using Discrete EveNts
-Version: 2.0.2
+Version: 2.0.3
 Authors@R: 
     c(person(given = "Javier",
            family = "Sanchez Alvarez",
@@ -52,7 +52,7 @@ Imports:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Depends: 
-    R (>= 2.10)
+    R (>= 4.1.0)
 URL: https://jsanchezalv.github.io/WARDEN/
 LinkingTo: 
     Rcpp

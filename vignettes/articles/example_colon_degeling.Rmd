@@ -1920,24 +1920,21 @@ common_all_inputs2 <-add_item(input = {
  
                       drc         <- 0.04 
                       drq         <- 0.015
-                      p_highrisk  <- 0.6
-                      
-                      pick_val_v(
+                      p_highrisk  <- 0.6 }) |>
+                     input_block(
                         base= l_inputs[["base_value"]],
                         psa = pick_psa(
                             l_inputs[["PSA_dist"]],
                             l_inputs[["n"]],
                             l_inputs[["a"]],
                             l_inputs[["b"]]),
-                        psa_ind     = psa_bool,
-                        sens_ind    = FALSE, 
+                        sens = NULL,
                         names_out   = l_inputs[["parameter_name"]],
-                        indicator   = rep(1,10), 
-                        indicator_psa = l_inputs[["psa_indicators"]],
-                        deploy_env = TRUE
-                      ) 
-
-                      
+                        sens_indicators = rep(1,10), 
+                        psa_indicators  = l_inputs[["psa_indicators"]],
+                        indicator_sens_binary = TRUE
+                      ) |>
+                     add_item(input = {
                       d_BS_shape <- df_survival_models$d_RF_D_shape
                       d_BS_rate  <- df_survival_models$d_RF_D_rate
                       d_TTR_cure_1_low  <- thetaToProb(m_TTR["theta"])

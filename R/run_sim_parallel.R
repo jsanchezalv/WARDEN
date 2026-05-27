@@ -4,7 +4,7 @@
 if(getRversion() >= "2.15.1") {
   utils::globalVariables(
     c(
-      c('simulation')
+      c('simulation','chunk')
     )) 
 }
 
@@ -585,7 +585,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
 
         if (debug) final_output$log_list <- log_sink$entries
 
-        chunk_results[[idx]] <- list(final_output)
+        chunk_results[[idx]] <- final_output
 
         message(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
       }
