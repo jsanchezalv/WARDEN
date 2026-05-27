@@ -1009,6 +1009,10 @@ pop_and_return_event <- function(ptr) {
   pop_and_return_event_cpp(ptr)
 }
 
+pop_into <- function(out_list, ptr) {
+  pop_into_cpp(ptr, out_list)
+}
+
 #' Remove events for a patient
 #'
 #' Removes one or more events from the queue for the given patient.

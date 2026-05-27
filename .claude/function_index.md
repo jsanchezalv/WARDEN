@@ -47,7 +47,8 @@
 - `next_event()` [L686–689]: Peek at the next event(s) in the queue
 - `next_event_pt()` [L701–706]: Peek at next event(s) for a specific patient
 - `pop_event()` [L716–719]: Remove the top event from the queue
-- `pop_and_return_event()` [L728–731]: Remove and return the top event
+- `pop_and_return_event()` [L1007–1009]: Remove and return the top event (creates new named list)
+- `pop_into()` [L1012–1014]: Internal — pop into a pre-allocated 3-element list buffer (avoids list allocation)
 - `remove_event()` [L743–779]: Remove named event(s) for a patient
 - `modify_event()` [L806–848]: Modify event time/name for a patient (creates if missing by default)
 - `queue_empty()` [L857–860]: Check if queue is empty

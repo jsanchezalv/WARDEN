@@ -7,6 +7,7 @@
 ^\.github$
 ^vignettes/articles$
 ^tools$
+^presentation$
 ^other docs$
 ^Rprof.out$
 ^update_github_sites.R$

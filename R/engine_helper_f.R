@@ -150,12 +150,11 @@ initiate_evt <- function(arm_name,input_list_arm){
 #' @keywords internal
 #' @noRd
 
-react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function processes the next event (as identified in the GetNextEvt function)
+react_evt <- function(evt, evttime, arm, input_list_arm=NULL){
   # Initial set-up --------------------------
-  evt <- thisevt$evt                  # Identify event type
-  prevtime <- input_list_arm$curtime                 # Identify time of previous event
-  curtime <- thisevt$evttime         # Identify time of next event
-  
+  prevtime <- input_list_arm$curtime
+  curtime <- evttime
+
   if (curtime<prevtime) {
     stop("Time of event '", evt,"': ", round(curtime,4), " is smaller than the time of previous event '", if(!is.list(input_list_arm$evt)){input_list_arm$evt}else{NA}, "': ", round(prevtime,4), ". Arm: ", arm, ", id: ", input_list_arm$i)
   }
@@ -166,22 +165,16 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
   input_list_arm[["arm"]] <- arm
   
   # Create costs and utilities for event --------------------------------------------------
-  evt_arm <- paste(evt,arm,sep = "_")
+  input_list_arm[["evt_arm"]] <- input_list_arm$evt_arm_lookup[[evt]]
   
   #Reset instantaneous costs/qalys/others
-  if(!is.null(input_list_arm$uc_lists$instant_inputs)){
-    for (var_name in input_list_arm$uc_lists$instant_inputs) {
-      assign(var_name, 0, envir = input_list_arm)
-    }
+  if (!is.null(input_list_arm$uc_lists$zero_instant)) {
+    list2env(input_list_arm$uc_lists$zero_instant, input_list_arm)
   }
-  
+
   #Reset accumulator backwards flags
-  if(input_list_arm$accum_backwards){
-    if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
-      for (var_name in input_list_arm$ongoing_inputs_lu) {
-        assign(var_name, 0, envir = input_list_arm)
-      }
-    }
+  if (input_list_arm$accum_backwards && !is.null(input_list_arm$uc_lists$zero_ongoing_lu)) {
+    list2env(input_list_arm$uc_lists$zero_ongoing_lu, input_list_arm)
   }
   
 
@@ -216,16 +209,15 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
 eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
   # Initial set-up --------------------------
 
-  position <- which(evt_name==names(react_list))
-  pos_l <- length(position)
-  if (pos_l==0 | pos_l>1 ) {
-    stop("Reaction to event ", evt_name, " not recognised or more than one reaction found. Make sure that only one reaction has been defined for the event")    
+  reaction <- react_list[[evt_name]]
+  if (is.null(reaction)) {
+    stop("Reaction to event '", evt_name, "' not recognised. Make sure that a reaction has been defined for the event")
   }
 
 # Evaluate reaction -------------------------------------------------------
   #debug bit (pre-evaluation)
   if(input_list_arm$debug){
-    prev_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm, ifnotfound = Inf)
+    prev_values <- mget(reaction[["debug_vars"]], input_list_arm, ifnotfound = Inf)
 
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                   "; Sim: ", input_list_arm$simulation,
@@ -235,25 +227,25 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
                   "; Time: ", round(input_list_arm$curtime,3)
     )
   }
-  
+
   #evaluate event
   if(input_list_arm$accum_backwards){
     if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
       with_write_flags_lang(
-        react_list[[position]][["react"]],
+        reaction[["react"]],
         tracked = input_list_arm$uc_lists$ongoing_inputs,
         env     = input_list_arm,
         flag_value = 1L
       )
     }
   }else{
-    eval(react_list[[position]][["react"]], input_list_arm)
+    eval(reaction[["react"]], input_list_arm)
   }
-  
+
   #debug bit (after evaluation)
   if(input_list_arm$debug){
-    
-    cur_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm, ifnotfound = Inf)
+
+    cur_values <- mget(reaction[["debug_vars"]], input_list_arm, ifnotfound = Inf)
     
     if(!is.null(input_list_arm$log_list[[loc]])){
       input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value, prev_values)
@@ -818,99 +810,69 @@ compute_outputs_timseq <- function(freq,
   
 
   # Discounting of Outcomes-------------------------------------------------------------
-  
-  #Discount and undiscount ongoing
-  
+  # Two-phase approach (mirrors compute_outputs): set() for discounting, Reduce(+,...) for accumulation.
+
+  if (input_list$accum_backwards) {
+    prvtime_v <- final_filtered[["prevtime"]]
+    curtime_v <- final_filtered[["evttime"]]
+  } else {
+    prvtime_v <- final_filtered[["evttime"]]
+    curtime_v <- final_filtered[["nexttime"]]
+  }
+  evttime_v <- final_filtered[["evttime"]]
+
+  # Phase 1: compute discounted columns
   for (cat in input_list$uc_lists$ongoing_inputs) {
-    
-    
-    final_filtered[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
-                                                               lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                                               lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                                               lclval=get(cat))]
-    
-    final_filtered[,paste0(cat) := disc_ongoing_v(lcldr=if(cat %in% input_list$uc_lists$cost_categories_ongoing){input_list$drc}else{input_list$drq},
-                                                  lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                                  lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                                  lclval=get(cat))]
-    
-    if(cat %in% input_list$uc_lists$cost_categories_ongoing){
-      final_filtered[, "costs" := costs + get(cat)]
-      final_filtered[, "costs_undisc" := costs_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
-    if(cat %in% input_list$uc_lists$util_categories_ongoing){
-      final_filtered[, "qalys" := qalys+ get(cat)]
-      final_filtered[, "qalys_undisc" := qalys_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
-    
+    val_v <- final_filtered[[cat]]
+    dr <- if (cat %in% input_list$uc_lists$cost_categories_ongoing) input_list$drc else input_list$drq
+    set(final_filtered, j = paste0(cat, "_undisc"), value = disc_ongoing_v(lcldr=0,  lclprvtime=prvtime_v, lclcurtime=curtime_v, lclval=val_v))
+    set(final_filtered, j = cat,                    value = disc_ongoing_v(lcldr=dr, lclprvtime=prvtime_v, lclcurtime=curtime_v, lclval=val_v))
   }
-  
-  
-  #Discount and undiscount instant
+
   for (cat in input_list$uc_lists$instant_inputs) {
-    final_filtered[,paste0(cat,"_","undisc") := disc_instant_v(lcldr=0,
-                                                               lclcurtime=evttime,
-                                                               lclval=get(cat))]
-    
-    final_filtered[,paste0(cat) := disc_instant_v(lcldr=if(cat %in% input_list$uc_lists$cost_categories_instant){input_list$drc}else{input_list$drq},
-                                                  lclcurtime=evttime,
-                                                  lclval=get(cat))]
-    
-    if(cat %in% input_list$uc_lists$cost_categories_instant){
-      final_filtered[, "costs" := costs + get(cat)]
-      final_filtered[, "costs_undisc" := costs_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
-    if(cat %in% input_list$uc_lists$util_categories_instant){
-      final_filtered[, "qalys" := qalys + get(cat)]
-      final_filtered[, "qalys_undisc" := qalys_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
+    val_v <- final_filtered[[cat]]
+    dr <- if (cat %in% input_list$uc_lists$cost_categories_instant) input_list$drc else input_list$drq
+    set(final_filtered, j = paste0(cat, "_undisc"), value = disc_instant_v(lcldr=0,  lclcurtime=evttime_v, lclval=val_v))
+    set(final_filtered, j = cat,                    value = disc_instant_v(lcldr=dr, lclcurtime=evttime_v, lclval=val_v))
   }
-  
-  #Discount and undiscount cycle
+
   for (cat in input_list$uc_lists$cycle_inputs) {
-    final_filtered[,paste0(cat,"_","undisc") := disc_cycle_v(lcldr=0,
-                                                             lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                                             cyclelength = get(paste0(cat,"_","cycle_l")),
-                                                             lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                                             lclval= get(cat),
-                                                             starttime = get(paste0(cat,"_","cycle_starttime")),
-                                                             max_cycles = get(paste0(cat,"_","max_cycles")))] 
-    
-    final_filtered[,paste0(cat) := disc_cycle_v(lcldr=if(cat %in% input_list$uc_lists$cost_categories_cycle){input_list$drc}else{input_list$drq},
-                                                lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                                cyclelength = get(paste0(cat,"_","cycle_l")),
-                                                lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                                lclval= get(cat),
-                                                starttime = get(paste0(cat,"_","cycle_starttime")),
-                                                max_cycles = get(paste0(cat,"_","max_cycles")))]
-    
-    if(cat %in% input_list$uc_lists$cost_categories_cycle){
-      final_filtered[, "costs" := costs + get(cat)]
-      final_filtered[, "costs_undisc" := costs_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
-    if(cat %in% input_list$uc_lists$util_categories_cycle){
-      final_filtered[, "qalys" := qalys + get(cat)]
-      final_filtered[, "qalys_undisc" := qalys_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
+    val_v      <- final_filtered[[cat]]
+    cycle_l_v  <- final_filtered[[paste0(cat, "_cycle_l")]]
+    start_v    <- final_filtered[[paste0(cat, "_cycle_starttime")]]
+    maxcyc_v   <- final_filtered[[paste0(cat, "_max_cycles")]]
+    dr <- if (cat %in% input_list$uc_lists$cost_categories_cycle) input_list$drc else input_list$drq
+    set(final_filtered, j = paste0(cat, "_undisc"),
+        value = disc_cycle_v(lcldr=0,  lclprvtime=prvtime_v, cyclelength=cycle_l_v, lclcurtime=curtime_v,
+                             lclval=val_v, starttime=start_v, max_cycles=maxcyc_v))
+    set(final_filtered, j = cat,
+        value = disc_cycle_v(lcldr=dr, lclprvtime=prvtime_v, cyclelength=cycle_l_v, lclcurtime=curtime_v,
+                             lclval=val_v, starttime=start_v, max_cycles=maxcyc_v))
   }
-  
-  
+
+  # Phase 2: accumulate costs/qalys in a single pass over all contributing columns
+  all_cost_cols <- c(
+    intersect(input_list$uc_lists$ongoing_inputs, input_list$uc_lists$cost_categories_ongoing),
+    intersect(input_list$uc_lists$instant_inputs, input_list$uc_lists$cost_categories_instant),
+    intersect(input_list$uc_lists$cycle_inputs,   input_list$uc_lists$cost_categories_cycle)
+  )
+  all_util_cols <- c(
+    intersect(input_list$uc_lists$ongoing_inputs, input_list$uc_lists$util_categories_ongoing),
+    intersect(input_list$uc_lists$instant_inputs, input_list$uc_lists$util_categories_instant),
+    intersect(input_list$uc_lists$cycle_inputs,   input_list$uc_lists$util_categories_cycle)
+  )
+  if (length(all_cost_cols) > 0L) {
+    set(final_filtered, j = "costs",        value = Reduce(`+`, lapply(all_cost_cols,                    \(col) final_filtered[[col]])))
+    set(final_filtered, j = "costs_undisc", value = Reduce(`+`, lapply(paste0(all_cost_cols, "_undisc"), \(col) final_filtered[[col]])))
+  }
+  if (length(all_util_cols) > 0L) {
+    set(final_filtered, j = "qalys",        value = Reduce(`+`, lapply(all_util_cols,                    \(col) final_filtered[[col]])))
+    set(final_filtered, j = "qalys_undisc", value = Reduce(`+`, lapply(paste0(all_util_cols, "_undisc"), \(col) final_filtered[[col]])))
+  }
+
   #Discount and undiscount LYs
-  final_filtered[,"lys" := disc_ongoing_v(lcldr=input_list$drq,
-                                          lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                          lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                          lclval=1)]
-  
-  final_filtered[,"lys_undisc" := disc_ongoing_v(lcldr=0,
-                                                 lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                                 lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                                 lclval=1)]
+  set(final_filtered, j = "lys",        value = disc_ongoing_v(lcldr=input_list$drq, lclprvtime=prvtime_v, lclcurtime=curtime_v, lclval=1))
+  set(final_filtered, j = "lys_undisc", value = disc_ongoing_v(lcldr=0,              lclprvtime=prvtime_v, lclcurtime=curtime_v, lclval=1))
   
   #Calculate total outcomes
   final_filtered[,"total_costs" := sum(costs),by=.(pat_id,arm)]
@@ -1040,15 +1002,14 @@ compute_outputs <- function(patdata,input_list) {
   npats <- input_list$npats
   psa_bool <- input_list$psa_bool
   
-  list_patdata <- NULL
-  
   #Split the data as to be exported as a data.table, and the extra data the user described
   data_export_aslist <- input_list$input_out[!input_list$input_out %chin% input_list$categories_for_export]
   data_export_summarized_nonumeric <- data_export_aslist
-    
-  for (arm_i in arm_list) {
-    list_patdata <- c(list_patdata,unlist(map(map(patdata,arm_i),"evtlist"), recursive = FALSE))
-  }  
+
+  list_patdata <- unlist(
+    lapply(arm_list, \(arm_i) unlist(map(map(patdata, arm_i), "evtlist"), recursive = FALSE)),
+    recursive = FALSE
+  )
   
   rm(patdata)
 
@@ -1110,8 +1071,11 @@ compute_outputs <- function(patdata,input_list) {
   )
   
   #Use the data.table to initialize values
-  patdata_dt[,prevtime:=data.table::shift(evttime,fill=0)]
-  patdata_dt[,prevtime:=ifelse(prevtime>evttime,0,prevtime)]
+  patdata_dt[, prevtime := data.table::shift(evttime, fill = 0)]
+  n_row <- nrow(patdata_dt)
+  boundary_start <- c(TRUE, patdata_dt$pat_id[-1L] != patdata_dt$pat_id[-n_row] |
+                            patdata_dt$arm[-1L] != patdata_dt$arm[-n_row])
+  set(patdata_dt, i = which(boundary_start), j = "prevtime", value = 0)
   cols_init <- c("lys",
                  "qalys",
                  "costs",
@@ -1142,8 +1106,11 @@ compute_outputs <- function(patdata,input_list) {
     }
   
   } else{
-    patdata_dt[, nexttime:=data.table::shift(evttime,fill=0,n=-1L)]
-    patdata_dt[, nexttime := ifelse(nexttime<evttime,evttime,nexttime)]
+    patdata_dt[, nexttime := data.table::shift(evttime, fill = 0, n = -1L)]
+    boundary_end <- c(patdata_dt$pat_id[-1L] != patdata_dt$pat_id[-n_row] |
+                      patdata_dt$arm[-1L] != patdata_dt$arm[-n_row], TRUE)
+    set(patdata_dt, i = which(boundary_end), j = "nexttime",
+        value = patdata_dt$evttime[which(boundary_end)])
     }
   
   if(!is.null(input_list$timed_freq)){
@@ -1156,98 +1123,72 @@ compute_outputs <- function(patdata,input_list) {
   }
   
   # Discounting of Outcomes-------------------------------------------------------------
-  
-  #Discount and undiscount ongoing
-  
+  # Two-phase approach to reduce full-table passes:
+  # Phase 1: discount each category using set() (2 passes/cat, bypasses [,:=] j-expression overhead).
+  # Phase 2: accumulate costs/qalys via Reduce(+,...) over all contributing columns (1 pass each).
+
+  # Pre-extract time vectors once; avoids repeated conditional lookup inside the category loops.
+  if (input_list$accum_backwards) {
+    prvtime_v <- patdata_dt[["prevtime"]]
+    curtime_v <- patdata_dt[["evttime"]]
+  } else {
+    prvtime_v <- patdata_dt[["evttime"]]
+    curtime_v <- patdata_dt[["nexttime"]]
+  }
+  evttime_v <- patdata_dt[["evttime"]]
+
+  # Phase 1: compute discounted columns
   for (cat in input_list$uc_lists$ongoing_inputs) {
-    patdata_dt[,paste0(cat,"_","undisc") := disc_ongoing_v(lcldr=0,
-                                                                        lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                                                        lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                                                        lclval=get(cat))]
-    
-    patdata_dt[,paste0(cat) := disc_ongoing_v(lcldr=if(cat %in% input_list$uc_lists$cost_categories_ongoing){input_list$drc}else{input_list$drq},
-                                                                 lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                                                 lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                                                 lclval=get(cat))]
-
-    if(cat %in% input_list$uc_lists$cost_categories_ongoing){
-      patdata_dt[, "costs" := costs + get(cat)]
-      patdata_dt[, "costs_undisc" := costs_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
-    if(cat %in% input_list$uc_lists$util_categories_ongoing){
-      patdata_dt[, "qalys" := qalys+ get(cat)]
-      patdata_dt[, "qalys_undisc" := qalys_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
-
+    val_v <- patdata_dt[[cat]]
+    dr <- if (cat %in% input_list$uc_lists$cost_categories_ongoing) input_list$drc else input_list$drq
+    set(patdata_dt, j = paste0(cat, "_undisc"), value = disc_ongoing_v(lcldr=0,  lclprvtime=prvtime_v, lclcurtime=curtime_v, lclval=val_v))
+    set(patdata_dt, j = cat,                    value = disc_ongoing_v(lcldr=dr, lclprvtime=prvtime_v, lclcurtime=curtime_v, lclval=val_v))
   }
-  
-  
-  #Discount and undiscount instant
+
   for (cat in input_list$uc_lists$instant_inputs) {
-    patdata_dt[,paste0(cat,"_","undisc") := disc_instant_v(lcldr=0,
-                                                                        lclcurtime=evttime,
-                                                                        lclval=get(cat))]
-    
-    patdata_dt[,paste0(cat) := disc_instant_v(lcldr=if(cat %in% input_list$uc_lists$cost_categories_instant){input_list$drc}else{input_list$drq},
-                                                                 lclcurtime=evttime,
-                                                                 lclval=get(cat))]
-    
-    if(cat %in% input_list$uc_lists$cost_categories_instant){
-      patdata_dt[, "costs" := costs + get(cat)]
-      patdata_dt[, "costs_undisc" := costs_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
-    if(cat %in% input_list$uc_lists$util_categories_instant){
-      patdata_dt[, "qalys" := qalys + get(cat)]
-      patdata_dt[, "qalys_undisc" := qalys_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
+    val_v <- patdata_dt[[cat]]
+    dr <- if (cat %in% input_list$uc_lists$cost_categories_instant) input_list$drc else input_list$drq
+    set(patdata_dt, j = paste0(cat, "_undisc"), value = disc_instant_v(lcldr=0,  lclcurtime=evttime_v, lclval=val_v))
+    set(patdata_dt, j = cat,                    value = disc_instant_v(lcldr=dr, lclcurtime=evttime_v, lclval=val_v))
   }
-  
-  #Discount and undiscount cycle
+
   for (cat in input_list$uc_lists$cycle_inputs) {
-    
-    patdata_dt[,paste0(cat,"_","undisc") := disc_cycle_v(lcldr=0,
-                                                                    lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                                                    cyclelength = get(paste0(cat,"_","cycle_l")),
-                                                                    lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                                                    lclval= get(cat),
-                                                                    starttime = get(paste0(cat,"_","cycle_starttime")),
-                                                                    max_cycles = get(paste0(cat,"_","max_cycles")))] 
-    
-    patdata_dt[,paste0(cat) := disc_cycle_v(lcldr=if(cat %in% input_list$uc_lists$cost_categories_cycle){input_list$drc}else{input_list$drq},
-                                                             lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                                             cyclelength = get(paste0(cat,"_","cycle_l")),
-                                                             lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                                             lclval= get(cat),
-                                                             starttime = get(paste0(cat,"_","cycle_starttime")),
-                                                             max_cycles = get(paste0(cat,"_","max_cycles")))]
-    
-    if(cat %in% input_list$uc_lists$cost_categories_cycle){
-      patdata_dt[, "costs" := costs + get(cat)]
-      patdata_dt[, "costs_undisc" := costs_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
-    if(cat %in% input_list$uc_lists$util_categories_cycle){
-      patdata_dt[, "qalys" := qalys + get(cat)]
-      patdata_dt[, "qalys_undisc" := qalys_undisc + get(paste0(cat,"_","undisc"))]
-    }
-    
+    val_v      <- patdata_dt[[cat]]
+    cycle_l_v  <- patdata_dt[[paste0(cat, "_cycle_l")]]
+    start_v    <- patdata_dt[[paste0(cat, "_cycle_starttime")]]
+    maxcyc_v   <- patdata_dt[[paste0(cat, "_max_cycles")]]
+    dr <- if (cat %in% input_list$uc_lists$cost_categories_cycle) input_list$drc else input_list$drq
+    set(patdata_dt, j = paste0(cat, "_undisc"),
+        value = disc_cycle_v(lcldr=0,  lclprvtime=prvtime_v, cyclelength=cycle_l_v, lclcurtime=curtime_v,
+                             lclval=val_v, starttime=start_v, max_cycles=maxcyc_v))
+    set(patdata_dt, j = cat,
+        value = disc_cycle_v(lcldr=dr, lclprvtime=prvtime_v, cyclelength=cycle_l_v, lclcurtime=curtime_v,
+                             lclval=val_v, starttime=start_v, max_cycles=maxcyc_v))
   }
-  
-  
+
+  # Phase 2: accumulate costs/qalys in a single pass over all contributing columns
+  all_cost_cols <- c(
+    intersect(input_list$uc_lists$ongoing_inputs, input_list$uc_lists$cost_categories_ongoing),
+    intersect(input_list$uc_lists$instant_inputs, input_list$uc_lists$cost_categories_instant),
+    intersect(input_list$uc_lists$cycle_inputs,   input_list$uc_lists$cost_categories_cycle)
+  )
+  all_util_cols <- c(
+    intersect(input_list$uc_lists$ongoing_inputs, input_list$uc_lists$util_categories_ongoing),
+    intersect(input_list$uc_lists$instant_inputs, input_list$uc_lists$util_categories_instant),
+    intersect(input_list$uc_lists$cycle_inputs,   input_list$uc_lists$util_categories_cycle)
+  )
+  if (length(all_cost_cols) > 0L) {
+    set(patdata_dt, j = "costs",        value = Reduce(`+`, lapply(all_cost_cols,                    \(col) patdata_dt[[col]])))
+    set(patdata_dt, j = "costs_undisc", value = Reduce(`+`, lapply(paste0(all_cost_cols, "_undisc"), \(col) patdata_dt[[col]])))
+  }
+  if (length(all_util_cols) > 0L) {
+    set(patdata_dt, j = "qalys",        value = Reduce(`+`, lapply(all_util_cols,                    \(col) patdata_dt[[col]])))
+    set(patdata_dt, j = "qalys_undisc", value = Reduce(`+`, lapply(paste0(all_util_cols, "_undisc"), \(col) patdata_dt[[col]])))
+  }
+
   #Discount and undiscount LYs
-  patdata_dt[,"lys" := disc_ongoing_v(lcldr=input_list$drq,
-                                      lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                      lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                      lclval=1)]
-  
-  patdata_dt[,"lys_undisc" := disc_ongoing_v(lcldr=0,
-                                             lclprvtime=if(input_list$accum_backwards){prevtime}else{evttime},
-                                             lclcurtime=if(input_list$accum_backwards){evttime}else{nexttime},
-                                             lclval=1)]
+  set(patdata_dt, j = "lys",        value = disc_ongoing_v(lcldr=input_list$drq, lclprvtime=prvtime_v, lclcurtime=curtime_v, lclval=1))
+  set(patdata_dt, j = "lys_undisc", value = disc_ongoing_v(lcldr=0,              lclprvtime=prvtime_v, lclcurtime=curtime_v, lclval=1))
   
   #Calculate total outcomes
   patdata_dt[,"total_costs" := sum(costs),by=.(pat_id,arm)]

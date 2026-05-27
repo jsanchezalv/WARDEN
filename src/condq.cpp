@@ -366,6 +366,40 @@ NumericVector luck_adj(NumericVector prevsurv,
                             NumericVector luck,
                             bool condq);
 
+// --- Scalar helpers for qtimecov tight loop (no NumericVector allocation) ---
+
+static inline double luck_adj_scalar(double prevsurv, double cursurv, double luck) {
+  double adj = (prevsurv != 0.0) ? 1.0 - ((1.0 - luck) * (prevsurv / cursurv)) : luck;
+  return std::min(std::max(adj, 1e-9), 0.999999999);
+}
+
+// Scalar qcond functions with uniform signature (luck, a, b, t, surv_prev)
+static inline double qcond_exp_s(double luck, double a, double /*b*/, double /*t*/, double /*sp*/) {
+  return -std::log1p(-luck) / a;
+}
+static inline double qcond_weibull_s(double luck, double a, double b, double t, double /*sp*/) {
+  return std::pow(std::pow(t / b, a) - std::log1p(-luck), 1.0 / a) * b - t;
+}
+static inline double qcond_weibullPH_s(double luck, double a, double b, double t, double /*sp*/) {
+  double base = std::pow(t, a) - std::log1p(-luck) / b;
+  return (base < 0) ? NA_REAL : std::pow(base, 1.0 / a) - t;
+}
+static inline double qcond_llogis_s(double luck, double a, double b, double t, double /*sp*/) {
+  return b * std::pow((1.0 / (1.0 - luck)) * (luck + std::pow(t / b, a)), 1.0 / a) - t;
+}
+static inline double qcond_gompertz_s(double luck, double a, double b, double t, double /*sp*/) {
+  return (1.0 / a) * std::log1p(-((a / b) * std::log1p(-luck) / (std::expm1(a * t) + 1)));
+}
+static inline double qcond_lnorm_s(double luck, double a, double b, double t, double sp) {
+  return std::expm1(a + b * R::qnorm(1.0 - sp * (1.0 - luck), 0.0, 1.0, 1, 0)) + 1.0 - t;
+}
+static inline double qcond_norm_s(double luck, double a, double b, double t, double sp) {
+  return R::qnorm(1.0 - sp * (1.0 - luck), a, b, 1, 0) - t;
+}
+static inline double qcond_gamma_s(double luck, double a, double b, double t, double sp) {
+  return R::qgamma(1.0 - sp * (1.0 - luck), a, 1.0 / b, 1, 0) - t;
+}
+
 //' Draw time-to-event with time-dependent covariates and luck adjustment
 //'
 //' Simulate a time-to-event (TTE) from a parametric distribution with parameters varying over time.
@@ -526,122 +560,87 @@ List qtimecov(double luck,
                   double dt = 0.1,
                   double max_time = 100,
                   double start_time = 0) {
-  
+
   if (a_fun.isNULL()) stop("a_fun must be a valid function");
-  
-  // Define function pointers for survival and conditional quantile, avoiding repeated if-else
-  
+
+  // Select scalar qcond function and survival function based on distribution
   typedef double (*SfFun)(double, double, double);
-  typedef NumericVector (*QCondFun)(NumericVector, NumericVector, NumericVector, NumericVector, NumericVector);
-  
+  typedef double (*QCondScalarFun)(double, double, double, double, double);
+
   SfFun sf_fun = nullptr;
-  QCondFun qcond_fun = nullptr;
-  
+  QCondScalarFun qcond_s = nullptr;
+
   if (dist == "exp") {
-    sf_fun = [](double t, double rate, double unused) {
-      return sf_exp(t, rate);
-    };
-    qcond_fun = [](NumericVector luck, NumericVector a, NumericVector b, NumericVector t, NumericVector surv_prev) {
-      return qcond_exp(luck, a);
-    };
+    sf_fun = [](double t, double rate, double) { return sf_exp(t, rate); };
+    qcond_s = qcond_exp_s;
   } else if (dist == "gamma") {
     sf_fun = sf_gamma;
-    qcond_fun = qcond_gamma;
+    qcond_s = qcond_gamma_s;
   } else if (dist == "lnorm") {
     sf_fun = sf_lnorm;
-    qcond_fun = qcond_lnorm;
+    qcond_s = qcond_lnorm_s;
   } else if (dist == "norm") {
     sf_fun = sf_norm;
-    qcond_fun = qcond_norm;
+    qcond_s = qcond_norm_s;
   } else if (dist == "weibull") {
     sf_fun = sf_weibull;
-    qcond_fun = [](NumericVector luck, NumericVector a, NumericVector b, NumericVector t, NumericVector surv_prev) {
-      return qcond_weibull(luck, a, b, t);
-    };
+    qcond_s = qcond_weibull_s;
   } else if (dist == "weibullPH") {
     sf_fun = sf_weibullPH;
-    qcond_fun = [](NumericVector luck, NumericVector a, NumericVector b, NumericVector t, NumericVector surv_prev) {
-      return qcond_weibullPH(luck, a, b, t);
-    };
+    qcond_s = qcond_weibullPH_s;
   } else if (dist == "llogis") {
     sf_fun = sf_llogis;
-    qcond_fun = [](NumericVector luck, NumericVector a, NumericVector b, NumericVector t, NumericVector surv_prev) {
-      return qcond_llogis(luck, a, b, t);
-    };
+    qcond_s = qcond_llogis_s;
   } else if (dist == "gompertz") {
     sf_fun = sf_gompertz;
-    qcond_fun = [](NumericVector luck, NumericVector a, NumericVector b, NumericVector t, NumericVector surv_prev) {
-      return qcond_gompertz(luck, a, b, t);
-    };
+    qcond_s = qcond_gompertz_s;
   } else {
     stop("Unsupported distribution");
   }
-  
+
   double time = start_time;
-  
-  // Determine if b_fun is a callable function
-   
-  // Evaluate a and b at start time
+
+  bool type_b_fun_f = (TYPEOF(b_fun) == CLOSXP);
+  // Construct b_fun_func once outside the loop (C4 optimization)
+  Function b_fun_func = type_b_fun_f ? Function(b_fun) : Function("identity");
+
   double a_curr = as<double>(a_fun(time));
-  bool type_b_fun_f;
-  type_b_fun_f = TYPEOF(b_fun) == CLOSXP;
   double b_curr;
   if (b_fun.isNULL()) {
     b_curr = NA_REAL;
   } else if (type_b_fun_f) {
-    Function b_fun_func(b_fun); // safe conversion now
     b_curr = as<double>(b_fun_func(time));
   } else {
     stop("b_fun is not a function or NULL");
   }
-  // Compute initial survival at current time
+
   double surv_prev = sf_fun(time, a_curr, b_curr);
-  
-  // Compute residual time-to-event based on distribution
-  double residual_tte = qcond_fun(NumericVector::create(luck),
-                                  NumericVector::create(a_curr),
-                                  NumericVector::create(b_curr),
-                                  NumericVector::create(time),
-                                  NumericVector::create(surv_prev))[0];
-  
-  
+  double residual_tte = qcond_s(luck, a_curr, b_curr, time, surv_prev);
+
   if (residual_tte <= dt) {
     return List::create(Named("tte") = residual_tte + time, Named("luck") = luck);
   }
-  
+
   while (true) {
     time += dt;
-    
-    double surv_curr = sf_fun(time, a_curr, b_curr);
+
+    double surv_curr    = sf_fun(time, a_curr, b_curr);
     double surv_prev_dt = sf_fun(time - dt, a_curr, b_curr);
-    
+
     a_curr = as<double>(a_fun(time));
     if (type_b_fun_f) {
-      Function b_fun_func(b_fun); // safe conversion now
       b_curr = as<double>(b_fun_func(time));
     }
 
-    // Update luck with survival adjustment
-    luck = luck_adj(NumericVector::create(surv_prev_dt),
-                         NumericVector::create(surv_curr),
-                         NumericVector::create(luck),
-                         true)[0];
-    
-    // Calculate residual time-to-event
-    residual_tte = qcond_fun(NumericVector::create(luck),
-                             NumericVector::create(a_curr),
-                             NumericVector::create(b_curr),
-                             NumericVector::create(time - dt),
-                             NumericVector::create(surv_prev_dt))[0];
-    // Rcout << "time: " << time << ", luck: " << luck << ", residual_tte: " << residual_tte
-    //       << ", surv_prev_dt: " << surv_prev_dt << ", surv_curr: " << surv_curr << std::endl;
-    
+    luck = luck_adj_scalar(surv_prev_dt, surv_curr, luck);
+    residual_tte = qcond_s(luck, a_curr, b_curr, time - dt, surv_prev_dt);
+
     double total_tte = time + residual_tte;
-    
+
     if (residual_tte <= dt || total_tte <= time || time >= max_time) {
       return List::create(Named("tte") = std::min(total_tte, max_time), Named("luck") = luck);
     }
   }
-  
+
   return NA_REAL;
 }
