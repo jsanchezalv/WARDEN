@@ -492,8 +492,8 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     exported_items <- unique(c("input_list_sens",ls(.GlobalEnv),ls(parent.env(environment()), all.names = TRUE),ls(environment(), all.names = TRUE)))
     options(future.rng.onMisuse = "ignore")
     n_chunks <- min(n_sim, ncores * 2L)
-    sim_chunks <- split(seq_len(n_sim), cut(seq_len(n_sim), n_chunks, labels = FALSE))
-
+    sim_chunks <- split(seq_len(n_sim), ceiling(seq_len(n_sim) / ceiling(n_sim / n_chunks)))
+    
     output_sim[[sens]] <- foreach(chunk = sim_chunks,
                          # .options.future = list(seed = TRUE),
                          .options.future = list(packages = .packages()),
