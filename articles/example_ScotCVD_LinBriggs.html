@@ -424,71 +424,64 @@ spline.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">disu_sec_vec</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">time</span>, <span class="va">DU_ALL</span>, <span class="va">DU</span>, <span class="va">B5</span>, <span class="va">B6</span>, <span class="va">nl_RCS_ch</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  </span>
-<span>   <span class="co"># Segment indicator</span></span>
+<span></span>
 <span>  <span class="va">seg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span></span>
 <span>    <span class="va">time</span>,</span>
 <span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="va">nl_RCS_ch</span><span class="op">$</span><span class="va">knots</span>, <span class="cn">Inf</span><span class="op">)</span>,</span>
 <span>    labels <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    right <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># Preallocate spline coefficients (per time)</span></span>
-<span>  <span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># Segment 2</span></span>
+<span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span></span>
+<span>  <span class="va">a0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>; <span class="va">a1</span> <span class="op">&lt;-</span> <span class="va">a0</span>; <span class="va">a2</span> <span class="op">&lt;-</span> <span class="va">a0</span>; <span class="va">a3</span> <span class="op">&lt;-</span> <span class="va">a0</span></span>
+<span></span>
 <span>  <span class="va">s2</span> <span class="op">&lt;-</span> <span class="va">seg</span> <span class="op">==</span> <span class="fl">2</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">s2</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">A</span><span class="op">[</span><span class="va">s2</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, ncol <span class="op">=</span> <span class="fl">4</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">s2</span><span class="op">)</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    <span class="va">a0</span><span class="op">[</span><span class="va">s2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>; <span class="va">a1</span><span class="op">[</span><span class="va">s2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>    <span class="va">a2</span><span class="op">[</span><span class="va">s2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>; <span class="va">a3</span><span class="op">[</span><span class="va">s2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span></span>
 <span>  <span class="op">}</span></span>
-<span>  </span>
-<span>  <span class="co"># Segment 3</span></span>
+<span></span>
 <span>  <span class="va">s3</span> <span class="op">&lt;-</span> <span class="va">seg</span> <span class="op">==</span> <span class="fl">3</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">s3</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">A</span><span class="op">[</span><span class="va">s3</span>,<span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span>, ncol <span class="op">=</span> <span class="fl">4</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">s3</span><span class="op">)</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    <span class="va">a0</span><span class="op">[</span><span class="va">s3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>; <span class="va">a1</span><span class="op">[</span><span class="va">s3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>    <span class="va">a2</span><span class="op">[</span><span class="va">s3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>; <span class="va">a3</span><span class="op">[</span><span class="va">s3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span></span>
 <span>  <span class="op">}</span></span>
-<span>  </span>
+<span></span>
 <span>  <span class="fu">rcs_du_v</span><span class="op">(</span></span>
-<span>    t2  <span class="op">=</span> <span class="va">time</span>,</span>
+<span>    t2    <span class="op">=</span> <span class="va">time</span>,</span>
 <span>    du_all <span class="op">=</span> <span class="va">DU_ALL</span>,</span>
-<span>    du <span class="op">=</span> <span class="va">DU</span>,</span>
-<span>    b5 <span class="op">=</span> <span class="va">B5</span>,</span>
-<span>    b6 <span class="op">=</span> <span class="va">B6</span>,</span>
-<span>    a0 <span class="op">=</span> <span class="va">A</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>,</span>
-<span>    a1 <span class="op">=</span> <span class="va">A</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>,</span>
-<span>    a2 <span class="op">=</span> <span class="va">A</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span>,</span>
-<span>    a3 <span class="op">=</span> <span class="va">A</span><span class="op">[</span>,<span class="fl">4</span><span class="op">]</span></span>
+<span>    du    <span class="op">=</span> <span class="va">DU</span>,</span>
+<span>    b5    <span class="op">=</span> <span class="va">B5</span>,</span>
+<span>    b6    <span class="op">=</span> <span class="va">B6</span>,</span>
+<span>    a0    <span class="op">=</span> <span class="va">a0</span>,</span>
+<span>    a1    <span class="op">=</span> <span class="va">a1</span>,</span>
+<span>    a2    <span class="op">=</span> <span class="va">a2</span>,</span>
+<span>    a3    <span class="op">=</span> <span class="va">a3</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">rcs_cost_f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">time</span>, <span class="va">nl_RCS_ch</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  </span>
+<span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="va">i1</span> <span class="op">&lt;-</span> <span class="va">time</span> <span class="op">&lt;</span> <span class="va">nl_RCS_ch</span><span class="op">$</span><span class="va">knots</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="va">i2</span> <span class="op">&lt;-</span> <span class="va">time</span> <span class="op">&gt;=</span> <span class="va">nl_RCS_ch</span><span class="op">$</span><span class="va">knots</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&amp;</span> <span class="va">time</span> <span class="op">&lt;</span> <span class="va">nl_RCS_ch</span><span class="op">$</span><span class="va">knots</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span>  <span class="va">i3</span> <span class="op">&lt;-</span> <span class="va">time</span> <span class="op">&gt;=</span> <span class="va">nl_RCS_ch</span><span class="op">$</span><span class="va">knots</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">&amp;</span> <span class="va">time</span> <span class="op">&lt;</span> <span class="va">nl_RCS_ch</span><span class="op">$</span><span class="va">knots</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
-<span>  <span class="va">i4</span> <span class="op">&lt;-</span> <span class="va">time</span> <span class="op">&gt;=</span> <span class="va">nl_RCS_ch</span><span class="op">$</span><span class="va">knots</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
-<span>  </span>
-<span>  <span class="co"># Segment 1: below first knot → zero</span></span>
-<span>  <span class="va">out</span><span class="op">[</span><span class="va">i1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span>  </span>
-<span>  <span class="co"># Segment 2: cubic spline piece 2</span></span>
+<span>  <span class="va">knots</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">$</span><span class="va">knots</span></span>
+<span></span>
+<span>  <span class="va">i2</span> <span class="op">&lt;-</span> <span class="va">time</span> <span class="op">&gt;=</span> <span class="va">knots</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&amp;</span> <span class="va">time</span> <span class="op">&lt;</span> <span class="va">knots</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>  <span class="va">i3</span> <span class="op">&lt;-</span> <span class="va">time</span> <span class="op">&gt;=</span> <span class="va">knots</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">&amp;</span> <span class="va">time</span> <span class="op">&lt;</span> <span class="va">knots</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
+<span>  <span class="va">i4</span> <span class="op">&lt;-</span> <span class="va">time</span> <span class="op">&gt;=</span> <span class="va">knots</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
+<span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">i2</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">t</span> <span class="op">&lt;-</span> <span class="va">time</span><span class="op">[</span><span class="va">i2</span><span class="op">]</span></span>
-<span>    <span class="va">out</span><span class="op">[</span><span class="va">i2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">t</span>, <span class="va">t</span><span class="op">^</span><span class="fl">2</span>, <span class="va">t</span><span class="op">^</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">t</span> <span class="op">&lt;-</span> <span class="va">time</span><span class="op">[</span><span class="va">i2</span><span class="op">]</span>; <span class="va">a</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="va">out</span><span class="op">[</span><span class="va">i2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">a</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span><span class="op">*</span><span class="op">(</span><span class="va">a</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span><span class="op">*</span><span class="op">(</span><span class="va">a</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span><span class="op">*</span><span class="va">a</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
-<span>  </span>
-<span>  <span class="co"># Segment 3: cubic spline piece 3</span></span>
+<span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">i3</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">t</span> <span class="op">&lt;-</span> <span class="va">time</span><span class="op">[</span><span class="va">i3</span><span class="op">]</span></span>
-<span>    <span class="va">out</span><span class="op">[</span><span class="va">i3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">t</span>, <span class="va">t</span><span class="op">^</span><span class="fl">2</span>, <span class="va">t</span><span class="op">^</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">t</span> <span class="op">&lt;-</span> <span class="va">time</span><span class="op">[</span><span class="va">i3</span><span class="op">]</span>; <span class="va">a</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="va">out</span><span class="op">[</span><span class="va">i3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">a</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span><span class="op">*</span><span class="op">(</span><span class="va">a</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span><span class="op">*</span><span class="op">(</span><span class="va">a</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span><span class="op">*</span><span class="va">a</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
-<span>  </span>
-<span>  <span class="co"># Segment 4: linear tail</span></span>
+<span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">i4</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">t</span> <span class="op">&lt;-</span> <span class="va">time</span><span class="op">[</span><span class="va">i4</span><span class="op">]</span></span>
-<span>    <span class="va">out</span><span class="op">[</span><span class="va">i4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">t</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">t</span> <span class="op">&lt;-</span> <span class="va">time</span><span class="op">[</span><span class="va">i4</span><span class="op">]</span>; <span class="va">a</span> <span class="op">&lt;-</span> <span class="va">nl_RCS_ch</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="va">out</span><span class="op">[</span><span class="va">i4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">a</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">a</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">*</span><span class="va">t</span></span>
 <span>  <span class="op">}</span></span>
 <span>  <span class="va">out</span></span>
 <span><span class="op">}</span></span>
@@ -661,9 +654,12 @@ spline.</p>
 <span>    <span class="va">tte_first</span> <span class="op">&lt;-</span> <span class="va">v_first_times</span><span class="op">[</span><span class="va">status_1</span><span class="op">]</span></span>
 <span>    </span>
 <span>    <span class="va">seq_ch</span> <span class="op">&lt;-</span> <span class="kw">if</span><span class="op">(</span><span class="va">status_1</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span><span class="op">{</span><span class="va">odd_seq</span><span class="op">}</span><span class="kw">else</span> <span class="kw">if</span><span class="op">(</span><span class="va">status_1</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span><span class="op">{</span><span class="va">even_seq</span><span class="op">}</span><span class="kw">else</span><span class="op">{</span><span class="cn">NA</span><span class="op">}</span></span>
-<span>    </span>
+<span></span>
 <span>    <span class="va">b5</span> <span class="op">&lt;-</span> <span class="va">second_event_du_coef</span><span class="op">[</span><span class="va">seq_ch</span>,<span class="fl">1</span><span class="op">]</span></span>
 <span>    <span class="va">b6</span> <span class="op">&lt;-</span> <span class="va">second_event_du_coef</span><span class="op">[</span><span class="va">seq_ch</span>,<span class="fl">2</span><span class="op">]</span></span>
+<span></span>
+<span>    <span class="va">nl_RCS_pre_sex</span>  <span class="op">&lt;-</span> <span class="va">nl_RCS</span><span class="op">[[</span><span class="st">"nl_RCS_pre"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">2</span><span class="op">-</span><span class="va">sex</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="va">nl_RCS_post_sex</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">status_1</span> <span class="op">&lt;=</span> <span class="fl">2</span><span class="op">)</span> <span class="va">nl_RCS</span><span class="op">[[</span><span class="va">status_1</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">2</span><span class="op">-</span><span class="va">sex</span><span class="op">]</span><span class="op">]</span> <span class="kw">else</span> <span class="cn">NULL</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -715,15 +711,14 @@ and understand.</p>
 <span>                      <span class="fu"><a href="../reference/next_event.html">next_event</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">time</span>,</span>
 <span>                      by <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">12</span>,</span>
 <span>                      <span class="op">(</span><span class="va">.time</span><span class="op">-</span><span class="va">curtime</span><span class="op">)</span> <span class="op">*</span> <span class="va">coef_cost_1</span> <span class="op">+</span></span>
-<span>                        <span class="va">coef_cost_2</span> <span class="op">*</span> <span class="fu">rcs_cost_f</span><span class="op">(</span><span class="op">(</span><span class="va">.time</span><span class="op">-</span><span class="va">curtime</span><span class="op">)</span>, <span class="va">nl_RCS</span><span class="op">[[</span><span class="st">"nl_RCS_pre"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">2</span><span class="op">-</span><span class="va">sex</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, </span>
+<span>                        <span class="va">coef_cost_2</span> <span class="op">*</span> <span class="fu">rcs_cost_f</span><span class="op">(</span><span class="op">(</span><span class="va">.time</span><span class="op">-</span><span class="va">curtime</span><span class="op">)</span>, <span class="va">nl_RCS_pre_sex</span><span class="op">)</span>,</span>
 <span>                      discount <span class="op">=</span> <span class="va">drc</span>,</span>
 <span>                      vectorized_f <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>                 <span class="op">)</span></span>
-<span>                 </span>
-<span>                 <span class="va">cost</span> <span class="op">&lt;-</span> <span class="va">linpred_cost</span> <span class="op">+</span> </span>
+<span></span>
+<span>                 <span class="va">cost</span> <span class="op">&lt;-</span> <span class="va">linpred_cost</span> <span class="op">+</span></span>
 <span>                   <span class="va">cost_2</span> <span class="op">+</span></span>
-<span>                   <span class="va">cost_tx</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span></span>
-<span>                   </span>
+<span>                   <span class="va">cost_tx</span> <span class="op">*</span> <span class="va">treatment</span></span>
 <span></span>
 <span>                 <span class="co">#utility</span></span>
 <span>                 <span class="co">#use adj_val to calculate the utility changing over time between curtime and next event time due to age change</span></span>
@@ -733,15 +728,15 @@ and understand.</p>
 <span>                      by <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">12</span>,</span>
 <span>                      <span class="op">{</span><span class="va">cutoff</span> <span class="op">&lt;-</span> <span class="va">.time</span> <span class="op">+</span> <span class="va">bs_age</span></span>
 <span>                       <span class="va">pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval</a></span><span class="op">(</span><span class="va">cutoff</span>, <span class="va">u_norms</span><span class="op">$</span><span class="va">age_max</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span></span>
-<span>                       </span>
+<span></span>
 <span>                       <span class="co"># Clamp to bounds</span></span>
 <span>                       <span class="va">pos</span><span class="op">[</span><span class="va">pos</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">u_norms</span><span class="op">$</span><span class="va">utility</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
-<span>                       </span>
+<span></span>
 <span>                       <span class="va">u_norms</span><span class="op">$</span><span class="va">utility</span><span class="op">[</span><span class="va">pos</span><span class="op">]</span><span class="op">}</span>,</span>
 <span>                      discount <span class="op">=</span> <span class="va">drq</span>,</span>
 <span>                      vectorized_f <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>                 <span class="op">)</span></span>
-<span>                 <span class="va">q_total</span> <span class="op">&lt;-</span> <span class="va">adj_factor</span> <span class="op">-</span> <span class="va">disu</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">arm</span><span class="op">==</span><span class="st">"int"</span><span class="op">)</span></span>
+<span>                 <span class="va">q_total</span> <span class="op">&lt;-</span> <span class="va">adj_factor</span> <span class="op">-</span> <span class="va">disu</span> <span class="op">*</span> <span class="va">treatment</span></span>
 <span>               <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/add_reactevt.html">add_reactevt</a></span><span class="op">(</span>name_evt <span class="op">=</span> <span class="st">"event_1"</span>,</span>
 <span>               input <span class="op">=</span> <span class="op">{</span></span>
@@ -778,7 +773,7 @@ and understand.</p>
 <span>                     <span class="fu"><a href="../reference/next_event.html">next_event</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">time</span>,</span>
 <span>                     by <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">12</span>,</span>
 <span>                     <span class="op">(</span><span class="va">.time</span><span class="op">-</span><span class="va">curtime</span><span class="op">)</span> <span class="op">*</span> <span class="va">coef_cost_1</span> <span class="op">+</span></span>
-<span>                       <span class="va">coef_cost_2</span> <span class="op">*</span> <span class="fu">rcs_cost_f</span><span class="op">(</span><span class="op">(</span><span class="va">.time</span><span class="op">-</span><span class="va">curtime</span><span class="op">)</span>, <span class="va">nl_RCS</span><span class="op">[[</span><span class="va">status_1</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">2</span><span class="op">-</span><span class="va">sex</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                       <span class="va">coef_cost_2</span> <span class="op">*</span> <span class="fu">rcs_cost_f</span><span class="op">(</span><span class="op">(</span><span class="va">.time</span><span class="op">-</span><span class="va">curtime</span><span class="op">)</span>, <span class="va">nl_RCS_post_sex</span><span class="op">)</span>,</span>
 <span>                     discount <span class="op">=</span> <span class="va">drc</span>,</span>
 <span>                     vectorized_f <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>                <span class="op">)</span></span>
@@ -801,7 +796,7 @@ and understand.</p>
 <span>                       <span class="va">pos</span><span class="op">[</span><span class="va">pos</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">u_norms</span><span class="op">$</span><span class="va">utility</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
 <span>                       </span>
 <span>                      <span class="va">out</span> <span class="op">&lt;-</span> <span class="va">u_norms</span><span class="op">$</span><span class="va">utility</span><span class="op">[</span><span class="va">pos</span><span class="op">]</span> <span class="op">-</span></span>
-<span>                      <span class="fu">disu_sec_vec</span><span class="op">(</span><span class="va">.time</span> <span class="op">-</span> <span class="va">curtime</span>,<span class="va">v_du</span><span class="op">[</span><span class="op">-</span><span class="fl">6</span><span class="op">]</span>, <span class="va">lp_disusecond</span>, <span class="va">b5</span>, <span class="va">b6</span>, <span class="va">nl_RCS</span><span class="op">[[</span><span class="va">status_1</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">2</span><span class="op">-</span><span class="va">sex</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span>                      <span class="fu">disu_sec_vec</span><span class="op">(</span><span class="va">.time</span> <span class="op">-</span> <span class="va">curtime</span>,<span class="va">v_du</span><span class="op">[</span><span class="op">-</span><span class="fl">6</span><span class="op">]</span>, <span class="va">lp_disusecond</span>, <span class="va">b5</span>, <span class="va">b6</span>, <span class="va">nl_RCS_post_sex</span><span class="op">)</span></span>
 <span>                      <span class="va">out</span></span>
 <span>                        <span class="op">}</span></span>
 <span>                      ,</span>
@@ -853,9 +848,9 @@ and understand.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 74.29s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 74.29s</span></span>
-<span><span class="co">#&gt; Total time to run: 74.29s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 65.9s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 65.9s</span></span>
+<span><span class="co">#&gt; Total time to run: 65.91s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>

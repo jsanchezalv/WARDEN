@@ -341,71 +341,64 @@ rcs_du_v <-  function(du_all, du, t2, b5, b6, a0, a1, a2, a3){
 }
 
 disu_sec_vec <- function(time, DU_ALL, DU, B5, B6, nl_RCS_ch) {
-  
-   # Segment indicator
+
   seg <- cut(
     time,
     breaks = c(-Inf, nl_RCS_ch$knots, Inf),
     labels = FALSE,
     right = FALSE
   )
-  
-  # Preallocate spline coefficients (per time)
-  A <- matrix(0, nrow = length(time), ncol = 4)
-  
-  # Segment 2
+
+  n <- length(time)
+  a0 <- numeric(n); a1 <- a0; a2 <- a0; a3 <- a0
+
   s2 <- seg == 2
   if (any(s2)) {
-    A[s2,] <- matrix(nl_RCS_ch[[2]], ncol = 4, nrow = sum(s2), byrow = TRUE)
+    a0[s2] <- nl_RCS_ch[[2]][1]; a1[s2] <- nl_RCS_ch[[2]][2]
+    a2[s2] <- nl_RCS_ch[[2]][3]; a3[s2] <- nl_RCS_ch[[2]][4]
   }
-  
-  # Segment 3
+
   s3 <- seg == 3
   if (any(s3)) {
-    A[s3,] <- matrix(nl_RCS_ch[[3]], ncol = 4, nrow = sum(s3), byrow = TRUE)
+    a0[s3] <- nl_RCS_ch[[3]][1]; a1[s3] <- nl_RCS_ch[[3]][2]
+    a2[s3] <- nl_RCS_ch[[3]][3]; a3[s3] <- nl_RCS_ch[[3]][4]
   }
-  
+
   rcs_du_v(
-    t2  = time,
+    t2    = time,
     du_all = DU_ALL,
-    du = DU,
-    b5 = B5,
-    b6 = B6,
-    a0 = A[,1],
-    a1 = A[,2],
-    a2 = A[,3],
-    a3 = A[,4]
+    du    = DU,
+    b5    = B5,
+    b6    = B6,
+    a0    = a0,
+    a1    = a1,
+    a2    = a2,
+    a3    = a3
   )
 }
 
 rcs_cost_f <- function(time, nl_RCS_ch) {
-  
+
   out <- numeric(length(time))
-  
-  i1 <- time < nl_RCS_ch$knots[1]
-  i2 <- time >= nl_RCS_ch$knots[1] & time < nl_RCS_ch$knots[2]
-  i3 <- time >= nl_RCS_ch$knots[2] & time < nl_RCS_ch$knots[3]
-  i4 <- time >= nl_RCS_ch$knots[3]
-  
-  # Segment 1: below first knot → zero
-  out[i1] <- 0
-  
-  # Segment 2: cubic spline piece 2
+  knots <- nl_RCS_ch$knots
+
+  i2 <- time >= knots[1] & time < knots[2]
+  i3 <- time >= knots[2] & time < knots[3]
+  i4 <- time >= knots[3]
+
   if (any(i2)) {
-    t <- time[i2]
-    out[i2] <- as.numeric(nl_RCS_ch[[2]] %*% rbind(1, t, t^2, t^3))
+    t <- time[i2]; a <- nl_RCS_ch[[2]]
+    out[i2] <- a[1] + t*(a[2] + t*(a[3] + t*a[4]))
   }
-  
-  # Segment 3: cubic spline piece 3
+
   if (any(i3)) {
-    t <- time[i3]
-    out[i3] <- as.numeric(nl_RCS_ch[[3]] %*% rbind(1, t, t^2, t^3))
+    t <- time[i3]; a <- nl_RCS_ch[[3]]
+    out[i3] <- a[1] + t*(a[2] + t*(a[3] + t*a[4]))
   }
-  
-  # Segment 4: linear tail
+
   if (any(i4)) {
-    t <- time[i4]
-    out[i4] <- as.numeric(nl_RCS_ch[[4]] %*% rbind(1, t))
+    t <- time[i4]; a <- nl_RCS_ch[[4]]
+    out[i4] <- a[1] + a[2]*t
   }
   out
 }
@@ -578,9 +571,12 @@ unique_pt_inputs <- add_item(input = {
     tte_first <- v_first_times[status_1]
     
     seq_ch <- if(status_1 == 1){odd_seq}else if(status_1 == 2){even_seq}else{NA}
-    
+
     b5 <- second_event_du_coef[seq_ch,1]
     b6 <- second_event_du_coef[seq_ch,2]
+
+    nl_RCS_pre_sex  <- nl_RCS[["nl_RCS_pre"]][[2-sex]]
+    nl_RCS_post_sex <- if (status_1 <= 2) nl_RCS[[status_1 + 1]][[2-sex]] else NULL
 })
 ```
 
@@ -636,15 +632,14 @@ evt_react_list <-
                       next_event()$time,
                       by = 1/12,
                       (.time-curtime) * coef_cost_1 +
-                        coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS[["nl_RCS_pre"]][[2-sex]]), 
+                        coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS_pre_sex),
                       discount = drc,
                       vectorized_f = TRUE
                  )
-                 
-                 cost <- linpred_cost + 
+
+                 cost <- linpred_cost +
                    cost_2 +
-                   cost_tx * as.integer(arm=="int")
-                   
+                   cost_tx * treatment
 
                  #utility
                  #use adj_val to calculate the utility changing over time between curtime and next event time due to age change
@@ -654,15 +649,15 @@ evt_react_list <-
                       by = 1/12,
                       {cutoff <- .time + bs_age
                        pos <- findInterval(cutoff, u_norms$age_max) + 1
-                       
+
                        # Clamp to bounds
                        pos[pos > length(u_norms$utility)] <- NA
-                       
+
                        u_norms$utility[pos]},
                       discount = drq,
                       vectorized_f = TRUE
                  )
-                 q_total <- adj_factor - disu * as.integer(arm=="int")
+                 q_total <- adj_factor - disu * treatment
                }) |> 
   add_reactevt(name_evt = "event_1",
                input = {
@@ -699,7 +694,7 @@ evt_react_list <-
                      next_event()$time,
                      by = 1/12,
                      (.time-curtime) * coef_cost_1 +
-                       coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS[[status_1+1]][[2-sex]]),
+                       coef_cost_2 * rcs_cost_f((.time-curtime), nl_RCS_post_sex),
                      discount = drc,
                      vectorized_f = TRUE
                 )
@@ -722,7 +717,7 @@ evt_react_list <-
                        pos[pos > length(u_norms$utility)] <- NA
                        
                       out <- u_norms$utility[pos] -
-                      disu_sec_vec(.time - curtime,v_du[-6], lp_disusecond, b5, b6, nl_RCS[[status_1+1]][[2-sex]])
+                      disu_sec_vec(.time - curtime,v_du[-6], lp_disusecond, b5, b6, nl_RCS_post_sex)
                       out
                         }
                       ,
@@ -775,9 +770,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 74.29s
-#> Time to run analysis 1: 74.29s
-#> Total time to run: 74.29s
+#> Time to run simulation 1: 65.9s
+#> Time to run analysis 1: 65.9s
+#> Total time to run: 65.91s
 #> Simulation finalized;
 ```
 
