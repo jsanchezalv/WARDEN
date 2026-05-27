@@ -1,3 +1,5 @@
+# WARDEN (development version)
+
 # WARDEN 2.0.3
 * `add_item()` now works correctly with the native pipe (`|>`). The `.data` argument has been moved to the first position (`.data = NULL, ..., input`), so the LHS of `|>` is naturally routed to `.data` without relying on magrittr's `.` symbol. Existing code using `%>%`, `input=`, or named `...` arguments is unaffected (#TODO).
 * `input_block()` and `run_sim()` now correctly handle multiple blocks spanning different simulation levels (e.g., `common_all_inputs` and `common_pt_inputs`): `n_sensitivity` is summed across all blocks, and binary-mode parameter offsets are injected automatically so each block activates at the right DSA iteration.
