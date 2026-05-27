@@ -442,7 +442,7 @@ results <- run_sim(
 #> Simulation number: 2
 #> Time to run simulation 2: 0.05s
 #> Time to run analysis 1: 0.1s
-#> Total time to run: 0.1s
+#> Total time to run: 0.11s
 #> Simulation finalized;
 
 summary_results_sim(results[[1]])  |>
@@ -582,8 +582,8 @@ results <- run_sim(
 #> Time to run simulation 1: 0.06s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.06s
-#> Time to run analysis 14: 0.12s
-#> Total time to run: 1.7s
+#> Time to run analysis 14: 0.11s
+#> Total time to run: 1.69s
 #> Simulation finalized;
 
 summary_results_sens(results)
@@ -937,7 +937,7 @@ results <- run_sim(
 #> Simulation number: 2
 #> Time to run simulation 2: 0.06s
 #> Time to run analysis 18: 0.13s
-#> Total time to run: 2.34s
+#> Total time to run: 2.33s
 #> Simulation finalized;
 
 summary_results_sens(results)
@@ -1123,7 +1123,7 @@ results <- run_sim(
 #> Simulation number: 1
 #> Time to run simulation 1: 0.07s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.06s
+#> Time to run simulation 2: 0.07s
 #> Time to run analysis 1: 0.13s
 #> Analysis number: 2
 #> Simulation number: 1
@@ -1159,7 +1159,7 @@ results <- run_sim(
 #> Simulation number: 1
 #> Time to run simulation 1: 0.06s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
+#> Time to run simulation 2: 0.06s
 #> Time to run analysis 7: 0.13s
 #> Analysis number: 8
 #> Simulation number: 1
@@ -1179,7 +1179,7 @@ results <- run_sim(
 #> Simulation number: 2
 #> Time to run simulation 2: 0.06s
 #> Time to run analysis 10: 0.13s
-#> Total time to run: 1.35s
+#> Total time to run: 1.34s
 #> Simulation finalized;
 
 summary_results_sens(results)
@@ -1342,7 +1342,7 @@ results <- run_sim(
 #> Simulation number: 1
 #> Time to run simulation 1: 0.06s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.07s
+#> Time to run simulation 2: 0.06s
 #> Time to run analysis 1: 0.13s
 #> Analysis number: 2
 #> Simulation number: 1
@@ -1410,7 +1410,7 @@ results <- run_sim(
 #> Simulation number: 2
 #> Time to run simulation 2: 0.06s
 #> Time to run analysis 12: 0.13s
-#> Total time to run: 1.59s
+#> Total time to run: 1.57s
 #> Simulation finalized;
 
 summary_results_sens(results)

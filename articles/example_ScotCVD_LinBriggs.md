@@ -294,7 +294,7 @@ options(tibble.print_max = 50)
 
 As with any model, we need to load inputs, set initial TTE, event
 reactions, utilities/costs, etc. We’ll use the
-[`pick_val_v()`](https://jsanchezalv.github.io/WARDEN/reference/pick_val_v.md)
+[`input_block()`](https://jsanchezalv.github.io/WARDEN/reference/input_block.md)
 function to have all inputs set-up at once.
 
 Though the model is a cohort one except for the SIMD variable, we assume
@@ -775,9 +775,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 75.11s
-#> Time to run analysis 1: 75.11s
-#> Total time to run: 75.12s
+#> Time to run simulation 1: 74.29s
+#> Time to run analysis 1: 74.29s
+#> Total time to run: 74.29s
 #> Simulation finalized;
 ```
 
