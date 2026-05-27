@@ -292,7 +292,7 @@ options(tibble.print_max = 50)
 
 ## Inputs
 
-As with any model, we need to load inputs, set initial TTE, event reactions, utilities/costs, etc. We'll use the `pick_val_v()` function to have all inputs set-up at once.
+As with any model, we need to load inputs, set initial TTE, event reactions, utilities/costs, etc. We'll use the `input_block()` function to have all inputs set-up at once.
 
 Though the model is a cohort one except for the SIMD variable, we assume here that we could use one with individual variation, so we define the parameters at the individual level instead of pre-loading them as a cohort (though we could do that as well). Since we do not have any uncertainty around the cohort parameters, we assume those are excluded from the PSA as in the original publication.
 

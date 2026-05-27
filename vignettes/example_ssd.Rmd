@@ -51,7 +51,7 @@ Initial inputs and flags that will be used in the model can be defined below. We
 
 Note that time to death is set in the common_pt_inputs, but it could also just be set in the `add_tte` function explained below. The user has full flexibility on how to implement this type of inputs.
 
-There are some auxiliary functions to help setting up inputs, like `pick_val_v()` (and `pick_psa()`, see below the section on [Sensitivity Analysis](#sensitivity-analysis)). Note that `pick_val_v()` can be directly loaded as parameters (in fact, a named list will be loaded directly by R).
+There are some auxiliary functions to help setting up inputs, like `input_block()` (and `pick_psa()`, see below the section on [Sensitivity Analysis](#sensitivity-analysis)). Note that `input_block()` can be directly loaded as parameters (in fact, a named list will be loaded directly by R).
 
 ```{r input_delayed}
 #We don't need to use sensitivity_inputs here, so we don't add that object
