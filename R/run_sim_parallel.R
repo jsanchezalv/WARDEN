@@ -486,63 +486,72 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     
     
 # Simulation loop ---------------------------------------------------------
-    output_sim[[sens]] <- vector("list", length=n_sim) # empty list with n_sim elements
-    # Outer loop, repeat for each patient
-    
+    # Chunk simulations so each worker processes a sequential block instead of a single
+    # simulation. Reduces future dispatch overhead from n_sim to n_chunks round-trips.
+    # Seeds are simulation-indexed so results are identical regardless of chunking.
     exported_items <- unique(c("input_list_sens",ls(.GlobalEnv),ls(parent.env(environment()), all.names = TRUE),ls(environment(), all.names = TRUE)))
     options(future.rng.onMisuse = "ignore")
-    
-    output_sim[[sens]] <- foreach(simulation = 1:n_sim,
+    n_chunks <- min(n_sim, ncores * 2L)
+    sim_chunks <- split(seq_len(n_sim), cut(seq_len(n_sim), n_chunks, labels = FALSE))
+
+    output_sim[[sens]] <- foreach(chunk = sim_chunks,
                          # .options.future = list(seed = TRUE),
                          .options.future = list(packages = .packages()),
                          .options.future = list(globals=structure(TRUE,add = exported_items)),
                          .combine = 'c') %dofuture% {
-      .set_last_ctx(stage="Error in setup:simulation_start", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
-                           
-      RNGkind("L'Ecuyer-CMRG") #repeat this here so parallel::RngStream does not malfunction
-                            
-      message(paste0("Simulation number: ",simulation))
-      
-                           
-      start_time_sim <-  proc.time()
-                           
-                           
-      # input_list <- rlang::env_clone(input_list_sens , parent.env(input_list_sens))
-      input_list <- new.env(parent = input_list_sens)
-      list2env(as.list(input_list_sens), input_list)
-      input_list$simulation <- simulation
-      input_list$n_sens_before <- .n_before_offsets[2L]
+      # Per-worker setup: runs once per chunk, not once per simulation.
+      # Prevent data.table thread oversubscription: ncores workers × N DT threads = N*ncores
+      # threads fighting for ncores cores. Single-threaded DT is faster at per-simulation sizes.
+      prev_dt_threads <- data.table::getDTthreads()
+      data.table::setDTthreads(1L)
+      on.exit(data.table::setDTthreads(prev_dt_threads), add = TRUE)
+      RNGkind("L'Ecuyer-CMRG") #set once per worker; parallel::RngStream requires this
 
-      set.seed(simulation*1007*seed)
-      .set_last_ctx(stage="setup:common_all_inputs", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
-      
-      
-      # Draw Common parameters  -------------------------------
-      if(!is.null(common_all_inputs)){
-        on_error_check({
-              load_inputs(inputs = input_list,list_uneval_inputs = common_all_inputs)
-        }, continue_on_error = continue_on_error)
-          if(.skip_to_next){return(NULL)}
-        
-        if(input_list_sens$debug){ 
-          dump_info <- debug_inputs(input_list_sens,input_list)
-          
-          
-          names(dump_info) <- paste0("Analysis: ", input_list$sens," ", input_list$sens_name_used,
-                                     "; Sim: ", input_list$simulation,
-                                     "; Statics"
-          )
-          
-          log_list <- c(log_list,dump_info)
-          log_add(dump_info)
+      chunk_results <- vector("list", length(chunk))
+
+      for (idx in seq_along(chunk)) {
+        simulation <- chunk[idx]
+        .skip_to_next <- FALSE
+
+        .set_last_ctx(stage="Error in setup:simulation_start", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
+
+        message(paste0("Simulation number: ",simulation))
+
+        start_time_sim <-  proc.time()
+
+        # input_list <- rlang::env_clone(input_list_sens , parent.env(input_list_sens))
+        input_list <- new.env(parent = input_list_sens)
+        list2env(as.list(input_list_sens), input_list)
+        input_list$simulation <- simulation
+        input_list$n_sens_before <- .n_before_offsets[2L]
+
+        set.seed(simulation*1007*seed)
+        .set_last_ctx(stage="setup:common_all_inputs", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
+
+        # Draw Common parameters  -------------------------------
+        if(!is.null(common_all_inputs)){
+          on_error_check({
+                load_inputs(inputs = input_list,list_uneval_inputs = common_all_inputs)
+          }, continue_on_error = continue_on_error)
+            if(.skip_to_next){next}
+
+          if(input_list_sens$debug){
+            dump_info <- debug_inputs(input_list_sens,input_list)
+
+            names(dump_info) <- paste0("Analysis: ", input_list$sens," ", input_list$sens_name_used,
+                                       "; Sim: ", input_list$simulation,
+                                       "; Statics"
+            )
+
+            log_list <- c(log_list,dump_info)
+            log_add(dump_info)
+          }
         }
-        }
-      
-  
-      if(is.null(input_list$drc)){input_list$drc <- 0.03}
-      if(is.null(input_list$drq)){input_list$drq <- 0.03}
-      
-      # Run engine ----------------------------------------------------------
+
+        if(is.null(input_list$drc)){input_list$drc <- 0.03}
+        if(is.null(input_list$drq)){input_list$drq <- 0.03}
+
+        # Run engine ----------------------------------------------------------
         .set_last_ctx(stage="Error in engine:start", sens=sens, simulation=simulation, .warden_ctx = .warden_ctx)
         on_error_check({
           if(constrained){
@@ -552,7 +561,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                                                    input_list = input_list,
                                                    pb = pb,
                                                    seed = seed,
-                                                   .warden_ctx = .warden_ctx)  
+                                                   .warden_ctx = .warden_ctx)
           } else{
             final_output <- run_engine(arm_list=arm_list,
                                        common_pt_inputs=common_pt_inputs,
@@ -565,23 +574,25 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
                                        .warden_ctx = .warden_ctx)
           }
         }, continue_on_error = continue_on_error)
-        if(.skip_to_next){return(NULL)}
-      
-      if (input_list$ipd>0) {
-  
-        final_output$merged_df$simulation <- simulation
-        final_output$merged_df$sensitivity <- sens
-      }
-      
-      final_output <- c(list(sensitivity_name = sens_name_used), final_output)
-      
-      if (debug) final_output$log_list <- log_sink$entries
-      
-      return(list(final_output))
-      
-      message(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
-      
+        if(.skip_to_next){next}
 
+        if (input_list$ipd>0) {
+          final_output$merged_df$simulation <- simulation
+          final_output$merged_df$sensitivity <- sens
+        }
+
+        final_output <- c(list(sensitivity_name = sens_name_used), final_output)
+
+        if (debug) final_output$log_list <- log_sink$entries
+
+        chunk_results[[idx]] <- list(final_output)
+
+        message(paste0("Time to run simulation ", simulation,": ",  round(proc.time()[3]- start_time_sim[3] , 2 ), "s"))
+      }
+
+      # Drop NULL entries (skipped simulations) to match original one-future-per-sim behaviour
+      # where return(NULL) caused NULL to be dropped by .combine='c' between separate futures.
+      Filter(Negate(is.null), chunk_results)
      }
     
 
