@@ -404,9 +404,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 14.57s
-#> Time to run analysis 1: 14.57s
-#> Total time to run: 14.58s
+#> Time to run simulation 1: 12.35s
+#> Time to run analysis 1: 12.35s
+#> Total time to run: 12.35s
 #> Simulation finalized;
 ```
 
@@ -649,9 +649,9 @@ results2 <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 6.63s
-#> Time to run analysis 1: 6.63s
-#> Total time to run: 6.63s
+#> Time to run simulation 1: 6.45s
+#> Time to run analysis 1: 6.45s
+#> Total time to run: 6.45s
 #> Simulation finalized;
 ```
 
@@ -840,24 +840,21 @@ common_all_inputs2 <-add_item(input = {
  
                       drc         <- 0.04 
                       drq         <- 0.015
-                      p_highrisk  <- 0.6
-                      
-                      pick_val_v(
+                      p_highrisk  <- 0.6 }) |>
+                     input_block(
                         base= l_inputs[["base_value"]],
                         psa = pick_psa(
                             l_inputs[["PSA_dist"]],
                             l_inputs[["n"]],
                             l_inputs[["a"]],
                             l_inputs[["b"]]),
-                        psa_ind     = psa_bool,
-                        sens_ind    = FALSE, 
+                        sens = NULL,
                         names_out   = l_inputs[["parameter_name"]],
-                        indicator   = rep(1,10), 
-                        indicator_psa = l_inputs[["psa_indicators"]],
-                        deploy_env = TRUE
-                      ) 
-
-                      
+                        sens_indicators = rep(1,10), 
+                        psa_indicators  = l_inputs[["psa_indicators"]],
+                        indicator_sens_binary = TRUE
+                      ) |>
+                     add_item(input = {
                       d_BS_shape <- df_survival_models$d_RF_D_shape
                       d_BS_rate  <- df_survival_models$d_RF_D_rate
                       d_TTR_cure_1_low  <- thetaToProb(m_TTR["theta"])
@@ -924,12 +921,17 @@ results_psa <- run_sim_parallel(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Data aggregated across events and patients by selecting the last value for input_out numeric items and then averaging across patients. Only last value of non-numeric and length > 1 items in simulation is displayed.
+#> Time to run simulation 1: 1.54s
 #> Simulation number: 2
+#> Time to run simulation 2: 1.28s
 #> Simulation number: 3
+#> Time to run simulation 3: 1.28s
 #> Simulation number: 4
+#> Time to run simulation 4: 1.22s
 #> Simulation number: 5
-#> Time to run analysis 1: 8.04s
-#> Total time to run: 8.04s
+#> Time to run simulation 5: 1.3s
+#> Time to run analysis 1: 7.59s
+#> Total time to run: 7.59s
 #> Simulation finalized;
   
 summary_results_sim(results_psa[[1]], arm ="two") 

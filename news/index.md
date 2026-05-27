@@ -1,8 +1,6 @@
 # Changelog
 
-## WARDEN 2.0.2
-
-CRAN release: 2026-03-18
+## WARDEN 2.0.3
 
 - [`add_item()`](https://jsanchezalv.github.io/WARDEN/reference/add_item.md)
   now works correctly with the native pipe (`|>`). The `.data` argument

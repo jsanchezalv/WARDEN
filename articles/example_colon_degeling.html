@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Javier Sanchez
 Alvarez</h4>
             
-            <h4 data-toc-skip class="date">May 26, 2026</h4>
+            <h4 data-toc-skip class="date">May 27, 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/vignettes/articles/example_colon_degeling.Rmd" class="external-link"><code>vignettes/articles/example_colon_degeling.Rmd</code></a></small>
       <div class="d-none name"><code>example_colon_degeling.Rmd</code></div>
@@ -485,9 +485,9 @@ results.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 14.57s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 14.57s</span></span>
-<span><span class="co">#&gt; Total time to run: 14.58s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 12.35s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 12.35s</span></span>
+<span><span class="co">#&gt; Total time to run: 12.35s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 </div>
 </div>
@@ -1369,9 +1369,9 @@ structure.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Patient-arm data aggregated across events by selecting the last value for input_out items.</span></span>
-<span><span class="co">#&gt; Time to run simulation 1: 6.63s</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 6.63s</span></span>
-<span><span class="co">#&gt; Total time to run: 6.63s</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 6.45s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 6.45s</span></span>
+<span><span class="co">#&gt; Total time to run: 6.45s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="summary-of-results">Summary of Results<a class="anchor" aria-label="anchor" href="#summary-of-results"></a>
@@ -2590,24 +2590,21 @@ time.</p>
 <span> </span>
 <span>                      <span class="va">drc</span>         <span class="op">&lt;-</span> <span class="fl">0.04</span> </span>
 <span>                      <span class="va">drq</span>         <span class="op">&lt;-</span> <span class="fl">0.015</span></span>
-<span>                      <span class="va">p_highrisk</span>  <span class="op">&lt;-</span> <span class="fl">0.6</span></span>
-<span>                      </span>
-<span>                      <span class="fu"><a href="../reference/pick_val_v.html">pick_val_v</a></span><span class="op">(</span></span>
+<span>                      <span class="va">p_highrisk</span>  <span class="op">&lt;-</span> <span class="fl">0.6</span> <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>                     <span class="fu"><a href="../reference/input_block.html">input_block</a></span><span class="op">(</span></span>
 <span>                        base<span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"base_value"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>                        psa <span class="op">=</span> <span class="fu"><a href="../reference/pick_psa.html">pick_psa</a></span><span class="op">(</span></span>
 <span>                            <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"PSA_dist"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>                            <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"n"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>                            <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"a"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>                            <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"b"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>                        psa_ind     <span class="op">=</span> <span class="va">psa_bool</span>,</span>
-<span>                        sens_ind    <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>                        sens <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>                        names_out   <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"parameter_name"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>                        indicator   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">10</span><span class="op">)</span>, </span>
-<span>                        indicator_psa <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>                        deploy_env <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>                      <span class="op">)</span> </span>
-<span></span>
-<span>                      </span>
+<span>                        sens_indicators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">10</span><span class="op">)</span>, </span>
+<span>                        psa_indicators  <span class="op">=</span> <span class="va">l_inputs</span><span class="op">[[</span><span class="st">"psa_indicators"</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>                        indicator_sens_binary <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>                      <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>                     <span class="fu"><a href="../reference/add_item.html">add_item</a></span><span class="op">(</span>input <span class="op">=</span> <span class="op">{</span></span>
 <span>                      <span class="va">d_BS_shape</span> <span class="op">&lt;-</span> <span class="va">df_survival_models</span><span class="op">$</span><span class="va">d_RF_D_shape</span></span>
 <span>                      <span class="va">d_BS_rate</span>  <span class="op">&lt;-</span> <span class="va">df_survival_models</span><span class="op">$</span><span class="va">d_RF_D_rate</span></span>
 <span>                      <span class="va">d_TTR_cure_1_low</span>  <span class="op">&lt;-</span> <span class="fu">thetaToProb</span><span class="op">(</span><span class="va">m_TTR</span><span class="op">[</span><span class="st">"theta"</span><span class="op">]</span><span class="op">)</span></span>
@@ -2674,12 +2671,17 @@ time.</p>
 <span><span class="co">#&gt; Analysis number: 1</span></span>
 <span><span class="co">#&gt; Simulation number: 1</span></span>
 <span><span class="co">#&gt; Data aggregated across events and patients by selecting the last value for input_out numeric items and then averaging across patients. Only last value of non-numeric and length &gt; 1 items in simulation is displayed.</span></span>
+<span><span class="co">#&gt; Time to run simulation 1: 1.54s</span></span>
 <span><span class="co">#&gt; Simulation number: 2</span></span>
+<span><span class="co">#&gt; Time to run simulation 2: 1.28s</span></span>
 <span><span class="co">#&gt; Simulation number: 3</span></span>
+<span><span class="co">#&gt; Time to run simulation 3: 1.28s</span></span>
 <span><span class="co">#&gt; Simulation number: 4</span></span>
+<span><span class="co">#&gt; Time to run simulation 4: 1.22s</span></span>
 <span><span class="co">#&gt; Simulation number: 5</span></span>
-<span><span class="co">#&gt; Time to run analysis 1: 8.04s</span></span>
-<span><span class="co">#&gt; Total time to run: 8.04s</span></span>
+<span><span class="co">#&gt; Time to run simulation 5: 1.3s</span></span>
+<span><span class="co">#&gt; Time to run analysis 1: 7.59s</span></span>
+<span><span class="co">#&gt; Total time to run: 7.59s</span></span>
 <span><span class="co">#&gt; Simulation finalized;</span></span>
 <span>  </span>
 <span><span class="fu"><a href="../reference/summary_results_sim.html">summary_results_sim</a></span><span class="op">(</span><span class="va">results_psa</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, arm <span class="op">=</span><span class="st">"two"</span><span class="op">)</span> </span>
