@@ -332,8 +332,8 @@ psa_bool = FALSE,
 ipd = 1)
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.04s
-#> Time to run analysis 1: 0.04s
+#> Time to run simulation 1: 0.05s
+#> Time to run analysis 1: 0.05s
 #> Total time to run: 0.05s
 #> Simulation finalized; 
 #> [[1]]
