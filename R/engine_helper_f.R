@@ -150,12 +150,11 @@ initiate_evt <- function(arm_name,input_list_arm){
 #' @keywords internal
 #' @noRd
 
-react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function processes the next event (as identified in the GetNextEvt function)
+react_evt <- function(evt, evttime, arm, input_list_arm=NULL){
   # Initial set-up --------------------------
-  evt <- thisevt$evt                  # Identify event type
-  prevtime <- input_list_arm$curtime                 # Identify time of previous event
-  curtime <- thisevt$evttime         # Identify time of next event
-  
+  prevtime <- input_list_arm$curtime
+  curtime <- evttime
+
   if (curtime<prevtime) {
     stop("Time of event '", evt,"': ", round(curtime,4), " is smaller than the time of previous event '", if(!is.list(input_list_arm$evt)){input_list_arm$evt}else{NA}, "': ", round(prevtime,4), ". Arm: ", arm, ", id: ", input_list_arm$i)
   }
@@ -166,22 +165,16 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
   input_list_arm[["arm"]] <- arm
   
   # Create costs and utilities for event --------------------------------------------------
-  evt_arm <- paste(evt,arm,sep = "_")
+  input_list_arm[["evt_arm"]] <- input_list_arm$evt_arm_lookup[[evt]]
   
   #Reset instantaneous costs/qalys/others
-  if(!is.null(input_list_arm$uc_lists$instant_inputs)){
-    for (var_name in input_list_arm$uc_lists$instant_inputs) {
-      assign(var_name, 0, envir = input_list_arm)
-    }
+  if (!is.null(input_list_arm$uc_lists$zero_instant)) {
+    list2env(input_list_arm$uc_lists$zero_instant, input_list_arm)
   }
-  
+
   #Reset accumulator backwards flags
-  if(input_list_arm$accum_backwards){
-    if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
-      for (var_name in input_list_arm$ongoing_inputs_lu) {
-        assign(var_name, 0, envir = input_list_arm)
-      }
-    }
+  if (input_list_arm$accum_backwards && !is.null(input_list_arm$uc_lists$zero_ongoing_lu)) {
+    list2env(input_list_arm$uc_lists$zero_ongoing_lu, input_list_arm)
   }
   
 
@@ -216,16 +209,15 @@ react_evt <- function(thisevt,arm,input_list_arm=NULL){      # This function pro
 eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
   # Initial set-up --------------------------
 
-  position <- which(evt_name==names(react_list))
-  pos_l <- length(position)
-  if (pos_l==0 | pos_l>1 ) {
-    stop("Reaction to event ", evt_name, " not recognised or more than one reaction found. Make sure that only one reaction has been defined for the event")    
+  reaction <- react_list[[evt_name]]
+  if (is.null(reaction)) {
+    stop("Reaction to event '", evt_name, "' not recognised. Make sure that a reaction has been defined for the event")
   }
 
 # Evaluate reaction -------------------------------------------------------
   #debug bit (pre-evaluation)
   if(input_list_arm$debug){
-    prev_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm, ifnotfound = Inf)
+    prev_values <- mget(reaction[["debug_vars"]], input_list_arm, ifnotfound = Inf)
 
     loc <- paste0("Analysis: ", input_list_arm$sens," ", input_list_arm$sens_name_used,
                   "; Sim: ", input_list_arm$simulation,
@@ -235,25 +227,25 @@ eval_reactevt <-  function(react_list,evt_name,input_list_arm=NULL){
                   "; Time: ", round(input_list_arm$curtime,3)
     )
   }
-  
+
   #evaluate event
   if(input_list_arm$accum_backwards){
     if(!is.null(input_list_arm$uc_lists$ongoing_inputs)){
       with_write_flags_lang(
-        react_list[[position]][["react"]],
+        reaction[["react"]],
         tracked = input_list_arm$uc_lists$ongoing_inputs,
         env     = input_list_arm,
         flag_value = 1L
       )
     }
   }else{
-    eval(react_list[[position]][["react"]], input_list_arm)
+    eval(reaction[["react"]], input_list_arm)
   }
-  
+
   #debug bit (after evaluation)
   if(input_list_arm$debug){
-    
-    cur_values <- mget(react_list[[position]][["debug_vars"]], input_list_arm, ifnotfound = Inf)
+
+    cur_values <- mget(reaction[["debug_vars"]], input_list_arm, ifnotfound = Inf)
     
     if(!is.null(input_list_arm$log_list[[loc]])){
       input_list_arm$log_list[[loc]]$prev_value <- c(input_list_arm$log_list[[loc]]$prev_value, prev_values)
@@ -1040,15 +1032,14 @@ compute_outputs <- function(patdata,input_list) {
   npats <- input_list$npats
   psa_bool <- input_list$psa_bool
   
-  list_patdata <- NULL
-  
   #Split the data as to be exported as a data.table, and the extra data the user described
   data_export_aslist <- input_list$input_out[!input_list$input_out %chin% input_list$categories_for_export]
   data_export_summarized_nonumeric <- data_export_aslist
-    
-  for (arm_i in arm_list) {
-    list_patdata <- c(list_patdata,unlist(map(map(patdata,arm_i),"evtlist"), recursive = FALSE))
-  }  
+
+  list_patdata <- unlist(
+    lapply(arm_list, \(arm_i) unlist(map(map(patdata, arm_i), "evtlist"), recursive = FALSE)),
+    recursive = FALSE
+  )
   
   rm(patdata)
 
@@ -1110,8 +1101,11 @@ compute_outputs <- function(patdata,input_list) {
   )
   
   #Use the data.table to initialize values
-  patdata_dt[,prevtime:=data.table::shift(evttime,fill=0)]
-  patdata_dt[,prevtime:=ifelse(prevtime>evttime,0,prevtime)]
+  patdata_dt[, prevtime := data.table::shift(evttime, fill = 0)]
+  n_row <- nrow(patdata_dt)
+  boundary_start <- c(TRUE, patdata_dt$pat_id[-1L] != patdata_dt$pat_id[-n_row] |
+                            patdata_dt$arm[-1L] != patdata_dt$arm[-n_row])
+  set(patdata_dt, i = which(boundary_start), j = "prevtime", value = 0)
   cols_init <- c("lys",
                  "qalys",
                  "costs",
@@ -1142,8 +1136,11 @@ compute_outputs <- function(patdata,input_list) {
     }
   
   } else{
-    patdata_dt[, nexttime:=data.table::shift(evttime,fill=0,n=-1L)]
-    patdata_dt[, nexttime := ifelse(nexttime<evttime,evttime,nexttime)]
+    patdata_dt[, nexttime := data.table::shift(evttime, fill = 0, n = -1L)]
+    boundary_end <- c(patdata_dt$pat_id[-1L] != patdata_dt$pat_id[-n_row] |
+                      patdata_dt$arm[-1L] != patdata_dt$arm[-n_row], TRUE)
+    set(patdata_dt, i = which(boundary_end), j = "nexttime",
+        value = patdata_dt$evttime[which(boundary_end)])
     }
   
   if(!is.null(input_list$timed_freq)){

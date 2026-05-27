@@ -3,6 +3,7 @@
 inst/doc
 /doc/
 /docs/
+/presentation/
 /Meta/
 .Rhistory
 /.claude/btw_setup.R

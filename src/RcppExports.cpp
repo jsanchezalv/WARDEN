@@ -267,6 +267,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// pop_into_cpp
+void pop_into_cpp(SEXP ptr, SEXP out_list);
+RcppExport SEXP _WARDEN_pop_into_cpp(SEXP ptrSEXP, SEXP out_listSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type out_list(out_listSEXP);
+    pop_into_cpp(ptr, out_list);
+    return R_NilValue;
+END_RCPP
+}
 // remove_event_cpp
 void remove_event_cpp(SEXP ptr, int patient_id, SEXP events);
 RcppExport SEXP _WARDEN_remove_event_cpp(SEXP ptrSEXP, SEXP patient_idSEXP, SEXP eventsSEXP) {
@@ -591,6 +602,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_WARDEN_next_event_pt_cpp", (DL_FUNC) &_WARDEN_next_event_pt_cpp, 3},
     {"_WARDEN_pop_event_cpp", (DL_FUNC) &_WARDEN_pop_event_cpp, 1},
     {"_WARDEN_pop_and_return_event_cpp", (DL_FUNC) &_WARDEN_pop_and_return_event_cpp, 1},
+    {"_WARDEN_pop_into_cpp", (DL_FUNC) &_WARDEN_pop_into_cpp, 2},
     {"_WARDEN_remove_event_cpp", (DL_FUNC) &_WARDEN_remove_event_cpp, 3},
     {"_WARDEN_modify_event_cpp", (DL_FUNC) &_WARDEN_modify_event_cpp, 4},
     {"_WARDEN_queue_empty_cpp", (DL_FUNC) &_WARDEN_queue_empty_cpp, 2},

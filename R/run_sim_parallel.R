@@ -253,7 +253,13 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     stop(paste0("Number of events defined in init_event_list first sublist `evts` is not equal to the number of events defined in evt_react_list.
          Please ensure both have equal length, ",dif," is/are missing from one of the lists."))
   }
-  
+
+  if (anyDuplicated(names(evt_react_list)) > 0L) {
+    dupes <- names(evt_react_list)[duplicated(names(evt_react_list))]
+    stop("Duplicate reaction(s) found for event(s): ", paste(dupes, collapse = ", "),
+         ". Make sure that only one reaction has been defined for each event")
+  }
+
   plan(multisession, workers = ncores)
   
   arm_list <- arm_list #this is done as otherwise there are problems passing arguments from function to function

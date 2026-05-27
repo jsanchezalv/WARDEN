@@ -468,6 +468,22 @@ List pop_and_return_event_cpp(SEXP ptr) {
   }
 }
 
+// Writes pop result into a pre-allocated R list (patient_id, event_name, time)
+// by replacing element SEXPs in-place, avoiding named list allocation per event.
+// [[Rcpp::export]]
+void pop_into_cpp(SEXP ptr, SEXP out_list) {
+  try {
+    EventQueuePtr q(ptr);
+    Event e = q->pop_and_return();
+    List out(out_list);
+    out[0] = e.patient_id;
+    out[1] = e.event_name;
+    out[2] = e.time;
+  } catch (const std::exception& ex) {
+    throw Rcpp::exception(ex.what());
+  }
+}
+
 // [[Rcpp::export]]
 void remove_event_cpp(SEXP ptr, int patient_id, SEXP events) {
   try {

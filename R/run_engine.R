@@ -49,7 +49,19 @@ run_engine <- function(arm_list,
   }else{
     input_out_v <- c(input_list$input_out)
   }
-  
+
+  if (!is.null(input_list$uc_lists$instant_inputs)) {
+    input_list$uc_lists$zero_instant <- setNames(
+      as.list(rep(0, length(input_list$uc_lists$instant_inputs))),
+      input_list$uc_lists$instant_inputs)
+  }
+  if (input_list$accum_backwards && !is.null(input_list$uc_lists$ongoing_inputs)) {
+    input_list$uc_lists$zero_ongoing_lu <- setNames(
+      as.list(rep(0, length(input_list$ongoing_inputs_lu))),
+      input_list$ongoing_inputs_lu)
+  }
+
+  .pop_buf <- list(patient_id = 0L, event_name = "", time = 0.0)
 
   #1 Loop per patient ----------------------------------------------------------
   patdata <- vector("list", length=npats) # empty list with npats elements
@@ -128,15 +140,16 @@ run_engine <- function(arm_list,
       input_list_arm$arm <- arm
       input_list_arm$n_sens_before <- n_sens_before_unique_pt
 
+      which_arm <- which(arm==arm_list)
+
       if(l_disres>0){
-        which_arm <- which(arm==arm_list)
         for (obj in 1:l_disres) {
           input_list_arm[[names_disres[[obj]]]] <-  cloned_resources[[obj]][[which_arm]]
         }
       }
-      
+
       #Unique patient-arm inputs
-      set.seed(seed*(simulation*1007 + i*53 + which(arm==arm_list)))
+      set.seed(seed*(simulation*1007 + i*53 + which_arm))
       # Initialize values to prevent errors
       .set_last_ctx("Error in setup:unique_pt_inputs", sens=input_list$sens,
                     simulation=input_list$simulation, patient_id=i, arm=arm, .warden_ctx = .warden_ctx)
@@ -170,6 +183,7 @@ run_engine <- function(arm_list,
       } else {
         priority_order <- "start"  # default if no events defined
       }
+      input_list_arm$evt_arm_lookup <- setNames(paste(priority_order, arm, sep="_"), priority_order)
       event_queue <- queue_create(priority_order)
       
       if (is.null(input_list_arm$init_event_list)) {
@@ -224,13 +238,11 @@ run_engine <- function(arm_list,
       assign("cur_evtlist", event_queue, envir = input_list_arm)
       
       while (!queue_empty(event_queue)) {
-        if(is.infinite(next_event(1,event_queue)$time)){
-          break
-        }
-        # Get next event
-        next_evt <- pop_and_return_event(event_queue)
-        current_event <- next_evt$event_name
-        current_time <- next_evt$time
+        # Get next event into pre-allocated buffer to avoid per-event list allocation
+        pop_into(.pop_buf, event_queue)
+        if (is.infinite(.pop_buf[[3L]])) break
+        current_event <- .pop_buf[[2L]]
+        current_time  <- .pop_buf[[3L]]
         
         .set_last_ctx("Error in engine:event reaction", sens=input_list$sens,
                       simulation=input_list$simulation, patient_id=i,
@@ -243,11 +255,7 @@ run_engine <- function(arm_list,
         }        
         n_evt <- n_evt + 1
         
-        input_list_arm <- react_evt(list(evt = current_event,
-                                         curtime = current_prevtime,
-                                         evttime = current_time),
-                                    arm,
-                                    input_list_arm)
+        input_list_arm <- react_evt(current_event, current_time, arm, input_list_arm)
        
         #Get extra objects to be exported
         if(is.null(input_out_v)){
@@ -255,7 +263,7 @@ run_engine <- function(arm_list,
         } else{
           extra_data <-  mget(input_out_v, input_list_arm) 
         }
-        extra_data <- extra_data[!vapply(extra_data, is.null, TRUE)]
+        extra_data <- extra_data[lengths(extra_data) > 0L]
           
               this_patient[[arm]]$evtlist[[n_evt]] <- c(evtname = current_event,
                                                         evttime = current_time,

@@ -80,7 +80,7 @@ run_engine_constrained <- function(arm_list,
   if (input_list$accum_backwards) {
     input_list$ongoing_inputs_lu <- paste0(input_list$uc_lists$ongoing_inputs, "_lastupdate", recycle0 = TRUE)
     input_out_v <- c(input_list$input_out, input_list$ongoing_inputs_lu)
-    
+
     # Initialize ongoing_list_temp for backwards accumulation
     if (!is.null(input_list$uc_lists$ongoing_inputs)) {
       input_list$ongoing_list_temp <- setNames(
@@ -91,7 +91,18 @@ run_engine_constrained <- function(arm_list,
   } else {
     input_out_v <- c(input_list$input_out)
   }
-  
+
+  if (!is.null(input_list$uc_lists$instant_inputs)) {
+    input_list$uc_lists$zero_instant <- setNames(
+      as.list(rep(0, length(input_list$uc_lists$instant_inputs))),
+      input_list$uc_lists$instant_inputs)
+  }
+  if (input_list$accum_backwards && !is.null(input_list$uc_lists$ongoing_inputs)) {
+    input_list$uc_lists$zero_ongoing_lu <- setNames(
+      as.list(rep(0, length(input_list$ongoing_inputs_lu))),
+      input_list$ongoing_inputs_lu)
+  }
+
   # Get priority order for event queue (from init_event_list)
   if (!is.null(input_list$init_event_list)) {
     priority_order <- input_list$init_event_list[[1]]$evts
@@ -100,6 +111,8 @@ run_engine_constrained <- function(arm_list,
   }
   
   
+  .pop_buf <- list(patient_id = 0L, event_name = "", time = 0.0)
+
   # Storage for patient data per arm
   patdata <- vector("list", length=npats) # empty list with npats elements
   
@@ -161,6 +174,8 @@ run_engine_constrained <- function(arm_list,
         }
       }
       
+      input_list_arm_base$evt_arm_lookup <- setNames(paste(priority_order, arm, sep="_"), priority_order)
+
       # Create event queue for this arm
       event_queue <- queue_create(priority_order)
       
@@ -305,16 +320,12 @@ run_engine_constrained <- function(arm_list,
                     simulation=input_list$simulation, .warden_ctx = .warden_ctx)
       # Process events while queue is not empty
       while (!queue_empty(event_queue)) {
-        
-        if(is.infinite(next_event(1,event_queue)$time)){
-          break
-        }
-        
-        # Get next event
-        next_evt <- pop_and_return_event(event_queue)
-        current_patient_id <- next_evt$patient_id
-        current_event <- next_evt$event_name
-        current_time <- next_evt$time
+        # Get next event into pre-allocated buffer to avoid per-event list allocation
+        pop_into(.pop_buf, event_queue)
+        if (is.infinite(.pop_buf[[3L]])) break
+        current_patient_id <- .pop_buf[[1L]]
+        current_event      <- .pop_buf[[2L]]
+        current_time       <- .pop_buf[[3L]]
         
         .set_last_ctx("Error in engine:event reaction", sens=input_list$sens,
                       simulation=input_list$simulation, patient_id=current_patient_id,
@@ -337,11 +348,7 @@ run_engine_constrained <- function(arm_list,
 
        
         
-        input_list_arm <- react_evt(list(evt = current_event,
-                                         curtime = current_prevtime,
-                                         evttime = current_time),
-                                    arm,
-                                    input_list_arm)
+        input_list_arm <- react_evt(current_event, current_time, arm, input_list_arm)
        
         patient_arm_environments[[current_patient_id]] <-  input_list_arm 
         
@@ -352,7 +359,7 @@ run_engine_constrained <- function(arm_list,
         } else{
           extra_data <-  mget(input_out_v, input_list_arm) 
         }
-        extra_data <- extra_data[!vapply(extra_data, is.null, TRUE)]
+        extra_data <- extra_data[lengths(extra_data) > 0L]
         
         
         patdata[[current_patient_id]][[arm]]$evtlist[[input_list_arm$n_evt]] <- c(evtname = current_event,

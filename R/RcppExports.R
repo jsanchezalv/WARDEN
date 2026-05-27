@@ -482,6 +482,10 @@ pop_and_return_event_cpp <- function(ptr) {
     .Call(`_WARDEN_pop_and_return_event_cpp`, ptr)
 }
 
+pop_into_cpp <- function(ptr, out_list) {
+    invisible(.Call(`_WARDEN_pop_into_cpp`, ptr, out_list))
+}
+
 remove_event_cpp <- function(ptr, patient_id, events) {
     invisible(.Call(`_WARDEN_remove_event_cpp`, ptr, patient_id, events))
 }
