@@ -115,7 +115,7 @@ constrained <- TRUE
 b1 <- shared_input(10)
 b2 <- b1        # alias (same state)
 b1$modify(11)
-#> <environment: 0x556b996199d0>
+#> <environment: 0x55c787ded2b8>
 #> attr(,"class")
 #> [1] "shared_input_env" "shared_input"    
 b1$value(); b2$value()  # both 11
@@ -124,7 +124,7 @@ b1$value(); b2$value()  # both 11
 
 b3 <- b1$clone()
 b1$modify(99)
-#> <environment: 0x556b95c74ac8>
+#> <environment: 0x55c788f16fb0>
 #> attr(,"class")
 #> [1] "shared_input_env" "shared_input"    
 b1$value(); b3$value()  # 99, 11
