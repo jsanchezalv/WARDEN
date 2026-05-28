@@ -1,8 +1,61 @@
 # Changelog
 
-## WARDEN (development version)
+## WARDEN 2.0.4
+
+- [`release()`](https://jsanchezalv.github.io/WARDEN/reference/release.md)
+  is a new helper that frees a `resource_discrete` for the current
+  patient and, when `resume_event` is supplied, automatically schedules
+  that event for the next patient in the resource queue — eliminating
+  the manual `if(success & queue_size > 0) new_event(...)` pattern.
+- [`release_all()`](https://jsanchezalv.github.io/WARDEN/reference/release_all.md)
+  is a new helper that fully purges the current patient from a list of
+  `resource_discrete` objects (removes from using and from all queue
+  entries) and optionally schedules per-resource resume events. Resume
+  events are only triggered for resources where the patient was actually
+  using (capacity freed).
+- [`release_all_if_using()`](https://jsanchezalv.github.io/WARDEN/reference/release_all_if_using.md)
+  is a new helper that frees the current patient from a list of
+  `resource_discrete` objects only if they are currently using them.
+  Does not touch queue entries, preserving queue position for
+  multi-resource workflows.
+- [`resource_discrete()`](https://jsanchezalv.github.io/WARDEN/reference/resource_discrete.md)
+  gains `discipline` (`"FIFO"` or `"LIFO"`) and `max_queue` arguments.
+  `discipline` controls ordering within the same priority level.
+  `max_queue` caps the waiting list so that `attempt_block()` returns
+  `NA` (patient rejected) when the queue is full, enabling M/M/c/k
+  systems.
+- [`resource_discrete()`](https://jsanchezalv.github.io/WARDEN/reference/resource_discrete.md)
+  gains new statistics methods: `queue_wait_time()`,
+  `queue_wait_time_current()`, `had_to_queue()`, `time_in_use()`,
+  `utilization()`, `n_using()`, `total_patients_blocked()`, and
+  `total_patients_queued()`. `queue_wait_time_current()` returns `0` at
+  queue entry, grows with elapsed time at each subsequent event while
+  waiting, and returns the total wait on acquisition — replacing the
+  need to manually track `time_start_queue`. `queue_wait_time()` returns
+  the final stored wait only after dequeue.
+- [`resource_discrete()`](https://jsanchezalv.github.io/WARDEN/reference/resource_discrete.md)
+  gains `batch_seize()` for seizing a resource for multiple patients in
+  a single C++ call, and `attempt_block()` / `attempt_free()` now accept
+  an `amount` argument for multi-unit acquisitions by a single patient.
+- [`seize()`](https://jsanchezalv.github.io/WARDEN/reference/seize.md)
+  is a new thin wrapper around `resource$attempt_block()` that reads `i`
+  and `curtime` from the calling environment, returning `TRUE`
+  (acquired), `FALSE` (queued), or `NA` (rejected).
+- [`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)
+  is a new helper that atomically seizes a list of resources in C++
+  under `"all_or_none"` or `"sequential"` policy, enabling deadlock-free
+  surgery-scheduling and philosophers-problem patterns. Fixed a bug
+  where `"all_or_none"` could partially acquire resources when one
+  resource had free capacity but patients already in its queue.
+- [`shared_decr()`](https://jsanchezalv.github.io/WARDEN/reference/shared_decr.md)
+  and
+  [`shared_incr()`](https://jsanchezalv.github.io/WARDEN/reference/shared_incr.md)
+  are new one-liner helpers for `shared_input` counters that increment
+  or decrement by `delta` and return the new value.
 
 ## WARDEN 2.0.3
+
+CRAN release: 2026-05-27
 
 - [`add_item()`](https://jsanchezalv.github.io/WARDEN/reference/add_item.md)
   now works correctly with the native pipe (`|>`). The `.data` argument

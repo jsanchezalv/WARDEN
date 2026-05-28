@@ -40,7 +40,7 @@
 - [`pop_and_return_event()`](https://jsanchezalv.github.io/WARDEN/reference/pop_and_return_event.md)
   : Pop and return the next event
 
-### Resource Constrained Specific Functions
+### Resource constrained specific functions
 
 - [`resource_discrete()`](https://jsanchezalv.github.io/WARDEN/reference/resource_discrete.md)
   : Create a discrete resource
@@ -48,6 +48,20 @@
   : Shared input object
 - [`discrete_resource_clone()`](https://jsanchezalv.github.io/WARDEN/reference/discrete_resource_clone.md)
   : Clone independent discrete resources
+- [`seize()`](https://jsanchezalv.github.io/WARDEN/reference/seize.md) :
+  Seize a discrete resource
+- [`release()`](https://jsanchezalv.github.io/WARDEN/reference/release.md)
+  : Release a discrete resource
+- [`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)
+  : Seize multiple discrete resources atomically
+- [`release_all()`](https://jsanchezalv.github.io/WARDEN/reference/release_all.md)
+  : Release multiple discrete resources
+- [`release_all_if_using()`](https://jsanchezalv.github.io/WARDEN/reference/release_all_if_using.md)
+  : Release multiple discrete resources (using only)
+- [`shared_incr()`](https://jsanchezalv.github.io/WARDEN/reference/shared_incr.md)
+  : Increment a shared counter
+- [`shared_decr()`](https://jsanchezalv.github.io/WARDEN/reference/shared_decr.md)
+  : Decrement a shared counter
 
 ### Auxiliary Functions
 

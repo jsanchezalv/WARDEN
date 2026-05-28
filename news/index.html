@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,10 +54,28 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="warden-development-version">WARDEN (development version)<a class="anchor" aria-label="anchor" href="#warden-development-version"></a></h2>
-</div>
+<h2 class="pkg-version" data-toc-text="2.0.4" id="warden-204">WARDEN 2.0.4<a class="anchor" aria-label="anchor" href="#warden-204"></a></h2>
+<ul><li>
+<code><a href="../reference/release.html">release()</a></code> is a new helper that frees a <code>resource_discrete</code> for the current patient and, when <code>resume_event</code> is supplied, automatically schedules that event for the next patient in the resource queue — eliminating the manual <code>if(success &amp; queue_size &gt; 0) new_event(...)</code> pattern.</li>
+<li>
+<code><a href="../reference/release_all.html">release_all()</a></code> is a new helper that fully purges the current patient from a list of <code>resource_discrete</code> objects (removes from using and from all queue entries) and optionally schedules per-resource resume events. Resume events are only triggered for resources where the patient was actually using (capacity freed).</li>
+<li>
+<code><a href="../reference/release_all_if_using.html">release_all_if_using()</a></code> is a new helper that frees the current patient from a list of <code>resource_discrete</code> objects only if they are currently using them. Does not touch queue entries, preserving queue position for multi-resource workflows.</li>
+<li>
+<code><a href="../reference/resource_discrete.html">resource_discrete()</a></code> gains <code>discipline</code> (<code>"FIFO"</code> or <code>"LIFO"</code>) and <code>max_queue</code> arguments. <code>discipline</code> controls ordering within the same priority level. <code>max_queue</code> caps the waiting list so that <code>attempt_block()</code> returns <code>NA</code> (patient rejected) when the queue is full, enabling M/M/c/k systems.</li>
+<li>
+<code><a href="../reference/resource_discrete.html">resource_discrete()</a></code> gains new statistics methods: <code>queue_wait_time()</code>, <code>queue_wait_time_current()</code>, <code>had_to_queue()</code>, <code>time_in_use()</code>, <code>utilization()</code>, <code>n_using()</code>, <code>total_patients_blocked()</code>, and <code>total_patients_queued()</code>. <code>queue_wait_time_current()</code> returns <code>0</code> at queue entry, grows with elapsed time at each subsequent event while waiting, and returns the total wait on acquisition — replacing the need to manually track <code>time_start_queue</code>. <code>queue_wait_time()</code> returns the final stored wait only after dequeue.</li>
+<li>
+<code><a href="../reference/resource_discrete.html">resource_discrete()</a></code> gains <code>batch_seize()</code> for seizing a resource for multiple patients in a single C++ call, and <code>attempt_block()</code> / <code>attempt_free()</code> now accept an <code>amount</code> argument for multi-unit acquisitions by a single patient.</li>
+<li>
+<code><a href="../reference/seize.html">seize()</a></code> is a new thin wrapper around <code>resource$attempt_block()</code> that reads <code>i</code> and <code>curtime</code> from the calling environment, returning <code>TRUE</code> (acquired), <code>FALSE</code> (queued), or <code>NA</code> (rejected).</li>
+<li>
+<code><a href="../reference/seize_all.html">seize_all()</a></code> is a new helper that atomically seizes a list of resources in C++ under <code>"all_or_none"</code> or <code>"sequential"</code> policy, enabling deadlock-free surgery-scheduling and philosophers-problem patterns. Fixed a bug where <code>"all_or_none"</code> could partially acquire resources when one resource had free capacity but patients already in its queue.</li>
+<li>
+<code><a href="../reference/shared_decr.html">shared_decr()</a></code> and <code><a href="../reference/shared_incr.html">shared_incr()</a></code> are new one-liner helpers for <code>shared_input</code> counters that increment or decrement by <code>delta</code> and return the new value.</li>
+</ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="2.0.3" id="warden-203">WARDEN 2.0.3<a class="anchor" aria-label="anchor" href="#warden-203"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.0.3" id="warden-203">WARDEN 2.0.3<a class="anchor" aria-label="anchor" href="#warden-203"></a></h2><p class="text-muted">CRAN release: 2026-05-27</p>
 <ul><li>
 <code><a href="../reference/add_item.html">add_item()</a></code> now works correctly with the native pipe (<code>|&gt;</code>). The <code>.data</code> argument has been moved to the first position (<code>.data = NULL, ..., input</code>), so the LHS of <code>|&gt;</code> is naturally routed to <code>.data</code> without relying on magrittr’s <code>.</code> symbol. Existing code using <code>%&gt;%</code>, <code>input=</code>, or named <code>...</code> arguments is unaffected (#TODO).</li>
 <li>

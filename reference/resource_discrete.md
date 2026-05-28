@@ -8,64 +8,144 @@ queue for waiting patients.
 ## Usage
 
 ``` r
-resource_discrete(n)
+resource_discrete(n, discipline = "FIFO", max_queue = Inf)
 ```
 
 ## Arguments
 
 - n:
 
-  Integer. The total capacity of the resource (must be \>= 1).
+  Integer \>= 0. Total capacity of the resource.
+
+- discipline:
+
+  `"FIFO"` (default) or `"LIFO"`. Queue discipline applied within the
+  same priority level.
+
+- max_queue:
+
+  Non-negative integer or `Inf` (default). Maximum number of patients
+  that can wait in the queue. Patients that arrive when the queue is
+  full are rejected (`attempt_block()` returns `NA`).
 
 ## Value
 
-An environment with methods for resource management.
+An environment of class `"resource_discrete"` with the following
+methods:
 
-## Details
+- `size()`:
 
-The returned environment has the following methods:
-
-- `size()`: Returns the total capacity
+  Total capacity.
 
 - [`queue_size()`](https://jsanchezalv.github.io/WARDEN/reference/queue_size.md):
-  Returns the number of patients in queue
 
-- `n_free()`: Returns the number of free resource units
+  Number of patients currently in the queue.
 
-- `patients_using()`: Vector of patient IDs currently using the resource
+- `n_free()`:
 
-- `patients_using_times()`: Vector of start times for patients using the
-  resource
+  Number of free resource units.
 
-- `queue_start_times()`: Vector of queue start times parallel to queue
-  order
+- `n_using()`:
 
-- `queue_priorities()`: Vector of priorities parallel to queue order
+  Number of units currently in use.
 
-- `queue_info(n)`: Data.frame with patient_id, priority, start_time for
-  queue
+- `utilization()`:
 
-- `is_patient_in_queue(patient_id)`: Check if patient is in queue
+  Fraction of capacity in use (0–1).
 
-- `is_patient_using(patient_id)`: Check if patient is using resource
+- `patients_using()`:
 
-- `attempt_block(patient_id, priority, start_time)`: Attempt to block a
-  resource unit
+  Vector of patient IDs currently using the resource.
 
-- `attempt_free(patient_id, remove_all)`: Free a resource unit
+- `patients_using_times()`:
 
-- `attempt_free_if_using(patient_id, remove_all)`: Free only if patient
-  is using
+  Vector of start times for patients using the resource.
 
-- `next_patient_in_line(n)`: Get next n patients in queue
+- `queue_start_times()`:
 
-- `modify_priority(patient_id, new_priority)`: Modify patient priority
-  in queue
+  Vector of queue start times in queue order.
 
-- `add_resource(n)`: Add n resource units to total capacity
+- `queue_priorities()`:
 
-- `remove_resource(n, current_time)`: Remove n resource units from total
-  capacity
+  Vector of priorities in queue order.
+
+- `queue_info(n)`:
+
+  Data frame with `patient_id`, `priority`, `start_time` for the queue.
+
+- `is_patient_in_queue(patient_id)`:
+
+  Check if patient is in queue. Defaults to `i` from the calling
+  environment.
+
+- `is_patient_using(patient_id)`:
+
+  Check if patient is using the resource. Defaults to `i` from the
+  calling environment.
+
+- `attempt_block(patient_id, priority, start_time, amount)`:
+
+  Attempt to block `amount` units. Returns `TRUE` (acquired), `FALSE`
+  (queued), or `NA` (rejected). Defaults `patient_id` to `i` and
+  `start_time` to `curtime` from the calling environment.
+
+- `attempt_free(patient_id, remove_all, amount)`:
+
+  Free the resource for a patient. Defaults `patient_id` to `i`.
+
+- `attempt_free_if_using(patient_id, remove_all)`:
+
+  Free only if patient is currently using. Defaults `patient_id` to `i`.
+
+- `next_patient_in_line(n)`:
+
+  Get next `n` patients in queue.
+
+- `modify_priority(patient_id, new_priority)`:
+
+  Modify patient priority in queue.
+
+- `add_resource(n)`:
+
+  Add `n` resource units.
+
+- `remove_resource(n, current_time)`:
+
+  Remove `n` resource units. Defaults `current_time` to `curtime`.
+
+- `queue_wait_time(patient_id)`:
+
+  Final queue wait time, set on successful dequeue. Returns `NA` if
+  never queued or still waiting. Defaults `patient_id` to `i`.
+
+- `queue_wait_time_current(patient_id, current_time)`:
+
+  Current elapsed queue wait: `0` at entry, grows each event while
+  waiting, returns final wait on acquisition, `NA` if never queued.
+  Defaults to `i` / `curtime`.
+
+- `had_to_queue(patient_id)`:
+
+  Returns `1L` if patient ever queued, `0L` otherwise. Defaults
+  `patient_id` to `i`.
+
+- `time_in_use(patient_id, current_time)`:
+
+  Time since patient acquired resource. Returns `NA` if not currently
+  using. Defaults to `i` / `curtime`.
+
+- `total_patients_blocked()`:
+
+  Count of unique patients that ever successfully acquired.
+
+- `total_patients_queued()`:
+
+  Count of unique patients that ever entered the queue.
+
+- `batch_seize(patient_ids, priority, start_time, amount_each)`:
+
+  Seize for multiple patients in a single C++ call. Returns an integer
+  vector (`1` = acquired, `0` = queued, `-1` = rejected).
 
 ## Examples
 
@@ -74,25 +154,22 @@ The returned environment has the following methods:
 beds <- resource_discrete(3)
 
 # Check initial state
-beds$size()      # 3
+beds$size()       # 3
 #> [1] 3
-beds$n_free()    # 3
+beds$n_free()     # 3
 #> [1] 3
 beds$queue_size() # 0
 #> [1] 0
 
-# Block resources
-i <- 101; curtime <- 0.0
-beds$attempt_block()  # Uses i and curtime from environment
+# Block resources (reads i and curtime from calling environment)
+i <- 101L; curtime <- 0.0
+beds$attempt_block()
 #> [1] TRUE
 
 # Or explicitly
-beds$attempt_block(patient_id = 102, priority = 1, start_time = 1.0)
+beds$attempt_block(patient_id = 102L, priority = 1L, start_time = 1.0)
 #> [1] TRUE
 
-# Check patient status
-beds$is_patient_using(101)     # TRUE
-#> [1] TRUE
-beds$is_patient_in_queue(102)  # FALSE
-#> [1] FALSE
+# LIFO resource and limited queue
+stack <- resource_discrete(2, discipline = "LIFO", max_queue = 5)
 ```
