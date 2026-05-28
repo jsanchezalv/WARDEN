@@ -625,99 +625,135 @@ cond_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
 .resource_discrete_from_xptr <- function(xptr) {
   env <- new.env(parent = emptyenv())
   env$.ptr <- xptr
-  
-  env$size                 <- function()        discrete_resource_size_cpp(env$.ptr)
-  env$queue_size           <- function()        discrete_resource_queue_size_cpp(env$.ptr)
-  env$n_free               <- function()        discrete_resource_n_free_cpp(env$.ptr)
-  env$patients_using       <- function()        discrete_resource_patients_using_cpp(env$.ptr)
-  env$patients_using_times <- function()        discrete_resource_patients_using_times_cpp(env$.ptr)
-  env$queue_start_times    <- function()        discrete_resource_queue_start_times_cpp(env$.ptr)
-  env$queue_priorities     <- function()        discrete_resource_queue_priorities_cpp(env$.ptr)
-  
+
+  env$size                 <- function() discrete_resource_size_cpp(env$.ptr)
+  env$queue_size           <- function() discrete_resource_queue_size_cpp(env$.ptr)
+  env$n_free               <- function() discrete_resource_n_free_cpp(env$.ptr)
+  env$patients_using       <- function() discrete_resource_patients_using_cpp(env$.ptr)
+  env$patients_using_times <- function() discrete_resource_patients_using_times_cpp(env$.ptr)
+  env$queue_start_times    <- function() discrete_resource_queue_start_times_cpp(env$.ptr)
+  env$queue_priorities     <- function() discrete_resource_queue_priorities_cpp(env$.ptr)
+
   env$queue_info <- function(n = NULL) {
     if (is.null(n)) n <- env$queue_size()
     if (n <= 0) return(data.frame(patient_id = integer(0), priority = integer(0), start_time = numeric(0)))
     ids  <- env$next_patient_in_line(n)
-    prio <- env$queue_priorities()[seq_len(length(ids))]
-    st   <- env$queue_start_times()[seq_len(length(ids))]
+    prio <- env$queue_priorities()[seq_along(ids)]
+    st   <- env$queue_start_times()[seq_along(ids)]
     data.frame(patient_id = ids, priority = prio, start_time = st, stringsAsFactors = FALSE)
   }
-  
-  env$is_patient_in_queue <- function(patient_id) {
+
+  env$is_patient_in_queue <- function(patient_id = NULL) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
     if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     discrete_resource_is_patient_in_queue_cpp(env$.ptr, as.integer(patient_id))
   }
-  env$is_patient_using <- function(patient_id) {
+
+  env$is_patient_using <- function(patient_id = NULL) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
     if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     discrete_resource_is_patient_using_cpp(env$.ptr, as.integer(patient_id))
   }
-  
-  env$attempt_block <- function(patient_id = NULL, priority = 1L, start_time = NULL) {
-    if (is.null(patient_id)) {
-      patient_id <- tryCatch(get("i", envir = parent.frame(), inherits = TRUE),
-                             error = function(e) stop("patient_id not provided and 'i' not found in parent frame"))
-    }
-    if (is.null(start_time)) {
-      start_time <- tryCatch(get("curtime", envir = parent.frame(), inherits = TRUE),
-                             error = function(e) stop("start_time not provided and 'curtime' not found in parent frame"))
-    }
+
+  env$attempt_block <- function(patient_id = NULL, priority = 1L, start_time = NULL, amount = 1L) {
+    if (is.null(patient_id)) patient_id <- get("i",       envir = parent.frame(), inherits = TRUE)
+    if (is.null(start_time)) start_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
     if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     if (!is.numeric(priority)   || length(priority)   != 1) stop("priority must be a single number")
     if (!is.numeric(start_time) || length(start_time) != 1) stop("start_time must be a single number")
-    discrete_resource_attempt_block_cpp(env$.ptr, as.integer(patient_id), as.integer(priority), as.numeric(start_time))
+    result_int <- discrete_resource_attempt_block_cpp(env$.ptr, as.integer(patient_id),
+                                                      as.integer(priority), as.numeric(start_time),
+                                                      as.integer(amount))
+    if (result_int == 1L) return(TRUE)
+    if (result_int == 0L) return(FALSE)
+    NA
   }
-  
-  env$attempt_free <- function(patient_id = NULL, remove_all = FALSE) {
-    if (is.null(patient_id)) {
-      patient_id <- tryCatch(get("i", envir = parent.frame(), inherits = TRUE),
-                             error = function(e) stop("patient_id not provided and 'i' not found in parent frame"))
-    }
+
+  env$attempt_free <- function(patient_id = NULL, remove_all = FALSE, amount = 1L) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
     if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     if (!is.logical(remove_all) || length(remove_all) != 1) stop("remove_all must be a single logical value")
-    discrete_resource_attempt_free_cpp(env$.ptr, as.integer(patient_id), remove_all)
+    discrete_resource_attempt_free_cpp(env$.ptr, as.integer(patient_id), remove_all, as.integer(amount))
     invisible(NULL)
   }
-  
+
   env$attempt_free_if_using <- function(patient_id = NULL, remove_all = FALSE) {
-    if (is.null(patient_id)) {
-      patient_id <- tryCatch(get("i", envir = parent.frame(), inherits = TRUE),
-                             error = function(e) stop("patient_id not provided and 'i' not found in parent frame"))
-    }
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
     if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     if (!is.logical(remove_all) || length(remove_all) != 1) stop("remove_all must be a single logical value")
     discrete_resource_attempt_free_if_using_cpp(env$.ptr, as.integer(patient_id), remove_all)
     invisible(NULL)
   }
-  
+
   env$next_patient_in_line <- function(n = 1L) {
     if (!is.numeric(n) || length(n) != 1 || n < 1) stop("n must be a single positive integer")
     discrete_resource_next_patient_in_line_cpp(env$.ptr, as.integer(n))
   }
-  
+
   env$modify_priority <- function(patient_id, new_priority) {
-    if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
+    if (!is.numeric(patient_id)   || length(patient_id)   != 1) stop("patient_id must be a single number")
     if (!is.numeric(new_priority) || length(new_priority) != 1) stop("new_priority must be a single number")
     discrete_resource_modify_priority_cpp(env$.ptr, as.integer(patient_id), as.integer(new_priority))
     invisible(NULL)
   }
-  
+
   env$add_resource <- function(n_to_add) {
     if (!is.numeric(n_to_add) || length(n_to_add) != 1 || n_to_add < 1) stop("n_to_add must be a single positive integer")
     discrete_resource_add_resource_cpp(env$.ptr, as.integer(n_to_add))
     invisible(NULL)
   }
-  
+
   env$remove_resource <- function(n_to_remove, current_time = NULL) {
-    if (is.null(current_time)) {
-      current_time <- tryCatch(get("curtime", envir = parent.frame(), inherits = TRUE),
-                               error = function(e) stop("current_time not provided and 'curtime' not found in parent frame"))
-    }
-    if (!is.numeric(n_to_remove) || length(n_to_remove) != 1 || n_to_remove < 1) stop("n_to_remove must be a single positive integer")
+    if (is.null(current_time)) current_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
+    if (!is.numeric(n_to_remove)  || length(n_to_remove)  != 1 || n_to_remove < 1) stop("n_to_remove must be a single positive integer")
     if (!is.numeric(current_time) || length(current_time) != 1) stop("current_time must be a single number")
     discrete_resource_remove_resource_cpp(env$.ptr, as.integer(n_to_remove), as.numeric(current_time))
     invisible(NULL)
   }
-  
+
+  # Statistics methods
+  env$queue_wait_time <- function(patient_id = NULL) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+    discrete_resource_queue_wait_time_cpp(env$.ptr, as.integer(patient_id))
+  }
+
+  env$queue_wait_time_current <- function(patient_id = NULL, current_time = NULL) {
+    if (is.null(patient_id))   patient_id   <- get("i",       envir = parent.frame(), inherits = TRUE)
+    if (is.null(current_time)) current_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
+    discrete_resource_queue_elapsed_time_cpp(env$.ptr, as.integer(patient_id), as.numeric(current_time))
+  }
+
+  env$had_to_queue <- function(patient_id = NULL) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+    discrete_resource_had_to_queue_cpp(env$.ptr, as.integer(patient_id))
+  }
+
+  env$time_in_use <- function(patient_id = NULL, current_time = NULL) {
+    if (is.null(patient_id))   patient_id   <- get("i",       envir = parent.frame(), inherits = TRUE)
+    if (is.null(current_time)) current_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
+    start <- discrete_resource_get_patient_using_start_time_cpp(env$.ptr, as.integer(patient_id))
+    if (is.na(start)) return(NA_real_)
+    current_time - start
+  }
+
+  env$utilization <- function() {
+    s <- env$size()
+    if (s == 0L) return(0)
+    (s - env$n_free()) / s
+  }
+
+  env$n_using <- function() env$size() - env$n_free()
+
+  env$total_patients_blocked <- function() discrete_resource_total_patients_blocked_cpp(env$.ptr)
+
+  env$total_patients_queued <- function() discrete_resource_total_patients_queued_cpp(env$.ptr)
+
+  env$batch_seize <- function(patient_ids, priority = 1L, start_time = NULL, amount_each = 1L) {
+    if (is.null(start_time)) start_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
+    discrete_resource_batch_seize_cpp(env$.ptr, as.integer(patient_ids), as.integer(priority),
+                                      as.numeric(start_time), as.integer(amount_each))
+  }
+
   class(env) <- "resource_discrete"
   env
 }

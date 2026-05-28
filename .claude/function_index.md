@@ -55,9 +55,16 @@
 - `queue_size()` [L869–872]: Get number of events in queue
 - `has_event()` [L883–887]: Check if a patient has a named event
 - `get_event()` [L898–902]: Get time of a named event for a patient
-- `resource_discrete()` [L960–1159]: Create Rcpp-backed discrete resource object
-- `print.resource_discrete()` [L1168–1175]: Print method for `resource_discrete`
-- `shared_input()` [L1271–1337]: Create shared input object for constrained DES
+- `resource_discrete()` [L960–1180]: Create Rcpp-backed discrete resource object; now accepts `discipline` ("FIFO"/"LIFO") and `max_queue`; new methods: `queue_wait_time`, `had_to_queue`, `time_in_use`, `utilization`, `n_using`, `total_patients_blocked`, `total_patients_queued`, `batch_seize`
+- `print.resource_discrete()` [L1188–1196]: Print method for `resource_discrete`
+- `seize()` [~L1200]: Acquire a resource for current patient; returns TRUE/FALSE/NA
+- `release()` [~L1215]: Free a resource + auto-trigger next queued patient via `resume_event`
+- `seize_all()` [~L1245]: Atomically seize multiple resources (C++); policies: all_or_none/sequential
+- `release_all()` [~L1556]: Free multiple resources + purge from queues (C++) + schedule resume events only for freed resources
+- `release_all_if_using()` [~L1598]: Free multiple resources only if using (no queue removal) + schedule resume events
+- `shared_incr()` [~L1300]: Increment a `shared_input` counter, return new value
+- `shared_decr()` [~L1310]: Decrement a `shared_input` counter, return new value
+- `shared_input()` [~L1330–1400]: Create shared input object for constrained DES
 - `add_reactevt()` [L1376–1399]: Add reactions (event-triggered logic) to the model
 - `random_stream()` [L1439–1465]: Create a random number stream object for reproducibility
 - `add_tte()` [L1494–1527]: Add time-to-event draws to the input list

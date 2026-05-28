@@ -1018,6 +1018,57 @@ test_that("Test everything but with constrained = TRUE", {
   expect_true(max(results[[1]][[1]]$merged_df$time_in_queue,na.rm=TRUE)>0)
   expect_true(results[[1]][[1]]$value_accum[[1]]>1)
   expect_true(results[[1]][[1]]$had_to_queue[[1]]>0)
+
+  # Same model using new API: seize/release/beds$had_to_queue()/beds$queue_wait_time()
+  unique_pt_inputs_new <- add_item(fl.sick = 1,
+                                   q_default = util.sick,
+                                   c_default = cost.sick + if(arm=="int"){cost.int}else{0},
+                                   had_to_queue = 0,
+                                   time_in_queue = NA)
+
+  evt_react_list_new <-
+    add_reactevt(name_evt = "sick", input = {
+      value_accum  <- shared_incr(shared_accumulator, 1)
+      beds_free    <- beds$n_free()
+      time_in_queue <- beds$queue_wait_time()
+    }) |>
+    add_reactevt(name_evt = "sicker", input = {
+      acquired  <- seize(beds)
+      beds_free <- beds$n_free()
+      if (!acquired) modify_event(c(death = max(curtime, get_event("death") * 0.8)))
+      had_to_queue  <- beds$had_to_queue()
+      time_in_queue <- beds$queue_wait_time()
+      q_default <- util.sicker
+      c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
+      fl.sick   <- 0
+    }) |>
+    add_reactevt(name_evt = "death", input = {
+      release(beds, resume_event = "sicker")
+      time_in_queue <- NA
+      beds_free     <- beds$n_free()
+      q_default     <- 0
+      c_default     <- 0
+      curtime       <- Inf
+    })
+
+  results_new <- run_sim(
+    npats = 10, n_sim = 1, psa_bool = FALSE,
+    arm_list = c("int", "noint"),
+    common_all_inputs = common_all_inputs,
+    common_pt_inputs = common_pt_inputs,
+    unique_pt_inputs = unique_pt_inputs_new,
+    init_event_list = init_event_list,
+    evt_react_list = evt_react_list_new,
+    util_ongoing_list = util_ongoing,
+    cost_ongoing_list = cost_ongoing,
+    constrained = TRUE, ipd = 1,
+    input_out = c("beds_free", "had_to_queue", "time_in_queue", "value_accum")
+  )
+
+  expect_true(results_new[[1]][[1]]$value_accum[[1]] > 1)
+  expect_true(results_new[[1]][[1]]$had_to_queue[[1]] > 0)
+  expect_true(max(results_new[[1]][[1]]$merged_df$time_in_queue, na.rm = TRUE) > 0)
+
   expect_equal(results[[1]][[1]]$timed_outputs$beds_free[[1]],
                c(0, 6, 5.9, 5.9, 5.7, 5.4, 5.4, 5.4, 5.4, 5.4, 5.4, 5.4, 5.4, 
                  5.4, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 3.9, 3.9, 3.9, 

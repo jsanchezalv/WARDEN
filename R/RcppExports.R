@@ -510,8 +510,8 @@ get_event_cpp <- function(ptr, patient_id, event_name) {
     .Call(`_WARDEN_get_event_cpp`, ptr, patient_id, event_name)
 }
 
-create_discrete_resource_cpp <- function(n) {
-    .Call(`_WARDEN_create_discrete_resource_cpp`, n)
+create_discrete_resource_cpp <- function(n, lifo = FALSE, max_queue_capacity = -1L) {
+    .Call(`_WARDEN_create_discrete_resource_cpp`, n, lifo, max_queue_capacity)
 }
 
 discrete_resource_size_cpp <- function(xptr) {
@@ -542,12 +542,12 @@ discrete_resource_is_patient_using_cpp <- function(xptr, patient_id) {
     .Call(`_WARDEN_discrete_resource_is_patient_using_cpp`, xptr, patient_id)
 }
 
-discrete_resource_attempt_block_cpp <- function(xptr, patient_id, priority, start_time) {
-    .Call(`_WARDEN_discrete_resource_attempt_block_cpp`, xptr, patient_id, priority, start_time)
+discrete_resource_attempt_block_cpp <- function(xptr, patient_id, priority, start_time, amount = 1L) {
+    .Call(`_WARDEN_discrete_resource_attempt_block_cpp`, xptr, patient_id, priority, start_time, amount)
 }
 
-discrete_resource_attempt_free_cpp <- function(xptr, patient_id, remove_all = FALSE) {
-    invisible(.Call(`_WARDEN_discrete_resource_attempt_free_cpp`, xptr, patient_id, remove_all))
+discrete_resource_attempt_free_cpp <- function(xptr, patient_id, remove_all = FALSE, amount = 1L) {
+    invisible(.Call(`_WARDEN_discrete_resource_attempt_free_cpp`, xptr, patient_id, remove_all, amount))
 }
 
 discrete_resource_attempt_free_if_using_cpp <- function(xptr, patient_id, remove_all = FALSE) {
@@ -576,6 +576,46 @@ discrete_resource_add_resource_cpp <- function(xptr, n_to_add) {
 
 discrete_resource_remove_resource_cpp <- function(xptr, n_to_remove, current_time) {
     invisible(.Call(`_WARDEN_discrete_resource_remove_resource_cpp`, xptr, n_to_remove, current_time))
+}
+
+discrete_resource_queue_wait_time_cpp <- function(xptr, patient_id) {
+    .Call(`_WARDEN_discrete_resource_queue_wait_time_cpp`, xptr, patient_id)
+}
+
+discrete_resource_queue_elapsed_time_cpp <- function(xptr, patient_id, current_time) {
+    .Call(`_WARDEN_discrete_resource_queue_elapsed_time_cpp`, xptr, patient_id, current_time)
+}
+
+discrete_resource_had_to_queue_cpp <- function(xptr, patient_id) {
+    .Call(`_WARDEN_discrete_resource_had_to_queue_cpp`, xptr, patient_id)
+}
+
+discrete_resource_get_patient_using_start_time_cpp <- function(xptr, patient_id) {
+    .Call(`_WARDEN_discrete_resource_get_patient_using_start_time_cpp`, xptr, patient_id)
+}
+
+discrete_resource_total_patients_blocked_cpp <- function(xptr) {
+    .Call(`_WARDEN_discrete_resource_total_patients_blocked_cpp`, xptr)
+}
+
+discrete_resource_total_patients_queued_cpp <- function(xptr) {
+    .Call(`_WARDEN_discrete_resource_total_patients_queued_cpp`, xptr)
+}
+
+discrete_resource_batch_seize_cpp <- function(xptr, patient_ids, priority, start_time, amount_each = 1L) {
+    .Call(`_WARDEN_discrete_resource_batch_seize_cpp`, xptr, patient_ids, priority, start_time, amount_each)
+}
+
+discrete_resource_seize_all_cpp <- function(resource_xptrs, patient_id, priorities, start_time, amounts, policy) {
+    .Call(`_WARDEN_discrete_resource_seize_all_cpp`, resource_xptrs, patient_id, priorities, start_time, amounts, policy)
+}
+
+discrete_resource_release_all_cpp <- function(resource_xptrs, patient_id, amounts) {
+    .Call(`_WARDEN_discrete_resource_release_all_cpp`, resource_xptrs, patient_id, amounts)
+}
+
+discrete_resource_release_all_if_using_cpp <- function(resource_xptrs, patient_id, amounts) {
+    .Call(`_WARDEN_discrete_resource_release_all_if_using_cpp`, resource_xptrs, patient_id, amounts)
 }
 
 discrete_resource_clone_xptrs_cpp <- function(wrapper_env, n = 1L) {

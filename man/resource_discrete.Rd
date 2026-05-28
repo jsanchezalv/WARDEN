@@ -4,59 +4,100 @@
 \alias{resource_discrete}
 \title{Create a discrete resource}
 \usage{
-resource_discrete(n)
+resource_discrete(n, discipline = "FIFO", max_queue = Inf)
 }
 \arguments{
-\item{n}{Integer. The total capacity of the resource (must be >= 1).}
+\item{n}{Integer >= 0. Total capacity of the resource.}
+
+\item{discipline}{\code{"FIFO"} (default) or \code{"LIFO"}. Queue discipline applied
+within the same priority level.}
+
+\item{max_queue}{Non-negative integer or \code{Inf} (default). Maximum number of
+patients that can wait in the queue. Patients that arrive when the queue is
+full are rejected (\code{attempt_block()} returns \code{NA}).}
 }
 \value{
-An environment with methods for resource management.
+An environment of class \code{"resource_discrete"} with the following
+methods:
+\describe{
+\item{\code{size()}}{Total capacity.}
+\item{\code{queue_size()}}{Number of patients currently in the queue.}
+\item{\code{n_free()}}{Number of free resource units.}
+\item{\code{n_using()}}{Number of units currently in use.}
+\item{\code{utilization()}}{Fraction of capacity in use (0–1).}
+\item{\code{patients_using()}}{Vector of patient IDs currently using the
+resource.}
+\item{\code{patients_using_times()}}{Vector of start times for patients
+using the resource.}
+\item{\code{queue_start_times()}}{Vector of queue start times in queue
+order.}
+\item{\code{queue_priorities()}}{Vector of priorities in queue order.}
+\item{\code{queue_info(n)}}{Data frame with \code{patient_id},
+\code{priority}, \code{start_time} for the queue.}
+\item{\code{is_patient_in_queue(patient_id)}}{Check if patient is in
+queue. Defaults to \code{i} from the calling environment.}
+\item{\code{is_patient_using(patient_id)}}{Check if patient is using the
+resource. Defaults to \code{i} from the calling environment.}
+\item{\code{attempt_block(patient_id, priority, start_time, amount)}}{
+Attempt to block \code{amount} units. Returns \code{TRUE} (acquired),
+\code{FALSE} (queued), or \code{NA} (rejected). Defaults
+\code{patient_id} to \code{i} and \code{start_time} to \code{curtime}
+from the calling environment.}
+\item{\code{attempt_free(patient_id, remove_all, amount)}}{Free the
+resource for a patient. Defaults \code{patient_id} to \code{i}.}
+\item{\code{attempt_free_if_using(patient_id, remove_all)}}{Free only if
+patient is currently using. Defaults \code{patient_id} to \code{i}.}
+\item{\code{next_patient_in_line(n)}}{Get next \code{n} patients in
+queue.}
+\item{\code{modify_priority(patient_id, new_priority)}}{Modify patient
+priority in queue.}
+\item{\code{add_resource(n)}}{Add \code{n} resource units.}
+\item{\code{remove_resource(n, current_time)}}{Remove \code{n} resource
+units. Defaults \code{current_time} to \code{curtime}.}
+\item{\code{queue_wait_time(patient_id)}}{Final queue wait time, set on
+successful dequeue. Returns \code{NA} if never queued or still waiting.
+Defaults \code{patient_id} to \code{i}.}
+\item{\code{queue_wait_time_current(patient_id, current_time)}}{Current
+elapsed queue wait: \code{0} at entry, grows each event while waiting,
+returns final wait on acquisition, \code{NA} if never queued. Defaults
+to \code{i} / \code{curtime}.}
+\item{\code{had_to_queue(patient_id)}}{Returns \code{1L} if patient ever
+queued, \code{0L} otherwise. Defaults \code{patient_id} to \code{i}.}
+\item{\code{time_in_use(patient_id, current_time)}}{Time since patient
+acquired resource. Returns \code{NA} if not currently using. Defaults to
+\code{i} / \code{curtime}.}
+\item{\code{total_patients_blocked()}}{Count of unique patients that ever
+successfully acquired.}
+\item{\code{total_patients_queued()}}{Count of unique patients that ever
+entered the queue.}
+\item{\code{batch_seize(patient_ids, priority, start_time, amount_each)}}{
+Seize for multiple patients in a single C++ call. Returns an integer
+vector (\code{1} = acquired, \code{0} = queued, \code{-1} = rejected).}
+}
 }
 \description{
 Creates a discrete resource management system for discrete event simulations.
 This system manages a fixed number of identical resource units that can be
-blocked (used) by patients and maintains a priority queue for waiting patients.
-}
-\details{
-The returned environment has the following methods:
-\itemize{
-\item \code{size()}: Returns the total capacity
-\item \code{queue_size()}: Returns the number of patients in queue
-\item \code{n_free()}: Returns the number of free resource units
-\item \code{patients_using()}: Vector of patient IDs currently using the resource
-\item \code{patients_using_times()}: Vector of start times for patients using the resource
-\item \code{queue_start_times()}: Vector of queue start times parallel to queue order
-\item \code{queue_priorities()}: Vector of priorities parallel to queue order
-\item \code{queue_info(n)}: Data.frame with patient_id, priority, start_time for queue
-\item \code{is_patient_in_queue(patient_id)}: Check if patient is in queue
-\item \code{is_patient_using(patient_id)}: Check if patient is using resource
-\item \code{attempt_block(patient_id, priority, start_time)}: Attempt to block a resource unit
-\item \code{attempt_free(patient_id, remove_all)}: Free a resource unit
-\item \code{attempt_free_if_using(patient_id, remove_all)}: Free only if patient is using
-\item \code{next_patient_in_line(n)}: Get next n patients in queue
-\item \code{modify_priority(patient_id, new_priority)}: Modify patient priority in queue
-\item \code{add_resource(n)}: Add n resource units to total capacity
-\item \code{remove_resource(n, current_time)}: Remove n resource units from total capacity
-}
+blocked (used) by patients and maintains a priority queue for waiting
+patients.
 }
 \examples{
 # Create a resource with 3 units
 beds <- resource_discrete(3)
 
 # Check initial state
-beds$size()      # 3
-beds$n_free()    # 3
+beds$size()       # 3
+beds$n_free()     # 3
 beds$queue_size() # 0
 
-# Block resources
-i <- 101; curtime <- 0.0
-beds$attempt_block()  # Uses i and curtime from environment
+# Block resources (reads i and curtime from calling environment)
+i <- 101L; curtime <- 0.0
+beds$attempt_block()
 
 # Or explicitly
-beds$attempt_block(patient_id = 102, priority = 1, start_time = 1.0)
+beds$attempt_block(patient_id = 102L, priority = 1L, start_time = 1.0)
 
-# Check patient status
-beds$is_patient_using(101)     # TRUE
-beds$is_patient_in_queue(102)  # FALSE
+# LIFO resource and limited queue
+stack <- resource_discrete(2, discipline = "LIFO", max_queue = 5)
 
 }

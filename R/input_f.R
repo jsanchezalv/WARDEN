@@ -1188,265 +1188,268 @@ get_event <- function(event_name, ptr , patient_id ) {
 # discrete resource -------------------------------------------------------
 
 #' Create a discrete resource
-#' 
+#'
 #' Creates a discrete resource management system for discrete event simulations.
 #' This system manages a fixed number of identical resource units that can be
-#' blocked (used) by patients and maintains a priority queue for waiting patients.
-#' 
-#' @param n Integer. The total capacity of the resource (must be >= 1).
-#' 
-#' @return An environment with methods for resource management.
-#' 
-#' @details
-#' The returned environment has the following methods:
-#' \itemize{
-#'   \item \code{size()}: Returns the total capacity
-#'   \item \code{queue_size()}: Returns the number of patients in queue
-#'   \item \code{n_free()}: Returns the number of free resource units
-#'   \item \code{patients_using()}: Vector of patient IDs currently using the resource
-#'   \item \code{patients_using_times()}: Vector of start times for patients using the resource
-#'   \item \code{queue_start_times()}: Vector of queue start times parallel to queue order
-#'   \item \code{queue_priorities()}: Vector of priorities parallel to queue order
-#'   \item \code{queue_info(n)}: Data.frame with patient_id, priority, start_time for queue
-#'   \item \code{is_patient_in_queue(patient_id)}: Check if patient is in queue
-#'   \item \code{is_patient_using(patient_id)}: Check if patient is using resource
-#'   \item \code{attempt_block(patient_id, priority, start_time)}: Attempt to block a resource unit
-#'   \item \code{attempt_free(patient_id, remove_all)}: Free a resource unit
-#'   \item \code{attempt_free_if_using(patient_id, remove_all)}: Free only if patient is using
-#'   \item \code{next_patient_in_line(n)}: Get next n patients in queue
-#'   \item \code{modify_priority(patient_id, new_priority)}: Modify patient priority in queue
-#'   \item \code{add_resource(n)}: Add n resource units to total capacity
-#'   \item \code{remove_resource(n, current_time)}: Remove n resource units from total capacity
+#' blocked (used) by patients and maintains a priority queue for waiting
+#' patients.
+#'
+#' @param n Integer >= 0. Total capacity of the resource.
+#' @param discipline `"FIFO"` (default) or `"LIFO"`. Queue discipline applied
+#'   within the same priority level.
+#' @param max_queue Non-negative integer or `Inf` (default). Maximum number of
+#'   patients that can wait in the queue. Patients that arrive when the queue is
+#'   full are rejected (`attempt_block()` returns `NA`).
+#'
+#' @return An environment of class `"resource_discrete"` with the following
+#'   methods:
+#' \describe{
+#'   \item{\code{size()}}{Total capacity.}
+#'   \item{\code{queue_size()}}{Number of patients currently in the queue.}
+#'   \item{\code{n_free()}}{Number of free resource units.}
+#'   \item{\code{n_using()}}{Number of units currently in use.}
+#'   \item{\code{utilization()}}{Fraction of capacity in use (0–1).}
+#'   \item{\code{patients_using()}}{Vector of patient IDs currently using the
+#'     resource.}
+#'   \item{\code{patients_using_times()}}{Vector of start times for patients
+#'     using the resource.}
+#'   \item{\code{queue_start_times()}}{Vector of queue start times in queue
+#'     order.}
+#'   \item{\code{queue_priorities()}}{Vector of priorities in queue order.}
+#'   \item{\code{queue_info(n)}}{Data frame with \code{patient_id},
+#'     \code{priority}, \code{start_time} for the queue.}
+#'   \item{\code{is_patient_in_queue(patient_id)}}{Check if patient is in
+#'     queue. Defaults to \code{i} from the calling environment.}
+#'   \item{\code{is_patient_using(patient_id)}}{Check if patient is using the
+#'     resource. Defaults to \code{i} from the calling environment.}
+#'   \item{\code{attempt_block(patient_id, priority, start_time, amount)}}{
+#'     Attempt to block \code{amount} units. Returns \code{TRUE} (acquired),
+#'     \code{FALSE} (queued), or \code{NA} (rejected). Defaults
+#'     \code{patient_id} to \code{i} and \code{start_time} to \code{curtime}
+#'     from the calling environment.}
+#'   \item{\code{attempt_free(patient_id, remove_all, amount)}}{Free the
+#'     resource for a patient. Defaults \code{patient_id} to \code{i}.}
+#'   \item{\code{attempt_free_if_using(patient_id, remove_all)}}{Free only if
+#'     patient is currently using. Defaults \code{patient_id} to \code{i}.}
+#'   \item{\code{next_patient_in_line(n)}}{Get next \code{n} patients in
+#'     queue.}
+#'   \item{\code{modify_priority(patient_id, new_priority)}}{Modify patient
+#'     priority in queue.}
+#'   \item{\code{add_resource(n)}}{Add \code{n} resource units.}
+#'   \item{\code{remove_resource(n, current_time)}}{Remove \code{n} resource
+#'     units. Defaults \code{current_time} to \code{curtime}.}
+#'   \item{\code{queue_wait_time(patient_id)}}{Final queue wait time, set on
+#'     successful dequeue. Returns \code{NA} if never queued or still waiting.
+#'     Defaults \code{patient_id} to \code{i}.}
+#'   \item{\code{queue_wait_time_current(patient_id, current_time)}}{Current
+#'     elapsed queue wait: \code{0} at entry, grows each event while waiting,
+#'     returns final wait on acquisition, \code{NA} if never queued. Defaults
+#'     to \code{i} / \code{curtime}.}
+#'   \item{\code{had_to_queue(patient_id)}}{Returns \code{1L} if patient ever
+#'     queued, \code{0L} otherwise. Defaults \code{patient_id} to \code{i}.}
+#'   \item{\code{time_in_use(patient_id, current_time)}}{Time since patient
+#'     acquired resource. Returns \code{NA} if not currently using. Defaults to
+#'     \code{i} / \code{curtime}.}
+#'   \item{\code{total_patients_blocked()}}{Count of unique patients that ever
+#'     successfully acquired.}
+#'   \item{\code{total_patients_queued()}}{Count of unique patients that ever
+#'     entered the queue.}
+#'   \item{\code{batch_seize(patient_ids, priority, start_time, amount_each)}}{
+#'     Seize for multiple patients in a single C++ call. Returns an integer
+#'     vector (\code{1} = acquired, \code{0} = queued, \code{-1} = rejected).}
 #' }
-#' 
+#'
 #' @examples
 #' # Create a resource with 3 units
 #' beds <- resource_discrete(3)
-#' 
+#'
 #' # Check initial state
-#' beds$size()      # 3
-#' beds$n_free()    # 3
+#' beds$size()       # 3
+#' beds$n_free()     # 3
 #' beds$queue_size() # 0
-#' 
-#' # Block resources
-#' i <- 101; curtime <- 0.0
-#' beds$attempt_block()  # Uses i and curtime from environment
-#' 
+#'
+#' # Block resources (reads i and curtime from calling environment)
+#' i <- 101L; curtime <- 0.0
+#' beds$attempt_block()
+#'
 #' # Or explicitly
-#' beds$attempt_block(patient_id = 102, priority = 1, start_time = 1.0)
-#' 
-#' # Check patient status
-#' beds$is_patient_using(101)     # TRUE
-#' beds$is_patient_in_queue(102)  # FALSE
-#' 
+#' beds$attempt_block(patient_id = 102L, priority = 1L, start_time = 1.0)
+#'
+#' # LIFO resource and limited queue
+#' stack <- resource_discrete(2, discipline = "LIFO", max_queue = 5)
+#'
 #' @export
-resource_discrete <- function(n) {
+resource_discrete <- function(n, discipline = "FIFO", max_queue = Inf) {
   if (!is.numeric(n) || length(n) != 1 || n < 0 || n != as.integer(n)) {
     stop("n must be a single integer >= 0")
   }
-  
-  # Create the environment
+  if (!discipline %in% c("FIFO", "LIFO")) {
+    stop("discipline must be \"FIFO\" or \"LIFO\"")
+  }
+  if (!is.numeric(max_queue) || length(max_queue) != 1 || (!is.infinite(max_queue) && max_queue < 0)) {
+    stop("max_queue must be a single non-negative number or Inf")
+  }
+
+  lifo <- discipline == "LIFO"
+  max_queue_cpp <- if (is.infinite(max_queue)) -1L else as.integer(max_queue)
+
   env <- new.env()
-  
-  # Create the C++ object using XPtr
-  env$.ptr <- create_discrete_resource_cpp(as.integer(n))
-  
-  # Size method
-  env$size <- function() {
-    discrete_resource_size_cpp(env$.ptr)
-  }
-  
-  # Queue size method
-  env$queue_size <- function() {
-    discrete_resource_queue_size_cpp(env$.ptr)
-  }
-  
-  # Number of free resources method
-  env$n_free <- function() {
-    discrete_resource_n_free_cpp(env$.ptr)
-  }
-  
-  # Get patients using resource
-  env$patients_using <- function() {
-    discrete_resource_patients_using_cpp(env$.ptr)
-  }
-  
-  # Get start times of patients using resource
-  env$patients_using_times <- function() {
-    discrete_resource_patients_using_times_cpp(env$.ptr)
-  }
-  
-  # Get queue start times
-  env$queue_start_times <- function() {
-    discrete_resource_queue_start_times_cpp(env$.ptr)
-  }
-  
-  # Get queue priorities
-  env$queue_priorities <- function() {
-    discrete_resource_queue_priorities_cpp(env$.ptr)
-  }
-  
-  # Get full queue information as data.frame
+  env$.ptr <- create_discrete_resource_cpp(as.integer(n), lifo, max_queue_cpp)
+
+  env$size <- function() discrete_resource_size_cpp(env$.ptr)
+
+  env$queue_size <- function() discrete_resource_queue_size_cpp(env$.ptr)
+
+  env$n_free <- function() discrete_resource_n_free_cpp(env$.ptr)
+
+  env$patients_using <- function() discrete_resource_patients_using_cpp(env$.ptr)
+
+  env$patients_using_times <- function() discrete_resource_patients_using_times_cpp(env$.ptr)
+
+  env$queue_start_times <- function() discrete_resource_queue_start_times_cpp(env$.ptr)
+
+  env$queue_priorities <- function() discrete_resource_queue_priorities_cpp(env$.ptr)
+
   env$queue_info <- function(n = NULL) {
     if (is.null(n)) n <- env$queue_size()
     if (n <= 0) return(data.frame(patient_id = integer(0), priority = integer(0), start_time = numeric(0)))
-    
     patient_ids <- env$next_patient_in_line(n)
-    priorities <- env$queue_priorities()[1:length(patient_ids)]
-    start_times <- env$queue_start_times()[1:length(patient_ids)]
-    
-    data.frame(
-      patient_id = patient_ids,
-      priority = priorities,
-      start_time = start_times,
-      stringsAsFactors = FALSE
-    )
+    priorities  <- env$queue_priorities()[seq_along(patient_ids)]
+    start_times <- env$queue_start_times()[seq_along(patient_ids)]
+    data.frame(patient_id = patient_ids, priority = priorities, start_time = start_times,
+               stringsAsFactors = FALSE)
   }
-  
-  # Check if patient is in queue
-  env$is_patient_in_queue <- function(patient_id) {
-    if (!is.numeric(patient_id) || length(patient_id) != 1) {
-      stop("patient_id must be a single number")
-    }
+
+  env$is_patient_in_queue <- function(patient_id = NULL) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+    if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     discrete_resource_is_patient_in_queue_cpp(env$.ptr, as.integer(patient_id))
   }
-  
-  # Check if patient is using resource
-  env$is_patient_using <- function(patient_id) {
-    if (!is.numeric(patient_id) || length(patient_id) != 1) {
-      stop("patient_id must be a single number")
-    }
+
+  env$is_patient_using <- function(patient_id = NULL) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+    if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     discrete_resource_is_patient_using_cpp(env$.ptr, as.integer(patient_id))
   }
-  
-  # Attempt to block a resource unit
-  env$attempt_block <- function(patient_id = NULL, priority = 1L, start_time = NULL) {
-    # Get patient_id from parent frame if not provided
-    if (is.null(patient_id)) {
-      patient_id <-get("i", envir = parent.frame(), inherits = TRUE)
-    }
-    
-    # Get start_time from parent frame if not provided
-    if (is.null(start_time)) {
-      start_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
-    }
-    
-    # Validate inputs
-    if (!is.numeric(patient_id) || length(patient_id) != 1) {
-      stop("patient_id must be a single number")
-    }
-    if (!is.numeric(priority) || length(priority) != 1) {
-      stop("priority must be a single number")
-    }
-    if (!is.numeric(start_time) || length(start_time) != 1) {
-      stop("start_time must be a single number")
-    }
-    
-    discrete_resource_attempt_block_cpp(env$.ptr, as.integer(patient_id), as.integer(priority), as.numeric(start_time))
+
+  env$attempt_block <- function(patient_id = NULL, priority = 1L, start_time = NULL, amount = 1L) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+    if (is.null(start_time)) start_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
+    if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
+    if (!is.numeric(priority)   || length(priority)   != 1) stop("priority must be a single number")
+    if (!is.numeric(start_time) || length(start_time) != 1) stop("start_time must be a single number")
+    result_int <- discrete_resource_attempt_block_cpp(env$.ptr, as.integer(patient_id),
+                                                      as.integer(priority), as.numeric(start_time),
+                                                      as.integer(amount))
+    if (result_int == 1L) return(TRUE)
+    if (result_int == 0L) return(FALSE)
+    NA  # rejected (max_queue full)
   }
-  
-  # Free a resource unit
-  env$attempt_free <- function(patient_id = NULL, remove_all = FALSE) {
-    # Get patient_id from parent frame if not provided
-    if (is.null(patient_id)) {
-      patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
-    }
-    
-    # Validate inputs
-    if (!is.numeric(patient_id) || length(patient_id) != 1) {
-      stop("patient_id must be a single number")
-    }
-    if (!is.logical(remove_all) || length(remove_all) != 1) {
-      stop("remove_all must be a single logical value")
-    }
-    
-    discrete_resource_attempt_free_cpp(env$.ptr, as.integer(patient_id), remove_all)
+
+  env$attempt_free <- function(patient_id = NULL, remove_all = FALSE, amount = 1L) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+    if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
+    if (!is.logical(remove_all) || length(remove_all) != 1) stop("remove_all must be a single logical value")
+    discrete_resource_attempt_free_cpp(env$.ptr, as.integer(patient_id), remove_all, as.integer(amount))
     invisible(NULL)
   }
-  
-  # Free a resource unit only if patient is using it
+
   env$attempt_free_if_using <- function(patient_id = NULL, remove_all = FALSE) {
-    # Get patient_id from parent frame if not provided
-    if (is.null(patient_id)) {
-      patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
-    }
-    
-    # Validate inputs
-    if (!is.numeric(patient_id) || length(patient_id) != 1) {
-      stop("patient_id must be a single number")
-    }
-    if (!is.logical(remove_all) || length(remove_all) != 1) {
-      stop("remove_all must be a single logical value")
-    }
-    
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+    if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
+    if (!is.logical(remove_all) || length(remove_all) != 1) stop("remove_all must be a single logical value")
     discrete_resource_attempt_free_if_using_cpp(env$.ptr, as.integer(patient_id), remove_all)
     invisible(NULL)
   }
-  
-  # Get next patients in line
+
   env$next_patient_in_line <- function(n = 1L) {
-    if (!is.numeric(n) || length(n) != 1 || n < 1) {
-      stop("n must be a single positive integer")
-    }
-    
+    if (!is.numeric(n) || length(n) != 1 || n < 1) stop("n must be a single positive integer")
     discrete_resource_next_patient_in_line_cpp(env$.ptr, as.integer(n))
   }
-  
-  # Modify priority of a patient in queue
+
   env$modify_priority <- function(patient_id, new_priority) {
-    # Validate inputs
-    if (!is.numeric(patient_id) || length(patient_id) != 1) {
-      stop("patient_id must be a single number")
-    }
-    if (!is.numeric(new_priority) || length(new_priority) != 1) {
-      stop("new_priority must be a single number")
-    }
-    
+    if (!is.numeric(patient_id)  || length(patient_id)  != 1) stop("patient_id must be a single number")
+    if (!is.numeric(new_priority) || length(new_priority) != 1) stop("new_priority must be a single number")
     discrete_resource_modify_priority_cpp(env$.ptr, as.integer(patient_id), as.integer(new_priority))
     invisible(NULL)
   }
-  
-  # Add resource units
+
   env$add_resource <- function(n_to_add) {
     if (!is.numeric(n_to_add) || length(n_to_add) != 1 || n_to_add < 1) {
       stop("n_to_add must be a single positive integer")
     }
-    
     discrete_resource_add_resource_cpp(env$.ptr, as.integer(n_to_add))
     invisible(NULL)
   }
-  
-  # Remove resource units
+
   env$remove_resource <- function(n_to_remove, current_time = NULL) {
-    # Get current_time from parent frame if not provided
-    if (is.null(current_time)) {
-      current_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
-    }
-    
-    if (!is.numeric(n_to_remove) || length(n_to_remove) != 1 || n_to_remove < 1) {
-      stop("n_to_remove must be a single positive integer")
-    }
-    
-    if (!is.numeric(current_time) || length(current_time) != 1) {
-      stop("current_time must be a single number")
-    }
-    
+    if (is.null(current_time)) current_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
+    if (!is.numeric(n_to_remove)  || length(n_to_remove)  != 1 || n_to_remove < 1) stop("n_to_remove must be a single positive integer")
+    if (!is.numeric(current_time) || length(current_time) != 1) stop("current_time must be a single number")
     discrete_resource_remove_resource_cpp(env$.ptr, as.integer(n_to_remove), as.numeric(current_time))
     invisible(NULL)
   }
-  
-  # Set class
+
+  # ── Statistics methods ──────────────────────────────────────────────────────
+
+  env$queue_wait_time <- function(patient_id = NULL) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+    discrete_resource_queue_wait_time_cpp(env$.ptr, as.integer(patient_id))
+  }
+
+  env$queue_wait_time_current <- function(patient_id = NULL, current_time = NULL) {
+    if (is.null(patient_id))   patient_id   <- get("i",       envir = parent.frame(), inherits = TRUE)
+    if (is.null(current_time)) current_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
+    discrete_resource_queue_elapsed_time_cpp(env$.ptr, as.integer(patient_id), as.numeric(current_time))
+  }
+
+  env$had_to_queue <- function(patient_id = NULL) {
+    if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
+    discrete_resource_had_to_queue_cpp(env$.ptr, as.integer(patient_id))
+  }
+
+  env$time_in_use <- function(patient_id = NULL, current_time = NULL) {
+    if (is.null(patient_id))   patient_id   <- get("i",       envir = parent.frame(), inherits = TRUE)
+    if (is.null(current_time)) current_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
+    start <- discrete_resource_get_patient_using_start_time_cpp(env$.ptr, as.integer(patient_id))
+    if (is.na(start)) return(NA_real_)
+    current_time - start
+  }
+
+  env$utilization <- function() {
+    s <- env$size()
+    if (s == 0L) return(0)
+    (s - env$n_free()) / s
+  }
+
+  env$n_using <- function() {
+    env$size() - env$n_free()
+  }
+
+  env$total_patients_blocked <- function() {
+    discrete_resource_total_patients_blocked_cpp(env$.ptr)
+  }
+
+  env$total_patients_queued <- function() {
+    discrete_resource_total_patients_queued_cpp(env$.ptr)
+  }
+
+  env$batch_seize <- function(patient_ids, priority = 1L, start_time = NULL, amount_each = 1L) {
+    if (is.null(start_time)) start_time <- get("curtime", envir = parent.frame(), inherits = TRUE)
+    discrete_resource_batch_seize_cpp(env$.ptr, as.integer(patient_ids), as.integer(priority),
+                                      as.numeric(start_time), as.integer(amount_each))
+  }
+
   class(env) <- "resource_discrete"
-  
-  return(env)
+  env
 }
 
 #' Print method for resource_discrete
 #' @param x A resource_discrete object
 #' @param ... Additional arguments (ignored)
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 #' @export
 print.resource_discrete <- function(x, ...) {
   cat("Discrete Resource:\n")
@@ -1455,6 +1458,182 @@ print.resource_discrete <- function(x, ...) {
   cat("  Queue size:", x$queue_size(), "\n")
   cat("  Patients using:", length(x$patients_using()), "\n")
   invisible(x)
+}
+
+# Resource helpers --------------------------------------------------------
+
+#' Seize a discrete resource
+#'
+#' Convenience wrapper around `resource$attempt_block()`. Reads `i` and
+#' `curtime` from the calling environment automatically.
+#'
+#' @param resource A `resource_discrete` object.
+#' @param amount Integer. Number of resource units to seize (default `1L`).
+#'
+#' @return `TRUE` if acquired, `FALSE` if queued, `NA` if rejected (queue full,
+#'   only when `max_queue` is set on the resource).
+#'
+#' @export
+seize <- function(resource, amount = 1L) {
+  i       <- get("i",       envir = parent.frame(), inherits = TRUE)
+  curtime <- get("curtime", envir = parent.frame(), inherits = TRUE)
+  resource$attempt_block(patient_id = i, start_time = curtime, amount = amount)
+}
+
+#' Release a discrete resource
+#'
+#' Frees the resource for the current patient (`i`) and, if the patient was
+#' actually using the resource and a `resume_event` is supplied, schedules that
+#' event for the next patient in the queue.
+#'
+#' @param resource A `resource_discrete` object.
+#' @param resume_event Character string. Name of the event to schedule for the
+#'   next queued patient, or `NULL` (default) to skip re-triggering.
+#' @param amount Integer. Units to free (default `1L`).
+#'
+#' @return Invisibly, `TRUE` if the patient was using the resource, `FALSE`
+#'   otherwise.
+#'
+#' @export
+release <- function(resource, resume_event = NULL, amount = 1L) {
+  i <- get("i", envir = parent.frame(), inherits = TRUE)
+  was_using <- resource$is_patient_using(i)
+  resource$attempt_free(amount = amount)
+  if (was_using && !is.null(resume_event) && resource$queue_size() > 0) {
+    curtime     <- get("curtime",     envir = parent.frame(), inherits = TRUE)
+    cur_evtlist <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+    next_pid    <- resource$next_patient_in_line()
+    new_event(setNames(curtime, resume_event), cur_evtlist, patient_id = next_pid)
+  }
+  invisible(was_using)
+}
+
+#' Seize multiple discrete resources atomically
+#'
+#' Attempts to acquire a list of resources in a single C++ call, avoiding
+#' per-resource R-to-C++ round trips.
+#'
+#' @param resources A list of `resource_discrete` objects.
+#' @param policy `"all_or_none"` (default) — acquires all only if all are
+#'   available; queues for the first bottleneck without holding any others.
+#'   `"sequential"` — acquires in list order, holding partial acquisitions;
+#'   user is responsible for avoiding deadlocks.
+#' @param amounts Integer vector of units per resource (default `1L` for each).
+#' @param priorities Integer vector of priorities per resource (default `1L`).
+#'
+#' @return `TRUE` if all acquired, `FALSE` if queued for a bottleneck resource,
+#'   `NA` if rejected.
+#'
+#' @export
+seize_all <- function(resources, policy = "all_or_none", amounts = NULL, priorities = NULL) {
+  if (is.null(amounts))    amounts    <- rep(1L, length(resources))
+  if (is.null(priorities)) priorities <- rep(1L, length(resources))
+  i       <- get("i",       envir = parent.frame(), inherits = TRUE)
+  curtime <- get("curtime", envir = parent.frame(), inherits = TRUE)
+  xptrs      <- lapply(resources, \(r) r$.ptr)
+  policy_int <- match(policy, c("all_or_none", "sequential")) - 1L
+  if (is.na(policy_int)) stop('policy must be "all_or_none" or "sequential"')
+  result_int <- discrete_resource_seize_all_cpp(xptrs, as.integer(i), as.integer(priorities),
+                                                as.numeric(curtime), as.integer(amounts),
+                                                as.integer(policy_int))
+  if (result_int == 1L) TRUE else if (result_int == 0L) FALSE else NA
+}
+
+#' Release multiple discrete resources
+#'
+#' Frees the current patient (`i`) from each resource via a single C++ call.
+#' Removes the patient from both the using list and the queue (all entries).
+#' Schedules resume events only for resources where the patient was actually
+#' using (i.e., where capacity was freed).
+#'
+#' @param resources A list of `resource_discrete` objects.
+#' @param resume_event `NULL` (no re-triggering), a single string (same event
+#'   for all resources' queues), or a character vector of length
+#'   `length(resources)` (per-resource events, matched positionally).
+#' @param amounts Integer vector of units per resource (default `1L` for each).
+#'
+#' @return Invisibly `NULL`.
+#'
+#' @export
+release_all <- function(resources, resume_event = NULL, amounts = NULL) {
+  if (is.null(amounts)) amounts <- rep(1L, length(resources))
+  i    <- get("i", envir = parent.frame(), inherits = TRUE)
+  xptrs <- lapply(resources, \(r) r$.ptr)
+  was_using <- discrete_resource_release_all_cpp(xptrs, as.integer(i), as.integer(amounts))
+  if (!is.null(resume_event)) {
+    if (length(resume_event) == 1L) resume_event <- rep(resume_event, length(resources))
+    curtime     <- get("curtime",     envir = parent.frame(), inherits = TRUE)
+    cur_evtlist <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+    for (idx in seq_along(resources)) {
+      if (was_using[idx] && resources[[idx]]$queue_size() > 0) {
+        next_pid <- resources[[idx]]$next_patient_in_line()
+        new_event(setNames(curtime, resume_event[idx]), cur_evtlist, patient_id = next_pid)
+      }
+    }
+  }
+  invisible(NULL)
+}
+
+#' Release multiple discrete resources (using only)
+#'
+#' Frees the current patient (`i`) from each resource only if they are
+#' currently using it. Does not remove the patient from any queue. Use this
+#' when a patient transitions state but should keep their queue position.
+#'
+#' @inheritParams release_all
+#'
+#' @return Invisibly `NULL`.
+#'
+#' @export
+release_all_if_using <- function(resources, resume_event = NULL, amounts = NULL) {
+  if (is.null(amounts)) amounts <- rep(1L, length(resources))
+  i    <- get("i", envir = parent.frame(), inherits = TRUE)
+  xptrs <- lapply(resources, \(r) r$.ptr)
+  was_using <- discrete_resource_release_all_if_using_cpp(xptrs, as.integer(i), as.integer(amounts))
+  if (!is.null(resume_event)) {
+    if (length(resume_event) == 1L) resume_event <- rep(resume_event, length(resources))
+    curtime     <- get("curtime",     envir = parent.frame(), inherits = TRUE)
+    cur_evtlist <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+    for (idx in seq_along(resources)) {
+      if (was_using[idx] && resources[[idx]]$queue_size() > 0) {
+        next_pid <- resources[[idx]]$next_patient_in_line()
+        new_event(setNames(curtime, resume_event[idx]), cur_evtlist, patient_id = next_pid)
+      }
+    }
+  }
+  invisible(NULL)
+}
+
+#' Increment a shared counter
+#'
+#' Adds `delta` to the value of a `shared_input` object and returns the new
+#' value.
+#'
+#' @param obj A `shared_input` object (constrained / shared mode).
+#' @param delta Numeric. Amount to add (default `1`).
+#'
+#' @return The new value after incrementing.
+#'
+#' @export
+shared_incr <- function(obj, delta = 1) {
+  obj$modify(obj$value() + delta)
+  obj$value()
+}
+
+#' Decrement a shared counter
+#'
+#' Subtracts `delta` from the value of a `shared_input` object and returns the
+#' new value.
+#'
+#' @param obj A `shared_input` object (constrained / shared mode).
+#' @param delta Numeric. Amount to subtract (default `1`).
+#'
+#' @return The new value after decrementing.
+#'
+#' @export
+shared_decr <- function(obj, delta = 1) {
+  obj$modify(obj$value() - delta)
+  obj$value()
 }
 
 

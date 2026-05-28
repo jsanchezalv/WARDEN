@@ -447,6 +447,315 @@ test_that("print method works correctly", {
   expect_true(any(grepl("Patients using: 3", output)))
 })
 
+# ── New features ─────────────────────────────────────────────────────────────
+
+# F1.1 Constructor parameters
+test_that("discipline and max_queue constructor parameters work", {
+  expect_silent(resource_discrete(5, discipline = "FIFO"))
+  expect_silent(resource_discrete(5, discipline = "LIFO"))
+  expect_silent(resource_discrete(5, max_queue = 3))
+  expect_silent(resource_discrete(5, discipline = "LIFO", max_queue = 2))
+  expect_error(resource_discrete(5, discipline = "INVALID"))
+  expect_error(resource_discrete(5, max_queue = -1))
+})
+
+# F1.2 LIFO discipline
+test_that("LIFO serves last-queued patient first among same priority", {
+  beds <- resource_discrete(1, discipline = "LIFO")
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  beds$attempt_block(patient_id = 3L, priority = 1L, start_time = 3)
+  expect_equal(beds$next_patient_in_line(1L), 3L)
+})
+
+test_that("LIFO priority still takes precedence over insertion order", {
+  beds <- resource_discrete(1, discipline = "LIFO")
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 3L, priority = 2L, start_time = 2)
+  expect_equal(beds$next_patient_in_line(1L), 3L)
+})
+
+test_that("FIFO serves first-queued patient first", {
+  beds <- resource_discrete(1, discipline = "FIFO")
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  beds$attempt_block(patient_id = 3L, priority = 1L, start_time = 3)
+  expect_equal(beds$next_patient_in_line(1L), 2L)
+})
+
+# F1.3 Limited queue (max_queue)
+test_that("max_queue rejects when queue is full", {
+  beds <- resource_discrete(1, max_queue = 2)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  expect_false(beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1))
+  expect_false(beds$attempt_block(patient_id = 3L, priority = 1L, start_time = 2))
+  result <- beds$attempt_block(patient_id = 4L, priority = 1L, start_time = 3)
+  expect_true(is.na(result))
+})
+
+test_that("max_queue=0 rejects immediately when capacity full", {
+  beds <- resource_discrete(1, max_queue = 0)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  result <- beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  expect_true(is.na(result))
+  expect_equal(beds$queue_size(), 0L)
+})
+
+test_that("max_queue allows queuing after a queue slot opens", {
+  beds <- resource_discrete(1, max_queue = 2)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 3L, priority = 1L, start_time = 2)
+  beds$attempt_free(patient_id = 2L)
+  result <- beds$attempt_block(patient_id = 4L, priority = 1L, start_time = 3)
+  expect_false(result)
+})
+
+test_that("unlimited queue (default) never rejects", {
+  beds <- resource_discrete(1)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  for (j in 2:101) {
+    expect_false(beds$attempt_block(patient_id = j, priority = 1L, start_time = j))
+  }
+})
+
+# F1.4 Batch amount (single patient, multiple units)
+test_that("attempt_block with amount blocks multiple units", {
+  beds <- resource_discrete(5)
+  result <- beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  expect_true(result)
+  expect_equal(beds$n_free(), 2L)
+})
+
+test_that("attempt_block with amount queues when insufficient capacity", {
+  beds <- resource_discrete(2)
+  result <- beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  expect_false(result)
+})
+
+test_that("n_free correct after patients with different amounts", {
+  beds <- resource_discrete(10)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1, amount = 4L)
+  expect_equal(beds$n_free(), 3L)
+})
+
+test_that("attempt_free frees correct amount of units", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  beds$attempt_free(patient_id = 1L)
+  expect_equal(beds$n_free(), 5L)
+  expect_false(beds$is_patient_using(1L))
+})
+
+test_that("queued patient with amount dequeues when enough slots available", {
+  beds <- resource_discrete(3)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1, amount = 2L)
+  beds$attempt_free(patient_id = 1L)
+  result <- beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2, amount = 2L)
+  expect_true(result)
+  expect_equal(beds$n_free(), 1L)
+})
+
+# F1.5 Queue wait time
+test_that("queue_wait_time returns NA for patient that never queued", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  expect_equal(beds$queue_wait_time(1L), NA_real_)
+})
+
+test_that("queue_wait_time_current returns elapsed wait while in queue", {
+  beds <- resource_discrete(1)
+  b <- resource_discrete(1)
+  i <- 1L
+  curtime <- 5.0
+  seize_all(list(beds, b))
+  i <- 2L
+  seize_all(list(beds, b))   # P2 queued for beds at t=5
+  curtime <- 10.0
+  # P2 still in queue: elapsed = 10 - 5 = 5
+  expect_equal(beds$queue_wait_time_current(2L, 10.0), 5.0)
+  # queue_wait_time (final-only) still NA while in queue
+  expect_equal(beds$queue_wait_time(2L), NA_real_)
+})
+
+test_that("queue_wait_time returns NA while patient is still in queue", {
+  beds <- resource_discrete(1)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 5)
+  expect_equal(beds$queue_wait_time(2L), NA_real_)
+})
+
+test_that("queue_wait_time returns most recent wait for repeated queuing", {
+  beds <- resource_discrete(1)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  beds$attempt_free(patient_id = 1L)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 7)  # wait=5
+  beds$attempt_free(patient_id = 2L)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 7)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 10)
+  beds$attempt_free(patient_id = 1L)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 12)  # wait=2
+  expect_equal(beds$queue_wait_time(2L), 2.0)
+})
+
+# F1.6 had_to_queue
+test_that("had_to_queue returns 0L for direct acquisition", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  expect_equal(beds$had_to_queue(1L), 0L)
+})
+
+test_that("had_to_queue returns 1L for patient that queued", {
+  beds <- resource_discrete(1)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  expect_equal(beds$had_to_queue(2L), 1L)
+})
+
+test_that("had_to_queue stays 1L even after patient acquires", {
+  beds <- resource_discrete(1)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_free(patient_id = 1L)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  expect_equal(beds$had_to_queue(2L), 1L)
+})
+
+test_that("had_to_queue returns 0L for patient that never interacted", {
+  beds <- resource_discrete(5)
+  expect_equal(beds$had_to_queue(99L), 0L)
+})
+
+# F1.7 time_in_use
+test_that("time_in_use returns correct duration", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 3.0)
+  expect_equal(beds$time_in_use(patient_id = 1L, current_time = 8.0), 5.0)
+})
+
+test_that("time_in_use returns NA for patient not currently using", {
+  beds <- resource_discrete(5)
+  expect_equal(beds$time_in_use(patient_id = 1L, current_time = 5.0), NA_real_)
+})
+
+# F1.8 Aggregate statistics
+test_that("total_patients_blocked counts unique patients not occurrences", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_free(patient_id = 1L)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 1)
+  expect_equal(beds$total_patients_blocked(), 1L)
+})
+
+test_that("total_patients_blocked counts multiple distinct patients", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 3L, priority = 1L, start_time = 2)
+  expect_equal(beds$total_patients_blocked(), 3L)
+})
+
+test_that("total_patients_queued counts unique queued patients", {
+  beds <- resource_discrete(1)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 3L, priority = 1L, start_time = 2)
+  expect_equal(beds$total_patients_queued(), 2L)
+})
+
+test_that("total_patients_queued is 0 when all acquired directly", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 3L, priority = 1L, start_time = 2)
+  expect_equal(beds$total_patients_queued(), 0L)
+})
+
+# F1.9 utilization and n_using
+test_that("utilization is 0 on fresh resource", {
+  beds <- resource_discrete(5)
+  expect_equal(beds$utilization(), 0)
+})
+
+test_that("utilization and n_using correct for partial use", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 3L, priority = 1L, start_time = 2)
+  expect_equal(beds$utilization(), 0.6)
+  expect_equal(beds$n_using(), 3L)
+})
+
+test_that("utilization is 1.0 when fully occupied", {
+  beds <- resource_discrete(3)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 3L, priority = 1L, start_time = 2)
+  expect_equal(beds$utilization(), 1.0)
+})
+
+test_that("utilization accounts for batch amounts", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  expect_equal(beds$utilization(), 0.6)
+})
+
+# F1.10 batch_seize
+test_that("batch_seize acquires first patients and queues rest", {
+  beds <- resource_discrete(3)
+  result <- beds$batch_seize(patient_ids = 1:5, priority = 1L, start_time = 0)
+  expect_equal(result[1:3], c(1L, 1L, 1L))
+  expect_equal(result[4:5], c(0L, 0L))
+})
+
+test_that("batch_seize rejects when max_queue reached", {
+  beds <- resource_discrete(3, max_queue = 1)
+  result <- beds$batch_seize(patient_ids = 1:5, priority = 1L, start_time = 0)
+  expect_equal(result[1:3], c(1L, 1L, 1L))
+  expect_equal(result[4], 0L)
+  expect_equal(result[5], -1L)
+})
+
+test_that("batch_seize returns integer vector of correct length", {
+  beds <- resource_discrete(5)
+  result <- beds$batch_seize(patient_ids = 1:10, priority = 1L, start_time = 0)
+  expect_type(result, "integer")
+  expect_length(result, 10L)
+})
+
+test_that("batch_seize with amount_each uses correct units per patient", {
+  beds <- resource_discrete(5)
+  result <- beds$batch_seize(patient_ids = 1:3, priority = 1L, start_time = 0, amount_each = 2L)
+  expect_equal(result[1:2], c(1L, 1L))
+  expect_equal(result[3], 0L)
+})
+
+# F1.11 no-arg is_patient_using / is_patient_in_queue
+test_that("is_patient_using no-arg uses i from parent frame", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  i <- 1L
+  expect_true(beds$is_patient_using())
+  i <- 99L
+  expect_false(beds$is_patient_using())
+})
+
+test_that("is_patient_in_queue no-arg uses i from parent frame", {
+  beds <- resource_discrete(1)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  i <- 2L
+  expect_true(beds$is_patient_in_queue())
+  i <- 1L
+  expect_false(beds$is_patient_in_queue())
+})
+
+# ── End new features ──────────────────────────────────────────────────────────
+
 # Test Complex Scenario
 test_that("complex scenario works correctly", {
   beds <- resource_discrete(2)

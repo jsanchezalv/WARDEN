@@ -82,11 +82,18 @@ reference:
       - pop_and_return_event
 
       
-  - subtitle: Resource Constrained Specific Functions
+  - subtitle: Resource constrained specific functions
     contents:
       - resource_discrete
       - shared_input
       - discrete_resource_clone
+      - seize
+      - release
+      - seize_all
+      - release_all
+      - release_all_if_using
+      - shared_incr
+      - shared_decr
 
 
   - subtitle: Auxiliary Functions

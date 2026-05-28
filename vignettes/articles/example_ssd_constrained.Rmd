@@ -69,7 +69,7 @@ common_all_inputs <-add_item(input = {
                       drc         <- 0.035 #different values than what's assumed by default
                       drq         <- 0.035
                       random_seed_sicker_i <- sample.int(100000,npats,replace = FALSE)
-                      beds <- resource_discrete(650) #initialized with 650 beds
+                      beds <- resource_discrete(650) #initialized with 650 beds 
                       beds_free <- beds$n_free() #extract current n_free
                       shared_accumulator <- shared_input(0) #initialized at 0
                       value_accum <- shared_accumulator$value() #extract value
@@ -83,10 +83,10 @@ common_pt_inputs <- add_item(death= max(0.0000001,rnorm(n=1, mean=12, sd=3)))
 unique_pt_inputs <- add_item(fl.sick = 1,
                              q_default = util.sick,
                              c_default = cost.sick + if(arm=="int"){cost.int}else{0},
-                             success_blocking_bed = FALSE,
                              had_to_queue = 0,
                              time_in_queue = NA,
-                             time_start_queue = NA) 
+                             beds_util = 0,
+                             beds_n_using = 0L)
 
 ```
 
@@ -107,54 +107,46 @@ init_event_list <-
 ## Add Reaction to Those Events
 We will assume that when the patients enter the sicker event, they attempt to use one of the beds. If they do so, everything goes as normal. If they fail to use one of the beds, the time to death is accelerated as they cannot get the right treatment.
 
-The discrete resources work similarly to R6 objects, i.e., we call functions from themselves (in this case, `beds$attempt_block()` as opposed to what would be a traditional approach `attempt_block(beds)`), and they automatically modify the `beds` object without needing to return anything. An advantage of using R6-like objects is that we can also make them return something to the user (as well as keep modifying themselves!). In this case, `attempt_block` will return `TRUE` or `FALSE` depending on the success or failure of using the resource.
+The resource helpers `seize()` and `release()` read `i` and `curtime` from the calling environment automatically. `seize(beds)` returns `TRUE` (acquired), `FALSE` (queued), or `NA` (rejected when `max_queue` is set). `release(beds, resume_event = "sicker")` frees the bed for the current patient and, when a patient is queued, schedules their `"sicker"` event automatically — eliminating the manual `if(was_using & queue_size > 0) new_event(...)` pattern.
 
-If the patient fails to block the bed, then the time to death is accelerated by a factor of 0.8. Note that because resources are shared, we can 1) know who the next patient in the queue is, and 2) create a new event for that specific patient, even if the current patient being evaluated is another.
-
-Once a patient reaches the sicker state (or dies), the resource is freed (if being used)/ the patient is removed from the queue (using `attempt_free()`) and we set the event time for the next patient in the queue to use.
-
-We are also tracking a few things just to keep track of them, like free beds count, time in a queue for patients who queued, and also whether the patient had to queue or not.
+Queue wait time and the queuing flag are now tracked in C++ inside the resource object. `beds$queue_wait_time_current()` returns `NA` if the patient never queued, `0` at the moment they enter the queue, grows with elapsed time at each subsequent event while waiting, and returns the total wait time once they acquire. `beds$had_to_queue()` returns `0L` or `1L` and is a permanent per-patient flag.
 
 ```{r model_reaction}
 evt_react_list <-
   add_reactevt(name_evt = "sick",
                input = {
-                 shared_accumulator <- shared_accumulator$modify(shared_accumulator$value() + 1)
-                 value_accum <- shared_accumulator$value()
-                 beds_free <- beds$n_free()
-                 time_in_queue <- NA
+                 value_accum   <- shared_incr(shared_accumulator, 1)
+                 beds_free     <- beds$n_free()
+                 beds_util     <- beds$utilization()
+                 beds_n_using  <- beds$n_using()
+                 time_in_queue <- beds$queue_wait_time_current()
                }) |>
   add_reactevt(name_evt = "sicker",
                input = {
-                 success_blocking_bed <- beds$attempt_block()
+                 acquired  <- seize(beds)
                  beds_free <- beds$n_free()
-                 if(!success_blocking_bed){
-                   time_start_queue <- curtime
-                   modify_event(c(death = max(curtime,get_event("death") * 0.8)))
-                   had_to_queue <- 1
-                 }else{
-                   time_in_queue <- ifelse(had_to_queue == 1, curtime - time_start_queue,NA)
+                 beds_util    <- beds$utilization()
+                 beds_n_using <- beds$n_using()
+                 if (!acquired) {
+                   modify_event(c(death = max(curtime, get_event("death") * 0.8)))
                  }
+                 had_to_queue  <- beds$had_to_queue()
+                 time_in_queue <- beds$queue_wait_time_current()
                  q_default <- util.sicker
                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
-                 fl.sick   <- 0 
+                 fl.sick   <- 0
                }) |>
   add_reactevt(name_evt = "death",
                input = {
-                 beds$attempt_free() #remove from using or from the queue
-                 if(success_blocking_bed & beds$queue_size() > 0){
-                    new_event(c(sicker = curtime),
-                               cur_evtlist,
-                               patient_id = beds$next_patient_in_line())
-                 }
-                 success_blocking_bed <- FALSE
-                 time_in_queue <- NA
-                 beds_free <- beds$n_free()
-                 q_default <- 0
-                 c_default <- 0
-                 curtime   <- Inf
-               }) 
-
+                 release(beds, resume_event = "sicker")
+                 time_in_queue <- beds$queue_wait_time_current()
+                 beds_free     <- beds$n_free()
+                 beds_util     <- beds$utilization()
+                 beds_n_using  <- beds$n_using()
+                 q_default     <- 0
+                 c_default     <- 0
+                 curtime       <- Inf
+               })
 
 ```
 
@@ -197,10 +189,10 @@ results <- run_sim(
   cost_ongoing_list = cost_ongoing,
   constrained = TRUE,
   ipd = 1,
-  input_out = c("beds_free","had_to_queue","time_in_queue","value_accum")
+  input_out = c("beds_free","beds_util","beds_n_using","had_to_queue","time_in_queue","value_accum")
 )
 ```
-# Post-processing of Model Outputs
+# Post-processing of model outputs
 ## Summary of Results
 
 ```{r post-processing_summary}
@@ -242,7 +234,121 @@ ggplot(psa_ipd |> group_by(arm,pat_id) |> summarise(time_in_queue=mean(time_in_q
 
 ```
 
-# Sensitivity Analysis
+# Resource statistics
+
+Resource utilization (`beds_util`) and units in use (`beds_n_using`) are tracked per event and exported via `input_out`. We can plot bed utilization over time just like `beds_free`:
+
+```{r resource_stats, echo=FALSE, message=FALSE}
+ggplot(psa_ipd, aes(x = evttime, y = beds_util, col = arm)) +
+  geom_line() +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 1), expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(y = "Bed utilization", x = "Time") +
+  theme_bw()
+```
+
+The queue wait time (`time_in_queue`) and queuing flag (`had_to_queue`) are computed inside the C++ resource and read back in the reaction with `beds$queue_wait_time_current()` and `beds$had_to_queue()`. No manual bookkeeping is needed.
+
+## Multi-resource scheduling
+
+When a patient needs multiple resources simultaneously (e.g., a bed AND a specialist), `seize_all()` handles atomic acquisition under `"all_or_none"` policy: the patient queues only for the first unavailable resource, holding nothing else — deadlock-free by design. Below is a complete model setup pattern using two resources.
+
+```{r multi_resource, eval=FALSE}
+# common_all_inputs — both resources initialized together
+common_all_inputs_multi <- add_item(input = {
+  util.sick   <- 0.8; util.sicker <- 0.5
+  cost.sick   <- 3000; cost.sicker <- 7000; cost.int <- 1000
+  coef_noint  <- log(0.2); HR_int <- 0.8; drc <- 0.035; drq <- 0.035
+  random_seed_sicker_i <- sample.int(100000, npats, replace = FALSE)
+  beds        <- resource_discrete(650)
+  specialists <- resource_discrete(50)
+  beds_free   <- beds$n_free()
+  specialists_free   <- specialists$n_free()
+})
+
+unique_pt_inputs_multi <- add_item(
+  fl.sick = 1,
+  q_default = util.sick,
+  c_default = cost.sick + if(arm == "int") cost.int else 0,
+  had_to_queue = 0,
+  time_in_queue = NA,
+  specialists_free = 0L,
+  beds_free = 0L
+)
+
+evt_react_list_multi <-
+  add_reactevt(name_evt = "sick", input = {
+    beds_free        <- beds$n_free()
+    specialists_free <- specialists$n_free()
+    time_in_queue    <- NA
+  }) |>
+  add_reactevt(name_evt = "sicker", input = {
+    # Patient needs BOTH a bed AND a specialist simultaneously.
+    # seize_all with "all_or_none": queues only for the first unavailable resource.
+    # With 650 beds vs 50 specialists, specialists saturate first, so patients
+    # typically queue for specialists only, but can't use any.
+    acquired <- seize_all(list(beds, specialists))
+    beds_free        <- beds$n_free()
+    specialists_free <- specialists$n_free()
+    if (!acquired) {
+      modify_event(c(death = max(curtime, get_event("death") * 0.8)))
+    }
+    # had_to_queue: 1 if queued for EITHER resource (check both)
+    had_to_queue  <- max(beds$had_to_queue(), specialists$had_to_queue())
+    # queue_wait_time_current: 0 at entry, grows while waiting, final wait on acquisition
+    q_default <- util.sicker
+    c_default <- cost.sicker + if(arm == "int") cost.int else 0
+    fl.sick   <- 0
+  }) |>
+  add_reactevt(name_evt = "death", input = {
+    time_in_queue <- specialists$queue_wait_time_current()
+    # Release both resources; re-trigger the next patient queued for each
+    release_all(list(beds, specialists), resume_event = "sicker")
+    beds_free        <- beds$n_free()
+    specialists_free <- specialists$n_free()
+    q_default <- 0; c_default <- 0; curtime <- Inf
+  })
+
+results_multi <- run_sim(
+  npats = 1000, n_sim = 1, psa_bool = FALSE,
+  arm_list = c("int", "noint"),
+  common_all_inputs = common_all_inputs_multi,
+  common_pt_inputs = common_pt_inputs,
+  unique_pt_inputs = unique_pt_inputs_multi,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list_multi,
+  util_ongoing_list = util_ongoing, cost_ongoing_list = cost_ongoing,
+  constrained = TRUE, ipd = 1,
+  input_out = c("beds_free","specialists_free","had_to_queue","time_in_queue")
+)
+
+psa_ipd <- bind_rows(map(results_multi[[1]], "merged_df")) 
+ggplot(psa_ipd) +
+  geom_line(aes(x=evttime,y=beds_free, col = arm))+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+ggplot(psa_ipd) +
+  geom_line(aes(x=evttime,y=specialists_free, col = arm))+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+ggplot(psa_ipd %>%
+         filter(evtname=="death") %>%
+         mutate(time_in_queue = ifelse(is.na(time_in_queue),0,time_in_queue)) %>%
+         group_by(pat_id, arm) %>%
+         summarise(time_in_queue = max(time_in_queue,na.rm=TRUE))
+       ) +
+  geom_histogram(aes(x=time_in_queue, fill = arm), alpha = 0.3, col = "white", position ="identity")+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+```
+
+# Sensitivity analysis
 ## Run model with constrained = FALSE
 It can be seen that with `constrained = FALSE`, the results are equivalent to the SSD standard vignette. Furthermore, if the model is run with constrained = TRUE but in such a way that the constraint does not bind (e.g., with 1000+ beds) then the results are also equivalent. If the model is run with `constrained = FALSE`, then shared inputs and resources are no longer shared. This allows to very quickly evaluate how the model outputs change when resources are constrained vs. when they are not.
 
