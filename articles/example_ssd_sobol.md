@@ -28,6 +28,11 @@ if(!require(randtoolbox)){
     library(randtoolbox)
 }
 #> Loading required package: randtoolbox
+#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+#> logical.return = TRUE, : there is no package called 'randtoolbox'
+#> Installing package into '/home/runner/work/_temp/Library'
+#> (as 'lib' is unspecified)
+#> also installing the dependency 'rngWELL'
 #> Loading required package: rngWELL
 #> This is randtoolbox. For an overview, type 'help("randtoolbox")'.
 ```
@@ -213,17 +218,17 @@ results_unif <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.24s
+#> Time to run simulation 1: 0.5s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.27s
+#> Time to run simulation 2: 0.3s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.24s
+#> Time to run simulation 3: 0.3s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.23s
+#> Time to run simulation 4: 0.3s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.24s
-#> Time to run analysis 1: 1.22s
-#> Total time to run: 1.23s
+#> Time to run simulation 5: 0.3s
+#> Time to run analysis 1: 1.7s
+#> Total time to run: 1.7s
 #> Simulation finalized;
 
 results_sobol <- run_sim(  
@@ -244,17 +249,17 @@ results_sobol <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.25s
+#> Time to run simulation 1: 0.3s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.25s
+#> Time to run simulation 2: 0.31s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.25s
+#> Time to run simulation 3: 0.3s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.24s
+#> Time to run simulation 4: 0.3s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.29s
-#> Time to run analysis 1: 1.29s
-#> Total time to run: 1.29s
+#> Time to run simulation 5: 0.3s
+#> Time to run analysis 1: 1.52s
+#> Total time to run: 1.52s
 #> Simulation finalized;
 ```
 
@@ -412,17 +417,17 @@ results_unif_psa <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.24s
+#> Time to run simulation 1: 0.31s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.23s
+#> Time to run simulation 2: 0.34s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.22s
+#> Time to run simulation 3: 0.32s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.28s
+#> Time to run simulation 4: 0.32s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.23s
-#> Time to run analysis 1: 1.2s
-#> Total time to run: 1.2s
+#> Time to run simulation 5: 0.39s
+#> Time to run analysis 1: 1.69s
+#> Total time to run: 1.69s
 #> Simulation finalized;
 
 results_sobol_psa <- run_sim(
@@ -443,17 +448,17 @@ results_sobol_psa <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.23s
+#> Time to run simulation 1: 0.33s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.23s
+#> Time to run simulation 2: 0.33s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.23s
+#> Time to run simulation 3: 0.33s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.24s
+#> Time to run simulation 4: 0.33s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.24s
-#> Time to run analysis 1: 1.17s
-#> Total time to run: 1.17s
+#> Time to run simulation 5: 0.34s
+#> Time to run analysis 1: 1.66s
+#> Total time to run: 1.66s
 #> Simulation finalized;
 ```
 

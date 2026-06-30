@@ -176,7 +176,6 @@ evt_react_list <-
                  beds_free     <- beds$n_free()
                  beds_util     <- beds$utilization()
                  beds_n_using  <- beds$n_using()
-                 time_in_queue <- beds$queue_wait_time_current()
                }) |>
   add_reactevt(name_evt = "sicker",
                input = {
@@ -188,15 +187,14 @@ evt_react_list <-
                    modify_event(c(death = max(curtime, get_event("death") * 0.8)))
                  }
                  had_to_queue  <- beds$had_to_queue()
-                 time_in_queue <- beds$queue_wait_time_current()
                  q_default <- util.sicker
                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
                  fl.sick   <- 0
                }) |>
   add_reactevt(name_evt = "death",
                input = {
-                 release(beds, resume_event = "sicker")
                  time_in_queue <- beds$queue_wait_time_current()
+                 release(beds, resume_event = "sicker")
                  beds_free     <- beds$n_free()
                  beds_util     <- beds$utilization()
                  beds_n_using  <- beds$n_using()
@@ -252,9 +250,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.86s
-#> Time to run analysis 1: 0.87s
-#> Total time to run: 0.87s
+#> Time to run simulation 1: 1.09s
+#> Time to run analysis 1: 1.09s
+#> Total time to run: 1.09s
 #> Simulation finalized;
 ```
 
@@ -302,7 +300,7 @@ summary_results_det(results[[1]][[1]]) #print first simulation
 #> dq_default            0.00     0.31
 #> q_default_undisc      7.62     7.20
 #> dq_default_undisc     0.00     0.41
-#> time_in_queue          NaN     0.78
+#> time_in_queue          NaN     0.65
 #> dtime_in_queue         NaN      NaN
 #> value_accum         500.50   500.50
 #> dvalue_accum          0.00     0.00
@@ -358,138 +356,6 @@ are computed inside the C++ resource and read back in the reaction with
 `beds$queue_wait_time_current()` and `beds$had_to_queue()`. No manual
 bookkeeping is needed.
 
-### Multi-resource scheduling
-
-When a patient needs multiple resources simultaneously (e.g., a bed AND
-a specialist),
-[`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)
-handles atomic acquisition under `"all_or_none"` policy: the patient
-queues only for the first unavailable resource, holding nothing else —
-deadlock-free by design. Below is a complete model setup pattern using
-two resources.
-
-``` r
-
-# common_all_inputs — both resources initialized together
-common_all_inputs_multi <- add_item(input = {
-  util.sick   <- 0.8; util.sicker <- 0.5
-  cost.sick   <- 3000; cost.sicker <- 7000; cost.int <- 1000
-  coef_noint  <- log(0.2); HR_int <- 0.8; drc <- 0.035; drq <- 0.035
-  random_seed_sicker_i <- sample.int(100000, npats, replace = FALSE)
-  beds        <- resource_discrete(650)
-  specialists <- resource_discrete(50)
-  beds_free   <- beds$n_free()
-  specialists_free   <- specialists$n_free()
-})
-
-unique_pt_inputs_multi <- add_item(
-  fl.sick = 1,
-  q_default = util.sick,
-  c_default = cost.sick + if(arm == "int") cost.int else 0,
-  had_to_queue = 0,
-  time_in_queue = NA,
-  specialists_free = 0L,
-  beds_free = 0L
-)
-
-evt_react_list_multi <-
-  add_reactevt(name_evt = "sick", input = {
-    beds_free        <- beds$n_free()
-    specialists_free <- specialists$n_free()
-    time_in_queue    <- NA
-  }) |>
-  add_reactevt(name_evt = "sicker", input = {
-    # Patient needs BOTH a bed AND a specialist simultaneously.
-    # seize_all with "all_or_none": queues only for the first unavailable resource.
-    # With 650 beds vs 50 specialists, specialists saturate first, so patients
-    # typically queue for specialists only, but can't use any.
-    acquired <- seize_all(list(beds, specialists))
-    beds_free        <- beds$n_free()
-    specialists_free <- specialists$n_free()
-    if (!acquired) {
-      modify_event(c(death = max(curtime, get_event("death") * 0.8)))
-    }
-    # had_to_queue: 1 if queued for EITHER resource (check both)
-    had_to_queue  <- max(beds$had_to_queue(), specialists$had_to_queue())
-    # queue_wait_time_current: 0 at entry, grows while waiting, final wait on acquisition
-    q_default <- util.sicker
-    c_default <- cost.sicker + if(arm == "int") cost.int else 0
-    fl.sick   <- 0
-  }) |>
-  add_reactevt(name_evt = "death", input = {
-    time_in_queue <- specialists$queue_wait_time_current()
-    # Release both resources; re-trigger the next patient queued for each
-    release_all(list(beds, specialists), resume_event = "sicker")
-    beds_free        <- beds$n_free()
-    specialists_free <- specialists$n_free()
-    q_default <- 0; c_default <- 0; curtime <- Inf
-  })
-
-results_multi <- run_sim(
-  npats = 1000, n_sim = 1, psa_bool = FALSE,
-  arm_list = c("int", "noint"),
-  common_all_inputs = common_all_inputs_multi,
-  common_pt_inputs = common_pt_inputs,
-  unique_pt_inputs = unique_pt_inputs_multi,
-  init_event_list = init_event_list,
-  evt_react_list = evt_react_list_multi,
-  util_ongoing_list = util_ongoing, cost_ongoing_list = cost_ongoing,
-  constrained = TRUE, ipd = 1,
-  input_out = c("beds_free","specialists_free","had_to_queue","time_in_queue")
-)
-#> Analysis number: 1
-#> Simulation number: 1
-#> Time to run simulation 1: 1.04s
-#> Time to run analysis 1: 1.04s
-#> Total time to run: 1.04s
-#> Simulation finalized;
-
-psa_ipd <- bind_rows(map(results_multi[[1]], "merged_df")) 
-ggplot(psa_ipd) +
-  geom_line(aes(x=evttime,y=beds_free, col = arm))+
-  scale_y_continuous(expand = c(0, 0)) +
-  scale_x_continuous(expand = c(0, 0)) +
-  theme_bw()
-```
-
-![](example_ssd_constrained_files/figure-html/multi_resource-1.png)
-
-``` r
-
-
-ggplot(psa_ipd) +
-  geom_line(aes(x=evttime,y=specialists_free, col = arm))+
-  scale_y_continuous(expand = c(0, 0)) +
-  scale_x_continuous(expand = c(0, 0)) +
-  theme_bw()
-```
-
-![](example_ssd_constrained_files/figure-html/multi_resource-2.png)
-
-``` r
-
-
-ggplot(psa_ipd %>%
-         filter(evtname=="death") %>%
-         mutate(time_in_queue = ifelse(is.na(time_in_queue),0,time_in_queue)) %>%
-         group_by(pat_id, arm) %>%
-         summarise(time_in_queue = max(time_in_queue,na.rm=TRUE))
-       ) +
-  geom_histogram(aes(x=time_in_queue, fill = arm), alpha = 0.3, col = "white", position ="identity")+
-  scale_y_continuous(expand = c(0, 0)) +
-  scale_x_continuous(expand = c(0, 0)) +
-  theme_bw()
-#> `summarise()` has regrouped the output.
-#> ℹ Summaries were computed grouped by pat_id and arm.
-#> ℹ Output is grouped by pat_id.
-#> ℹ Use `summarise(.groups = "drop_last")` to silence this message.
-#> ℹ Use `summarise(.by = c(pat_id, arm))` for per-operation grouping
-#>   (`?dplyr::dplyr_by`) instead.
-#> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
-```
-
-![](example_ssd_constrained_files/figure-html/multi_resource-3.png)
-
 ## Sensitivity analysis
 
 ### Run model with constrained = FALSE
@@ -524,9 +390,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.67s
-#> Time to run analysis 1: 0.67s
-#> Total time to run: 0.67s
+#> Time to run simulation 1: 0.98s
+#> Time to run analysis 1: 0.98s
+#> Total time to run: 0.98s
 #> Simulation finalized;
 
 summary_results_det(results[[1]][[1]]) #print first simulation
@@ -609,9 +475,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.78s
-#> Time to run analysis 1: 0.78s
-#> Total time to run: 0.78s
+#> Time to run simulation 1: 1.12s
+#> Time to run analysis 1: 1.12s
+#> Total time to run: 1.12s
 #> Simulation finalized;
 
 summary_results_det(results[[1]][[1]]) #print first simulation
@@ -712,61 +578,61 @@ results <- run_sim(
 #> sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Time to run analysis 1: 0.12s
+#> Time to run simulation 1: 0.14s
+#> Time to run analysis 1: 0.14s
 #> Analysis number: 2
 #> Simulation number: 1
-#> Time to run simulation 1: 0.11s
-#> Time to run analysis 2: 0.11s
+#> Time to run simulation 1: 0.15s
+#> Time to run analysis 2: 0.15s
 #> Analysis number: 3
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 3: 0.13s
+#> Time to run simulation 1: 0.15s
+#> Time to run analysis 3: 0.15s
 #> Analysis number: 4
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Time to run analysis 4: 0.13s
+#> Time to run simulation 1: 0.15s
+#> Time to run analysis 4: 0.15s
 #> Analysis number: 5
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Time to run analysis 5: 0.12s
+#> Time to run simulation 1: 0.14s
+#> Time to run analysis 5: 0.14s
 #> Analysis number: 6
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Time to run analysis 6: 0.12s
+#> Time to run simulation 1: 0.15s
+#> Time to run analysis 6: 0.15s
 #> Analysis number: 7
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Time to run analysis 7: 0.12s
+#> Time to run simulation 1: 0.18s
+#> Time to run analysis 7: 0.18s
 #> Analysis number: 8
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 8: 0.13s
+#> Time to run simulation 1: 0.14s
+#> Time to run analysis 8: 0.14s
 #> Analysis number: 9
 #> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Time to run analysis 9: 0.12s
+#> Time to run simulation 1: 0.16s
+#> Time to run analysis 9: 0.16s
 #> Analysis number: 10
 #> Simulation number: 1
-#> Time to run simulation 1: 0.17s
-#> Time to run analysis 10: 0.17s
+#> Time to run simulation 1: 0.15s
+#> Time to run analysis 10: 0.15s
 #> Analysis number: 11
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 11: 0.14s
+#> Time to run simulation 1: 0.15s
+#> Time to run analysis 11: 0.15s
 #> Analysis number: 12
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 12: 0.14s
+#> Time to run simulation 1: 0.16s
+#> Time to run analysis 12: 0.16s
 #> Analysis number: 13
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 13: 0.13s
+#> Time to run simulation 1: 0.15s
+#> Time to run analysis 13: 0.15s
 #> Analysis number: 14
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 14: 0.13s
-#> Total time to run: 1.83s
+#> Time to run simulation 1: 0.16s
+#> Time to run analysis 14: 0.16s
+#> Total time to run: 2.14s
 #> Simulation finalized;
 ```
 
@@ -828,201 +694,201 @@ results <- run_sim(
 #> sensitivity_names auto-set to c("DSA_min", "DSA_max") from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
+#> Time to run simulation 1: 0.16s
 #> Simulation number: 2
 #> Time to run simulation 2: 0.16s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.13s
+#> Time to run simulation 3: 0.15s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.15s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.14s
+#> Time to run simulation 5: 0.16s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.14s
-#> Time to run analysis 1: 0.87s
+#> Time to run simulation 6: 0.16s
+#> Time to run analysis 1: 0.96s
 #> Analysis number: 2
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
+#> Time to run simulation 1: 0.15s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.15s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.13s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.16s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.15s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.15s
-#> Time to run analysis 2: 0.89s
-#> Analysis number: 3
-#> Simulation number: 1
-#> Time to run simulation 1: 0.42s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.11s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.12s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.12s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.11s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.11s
-#> Time to run analysis 3: 0.99s
-#> Analysis number: 4
-#> Simulation number: 1
-#> Time to run simulation 1: 0.11s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.12s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.15s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.11s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.12s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 4: 0.73s
-#> Analysis number: 5
-#> Simulation number: 1
-#> Time to run simulation 1: 0.11s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.12s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.12s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.11s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.12s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 5: 0.69s
-#> Analysis number: 6
-#> Simulation number: 1
-#> Time to run simulation 1: 0.11s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.11s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.11s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.12s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.11s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 6: 0.68s
-#> Analysis number: 7
-#> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.11s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.11s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.12s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.18s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 7: 0.76s
-#> Analysis number: 8
-#> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.13s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.12s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.14s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.12s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 8: 0.78s
-#> Analysis number: 9
-#> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.12s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.14s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.14s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.11s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.14s
-#> Time to run analysis 9: 0.78s
-#> Analysis number: 10
-#> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.12s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.14s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.14s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.13s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 10: 0.78s
-#> Analysis number: 11
-#> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.14s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.11s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.14s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.14s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 11: 0.8s
-#> Analysis number: 12
-#> Simulation number: 1
-#> Time to run simulation 1: 0.12s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.14s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.13s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.14s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.17s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.14s
-#> Time to run analysis 12: 0.84s
-#> Analysis number: 13
-#> Simulation number: 1
-#> Time to run simulation 1: 0.16s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.13s
+#> Time to run simulation 2: 0.16s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.16s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.16s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.13s
+#> Time to run simulation 5: 0.15s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.15s
-#> Time to run analysis 13: 0.89s
-#> Analysis number: 14
+#> Time to run simulation 6: 0.16s
+#> Time to run analysis 2: 0.95s
+#> Analysis number: 3
+#> Simulation number: 1
+#> Time to run simulation 1: 0.16s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.16s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.16s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.15s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.16s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.16s
+#> Time to run analysis 3: 0.96s
+#> Analysis number: 4
+#> Simulation number: 1
+#> Time to run simulation 1: 0.16s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.17s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.2s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.16s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.19s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.17s
+#> Time to run analysis 4: 1.05s
+#> Analysis number: 5
+#> Simulation number: 1
+#> Time to run simulation 1: 0.16s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.18s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.17s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.16s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.18s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.17s
+#> Time to run analysis 5: 1.03s
+#> Analysis number: 6
 #> Simulation number: 1
 #> Time to run simulation 1: 0.15s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.13s
+#> Time to run simulation 2: 0.17s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.17s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.16s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.17s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.18s
+#> Time to run analysis 6: 1s
+#> Analysis number: 7
+#> Simulation number: 1
+#> Time to run simulation 1: 0.17s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.17s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.16s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.18s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.18s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.19s
+#> Time to run analysis 7: 1.05s
+#> Analysis number: 8
+#> Simulation number: 1
+#> Time to run simulation 1: 0.17s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.19s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.17s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.17s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.18s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.19s
+#> Time to run analysis 8: 1.07s
+#> Analysis number: 9
+#> Simulation number: 1
+#> Time to run simulation 1: 0.19s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.17s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.18s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.19s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.2s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.17s
+#> Time to run analysis 9: 1.11s
+#> Analysis number: 10
+#> Simulation number: 1
+#> Time to run simulation 1: 0.19s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.18s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.17s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.19s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.18s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.18s
+#> Time to run analysis 10: 1.1s
+#> Analysis number: 11
+#> Simulation number: 1
+#> Time to run simulation 1: 0.18s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.19s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.19s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.39s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.14s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.15s
+#> Time to run analysis 11: 1.25s
+#> Analysis number: 12
+#> Simulation number: 1
+#> Time to run simulation 1: 0.15s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.15s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.15s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.15s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.13s
+#> Time to run simulation 5: 0.15s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.15s
-#> Time to run analysis 14: 0.87s
-#> Total time to run: 11.36s
+#> Time to run analysis 12: 0.9s
+#> Analysis number: 13
+#> Simulation number: 1
+#> Time to run simulation 1: 0.15s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.15s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.15s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.15s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.16s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.15s
+#> Time to run analysis 13: 0.91s
+#> Analysis number: 14
+#> Simulation number: 1
+#> Time to run simulation 1: 0.15s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.15s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.14s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.15s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.15s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.14s
+#> Time to run analysis 14: 0.9s
+#> Total time to run: 14.26s
 #> Simulation finalized;
 ```
 
@@ -1104,27 +970,27 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.38s
+#> Time to run simulation 1: 0.16s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.12s
+#> Time to run simulation 2: 0.16s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.12s
+#> Time to run simulation 3: 0.15s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.12s
+#> Time to run simulation 4: 0.17s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.11s
+#> Time to run simulation 5: 0.15s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.12s
+#> Time to run simulation 6: 0.16s
 #> Simulation number: 7
-#> Time to run simulation 7: 0.12s
+#> Time to run simulation 7: 0.16s
 #> Simulation number: 8
-#> Time to run simulation 8: 0.11s
+#> Time to run simulation 8: 0.15s
 #> Simulation number: 9
-#> Time to run simulation 9: 0.12s
+#> Time to run simulation 9: 0.17s
 #> Simulation number: 10
-#> Time to run simulation 10: 0.12s
-#> Time to run analysis 1: 1.46s
-#> Total time to run: 1.46s
+#> Time to run simulation 10: 0.16s
+#> Time to run analysis 1: 1.61s
+#> Total time to run: 1.61s
 #> Simulation finalized;
 ```
 
@@ -1165,3 +1031,111 @@ ggplot(data_simulation,aes(x=evttime,y=beds_free, col = factor(simulation))) +
 ```
 
 ![](example_ssd_constrained_files/figure-html/check_psa-1.png)
+
+### Multi-resource scheduling
+
+When a patient needs multiple resources simultaneously (e.g., a bed AND
+a specialist),
+[`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)
+handles atomic acquisition under `"all_or_none"` policy: the patient
+queues only for the first unavailable resource, holding nothing else —
+deadlock-free by design. Below is a complete model setup pattern using
+two resources.
+
+``` r
+
+# common_all_inputs — both resources initialized together
+common_all_inputs_multi <- add_item(input = {
+  util.sick   <- 0.8; util.sicker <- 0.5
+  cost.sick   <- 3000; cost.sicker <- 7000; cost.int <- 1000
+  coef_noint  <- log(0.2); HR_int <- 0.8; drc <- 0.035; drq <- 0.035
+  random_seed_sicker_i <- sample.int(100000, npats, replace = FALSE)
+  beds        <- resource_discrete(650)
+  specialists <- resource_discrete(50)
+  beds_free   <- beds$n_free()
+  specialists_free   <- specialists$n_free()
+})
+
+unique_pt_inputs_multi <- add_item(input={
+    if(arm=="int" & i == 1) specialists$add_resource(50) #add 50 specialists if arm == "int"
+  }) |> 
+  add_item(
+    fl.sick = 1,
+    q_default = util.sick,
+    c_default = cost.sick + if(arm == "int") cost.int else 0,
+    had_to_queue = 0,
+    time_in_queue = NA,
+    specialists_free = 0L,
+    beds_free = 0L
+  )
+
+evt_react_list_multi <-
+  add_reactevt(name_evt = "sick", input = {
+    beds_free        <- beds$n_free()
+    specialists_free <- specialists$n_free()
+    time_in_queue    <- NA
+  }) |>
+  add_reactevt(name_evt = "sicker", input = {
+    # Patient needs BOTH a bed AND a specialist simultaneously.
+    # seize_all with "all_or_none": queues only for the first unavailable resource.
+    # With 650 beds vs 50 specialists, specialists saturate first, so patients
+    # typically queue for specialists only, but can't use any.
+    acquired <- seize_all(list(beds, specialists))
+    beds_free        <- beds$n_free()
+    specialists_free <- specialists$n_free()
+    if (!acquired) {
+      modify_event(c(death = max(curtime, get_event("death") * 0.8)))
+    }
+    # had_to_queue: 1 if queued for EITHER resource (check both)
+    had_to_queue  <- max(beds$had_to_queue(), specialists$had_to_queue())
+    # queue_wait_time_current: 0 at entry, grows while waiting, final wait on acquisition
+    q_default <- util.sicker
+    c_default <- cost.sicker + if(arm == "int") cost.int else 0
+    fl.sick   <- 0
+  }) |>
+  add_reactevt(name_evt = "death", input = {
+    time_in_queue <- specialists$queue_wait_time_current()
+    # Release both resources; re-trigger the next patient queued for each
+    release_all(list(beds, specialists), resume_event = "sicker")
+    beds_free        <- beds$n_free()
+    specialists_free <- specialists$n_free()
+    q_default <- 0; c_default <- 0; curtime <- Inf
+  })
+
+results_multi <- run_sim(
+  npats = 1000, n_sim = 1, psa_bool = FALSE,
+  arm_list = c("int", "noint"),
+  common_all_inputs = common_all_inputs_multi,
+  common_pt_inputs = common_pt_inputs,
+  unique_pt_inputs = unique_pt_inputs_multi,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list_multi,
+  util_ongoing_list = util_ongoing, cost_ongoing_list = cost_ongoing,
+  constrained = TRUE, ipd = 1,
+  input_out = c("beds_free","specialists_free","had_to_queue","time_in_queue")
+)
+
+psa_ipd <- bind_rows(map(results_multi[[1]], "merged_df")) 
+ggplot(psa_ipd) +
+  geom_line(aes(x=evttime,y=beds_free, col = arm))+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+ggplot(psa_ipd) +
+  geom_line(aes(x=evttime,y=specialists_free, col = arm))+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+ggplot(psa_ipd %>%
+         filter(evtname=="death") %>%
+         mutate(time_in_queue = ifelse(is.na(time_in_queue),0,time_in_queue)) %>%
+         group_by(pat_id, arm) %>%
+         summarise(time_in_queue = max(time_in_queue,na.rm=TRUE))
+       ) +
+  geom_histogram(aes(x=time_in_queue, fill = arm), alpha = 0.3, col = "white", position ="identity")+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+```

@@ -8,7 +8,12 @@ queue for waiting patients.
 ## Usage
 
 ``` r
-resource_discrete(n, discipline = "FIFO", max_queue = Inf)
+resource_discrete(
+  n,
+  discipline = "FIFO",
+  max_queue = Inf,
+  allow_multiple_queue = TRUE
+)
 ```
 
 ## Arguments
@@ -27,6 +32,12 @@ resource_discrete(n, discipline = "FIFO", max_queue = Inf)
   Non-negative integer or `Inf` (default). Maximum number of patients
   that can wait in the queue. Patients that arrive when the queue is
   full are rejected (`attempt_block()` returns `NA`).
+
+- allow_multiple_queue:
+
+  Logical (default `TRUE`). If `FALSE`, a patient that already has a
+  queued entry will be rejected (`attempt_block()` returns `NA`) instead
+  of being allowed to queue again.
 
 ## Value
 
@@ -103,7 +114,8 @@ methods:
 
 - `modify_priority(patient_id, new_priority)`:
 
-  Modify patient priority in queue.
+  Modify patient priority in queue. When the patient has `k` active
+  queue entries, complexity is O(k log n), not O(log n).
 
 - `add_resource(n)`:
 

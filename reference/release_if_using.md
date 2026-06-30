@@ -1,13 +1,13 @@
-# Release a discrete resource
+# Release a discrete resource only if using
 
-Frees the resource for the current patient (`i`) and, if the patient was
-actually using the resource and a `resume_event` is supplied, schedules
-that event for the next patient in the queue.
+Releases the resource for the current patient (`i`) only if they are
+currently using it. Does nothing if the patient is not using the
+resource. Never removes queue entries.
 
 ## Usage
 
 ``` r
-release(resource, resume_event = NULL, amount = NULL)
+release_if_using(resource, resume_event = NULL, amount = NULL)
 ```
 
 ## Arguments
@@ -28,5 +28,4 @@ release(resource, resume_event = NULL, amount = NULL)
 
 ## Value
 
-Invisibly, `TRUE` if the patient was using the resource, `FALSE`
-otherwise.
+Invisibly `NULL`.

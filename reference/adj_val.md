@@ -61,6 +61,17 @@ of the sequence being evaluated. For example, in
 `curtime = 0, nexttime = 4, by = 1`, `.time` would correspond to
 `0, 1, 2, 3`. If using `nexttime = 4.2`, `0, 1, 2, 3, 4`
 
+## Note
+
+In resource-constrained models where event timing is unpredictable
+(e.g., patients waiting in resource queues), use
+`accum_backwards = TRUE` in
+[`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md)
+and compute `adj_val(prevtime, curtime, ...)` at each event reaction.
+This ensures both time boundaries are known and the age/time adjustment
+is exact, avoiding prospective errors when a resource event fires
+earlier than expected.
+
 ## Examples
 
 ``` r

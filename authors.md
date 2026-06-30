@@ -14,13 +14,13 @@ Source:
 [`DESCRIPTION`](https://github.com/jsanchezalv/WARDEN/blob/main/DESCRIPTION)
 
 Sanchez Alvarez J (2026). *WARDEN: Workflows for Health Technology
-Assessments in R using Discrete EveNts*. R package version 2.0.4,
+Assessments in R using Discrete EveNts*. R package version 2.0.5,
 <https://jsanchezalv.github.io/WARDEN/>.
 
     @Manual{,
       title = {WARDEN: Workflows for Health Technology Assessments in R using Discrete EveNts},
       author = {Javier {Sanchez Alvarez}},
       year = {2026},
-      note = {R package version 2.0.4},
+      note = {R package version 2.0.5},
       url = {https://jsanchezalv.github.io/WARDEN/},
     }

@@ -178,7 +178,11 @@ run_sim(
   If TRUE, the ongoing accumulators will count backwards (i.e., the
   current value is applied until the previous update). If FALSE, the
   current value is applied between the current event and the next time
-  it is updated.
+  it is updated. Recommended for resource-constrained models where queue
+  waits make future event times unpredictable. With TRUE, ongoing values
+  are computed at each event for the interval just completed, avoiding
+  prospective errors from
+  [`adj_val()`](https://jsanchezalv.github.io/WARDEN/reference/adj_val.md).
 
 - continue_on_error:
 
@@ -332,9 +336,9 @@ psa_bool = FALSE,
 ipd = 1)
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.05s
-#> Time to run analysis 1: 0.06s
-#> Total time to run: 0.06s
+#> Time to run simulation 1: 0.04s
+#> Time to run analysis 1: 0.05s
+#> Total time to run: 0.05s
 #> Simulation finalized; 
 #> [[1]]
 #> [[1]][[1]]

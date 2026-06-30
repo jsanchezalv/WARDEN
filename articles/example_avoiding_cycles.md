@@ -154,9 +154,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 10.92s
-#> Time to run analysis 1: 10.92s
-#> Total time to run: 10.92s
+#> Time to run simulation 1: 14.34s
+#> Time to run analysis 1: 14.34s
+#> Total time to run: 14.35s
 #> Simulation finalized;
 ```
 
@@ -319,9 +319,9 @@ results2 <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 3.04s
-#> Time to run analysis 1: 3.04s
-#> Total time to run: 3.05s
+#> Time to run simulation 1: 4.57s
+#> Time to run analysis 1: 4.57s
+#> Total time to run: 4.57s
 #> Simulation finalized;
 ```
 

@@ -19,7 +19,7 @@ the vignette on avoiding cycles for an example in a model.'><meta property="og:i
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,6 +117,16 @@ If FALSE, it repeatedly evaluates the expression with time as a single value (sl
     <p>The user can use the <code>.time</code> variable to select the corresponding time of the sequence being evaluated.
 For example, in <code>curtime = 0, nexttime = 4, by = 1</code>, <code>.time</code> would correspond to <code>0, 1, 2, 3</code>.
 If using <code>nexttime = 4.2</code>, <code>0, 1, 2, 3, 4</code></p>
+    </div>
+    <div class="section level2">
+    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
+    <p>In resource-constrained models where event timing is unpredictable
+(e.g., patients waiting in resource queues), use
+<code>accum_backwards = TRUE</code> in <code><a href="run_sim.html">run_sim()</a></code> and compute
+<code>adj_val(prevtime, curtime, ...)</code> at each event reaction. This ensures
+both time boundaries are known and the age/time adjustment is exact,
+avoiding prospective errors when a resource event fires earlier than
+expected.</p>
     </div>
 
     <div class="section level2">

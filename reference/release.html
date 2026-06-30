@@ -17,7 +17,7 @@ event for the next patient in the queue."><meta property="og:image" content="htt
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,7 @@ event for the next patient in the queue.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">release</span><span class="op">(</span><span class="va">resource</span>, resume_event <span class="op">=</span> <span class="cn">NULL</span>, amount <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">release</span><span class="op">(</span><span class="va">resource</span>, resume_event <span class="op">=</span> <span class="cn">NULL</span>, amount <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -83,7 +83,8 @@ next queued patient, or <code>NULL</code> (default) to skip re-triggering.</p></
 
 
 <dt id="arg-amount">amount<a class="anchor" aria-label="anchor" href="#arg-amount"></a></dt>
-<dd><p>Integer. Units to free (default <code>1L</code>).</p></dd>
+<dd><p>Integer or <code>NULL</code> (default). Units to release. <code>NULL</code> means 1.
+Must exactly match the amount used when seizing (indivisible units).</p></dd>
 
 </dl></div>
     <div class="section level2">

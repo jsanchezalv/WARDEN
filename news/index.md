@@ -1,5 +1,75 @@
 # Changelog
 
+## WARDEN 2.0.5
+
+- [`release_all()`](https://jsanchezalv.github.io/WARDEN/reference/release_all.md)
+  and
+  [`release_all_if_using()`](https://jsanchezalv.github.io/WARDEN/reference/release_all_if_using.md)
+  now deduplicate resume events: when the same patient is first in queue
+  on multiple released resources, only one resume event is scheduled
+  (prevents double-seize on retry).
+- [`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)
+  gains an `accum_queue` argument (default `TRUE`). When `FALSE`,
+  retries do not accumulate phantom queue entries on bottleneck
+  resources — existing entries serve as placeholders.
+- [`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)
+  no longer rejects (returns `NA`) when retrying on resources with
+  `allow_multiple_queue = FALSE`. Previously, a retry was incorrectly
+  rejected because the patient was already queued; now the existing
+  queue entry is recognized and preserved.
+- [`new_event()`](https://jsanchezalv.github.io/WARDEN/reference/new_event.md)
+  and
+  [`modify_event()`](https://jsanchezalv.github.io/WARDEN/reference/modify_event.md)
+  now reject `NA` and `NaN` event times with an informative error; `Inf`
+  event times remain valid.
+- [`release()`](https://jsanchezalv.github.io/WARDEN/reference/release.md)
+  and `attempt_free()` now enforce indivisible units:
+  `release(amount = NULL)` (the default) releases one unit (equivalent
+  to `amount = 1`), and `release(amount = X)` requires an exact match
+  with the seized amount — mismatches throw an error.
+  `remove_all = TRUE` still removes all usage entries regardless of
+  amount.
+- [`release_all()`](https://jsanchezalv.github.io/WARDEN/reference/release_all.md)
+  and
+  [`release_all_if_using()`](https://jsanchezalv.github.io/WARDEN/reference/release_all_if_using.md)
+  now follow an all-or-none policy: both functions only act if the
+  patient is currently using **all** listed resources. If the patient
+  holds some but not all, they do nothing and emit an informative
+  message. `release_all(amounts = NULL)` purges queue entries as before;
+  `release_all(amounts = c(...))` performs indivisible per-resource
+  release without touching queue entries.
+  [`release_all()`](https://jsanchezalv.github.io/WARDEN/reference/release_all.md)
+  now also purges queue entries when the patient is not using any of the
+  listed resources (e.g. a patient who queued via
+  [`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)
+  and then died before acquiring); previously, calling
+  [`release_all()`](https://jsanchezalv.github.io/WARDEN/reference/release_all.md)
+  at a patient’s death event left dead patients stranded in resource
+  queues, causing them to be rescheduled when another patient later
+  released.
+- [`release_if_using()`](https://jsanchezalv.github.io/WARDEN/reference/release_if_using.md)
+  is a new exported function that releases a resource for the current
+  patient only if they are currently using it, doing nothing otherwise.
+  Unlike
+  [`release()`](https://jsanchezalv.github.io/WARDEN/reference/release.md),
+  it never errors on a non-using patient and never removes queue
+  entries.
+- [`resource_discrete()`](https://jsanchezalv.github.io/WARDEN/reference/resource_discrete.md)
+  gains an `allow_multiple_queue` argument (default `TRUE`). When
+  `FALSE`, a patient that already has a queued entry will be rejected
+  (`attempt_block()` returns `NA`) on a second seize attempt rather than
+  being allowed to queue again.
+- [`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)
+  with `policy = "all_or_none"` now queues the patient on **all**
+  bottleneck resources simultaneously (previously only the first
+  unavailable resource was queued). If any bottleneck would reject
+  queuing, no resource is queued and `NA` is returned.
+  [`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)
+  also gains a `force_unblock` argument: when `TRUE` and all resources
+  have capacity but the patient is blocked by queue position on some
+  resources, the patient is forcibly moved to the front of those queues
+  and acquires all resources.
+
 ## WARDEN 2.0.4
 
 - [`release()`](https://jsanchezalv.github.io/WARDEN/reference/release.md)

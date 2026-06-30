@@ -1,9 +1,13 @@
 # Release multiple discrete resources
 
-Frees the current patient (`i`) from each resource via a single C++
-call. Removes the patient from both the using list and the queue (all
-entries). Schedules resume events only for resources where the patient
-was actually using (i.e., where capacity was freed).
+Frees the current patient (`i`) from each resource. Applies an
+all_or_none policy: only acts if the patient is using ALL listed
+resources. Removes the patient from both the using list and the queue.
+When `amounts` is `NULL` (default), releases all entries and purges
+queue entries for the patient; when `amounts` is specified, performs an
+exact indivisible release without purging the queue. Schedules resume
+events only for resources where the patient was actually using (i.e.,
+where capacity was freed).
 
 ## Usage
 
@@ -25,7 +29,9 @@ release_all(resources, resume_event = NULL, amounts = NULL)
 
 - amounts:
 
-  Integer vector of units per resource (default `1L` for each).
+  Integer vector of units per resource, or `NULL` (default). `NULL`
+  releases all entries and purges queue entries for the patient.
+  Specified amounts perform exact indivisible releases without purging.
 
 ## Value
 

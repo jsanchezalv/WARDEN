@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,27 @@
       <small>Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.0.5" id="warden-205">WARDEN 2.0.5<a class="anchor" aria-label="anchor" href="#warden-205"></a></h2>
+<ul><li>
+<code><a href="../reference/release_all.html">release_all()</a></code> and <code><a href="../reference/release_all_if_using.html">release_all_if_using()</a></code> now deduplicate resume events: when the same patient is first in queue on multiple released resources, only one resume event is scheduled (prevents double-seize on retry).</li>
+<li>
+<code><a href="../reference/seize_all.html">seize_all()</a></code> gains an <code>accum_queue</code> argument (default <code>TRUE</code>). When <code>FALSE</code>, retries do not accumulate phantom queue entries on bottleneck resources — existing entries serve as placeholders.</li>
+<li>
+<code><a href="../reference/seize_all.html">seize_all()</a></code> no longer rejects (returns <code>NA</code>) when retrying on resources with <code>allow_multiple_queue = FALSE</code>. Previously, a retry was incorrectly rejected because the patient was already queued; now the existing queue entry is recognized and preserved.</li>
+<li>
+<code><a href="../reference/new_event.html">new_event()</a></code> and <code><a href="../reference/modify_event.html">modify_event()</a></code> now reject <code>NA</code> and <code>NaN</code> event times with an informative error; <code>Inf</code> event times remain valid.</li>
+<li>
+<code><a href="../reference/release.html">release()</a></code> and <code>attempt_free()</code> now enforce indivisible units: <code>release(amount = NULL)</code> (the default) releases one unit (equivalent to <code>amount = 1</code>), and <code>release(amount = X)</code> requires an exact match with the seized amount — mismatches throw an error. <code>remove_all = TRUE</code> still removes all usage entries regardless of amount.</li>
+<li>
+<code><a href="../reference/release_all.html">release_all()</a></code> and <code><a href="../reference/release_all_if_using.html">release_all_if_using()</a></code> now follow an all-or-none policy: both functions only act if the patient is currently using <strong>all</strong> listed resources. If the patient holds some but not all, they do nothing and emit an informative message. <code>release_all(amounts = NULL)</code> purges queue entries as before; <code>release_all(amounts = c(...))</code> performs indivisible per-resource release without touching queue entries. <code><a href="../reference/release_all.html">release_all()</a></code> now also purges queue entries when the patient is not using any of the listed resources (e.g. a patient who queued via <code><a href="../reference/seize_all.html">seize_all()</a></code> and then died before acquiring); previously, calling <code><a href="../reference/release_all.html">release_all()</a></code> at a patient’s death event left dead patients stranded in resource queues, causing them to be rescheduled when another patient later released.</li>
+<li>
+<code><a href="../reference/release_if_using.html">release_if_using()</a></code> is a new exported function that releases a resource for the current patient only if they are currently using it, doing nothing otherwise. Unlike <code><a href="../reference/release.html">release()</a></code>, it never errors on a non-using patient and never removes queue entries.</li>
+<li>
+<code><a href="../reference/resource_discrete.html">resource_discrete()</a></code> gains an <code>allow_multiple_queue</code> argument (default <code>TRUE</code>). When <code>FALSE</code>, a patient that already has a queued entry will be rejected (<code>attempt_block()</code> returns <code>NA</code>) on a second seize attempt rather than being allowed to queue again.</li>
+<li>
+<code><a href="../reference/seize_all.html">seize_all()</a></code> with <code>policy = "all_or_none"</code> now queues the patient on <strong>all</strong> bottleneck resources simultaneously (previously only the first unavailable resource was queued). If any bottleneck would reject queuing, no resource is queued and <code>NA</code> is returned. <code><a href="../reference/seize_all.html">seize_all()</a></code> also gains a <code>force_unblock</code> argument: when <code>TRUE</code> and all resources have capacity but the patient is blocked by queue position on some resources, the patient is forcibly moved to the front of those queues and acquires all resources.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.4" id="warden-204">WARDEN 2.0.4<a class="anchor" aria-label="anchor" href="#warden-204"></a></h2>
 <ul><li>

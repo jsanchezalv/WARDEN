@@ -52,6 +52,8 @@
   Seize a discrete resource
 - [`release()`](https://jsanchezalv.github.io/WARDEN/reference/release.md)
   : Release a discrete resource
+- [`release_if_using()`](https://jsanchezalv.github.io/WARDEN/reference/release_if_using.md)
+  : Release a discrete resource only if using
 - [`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)
   : Seize multiple discrete resources atomically
 - [`release_all()`](https://jsanchezalv.github.io/WARDEN/reference/release_all.md)

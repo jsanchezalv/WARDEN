@@ -15,7 +15,7 @@ per-resource R-to-C++ round trips."><meta property="og:image" content="https://j
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,14 @@ per-resource R-to-C++ round trips.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">seize_all</span><span class="op">(</span><span class="va">resources</span>, policy <span class="op">=</span> <span class="st">"all_or_none"</span>, amounts <span class="op">=</span> <span class="cn">NULL</span>, priorities <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">seize_all</span><span class="op">(</span></span>
+<span>  <span class="va">resources</span>,</span>
+<span>  policy <span class="op">=</span> <span class="st">"all_or_none"</span>,</span>
+<span>  amounts <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  priorities <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  force_unblock <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  accum_queue <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -87,6 +94,21 @@ user is responsible for avoiding deadlocks.</p></dd>
 
 <dt id="arg-priorities">priorities<a class="anchor" aria-label="anchor" href="#arg-priorities"></a></dt>
 <dd><p>Integer vector of priorities per resource (default <code>1L</code>).</p></dd>
+
+
+<dt id="arg-force-unblock">force_unblock<a class="anchor" aria-label="anchor" href="#arg-force-unblock"></a></dt>
+<dd><p>Logical (default <code>FALSE</code>). When <code>TRUE</code> and all resources
+have sufficient capacity but the patient is not first in queue on some
+resources (deadlock), forcibly moves the patient to the front of those
+queues and acquires all resources. Has no effect when capacity is
+genuinely insufficient.</p></dd>
+
+
+<dt id="arg-accum-queue">accum_queue<a class="anchor" aria-label="anchor" href="#arg-accum-queue"></a></dt>
+<dd><p>Logical (default <code>TRUE</code>). When <code>FALSE</code> and the patient
+already has a queue entry on a bottleneck resource from a previous failed
+attempt, skips adding a new entry (existing entry serves). Prevents
+phantom queue accumulation on retries.</p></dd>
 
 </dl></div>
     <div class="section level2">
