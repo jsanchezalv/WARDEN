@@ -474,7 +474,6 @@ ggplot(data_simulation,aes(x=evttime,y=beds_free, col = factor(simulation))) +
 ```
 
 
-
 ## Multi-resource scheduling
 
 When a patient needs multiple resources simultaneously (e.g., a bed AND a specialist), `seize_all()` handles atomic acquisition under `"all_or_none"` policy: the patient queues only for the first unavailable resource, holding nothing else — deadlock-free by design. Below is a complete model setup pattern using two resources.
