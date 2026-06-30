@@ -55,13 +55,14 @@
 - `queue_size()` [L869–872]: Get number of events in queue
 - `has_event()` [L883–887]: Check if a patient has a named event
 - `get_event()` [L898–902]: Get time of a named event for a patient
-- `resource_discrete()` [L960–1180]: Create Rcpp-backed discrete resource object; now accepts `discipline` ("FIFO"/"LIFO") and `max_queue`; new methods: `queue_wait_time`, `had_to_queue`, `time_in_use`, `utilization`, `n_using`, `total_patients_blocked`, `total_patients_queued`, `batch_seize`
-- `print.resource_discrete()` [L1188–1196]: Print method for `resource_discrete`
-- `seize()` [~L1200]: Acquire a resource for current patient; returns TRUE/FALSE/NA
-- `release()` [~L1215]: Free a resource + auto-trigger next queued patient via `resume_event`
-- `seize_all()` [~L1245]: Atomically seize multiple resources (C++); policies: all_or_none/sequential
-- `release_all()` [~L1556]: Free multiple resources + purge from queues (C++) + schedule resume events only for freed resources
-- `release_all_if_using()` [~L1598]: Free multiple resources only if using (no queue removal) + schedule resume events
+- `resource_discrete()` [~L1282]: Create Rcpp-backed discrete resource; accepts `discipline`, `max_queue`, `allow_multiple_queue`; indivisible `attempt_free(amount)` matching; methods: `queue_wait_time`, `had_to_queue`, `time_in_use`, `utilization`, `n_using`, `total_patients_blocked`, `total_patients_queued`, `batch_seize`
+- `print.resource_discrete()` [~L1454]: Print method for `resource_discrete`
+- `seize()` [~L1477]: Acquire a resource for current patient; returns TRUE/FALSE/NA
+- `release()` [~L1513]: Free a resource (indivisible; NULL = 1) + auto-trigger next queued patient via `resume_event`
+- `release_if_using()` [~L1526]: Free a resource for current patient only if using; no error, no queue removal if not using
+- `seize_all()` [~L1528]: Atomically seize multiple resources (all_or_none or sequential); queues ALL bottlenecks; `force_unblock` argument for deadlock resolution; duplicate resource check
+- `release_all()` [~L1558]: All-or-none release of multiple resources; NULL amounts = release all + purge queue; specific amounts = indivisible matching, no queue purge; emits message if not using all
+- `release_all_if_using()` [~L1588]: All-or-none release of multiple resources only if using all; never touches queues; emits message if not using all
 - `shared_incr()` [~L1300]: Increment a `shared_input` counter, return new value
 - `shared_decr()` [~L1310]: Decrement a `shared_input` counter, return new value
 - `shared_input()` [~L1330–1400]: Create shared input object for constrained DES

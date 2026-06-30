@@ -119,7 +119,6 @@ evt_react_list <-
                  beds_free     <- beds$n_free()
                  beds_util     <- beds$utilization()
                  beds_n_using  <- beds$n_using()
-                 time_in_queue <- beds$queue_wait_time_current()
                }) |>
   add_reactevt(name_evt = "sicker",
                input = {
@@ -131,15 +130,14 @@ evt_react_list <-
                    modify_event(c(death = max(curtime, get_event("death") * 0.8)))
                  }
                  had_to_queue  <- beds$had_to_queue()
-                 time_in_queue <- beds$queue_wait_time_current()
                  q_default <- util.sicker
                  c_default <- cost.sicker + if(arm=="int"){cost.int}else{0}
                  fl.sick   <- 0
                }) |>
   add_reactevt(name_evt = "death",
                input = {
-                 release(beds, resume_event = "sicker")
                  time_in_queue <- beds$queue_wait_time_current()
+                 release(beds, resume_event = "sicker")
                  beds_free     <- beds$n_free()
                  beds_util     <- beds$utilization()
                  beds_n_using  <- beds$n_using()
@@ -248,105 +246,6 @@ ggplot(psa_ipd, aes(x = evttime, y = beds_util, col = arm)) +
 ```
 
 The queue wait time (`time_in_queue`) and queuing flag (`had_to_queue`) are computed inside the C++ resource and read back in the reaction with `beds$queue_wait_time_current()` and `beds$had_to_queue()`. No manual bookkeeping is needed.
-
-## Multi-resource scheduling
-
-When a patient needs multiple resources simultaneously (e.g., a bed AND a specialist), `seize_all()` handles atomic acquisition under `"all_or_none"` policy: the patient queues only for the first unavailable resource, holding nothing else — deadlock-free by design. Below is a complete model setup pattern using two resources.
-
-```{r multi_resource, eval=FALSE}
-# common_all_inputs — both resources initialized together
-common_all_inputs_multi <- add_item(input = {
-  util.sick   <- 0.8; util.sicker <- 0.5
-  cost.sick   <- 3000; cost.sicker <- 7000; cost.int <- 1000
-  coef_noint  <- log(0.2); HR_int <- 0.8; drc <- 0.035; drq <- 0.035
-  random_seed_sicker_i <- sample.int(100000, npats, replace = FALSE)
-  beds        <- resource_discrete(650)
-  specialists <- resource_discrete(50)
-  beds_free   <- beds$n_free()
-  specialists_free   <- specialists$n_free()
-})
-
-unique_pt_inputs_multi <- add_item(
-  fl.sick = 1,
-  q_default = util.sick,
-  c_default = cost.sick + if(arm == "int") cost.int else 0,
-  had_to_queue = 0,
-  time_in_queue = NA,
-  specialists_free = 0L,
-  beds_free = 0L
-)
-
-evt_react_list_multi <-
-  add_reactevt(name_evt = "sick", input = {
-    beds_free        <- beds$n_free()
-    specialists_free <- specialists$n_free()
-    time_in_queue    <- NA
-  }) |>
-  add_reactevt(name_evt = "sicker", input = {
-    # Patient needs BOTH a bed AND a specialist simultaneously.
-    # seize_all with "all_or_none": queues only for the first unavailable resource.
-    # With 650 beds vs 50 specialists, specialists saturate first, so patients
-    # typically queue for specialists only, but can't use any.
-    acquired <- seize_all(list(beds, specialists))
-    beds_free        <- beds$n_free()
-    specialists_free <- specialists$n_free()
-    if (!acquired) {
-      modify_event(c(death = max(curtime, get_event("death") * 0.8)))
-    }
-    # had_to_queue: 1 if queued for EITHER resource (check both)
-    had_to_queue  <- max(beds$had_to_queue(), specialists$had_to_queue())
-    # queue_wait_time_current: 0 at entry, grows while waiting, final wait on acquisition
-    q_default <- util.sicker
-    c_default <- cost.sicker + if(arm == "int") cost.int else 0
-    fl.sick   <- 0
-  }) |>
-  add_reactevt(name_evt = "death", input = {
-    time_in_queue <- specialists$queue_wait_time_current()
-    # Release both resources; re-trigger the next patient queued for each
-    release_all(list(beds, specialists), resume_event = "sicker")
-    beds_free        <- beds$n_free()
-    specialists_free <- specialists$n_free()
-    q_default <- 0; c_default <- 0; curtime <- Inf
-  })
-
-results_multi <- run_sim(
-  npats = 1000, n_sim = 1, psa_bool = FALSE,
-  arm_list = c("int", "noint"),
-  common_all_inputs = common_all_inputs_multi,
-  common_pt_inputs = common_pt_inputs,
-  unique_pt_inputs = unique_pt_inputs_multi,
-  init_event_list = init_event_list,
-  evt_react_list = evt_react_list_multi,
-  util_ongoing_list = util_ongoing, cost_ongoing_list = cost_ongoing,
-  constrained = TRUE, ipd = 1,
-  input_out = c("beds_free","specialists_free","had_to_queue","time_in_queue")
-)
-
-psa_ipd <- bind_rows(map(results_multi[[1]], "merged_df")) 
-ggplot(psa_ipd) +
-  geom_line(aes(x=evttime,y=beds_free, col = arm))+
-  scale_y_continuous(expand = c(0, 0)) +
-  scale_x_continuous(expand = c(0, 0)) +
-  theme_bw()
-
-ggplot(psa_ipd) +
-  geom_line(aes(x=evttime,y=specialists_free, col = arm))+
-  scale_y_continuous(expand = c(0, 0)) +
-  scale_x_continuous(expand = c(0, 0)) +
-  theme_bw()
-
-ggplot(psa_ipd %>%
-         filter(evtname=="death") %>%
-         mutate(time_in_queue = ifelse(is.na(time_in_queue),0,time_in_queue)) %>%
-         group_by(pat_id, arm) %>%
-         summarise(time_in_queue = max(time_in_queue,na.rm=TRUE))
-       ) +
-  geom_histogram(aes(x=time_in_queue, fill = arm), alpha = 0.3, col = "white", position ="identity")+
-  scale_y_continuous(expand = c(0, 0)) +
-  scale_x_continuous(expand = c(0, 0)) +
-  theme_bw()
-
-```
 
 # Sensitivity analysis
 ## Run model with constrained = FALSE
@@ -568,6 +467,110 @@ data_simulation |> group_by(simulation) |> summarise_at(c("util.sick","util.sick
 ggplot(data_simulation,aes(x=evttime,y=beds_free, col = factor(simulation))) +
   facet_wrap(arm~.) + 
   geom_line()+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+```
+
+
+
+## Multi-resource scheduling
+
+When a patient needs multiple resources simultaneously (e.g., a bed AND a specialist), `seize_all()` handles atomic acquisition under `"all_or_none"` policy: the patient queues only for the first unavailable resource, holding nothing else — deadlock-free by design. Below is a complete model setup pattern using two resources.
+
+```{r multi_resource, eval=FALSE}
+# common_all_inputs — both resources initialized together
+common_all_inputs_multi <- add_item(input = {
+  util.sick   <- 0.8; util.sicker <- 0.5
+  cost.sick   <- 3000; cost.sicker <- 7000; cost.int <- 1000
+  coef_noint  <- log(0.2); HR_int <- 0.8; drc <- 0.035; drq <- 0.035
+  random_seed_sicker_i <- sample.int(100000, npats, replace = FALSE)
+  beds        <- resource_discrete(650)
+  specialists <- resource_discrete(50)
+  beds_free   <- beds$n_free()
+  specialists_free   <- specialists$n_free()
+})
+
+unique_pt_inputs_multi <- add_item(input={
+    if(arm=="int" & i == 1) specialists$add_resource(50) #add 50 specialists if arm == "int"
+  }) |> 
+  add_item(
+    fl.sick = 1,
+    q_default = util.sick,
+    c_default = cost.sick + if(arm == "int") cost.int else 0,
+    had_to_queue = 0,
+    time_in_queue = NA,
+    specialists_free = 0L,
+    beds_free = 0L
+  )
+
+evt_react_list_multi <-
+  add_reactevt(name_evt = "sick", input = {
+    beds_free        <- beds$n_free()
+    specialists_free <- specialists$n_free()
+    time_in_queue    <- NA
+  }) |>
+  add_reactevt(name_evt = "sicker", input = {
+    # Patient needs BOTH a bed AND a specialist simultaneously.
+    # seize_all with "all_or_none": queues only for the first unavailable resource.
+    # With 650 beds vs 50 specialists, specialists saturate first, so patients
+    # typically queue for specialists only, but can't use any.
+    acquired <- seize_all(list(beds, specialists))
+    beds_free        <- beds$n_free()
+    specialists_free <- specialists$n_free()
+    if (!acquired) {
+      modify_event(c(death = max(curtime, get_event("death") * 0.8)))
+    }
+    # had_to_queue: 1 if queued for EITHER resource (check both)
+    had_to_queue  <- max(beds$had_to_queue(), specialists$had_to_queue())
+    # queue_wait_time_current: 0 at entry, grows while waiting, final wait on acquisition
+    q_default <- util.sicker
+    c_default <- cost.sicker + if(arm == "int") cost.int else 0
+    fl.sick   <- 0
+  }) |>
+  add_reactevt(name_evt = "death", input = {
+    time_in_queue <- specialists$queue_wait_time_current()
+    # Release both resources; re-trigger the next patient queued for each
+    release_all(list(beds, specialists), resume_event = "sicker")
+    beds_free        <- beds$n_free()
+    specialists_free <- specialists$n_free()
+    q_default <- 0; c_default <- 0; curtime <- Inf
+  })
+
+results_multi <- run_sim(
+  npats = 1000, n_sim = 1, psa_bool = FALSE,
+  arm_list = c("int", "noint"),
+  common_all_inputs = common_all_inputs_multi,
+  common_pt_inputs = common_pt_inputs,
+  unique_pt_inputs = unique_pt_inputs_multi,
+  init_event_list = init_event_list,
+  evt_react_list = evt_react_list_multi,
+  util_ongoing_list = util_ongoing, cost_ongoing_list = cost_ongoing,
+  constrained = TRUE, ipd = 1,
+  input_out = c("beds_free","specialists_free","had_to_queue","time_in_queue")
+)
+
+psa_ipd <- bind_rows(map(results_multi[[1]], "merged_df")) 
+ggplot(psa_ipd) +
+  geom_line(aes(x=evttime,y=beds_free, col = arm))+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+ggplot(psa_ipd) +
+  geom_line(aes(x=evttime,y=specialists_free, col = arm))+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw()
+
+ggplot(psa_ipd %>%
+         filter(evtname=="death") %>%
+         mutate(time_in_queue = ifelse(is.na(time_in_queue),0,time_in_queue)) %>%
+         group_by(pat_id, arm) %>%
+         summarise(time_in_queue = max(time_in_queue,na.rm=TRUE))
+       ) +
+  geom_histogram(aes(x=time_in_queue, fill = arm), alpha = 0.3, col = "white", position ="identity")+
   scale_y_continuous(expand = c(0, 0)) +
   scale_x_continuous(expand = c(0, 0)) +
   theme_bw()

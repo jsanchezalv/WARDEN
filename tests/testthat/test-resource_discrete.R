@@ -544,7 +544,7 @@ test_that("n_free correct after patients with different amounts", {
 test_that("attempt_free frees correct amount of units", {
   beds <- resource_discrete(5)
   beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
-  beds$attempt_free(patient_id = 1L)
+  beds$attempt_free(patient_id = 1L, amount = 3L)
   expect_equal(beds$n_free(), 5L)
   expect_false(beds$is_patient_using(1L))
 })
@@ -553,7 +553,7 @@ test_that("queued patient with amount dequeues when enough slots available", {
   beds <- resource_discrete(3)
   beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
   beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1, amount = 2L)
-  beds$attempt_free(patient_id = 1L)
+  beds$attempt_free(patient_id = 1L, amount = 3L)
   result <- beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2, amount = 2L)
   expect_true(result)
   expect_equal(beds$n_free(), 1L)
@@ -795,6 +795,485 @@ test_that("complex scenario works correctly", {
   expect_equal(beds$queue_size(), 2)  # Queue unchanged
   
   # Remove more resources than capacity allows - should error
-  expect_error(beds$remove_resource(5, current_time = 6.0), 
+  expect_error(beds$remove_resource(5, current_time = 6.0),
                "Cannot remove more resources than available")
+})
+
+# ── Amount validation ─────────────────────────────────────────────────────────
+
+test_that("attempt_block amount validation", {
+  beds <- resource_discrete(5)
+  expect_error(beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 0L))
+  expect_error(beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = -1L))
+  expect_error(beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 2.5))
+})
+
+test_that("indivisible release: amount mismatch errors", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  expect_error(beds$attempt_free(patient_id = 1L, amount = 1L))
+  beds2 <- resource_discrete(5)
+  beds2$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  expect_silent(beds2$attempt_free(patient_id = 1L, amount = 3L))
+  expect_equal(beds2$n_free(), 5L)
+})
+
+test_that("release(amount = NULL) means release(amount = 1)", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  expect_error(beds$attempt_free(patient_id = 1L, amount = NULL))
+  beds2 <- resource_discrete(5)
+  beds2$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 1L)
+  expect_silent(beds2$attempt_free(patient_id = 1L, amount = NULL))
+  expect_equal(beds2$n_free(), 5L)
+})
+
+test_that("remove_all releases all entries regardless of amount", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 2L)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 1, amount = 3L)
+  expect_equal(beds$n_free(), 0L)
+  beds$attempt_free(patient_id = 1L, remove_all = TRUE)
+  expect_equal(beds$n_free(), 5L)
+  expect_false(beds$is_patient_using(1L))
+})
+
+test_that("multiple seize entries are independent", {
+  beds <- resource_discrete(5)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 2L)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 1, amount = 3L)
+  expect_equal(beds$n_free(), 0L)
+  beds$attempt_free(patient_id = 1L, amount = 2L)
+  expect_equal(beds$n_free(), 2L)
+  beds$attempt_free(patient_id = 1L, amount = 3L)
+  expect_equal(beds$n_free(), 5L)
+})
+
+# ── allow_multiple_queue ──────────────────────────────────────────────────────
+
+test_that("allow_multiple_queue = FALSE rejects repeated queue", {
+  beds <- resource_discrete(1, allow_multiple_queue = FALSE)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  result <- beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  expect_true(is.na(result))
+  expect_equal(beds$queue_size(), 1L)
+})
+
+test_that("allow_multiple_queue = FALSE allows acquisition if first in line", {
+  beds <- resource_discrete(1, allow_multiple_queue = FALSE)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_free(patient_id = 1L)
+  result <- beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  expect_true(result)
+  expect_equal(beds$queue_size(), 0L)
+})
+
+test_that("allow_multiple_queue = TRUE allows repeated queuing", {
+  beds <- resource_discrete(1, allow_multiple_queue = TRUE)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  expect_equal(beds$queue_size(), 2L)
+})
+
+# ── seize_all all_or_none ─────────────────────────────────────────────────────
+
+test_that("seize_all all_or_none queues ALL bottlenecks", {
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))
+  i <- 2L; curtime <- 1.0
+  result <- seize_all(list(beds, chairs))
+  expect_false(result)
+  expect_equal(beds$queue_size(), 1L)
+  expect_equal(chairs$queue_size(), 1L)
+})
+
+test_that("seize_all rejects duplicate resources", {
+  beds <- resource_discrete(5)
+  i <- 1L; curtime <- 0.0
+  expect_error(seize_all(list(beds, beds)), "duplicate")
+})
+
+test_that("seize_all force_unblock = FALSE returns FALSE on deadlock", {
+  # True deadlock setup: P2 pre-queued on both, capacity now free, P3 still first on chairs
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))    # P1 acquires both
+  i <- 3L; curtime <- 0.5
+  seize_all(list(chairs))          # P3 queues for chairs (P3 is first in chairs queue)
+  i <- 2L; curtime <- 1.0
+  seize_all(list(beds, chairs))    # P2 queues on both: first on beds, second on chairs
+  i <- 1L; curtime <- 2.0
+  beds$attempt_free(patient_id = 1L)     # P1 releases beds (P2 now first, capacity free)
+  chairs$attempt_free(patient_id = 1L)   # P1 releases chairs (P3 still first, P2 second)
+  i <- 2L; curtime <- 3.0
+  result <- seize_all(list(beds, chairs), force_unblock = FALSE)
+  expect_false(result)             # deadlock: P3 ahead on chairs, but force_unblock=FALSE
+  expect_false(beds$is_patient_using(2L))    # P2 did NOT acquire beds
+  expect_false(chairs$is_patient_using(2L))  # P2 did NOT acquire chairs
+})
+
+test_that("seize_all force_unblock = TRUE acquires on deadlock", {
+  # Same true deadlock setup: P2 pre-queued on both, P3 first on chairs
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))    # P1 acquires both
+  i <- 3L; curtime <- 0.5
+  seize_all(list(chairs))          # P3 queues for chairs (P3 is first)
+  i <- 2L; curtime <- 1.0
+  seize_all(list(beds, chairs))    # P2 queues on both: first on beds, second on chairs
+  i <- 1L; curtime <- 2.0
+  beds$attempt_free(patient_id = 1L)     # P1 releases beds
+  chairs$attempt_free(patient_id = 1L)   # P1 releases chairs (P3 still first, P2 second)
+  i <- 2L; curtime <- 3.0
+  result <- seize_all(list(beds, chairs), force_unblock = TRUE)
+  expect_true(result)              # P2 jumps to front of chairs, acquires both
+  expect_true(beds$is_patient_using(2L))
+  expect_true(chairs$is_patient_using(2L))
+})
+
+test_that("seize_all force_unblock has no effect when capacity insufficient", {
+  # Both resources full — no deadlock, just insufficient capacity
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))    # P1 acquires both (both full, no free capacity)
+  i <- 3L; curtime <- 0.5
+  seize_all(list(beds))            # P3 queues for beds
+  i <- 2L; curtime <- 1.0
+  result <- seize_all(list(beds, chairs), force_unblock = TRUE)
+  expect_false(result)  # capacity insufficient: force_unblock has no effect
+})
+
+# ── release_all all_or_none ───────────────────────────────────────────────────
+
+test_that("release_all only acts if using ALL resources", {
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))
+  i <- 2L; curtime <- 1.0
+  seize_all(list(beds, chairs))   # P2 queues on both (both full)
+  i <- 1L; curtime <- 2.0
+  beds$attempt_free(patient_id = 1L)   # P1 releases beds; P2 in queue but not auto-acquired
+  expect_equal(beds$n_free(), 1L)      # capacity freed, P2 still in queue
+  expect_equal(chairs$n_free(), 0L)    # chairs still held by P1
+  # P1 is no longer using beds → all_or_none policy → message + no action
+  expect_message(release_all(list(beds, chairs)))
+  expect_equal(chairs$n_free(), 0L)    # chairs NOT released (policy blocked it)
+})
+
+test_that("release_all with NULL amounts purges queue entries", {
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))
+  i <- 2L; curtime <- 1.0
+  seize_all(list(beds, chairs))
+  i <- 1L
+  release_all(list(beds, chairs), amounts = NULL)
+  expect_equal(beds$n_free(), 1L)
+  expect_equal(chairs$n_free(), 1L)
+  expect_false(beds$is_patient_in_queue(1L))
+  expect_false(chairs$is_patient_in_queue(1L))
+})
+
+test_that("release_all with amounts does NOT purge queue entries", {
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))
+  i <- 2L; curtime <- 1.0
+  seize_all(list(beds, chairs))
+  i <- 1L
+  release_all(list(beds, chairs), amounts = c(1L, 1L))
+  expect_equal(beds$n_free(), 1L)
+  expect_equal(chairs$n_free(), 1L)
+  expect_true(beds$is_patient_in_queue(2L))
+  expect_true(chairs$is_patient_in_queue(2L))
+})
+
+test_that("release_all errors when amounts do not match seized amounts", {
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))           # P1 seizes both with amount=1
+  expect_error(
+    release_all(list(beds, chairs), amounts = c(3L, 1L)),  # amount=3 ≠ seized=1 for beds
+    "amount mismatch"
+  )
+  expect_equal(beds$n_free(), 0L)         # capacity NOT freed (error occurred first)
+})
+
+test_that("release_all purges queue entries when patient not using resources", {
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))            # P1 acquires both
+
+  i <- 2L; curtime <- 1.0
+  acquired <- seize_all(list(beds, chairs)) # P2 queues on both
+  expect_false(acquired)
+  expect_equal(beds$queue_size(),   1L)
+  expect_equal(chairs$queue_size(), 1L)
+
+  # P2 "dies" while queued: release_all(amounts = NULL) should purge queues
+  release_all(list(beds, chairs))
+
+  expect_equal(beds$queue_size(),   0L)
+  expect_equal(chairs$queue_size(), 0L)
+
+  # P1 releases: queue is empty so no dead patient rescheduled
+  i <- 1L
+  release_all(list(beds, chairs))
+  expect_equal(beds$n_free(),   1L)
+  expect_equal(chairs$n_free(), 1L)
+})
+
+# ── release_if_using ──────────────────────────────────────────────────────────
+
+test_that("release_if_using does nothing when not using", {
+  beds <- resource_discrete(3)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  i <- 2L
+  expect_silent(release_if_using(beds))
+  expect_equal(beds$n_free(), 2L)
+})
+
+test_that("release_if_using releases when using", {
+  beds <- resource_discrete(3)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  i <- 1L
+  release_if_using(beds)
+  expect_equal(beds$n_free(), 3L)
+  expect_false(beds$is_patient_using(1L))
+})
+
+test_that("release_if_using never touches queue entries", {
+  beds <- resource_discrete(1)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  i <- 2L
+  release_if_using(beds)
+  expect_true(beds$is_patient_in_queue(2L))
+  expect_equal(beds$queue_size(), 1L)
+})
+
+# ── Queued immutable amount ───────────────────────────────────────────────────
+
+test_that("queued amount is immutable: retry with different amount does not dequeue", {
+  # P1 holds 3 of 4 capacity; n_free=1; P2 queues for 3. Retry with amount=1:
+  # n_free(1) < queued_amount(3) so P2 cannot dequeue — queues again
+  beds <- resource_discrete(4)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1, amount = 3L)
+  result <- beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2, amount = 1L)
+  expect_false(result)
+  expect_equal(beds$queue_size(), 2L)            # original entry(3) + new entry(1)
+})
+
+test_that("queued amount is immutable: allow_multiple_queue=TRUE adds second entry on retry", {
+  beds <- resource_discrete(4, allow_multiple_queue = TRUE)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1, amount = 3L)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2, amount = 1L)
+  expect_equal(beds$queue_size(), 2L)
+  expect_true(beds$is_patient_in_queue(2L))
+})
+
+test_that("queued amount is immutable: allow_multiple_queue=FALSE rejects retry", {
+  beds <- resource_discrete(4, allow_multiple_queue = FALSE)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1, amount = 3L)
+  result <- beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2, amount = 1L)
+  expect_true(is.na(result))
+  expect_equal(beds$queue_size(), 1L)
+})
+
+test_that("queued amount is honored on dequeue: patient acquires with original amount", {
+  beds <- resource_discrete(3)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0, amount = 3L)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1, amount = 3L)
+  beds$attempt_free(patient_id = 1L, amount = 3L)  # frees 3 units
+  # Now beds n_free=3, P2 queued for 3, P2 is first in queue
+  result <- beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2, amount = 1L)
+  expect_true(result)          # dequeue-and-acquire using original queued amount (3)
+  expect_equal(beds$n_free(), 0L)  # all 3 units consumed by P2
+})
+
+# ── Multiple queue entries ────────────────────────────────────────────────────
+
+test_that("allow_multiple_queue=TRUE: queue_size reflects multiple entries per patient", {
+  beds <- resource_discrete(1, allow_multiple_queue = TRUE)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  expect_equal(beds$queue_size(), 2L)
+})
+
+test_that("next_patient_in_line returns same patient twice when queued twice", {
+  beds <- resource_discrete(1, allow_multiple_queue = TRUE)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  result <- beds$next_patient_in_line(2L)
+  expect_equal(result[1], 2L)
+  expect_equal(result[2], 2L)
+})
+
+test_that("attempt_free(remove_all=FALSE) removes one queue entry per call", {
+  beds <- resource_discrete(1, allow_multiple_queue = TRUE)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  expect_equal(beds$queue_size(), 2L)
+  beds$attempt_free(patient_id = 2L)
+  expect_equal(beds$queue_size(), 1L)
+  beds$attempt_free(patient_id = 2L)
+  expect_equal(beds$queue_size(), 0L)
+})
+
+test_that("attempt_free(remove_all=TRUE) removes all queue entries at once", {
+  beds <- resource_discrete(1, allow_multiple_queue = TRUE)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 2)
+  expect_equal(beds$queue_size(), 2L)
+  beds$attempt_free(patient_id = 2L, remove_all = TRUE)
+  expect_equal(beds$queue_size(), 0L)
+  expect_false(beds$is_patient_in_queue(2L))
+})
+
+test_that("modify_priority updates all active queue entries, start times preserved", {
+  beds <- resource_discrete(1, allow_multiple_queue = TRUE)
+  beds$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 1)
+  beds$attempt_block(patient_id = 3L, priority = 1L, start_time = 2)
+  beds$attempt_block(patient_id = 2L, priority = 1L, start_time = 3)  # P2 has 2 entries
+  beds$modify_priority(patient_id = 2L, new_priority = 5L)             # elevate P2
+  result <- beds$next_patient_in_line(2L)
+  expect_equal(result[1], 2L)   # P2 is now first (highest priority)
+  expect_equal(result[2], 2L)   # both of P2's entries are first
+  times <- beds$queue_start_times()
+  expect_true(all(c(1.0, 3.0) %in% times[1:2]))  # original start times preserved
+})
+
+# ── Fix B: accum_queue parameter ─────────────────────────────────────────────
+
+test_that("seize_all accum_queue=FALSE prevents duplicate queue entries", {
+  beds   <- resource_discrete(1, allow_multiple_queue = TRUE)
+  chairs <- resource_discrete(1, allow_multiple_queue = TRUE)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))
+  i <- 2L; curtime <- 1.0
+  seize_all(list(beds, chairs), accum_queue = FALSE)
+  expect_equal(beds$queue_size(),   1L)
+  expect_equal(chairs$queue_size(), 1L)
+  curtime <- 2.0
+  result <- seize_all(list(beds, chairs), accum_queue = FALSE)
+  expect_false(result)
+  expect_equal(beds$queue_size(),   1L)
+  expect_equal(chairs$queue_size(), 1L)
+})
+
+test_that("seize_all accum_queue=TRUE (default) adds entries on retry", {
+  beds   <- resource_discrete(1, allow_multiple_queue = TRUE)
+  chairs <- resource_discrete(1, allow_multiple_queue = TRUE)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))
+  i <- 2L; curtime <- 1.0
+  seize_all(list(beds, chairs))
+  curtime <- 2.0
+  seize_all(list(beds, chairs))
+  expect_equal(beds$queue_size(),   2L)
+  expect_equal(chairs$queue_size(), 2L)
+})
+
+test_that("seize_all accum_queue=FALSE still queues on first attempt", {
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))
+  i <- 2L; curtime <- 1.0
+  result <- seize_all(list(beds, chairs), accum_queue = FALSE)
+  expect_false(result)
+  expect_equal(beds$queue_size(),   1L)
+  expect_equal(chairs$queue_size(), 1L)
+})
+
+# ── Fix C: allow_multiple_queue=FALSE + seize_all ────────────────────────────
+
+test_that("seize_all does not reject when allow_multiple_queue=FALSE and already queued", {
+  beds   <- resource_discrete(1, allow_multiple_queue = FALSE)
+  chairs <- resource_discrete(1, allow_multiple_queue = FALSE)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))
+  i <- 2L; curtime <- 1.0
+  result1 <- seize_all(list(beds, chairs))
+  expect_false(result1)
+  expect_equal(beds$queue_size(),   1L)
+  expect_equal(chairs$queue_size(), 1L)
+  curtime <- 2.0
+  result2 <- seize_all(list(beds, chairs))
+  expect_false(result2)
+  expect_equal(beds$queue_size(),   1L)
+  expect_equal(chairs$queue_size(), 1L)
+})
+
+test_that("seize_all allow_multiple_queue=FALSE acquires when resources free up", {
+  beds   <- resource_discrete(1, allow_multiple_queue = FALSE)
+  chairs <- resource_discrete(1, allow_multiple_queue = FALSE)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))
+  i <- 2L; curtime <- 1.0
+  seize_all(list(beds, chairs))
+  i <- 1L
+  beds$attempt_free(patient_id = 1L)
+  chairs$attempt_free(patient_id = 1L)
+  i <- 2L; curtime <- 2.0
+  result <- seize_all(list(beds, chairs))
+  expect_true(result)
+  expect_true(beds$is_patient_using(2L))
+  expect_true(chairs$is_patient_using(2L))
+})
+
+test_that("seize_all rejects when not queued and queue full", {
+  beds   <- resource_discrete(1, allow_multiple_queue = FALSE, max_queue = 1)
+  chairs <- resource_discrete(1, allow_multiple_queue = FALSE, max_queue = 1)
+  i <- 1L; curtime <- 0.0
+  seize_all(list(beds, chairs))
+  i <- 2L; curtime <- 1.0
+  seize_all(list(beds, chairs))
+  i <- 3L; curtime <- 2.0
+  result <- seize_all(list(beds, chairs))
+  expect_true(is.na(result))
+})
+
+# ── Fix E: priority inflation headroom ───────────────────────────────────────
+
+test_that("force_unblock works correctly after many priority bumps", {
+  beds   <- resource_discrete(1)
+  chairs <- resource_discrete(1)
+  for (iter in 1:100) {
+    i <- 1L; curtime <- 0.0
+    beds2   <- resource_discrete(1)
+    chairs2 <- resource_discrete(1)
+    beds2$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+    chairs2$attempt_block(patient_id = 1L, priority = 1L, start_time = 0)
+    beds2$attempt_block(patient_id = 3L, priority = 1L, start_time = 0.5)
+    i <- 2L; curtime <- 1.0
+    seize_all(list(beds2, chairs2))
+    i <- 1L
+    beds2$attempt_free(patient_id = 1L)
+    chairs2$attempt_free(patient_id = 1L)
+    i <- 2L; curtime <- 2.0
+    result <- seize_all(list(beds2, chairs2), force_unblock = TRUE)
+    expect_true(result)
+  }
 })

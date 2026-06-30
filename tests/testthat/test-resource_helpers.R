@@ -245,10 +245,9 @@ test_that("release_all only triggers events for resources with queued patients",
 # F2.x seize_all + queue_wait_time end-to-end --------------------------------
 
 test_that("seize_all all_or_none: queue_wait_time correct after dequeue via release_all", {
-  # P1 seizes both at t=0. P2 tries at t=1 (both full) -> queued for beds (first unavailable).
+  # P1 seizes both at t=0. P2 tries at t=1 (both full) -> queued for BOTH (all_or_none).
   # P1 releases at t=5 -> triggers P2. P2 acquires both.
-  # Expected: specialists$had_to_queue(2)==0, beds$had_to_queue(2)==1,
-  #           beds$queue_wait_time(2)==4.0
+  # New behavior: P2 queues for ALL bottleneck resources, not just the first.
   i <- 1L; curtime <- 0.0
   cur_evtlist <- queue_create(c("sicker", "death"))
   beds        <- resource_discrete(1)
@@ -257,10 +256,10 @@ test_that("seize_all all_or_none: queue_wait_time correct after dequeue via rele
   seize_all(list(beds, specialists))  # P1 acquires both
 
   i <- 2L; curtime <- 1.0
-  r2 <- seize_all(list(beds, specialists))  # P2 queued for beds (first full)
+  r2 <- seize_all(list(beds, specialists))  # P2 queued for both (both full)
   expect_false(r2)
   expect_equal(beds$had_to_queue(2L), 1L)
-  expect_equal(specialists$had_to_queue(2L), 0L)
+  expect_equal(specialists$had_to_queue(2L), 1L)  # all_or_none: queued for both
   expect_equal(beds$queue_wait_time(2L), NA_real_)  # still waiting
 
   i <- 1L; curtime <- 5.0
@@ -270,9 +269,9 @@ test_that("seize_all all_or_none: queue_wait_time correct after dequeue via rele
   i <- 2L; curtime <- 5.0
   r2b <- seize_all(list(beds, specialists))
   expect_true(r2b)
-  expect_equal(beds$had_to_queue(2L), 1L)         # permanent flag
-  expect_equal(beds$queue_wait_time(2L), 4.0)     # 5 - 1 = 4
-  expect_equal(specialists$queue_wait_time(2L), NA_real_)  # never queued for specialists
+  expect_equal(beds$had_to_queue(2L), 1L)
+  expect_equal(beds$queue_wait_time(2L), 4.0)         # 5 - 1 = 4
+  expect_equal(specialists$queue_wait_time(2L), 4.0)  # also waited 4 (queued from t=1 to t=5)
 })
 
 test_that("seize_all all_or_none: queue_wait_time for specialist bottleneck", {

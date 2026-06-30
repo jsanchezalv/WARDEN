@@ -37,7 +37,7 @@ if(getRversion() >= "2.15.1") {
 #' @param constrained Boolean, FALSE by default, which runs the simulation with patients not interacting with each other, TRUE if resources are shared within an arm (allows constrained resources)
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
-#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
+#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. Recommended for resource-constrained models where queue waits make future event times unpredictable. With TRUE, ongoing values are computed at each event for the interval just completed, avoiding prospective errors from [adj_val()].
 #' @param continue_on_error If TRUE, on error  at patient stage will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1, not at the patient level)
 #' @param seed Starting seed to be used for the whole analysis. If null, it's set to 1 by default.
 #'
@@ -356,7 +356,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   progressr::handlers(progressr::handler_txtprogressbar(width=100))
   options(progressr.interrupts = FALSE)
   progressr::with_progress({
-    pb <- progressr::progressor(min(npats*length_sensitivities*n_sim,50)) 
+    pb <- progressr::progressor(min(npats*length_sensitivities*n_sim,50))
     
   for (sens in 1:length_sensitivities) {
     .skip_to_next <- FALSE
@@ -493,7 +493,7 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     options(future.rng.onMisuse = "ignore")
     n_chunks <- min(n_sim, ncores * 2L)
     sim_chunks <- split(seq_len(n_sim), ceiling(seq_len(n_sim) / ceiling(n_sim / n_chunks)))
-    
+
     output_sim[[sens]] <- foreach(chunk = sim_chunks,
                          # .options.future = list(seed = TRUE),
                          .options.future = list(packages = .packages()),

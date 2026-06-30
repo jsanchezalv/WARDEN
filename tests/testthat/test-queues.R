@@ -305,4 +305,27 @@
     expect_equal(res$time[res$event_name == "visit"], 5)
     expect_equal(res$time[res$event_name == "lab_test"], 15)
   })
-  
+
+# ── NA/NaN rejection ──────────────────────────────────────────────────────────
+
+test_that("new_event rejects NA_real_ event times", {
+  q <- queue_create(c("visit", "death"))
+  expect_error(new_event(c(visit = NA_real_), ptr = q, patient_id = 1))
+})
+
+test_that("new_event rejects NaN event times", {
+  q <- queue_create(c("visit", "death"))
+  expect_error(new_event(c(visit = NaN), ptr = q, patient_id = 1))
+})
+
+test_that("modify_event rejects NA_real_ event times", {
+  q <- queue_create(c("visit", "death"))
+  new_event(c(visit = 5), ptr = q, patient_id = 1)
+  expect_error(modify_event(c(visit = NA_real_), ptr = q, patient_id = 1))
+})
+
+test_that("new_event allows Inf event times", {
+  q <- queue_create(c("visit", "death"))
+  expect_silent(new_event(c(visit = Inf), ptr = q, patient_id = 1))
+  expect_equal(queue_size(q), 1L)
+})

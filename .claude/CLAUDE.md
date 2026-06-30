@@ -143,6 +143,7 @@ The function index is stored in `.claude/function_index.md`. Make sure to update
 
 - Update parallel engine with **Mori** package
 - Update `"i"` iterator with `pat_i` to make it clearer and less bug-prone
+- No known bugs remaining in resource engine (all identified issues from v2.0.5 review resolved in v2.0.5 patch)
 
 ### Test scenarios not yet completed
 

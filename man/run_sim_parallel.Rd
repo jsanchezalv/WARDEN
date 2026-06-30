@@ -92,7 +92,7 @@ run_sim_parallel(
 
 \item{debug}{If TRUE, will generate a log file}
 
-\item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.}
+\item{accum_backwards}{If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. Recommended for resource-constrained models where queue waits make future event times unpredictable. With TRUE, ongoing values are computed at each event for the interval just completed, avoiding prospective errors from \code{\link[=adj_val]{adj_val()}}.}
 
 \item{continue_on_error}{If TRUE, on error  at patient stage will attempt to continue to the next simulation (only works if n_sim and/or n_sensitivity are > 1, not at the patient level)}
 

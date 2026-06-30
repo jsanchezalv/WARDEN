@@ -395,7 +395,7 @@ pick_val_v <- function(base,
 #' active parameters simultaneously in a single iteration.
 #'
 #' When `dsa_names = NULL` (the default) every sensitivity name is treated as a
-#' scenario — all active parameters take their scenario value at once, one
+#' scenario -- all active parameters take their scenario value at once, one
 #' iteration per `sensitivity_names` entry. This is the correct default when
 #' there is no DSA.
 #'
@@ -619,7 +619,7 @@ input_block <- function(.data = NULL,
 #'
 #' @param .data Optional: an existing `{}` block (or list of expressions)
 #'   to start from. Receives the LHS value when using `|>` or `%>%`.
-#' @param ... Unevaluated arguments. Named → `name <- expr`; unnamed → raw expr.
+#' @param ... Unevaluated arguments. Named -> `name <- expr`; unnamed -> raw expr.
 #' @param input Optional unevaluated expression or `{}` block to splice in.
 #'
 #' @return A single `{}` call (language object) ready for `load_inputs()`.
@@ -675,11 +675,11 @@ add_item <- function(.data = NULL, ..., input) {
   }
   
   # Use mc$.data (unevaluated) to decide how to treat the argument:
-  #   - NULL/missing            → start a fresh {} block
-  #   - symbol (variable name)  → evaluate: it holds a prior block (pipe LHS)
-  #   - add_item(...) call       → evaluate: chained pipe (nested add_item)
-  #   - { } literal block       → use as-is as the starting block
-  #   - anything else           → capture unevaluated as the first statement
+  #   - NULL/missing            -> start a fresh {} block
+  #   - symbol (variable name)  -> evaluate: it holds a prior block (pipe LHS)
+  #   - add_item(...) call       -> evaluate: chained pipe (nested add_item)
+  #   - { } literal block       -> use as-is as the starting block
+  #   - anything else           -> capture unevaluated as the first statement
   #     (e.g. pick_val_v(), if(), which reference engine-scope vars not yet defined)
   data_expr <- mc$.data
   built <- list()
@@ -699,7 +699,7 @@ add_item <- function(.data = NULL, ..., input) {
     .meta       <- attr(.data, "warden_block_meta")
   } else {
     # Unnamed unevaluated expression (e.g. pick_val_v(), if(), some_fn())
-    # Do NOT evaluate .data — keep it as a raw expression statement
+    # Do NOT evaluate .data -- keep it as a raw expression statement
     block_elems <- list(as.name("{"))
     built <- list(data_expr)
   }
@@ -1200,6 +1200,9 @@ get_event <- function(event_name, ptr , patient_id ) {
 #' @param max_queue Non-negative integer or `Inf` (default). Maximum number of
 #'   patients that can wait in the queue. Patients that arrive when the queue is
 #'   full are rejected (`attempt_block()` returns `NA`).
+#' @param allow_multiple_queue Logical (default `TRUE`). If `FALSE`, a patient
+#'   that already has a queued entry will be rejected (`attempt_block()` returns
+#'   `NA`) instead of being allowed to queue again.
 #'
 #' @return An environment of class `"resource_discrete"` with the following
 #'   methods:
@@ -1208,7 +1211,7 @@ get_event <- function(event_name, ptr , patient_id ) {
 #'   \item{\code{queue_size()}}{Number of patients currently in the queue.}
 #'   \item{\code{n_free()}}{Number of free resource units.}
 #'   \item{\code{n_using()}}{Number of units currently in use.}
-#'   \item{\code{utilization()}}{Fraction of capacity in use (0–1).}
+#'   \item{\code{utilization()}}{Fraction of capacity in use (0-1).}
 #'   \item{\code{patients_using()}}{Vector of patient IDs currently using the
 #'     resource.}
 #'   \item{\code{patients_using_times()}}{Vector of start times for patients
@@ -1234,7 +1237,8 @@ get_event <- function(event_name, ptr , patient_id ) {
 #'   \item{\code{next_patient_in_line(n)}}{Get next \code{n} patients in
 #'     queue.}
 #'   \item{\code{modify_priority(patient_id, new_priority)}}{Modify patient
-#'     priority in queue.}
+#'     priority in queue. When the patient has \code{k} active queue entries,
+#'     complexity is O(k log n), not O(log n).}
 #'   \item{\code{add_resource(n)}}{Add \code{n} resource units.}
 #'   \item{\code{remove_resource(n, current_time)}}{Remove \code{n} resource
 #'     units. Defaults \code{current_time} to \code{curtime}.}
@@ -1279,7 +1283,7 @@ get_event <- function(event_name, ptr , patient_id ) {
 #' stack <- resource_discrete(2, discipline = "LIFO", max_queue = 5)
 #'
 #' @export
-resource_discrete <- function(n, discipline = "FIFO", max_queue = Inf) {
+resource_discrete <- function(n, discipline = "FIFO", max_queue = Inf, allow_multiple_queue = TRUE) {
   if (!is.numeric(n) || length(n) != 1 || n < 0 || n != as.integer(n)) {
     stop("n must be a single integer >= 0")
   }
@@ -1289,12 +1293,15 @@ resource_discrete <- function(n, discipline = "FIFO", max_queue = Inf) {
   if (!is.numeric(max_queue) || length(max_queue) != 1 || (!is.infinite(max_queue) && max_queue < 0)) {
     stop("max_queue must be a single non-negative number or Inf")
   }
+  if (!is.logical(allow_multiple_queue) || length(allow_multiple_queue) != 1) {
+    stop("allow_multiple_queue must be a single logical value")
+  }
 
   lifo <- discipline == "LIFO"
   max_queue_cpp <- if (is.infinite(max_queue)) -1L else as.integer(max_queue)
 
   env <- new.env()
-  env$.ptr <- create_discrete_resource_cpp(as.integer(n), lifo, max_queue_cpp)
+  env$.ptr <- create_discrete_resource_cpp(as.integer(n), lifo, max_queue_cpp, isTRUE(allow_multiple_queue))
 
   env$size <- function() discrete_resource_size_cpp(env$.ptr)
 
@@ -1338,6 +1345,9 @@ resource_discrete <- function(n, discipline = "FIFO", max_queue = Inf) {
     if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     if (!is.numeric(priority)   || length(priority)   != 1) stop("priority must be a single number")
     if (!is.numeric(start_time) || length(start_time) != 1) stop("start_time must be a single number")
+    if (!is.numeric(amount) || length(amount) != 1 || amount <= 0 || amount != as.integer(amount)) {
+      stop("amount must be a single positive integer")
+    }
     result_int <- discrete_resource_attempt_block_cpp(env$.ptr, as.integer(patient_id),
                                                       as.integer(priority), as.numeric(start_time),
                                                       as.integer(amount))
@@ -1346,19 +1356,29 @@ resource_discrete <- function(n, discipline = "FIFO", max_queue = Inf) {
     NA  # rejected (max_queue full)
   }
 
-  env$attempt_free <- function(patient_id = NULL, remove_all = FALSE, amount = 1L) {
+  env$attempt_free <- function(patient_id = NULL, remove_all = FALSE, amount = NULL) {
     if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
     if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     if (!is.logical(remove_all) || length(remove_all) != 1) stop("remove_all must be a single logical value")
-    discrete_resource_attempt_free_cpp(env$.ptr, as.integer(patient_id), remove_all, as.integer(amount))
+    amount_int <- if (is.null(amount)) NA_integer_ else {
+      if (!is.numeric(amount) || length(amount) != 1 || amount <= 0 || amount != as.integer(amount))
+        stop("amount must be a single positive integer")
+      as.integer(amount)
+    }
+    discrete_resource_attempt_free_cpp(env$.ptr, as.integer(patient_id), remove_all, amount_int)
     invisible(NULL)
   }
 
-  env$attempt_free_if_using <- function(patient_id = NULL, remove_all = FALSE) {
+  env$attempt_free_if_using <- function(patient_id = NULL, remove_all = FALSE, amount = NULL) {
     if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
     if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     if (!is.logical(remove_all) || length(remove_all) != 1) stop("remove_all must be a single logical value")
-    discrete_resource_attempt_free_if_using_cpp(env$.ptr, as.integer(patient_id), remove_all)
+    amount_int <- if (is.null(amount)) NA_integer_ else {
+      if (!is.numeric(amount) || length(amount) != 1 || amount <= 0 || amount != as.integer(amount))
+        stop("amount must be a single positive integer")
+      as.integer(amount)
+    }
+    discrete_resource_attempt_free_if_using_cpp(env$.ptr, as.integer(patient_id), remove_all, amount_int)
     invisible(NULL)
   }
 
@@ -1390,7 +1410,7 @@ resource_discrete <- function(n, discipline = "FIFO", max_queue = Inf) {
     invisible(NULL)
   }
 
-  # ── Statistics methods ──────────────────────────────────────────────────────
+  # -- Statistics methods -------------------------------------------------------
 
   env$queue_wait_time <- function(patient_id = NULL) {
     if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
@@ -1489,13 +1509,14 @@ seize <- function(resource, amount = 1L) {
 #' @param resource A `resource_discrete` object.
 #' @param resume_event Character string. Name of the event to schedule for the
 #'   next queued patient, or `NULL` (default) to skip re-triggering.
-#' @param amount Integer. Units to free (default `1L`).
+#' @param amount Integer or `NULL` (default). Units to release. `NULL` means 1.
+#'   Must exactly match the amount used when seizing (indivisible units).
 #'
 #' @return Invisibly, `TRUE` if the patient was using the resource, `FALSE`
 #'   otherwise.
 #'
 #' @export
-release <- function(resource, resume_event = NULL, amount = 1L) {
+release <- function(resource, resume_event = NULL, amount = NULL) {
   i <- get("i", envir = parent.frame(), inherits = TRUE)
   was_using <- resource$is_patient_using(i)
   resource$attempt_free(amount = amount)
@@ -1508,26 +1529,78 @@ release <- function(resource, resume_event = NULL, amount = 1L) {
   invisible(was_using)
 }
 
+#' Release a discrete resource only if using
+#'
+#' Releases the resource for the current patient (`i`) only if they are
+#' currently using it. Does nothing if the patient is not using the resource.
+#' Never removes queue entries.
+#'
+#' @param resource A `resource_discrete` object.
+#' @param resume_event Character string. Name of the event to schedule for the
+#'   next queued patient, or `NULL` (default) to skip re-triggering.
+#' @param amount Integer or `NULL` (default). Units to release. `NULL` means 1.
+#'   Must exactly match the amount used when seizing (indivisible units).
+#'
+#' @return Invisibly `NULL`.
+#'
+#' @export
+release_if_using <- function(resource, resume_event = NULL, amount = NULL) {
+  i <- get("i", envir = parent.frame(), inherits = TRUE)
+  if (resource$is_patient_using(i)) {
+    release(resource, resume_event = resume_event, amount = amount)
+  }
+  invisible(NULL)
+}
+
 #' Seize multiple discrete resources atomically
 #'
 #' Attempts to acquire a list of resources in a single C++ call, avoiding
 #' per-resource R-to-C++ round trips.
 #'
 #' @param resources A list of `resource_discrete` objects.
-#' @param policy `"all_or_none"` (default) — acquires all only if all are
+#' @param policy `"all_or_none"` (default) -- acquires all only if all are
 #'   available; queues for the first bottleneck without holding any others.
-#'   `"sequential"` — acquires in list order, holding partial acquisitions;
+#'   `"sequential"` -- acquires in list order, holding partial acquisitions;
 #'   user is responsible for avoiding deadlocks.
 #' @param amounts Integer vector of units per resource (default `1L` for each).
 #' @param priorities Integer vector of priorities per resource (default `1L`).
+#' @param force_unblock Logical (default `FALSE`). When `TRUE` and all resources
+#'   have sufficient capacity but the patient is not first in queue on some
+#'   resources (deadlock), forcibly moves the patient to the front of those
+#'   queues and acquires all resources. Has no effect when capacity is
+#'   genuinely insufficient.
+#' @param accum_queue Logical (default `TRUE`). When `FALSE` and the patient
+#'   already has a queue entry on a bottleneck resource from a previous failed
+#'   attempt, skips adding a new entry (existing entry serves). Prevents
+#'   phantom queue accumulation on retries.
 #'
 #' @return `TRUE` if all acquired, `FALSE` if queued for a bottleneck resource,
 #'   `NA` if rejected.
 #'
 #' @export
-seize_all <- function(resources, policy = "all_or_none", amounts = NULL, priorities = NULL) {
-  if (is.null(amounts))    amounts    <- rep(1L, length(resources))
-  if (is.null(priorities)) priorities <- rep(1L, length(resources))
+seize_all <- function(resources, policy = "all_or_none", amounts = NULL, priorities = NULL,
+                      force_unblock = FALSE, accum_queue = TRUE) {
+  n_res <- length(resources)
+  if (!is.null(amounts)) {
+    if (length(amounts) != n_res)
+      stop("seize_all(): amounts must have the same length as resources")
+    if (any(!is.numeric(amounts) | amounts <= 0 | amounts != as.integer(amounts)))
+      stop("seize_all(): amounts must be positive integers")
+  }
+  if (!is.null(priorities) && length(priorities) != n_res)
+    stop("seize_all(): priorities must have the same length as resources")
+  if (is.null(amounts))    amounts    <- rep(1L, n_res)
+  if (is.null(priorities)) priorities <- rep(1L, n_res)
+  # Validate no duplicate resources
+  if (anyDuplicated(lapply(resources, \(r) r$.ptr))) {
+    stop("seize_all(): duplicate resources detected -- the same resource appears more than once")
+  }
+  if (!is.logical(force_unblock) || length(force_unblock) != 1) {
+    stop("force_unblock must be a single logical value")
+  }
+  if (!is.logical(accum_queue) || length(accum_queue) != 1) {
+    stop("accum_queue must be a single logical value")
+  }
   i       <- get("i",       envir = parent.frame(), inherits = TRUE)
   curtime <- get("curtime", envir = parent.frame(), inherits = TRUE)
   xptrs      <- lapply(resources, \(r) r$.ptr)
@@ -1535,39 +1608,86 @@ seize_all <- function(resources, policy = "all_or_none", amounts = NULL, priorit
   if (is.na(policy_int)) stop('policy must be "all_or_none" or "sequential"')
   result_int <- discrete_resource_seize_all_cpp(xptrs, as.integer(i), as.integer(priorities),
                                                 as.numeric(curtime), as.integer(amounts),
-                                                as.integer(policy_int))
+                                                as.integer(policy_int), isTRUE(force_unblock),
+                                                isTRUE(accum_queue))
   if (result_int == 1L) TRUE else if (result_int == 0L) FALSE else NA
 }
 
 #' Release multiple discrete resources
 #'
-#' Frees the current patient (`i`) from each resource via a single C++ call.
-#' Removes the patient from both the using list and the queue (all entries).
-#' Schedules resume events only for resources where the patient was actually
-#' using (i.e., where capacity was freed).
+#' Frees the current patient (`i`) from each resource. Applies an all_or_none
+#' policy: only acts if the patient is using ALL listed resources. Removes the
+#' patient from both the using list and the queue. When `amounts` is `NULL`
+#' (default), releases all entries and purges queue entries for the patient;
+#' when `amounts` is specified, performs an exact indivisible release without
+#' purging the queue. Schedules resume events only for resources where the
+#' patient was actually using (i.e., where capacity was freed).
 #'
 #' @param resources A list of `resource_discrete` objects.
 #' @param resume_event `NULL` (no re-triggering), a single string (same event
 #'   for all resources' queues), or a character vector of length
 #'   `length(resources)` (per-resource events, matched positionally).
-#' @param amounts Integer vector of units per resource (default `1L` for each).
+#' @param amounts Integer vector of units per resource, or `NULL` (default).
+#'   `NULL` releases all entries and purges queue entries for the patient.
+#'   Specified amounts perform exact indivisible releases without purging.
 #'
 #' @return Invisibly `NULL`.
 #'
 #' @export
 release_all <- function(resources, resume_event = NULL, amounts = NULL) {
-  if (is.null(amounts)) amounts <- rep(1L, length(resources))
-  i    <- get("i", envir = parent.frame(), inherits = TRUE)
+  if (!is.null(amounts)) {
+    if (length(amounts) != length(resources))
+      stop("release_all(): amounts must have the same length as resources")
+    if (any(!is.numeric(amounts) | amounts <= 0 | amounts != as.integer(amounts)))
+      stop("release_all(): amounts must be positive integers")
+  }
+  i <- get("i", envir = parent.frame(), inherits = TRUE)
+
+  # all_or_none policy: only act if patient is using ALL listed resources
+  using_status <- vapply(resources, \(r) r$is_patient_using(i), logical(1))
+  if (!all(using_status)) {
+    if (any(using_status)) {
+      message("release_all(): patient is not using all listed resources (all_or_none policy). No release performed.")
+    }
+    # When amounts = NULL, purge queue entries for resources the patient is NOT
+    # using. Covers the case where a patient queued via seize_all() and then died
+    # before acquiring -- without this, dead patients stay in the queue and get
+    # rescheduled when another patient releases. Resources where the patient IS
+    # using are left untouched (the all_or_none policy blocks their release).
+    # Calling release_full with NA_INTEGER on a non-using patient is a pure
+    # queue-purge: no usage entry exists so no capacity is freed.
+    if (is.null(amounts)) {
+      not_using <- !using_status
+      if (any(not_using)) {
+        xptrs_nu <- lapply(resources[not_using], \(r) r$.ptr)
+        discrete_resource_release_all_cpp(xptrs_nu, as.integer(i),
+                                          rep(NA_integer_, sum(not_using)),
+                                          TRUE)
+      }
+    }
+    return(invisible(NULL))
+  }
+
+  # NULL amounts -> NA_integer_ sentinel (release all entries + purge queues)
+  # Specified amounts -> exact indivisible release, no queue purge
+  purge_queues <- is.null(amounts)
+  amounts_int <- if (is.null(amounts)) rep(NA_integer_, length(resources)) else as.integer(amounts)
+
   xptrs <- lapply(resources, \(r) r$.ptr)
-  was_using <- discrete_resource_release_all_cpp(xptrs, as.integer(i), as.integer(amounts))
+  was_using <- discrete_resource_release_all_cpp(xptrs, as.integer(i), amounts_int, purge_queues)
+
   if (!is.null(resume_event)) {
     if (length(resume_event) == 1L) resume_event <- rep(resume_event, length(resources))
     curtime     <- get("curtime",     envir = parent.frame(), inherits = TRUE)
     cur_evtlist <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+    seen_pids <- integer(0L)
     for (idx in seq_along(resources)) {
       if (was_using[idx] && resources[[idx]]$queue_size() > 0) {
         next_pid <- resources[[idx]]$next_patient_in_line()
-        new_event(setNames(curtime, resume_event[idx]), cur_evtlist, patient_id = next_pid)
+        if (!next_pid %in% seen_pids) {
+          seen_pids <- c(seen_pids, next_pid)
+          new_event(setNames(curtime, resume_event[idx]), cur_evtlist, patient_id = next_pid)
+        }
       }
     }
   }
@@ -1577,8 +1697,10 @@ release_all <- function(resources, resume_event = NULL, amounts = NULL) {
 #' Release multiple discrete resources (using only)
 #'
 #' Frees the current patient (`i`) from each resource only if they are
-#' currently using it. Does not remove the patient from any queue. Use this
-#' when a patient transitions state but should keep their queue position.
+#' currently using it. Applies an all_or_none policy: only acts if the patient
+#' is using ALL listed resources. Does not remove the patient from any queue.
+#' Use this when a patient transitions state but should keep their queue
+#' position.
 #'
 #' @inheritParams release_all
 #'
@@ -1586,18 +1708,39 @@ release_all <- function(resources, resume_event = NULL, amounts = NULL) {
 #'
 #' @export
 release_all_if_using <- function(resources, resume_event = NULL, amounts = NULL) {
-  if (is.null(amounts)) amounts <- rep(1L, length(resources))
-  i    <- get("i", envir = parent.frame(), inherits = TRUE)
+  if (!is.null(amounts)) {
+    if (length(amounts) != length(resources))
+      stop("release_all_if_using(): amounts must have the same length as resources")
+    if (any(!is.numeric(amounts) | amounts <= 0 | amounts != as.integer(amounts)))
+      stop("release_all_if_using(): amounts must be positive integers")
+  }
+  i <- get("i", envir = parent.frame(), inherits = TRUE)
+
+  # all_or_none policy: only act if patient is using ALL listed resources
+  using_status <- vapply(resources, \(r) r$is_patient_using(i), logical(1))
+  if (!all(using_status)) {
+    if (any(using_status)) {
+      message("release_all_if_using(): patient is not using all listed resources (all_or_none policy). No release performed.")
+    }
+    return(invisible(NULL))
+  }
+
+  amounts_int <- if (is.null(amounts)) rep(NA_integer_, length(resources)) else as.integer(amounts)
   xptrs <- lapply(resources, \(r) r$.ptr)
-  was_using <- discrete_resource_release_all_if_using_cpp(xptrs, as.integer(i), as.integer(amounts))
+  was_using <- discrete_resource_release_all_if_using_cpp(xptrs, as.integer(i), amounts_int)
+
   if (!is.null(resume_event)) {
     if (length(resume_event) == 1L) resume_event <- rep(resume_event, length(resources))
     curtime     <- get("curtime",     envir = parent.frame(), inherits = TRUE)
     cur_evtlist <- get("cur_evtlist", envir = parent.frame(), inherits = TRUE)
+    seen_pids <- integer(0L)
     for (idx in seq_along(resources)) {
       if (was_using[idx] && resources[[idx]]$queue_size() > 0) {
         next_pid <- resources[[idx]]$next_patient_in_line()
-        new_event(setNames(curtime, resume_event[idx]), cur_evtlist, patient_id = next_pid)
+        if (!next_pid %in% seen_pids) {
+          seen_pids <- c(seen_pids, next_pid)
+          new_event(setNames(curtime, resume_event[idx]), cur_evtlist, patient_id = next_pid)
+        }
       }
     }
   }
@@ -1648,7 +1791,7 @@ shared_decr <- function(obj, delta = 1) {
 #'
 #' - **Immutable (non-shared)**: every modification produces a fresh, independent
 #'   copy of the object (safe for parallel or functional code).
-#' - **Shared (constrained)**: the object’s value is stored in a common
+#' - **Shared (constrained)**: the object's value is stored in a common
 #'   environment shared across all aliases (by-reference semantics). This
 #'   allows coordinated updates across multiple handles.
 #'
@@ -2016,6 +2159,14 @@ add_tte <- function(.data=NULL,arm, evts, other_inp = NULL,input){
 #'  The user can use the `.time` variable to select the corresponding time of the sequence being evaluated.
 #'  For example, in `curtime = 0, nexttime = 4, by = 1`, `.time` would correspond to `0, 1, 2, 3`.
 #'  If using `nexttime = 4.2`, `0, 1, 2, 3, 4`
+#'
+#' @note In resource-constrained models where event timing is unpredictable
+#'   (e.g., patients waiting in resource queues), use
+#'   `accum_backwards = TRUE` in [run_sim()] and compute
+#'   `adj_val(prevtime, curtime, ...)` at each event reaction. This ensures
+#'   both time boundaries are known and the age/time adjustment is exact,
+#'   avoiding prospective errors when a resource event fires earlier than
+#'   expected.
 #' 
 #'
 #' @examples
@@ -2329,7 +2480,7 @@ ast_as_list <- function(ee) {
     return(lapply(as.list(ee), ast_as_list))
   }
   
-  # Calls → convert to lists and recurse over children (incl. function position)
+  # Calls -> convert to lists and recurse over children (incl. function position)
   if (is.call(ee)) {
     return(lapply(as.list(ee), ast_as_list))
   }
@@ -2550,10 +2701,10 @@ extract_elements_from_list <- function(node, conditional_flag = FALSE) {
           )
         }
       }
-      # We ignore envir=… for the output schema, but this no longer warns or errors.
+      # We ignore envir=... for the output schema, but this no longer warns or errors.
     }
     
-    # ----- Case 4: if() — mark children as conditional 
+    # ----- Case 4: if() -- mark children as conditional 
     if (.is_call_named(node_list, "if")) {
       conditional_flag <- TRUE
     }
@@ -2602,10 +2753,10 @@ expr_from_list <- function(lst) {
   # Already a language object
   if (is.symbol(lst) || is.call(lst) || is.name(lst)) return(lst)
   
-  # Atomic vector → keep as-is
+  # Atomic vector -> keep as-is
   if (is.atomic(lst)) return(lst)
   
-  # Pairlist/expression/lists → rebuild recursively
+  # Pairlist/expression/lists -> rebuild recursively
   if (is.list(lst)) {
     if (length(lst) == 0L) return(NULL)
     head_expr <- expr_from_list(lst[[1L]])
@@ -2729,13 +2880,13 @@ extract_assignment_targets <- function(expr) {
         return(NULL)
       }
       
-      # pkg::name  or pkg:::name  (not assignable in R) → ignore as target but don't error
+      # pkg::name  or pkg:::name  (not assignable in R) -> ignore as target but don't error
       if (op_chr %in% c("::", ":::")) {
         return(NULL)
       }
     }
     
-    # Function-call LHS of other kinds → we don't treat as assignable base names
+    # Function-call LHS of other kinds -> we don't treat as assignable base names
     NULL
   }
   

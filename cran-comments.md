@@ -2,9 +2,8 @@
 
 * This is a minor package update. In this version I have:
 
-* Minor updates to a few functions to slightly increase speed
-* Created input_block() function to facilitate user's interactions
-* Allow to use the R native pipe by default
+* Added some more tests and handled corner case use
+* Added some functionality around corner case use
 
 ## R CMD check results
 

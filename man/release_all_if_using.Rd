@@ -13,13 +13,17 @@ release_all_if_using(resources, resume_event = NULL, amounts = NULL)
 for all resources' queues), or a character vector of length
 \code{length(resources)} (per-resource events, matched positionally).}
 
-\item{amounts}{Integer vector of units per resource (default \code{1L} for each).}
+\item{amounts}{Integer vector of units per resource, or \code{NULL} (default).
+\code{NULL} releases all entries and purges queue entries for the patient.
+Specified amounts perform exact indivisible releases without purging.}
 }
 \value{
 Invisibly \code{NULL}.
 }
 \description{
 Frees the current patient (\code{i}) from each resource only if they are
-currently using it. Does not remove the patient from any queue. Use this
-when a patient transitions state but should keep their queue position.
+currently using it. Applies an all_or_none policy: only acts if the patient
+is using ALL listed resources. Does not remove the patient from any queue.
+Use this when a patient transitions state but should keep their queue
+position.
 }

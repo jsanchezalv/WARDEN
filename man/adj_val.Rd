@@ -41,6 +41,15 @@ The user can use the \code{.time} variable to select the corresponding time of t
 For example, in \verb{curtime = 0, nexttime = 4, by = 1}, \code{.time} would correspond to \verb{0, 1, 2, 3}.
 If using \code{nexttime = 4.2}, \verb{0, 1, 2, 3, 4}
 }
+\note{
+In resource-constrained models where event timing is unpredictable
+(e.g., patients waiting in resource queues), use
+\code{accum_backwards = TRUE} in \code{\link[=run_sim]{run_sim()}} and compute
+\code{adj_val(prevtime, curtime, ...)} at each event reaction. This ensures
+both time boundaries are known and the age/time adjustment is exact,
+avoiding prospective errors when a resource event fires earlier than
+expected.
+}
 \examples{
 # Define a function or vector to evaluate
 bs_age <- 1

@@ -4,7 +4,12 @@
 \alias{resource_discrete}
 \title{Create a discrete resource}
 \usage{
-resource_discrete(n, discipline = "FIFO", max_queue = Inf)
+resource_discrete(
+  n,
+  discipline = "FIFO",
+  max_queue = Inf,
+  allow_multiple_queue = TRUE
+)
 }
 \arguments{
 \item{n}{Integer >= 0. Total capacity of the resource.}
@@ -15,6 +20,10 @@ within the same priority level.}
 \item{max_queue}{Non-negative integer or \code{Inf} (default). Maximum number of
 patients that can wait in the queue. Patients that arrive when the queue is
 full are rejected (\code{attempt_block()} returns \code{NA}).}
+
+\item{allow_multiple_queue}{Logical (default \code{TRUE}). If \code{FALSE}, a patient
+that already has a queued entry will be rejected (\code{attempt_block()} returns
+\code{NA}) instead of being allowed to queue again.}
 }
 \value{
 An environment of class \code{"resource_discrete"} with the following
@@ -50,7 +59,8 @@ patient is currently using. Defaults \code{patient_id} to \code{i}.}
 \item{\code{next_patient_in_line(n)}}{Get next \code{n} patients in
 queue.}
 \item{\code{modify_priority(patient_id, new_priority)}}{Modify patient
-priority in queue.}
+priority in queue. When the patient has \code{k} active queue entries,
+complexity is O(k log n), not O(log n).}
 \item{\code{add_resource(n)}}{Add \code{n} resource units.}
 \item{\code{remove_resource(n, current_time)}}{Remove \code{n} resource
 units. Defaults \code{current_time} to \code{curtime}.}

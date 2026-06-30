@@ -4,7 +4,14 @@
 \alias{seize_all}
 \title{Seize multiple discrete resources atomically}
 \usage{
-seize_all(resources, policy = "all_or_none", amounts = NULL, priorities = NULL)
+seize_all(
+  resources,
+  policy = "all_or_none",
+  amounts = NULL,
+  priorities = NULL,
+  force_unblock = FALSE,
+  accum_queue = TRUE
+)
 }
 \arguments{
 \item{resources}{A list of \code{resource_discrete} objects.}
@@ -17,6 +24,17 @@ user is responsible for avoiding deadlocks.}
 \item{amounts}{Integer vector of units per resource (default \code{1L} for each).}
 
 \item{priorities}{Integer vector of priorities per resource (default \code{1L}).}
+
+\item{force_unblock}{Logical (default \code{FALSE}). When \code{TRUE} and all resources
+have sufficient capacity but the patient is not first in queue on some
+resources (deadlock), forcibly moves the patient to the front of those
+queues and acquires all resources. Has no effect when capacity is
+genuinely insufficient.}
+
+\item{accum_queue}{Logical (default \code{TRUE}). When \code{FALSE} and the patient
+already has a queue entry on a bottleneck resource from a previous failed
+attempt, skips adding a new entry (existing entry serves). Prevents
+phantom queue accumulation on retries.}
 }
 \value{
 \code{TRUE} if all acquired, \code{FALSE} if queued for a bottleneck resource,

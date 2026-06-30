@@ -26,7 +26,7 @@
 #' @param constrained Boolean, FALSE by default, which runs the simulation with patients not interacting with each other, TRUE if resources are shared within an arm (allows constrained resources)
 #' @param timed_freq If NULL, it does not produce any timed outputs. Otherwise should be a number (e.g., every 1 year)
 #' @param debug If TRUE, will generate a log file
-#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated.
+#' @param accum_backwards If TRUE, the ongoing accumulators will count backwards (i.e., the current value is applied until the previous update). If FALSE, the current value is applied between the current event and the next time it is updated. Recommended for resource-constrained models where queue waits make future event times unpredictable. With TRUE, ongoing values are computed at each event for the interval just completed, avoiding prospective errors from [adj_val()].
 #' @param continue_on_error If TRUE, on error it will attempt to continue by skipping the current simulation 
 #' @param seed Starting seed to be used for the whole analysis. If null, it's set to 1 by default.
 #'

@@ -11,13 +11,13 @@ using namespace Rcpp;
 // Structure to hold patient information in queue with version tracking
 struct QueuedPatient {
   int patient_id;
-  int priority;
+  int64_t priority;
   int insertion_order;
   double queue_start_time;
   uint64_t version;
   int amount_requested;  // units requested when queuing
 
-  QueuedPatient(int id, int prio, int order, double start_time, uint64_t ver, int amt = 1) :
+  QueuedPatient(int id, int64_t prio, int order, double start_time, uint64_t ver, int amt = 1) :
     patient_id(id), priority(prio), insertion_order(order),
     queue_start_time(start_time), version(ver), amount_requested(amt) {}
 };
@@ -48,8 +48,9 @@ private:
   int current_total_used;  // maintained incrementally for O(1) n_free()
   bool is_lifo;
   int max_queue_capacity;  // -1 = unlimited
+  bool allow_multiple_queue;
   int next_insertion_order;
-  int current_max_priority;
+  int64_t current_max_priority;
   int total_entries_ever_added;
   int current_valid_entries;
   int operations_since_cleanup;
@@ -101,7 +102,7 @@ private:
 
     bool periodic_cleanup = (operations_since_cleanup >= CLEANUP_FREQUENCY);
     bool threshold_cleanup = (total_entries_ever_added - current_valid_entries >
-                                static_cast<int>(current_valid_entries * 0.5));
+                                static_cast<int>(current_valid_entries * 2));
 
     if (periodic_cleanup || threshold_cleanup) {
       full_queue_cleanup();
@@ -110,11 +111,13 @@ private:
   }
 
 public:
-  DiscreteResource(int n, bool lifo = false, int max_queue = -1) :
+  DiscreteResource(int n, bool lifo = false, int max_queue = -1,
+                   bool allow_multi_queue = true) :
     total_capacity(n),
     current_total_used(0),
     is_lifo(lifo),
     max_queue_capacity(max_queue),
+    allow_multiple_queue(allow_multi_queue),
     next_insertion_order(0),
     current_max_priority(1),
     total_entries_ever_added(0),
@@ -173,8 +176,16 @@ public:
     return (top.patient_id == patient_id && is_entry_valid(top));
   }
 
+  bool can_patient_queue(int patient_id) {
+    if (max_queue_capacity >= 0 && current_valid_entries >= max_queue_capacity) return false;
+    if (!allow_multiple_queue &&
+        patient_queue_count.find(patient_id) != patient_queue_count.end() &&
+        patient_queue_count.at(patient_id) > 0) return false;
+    return true;
+  }
+
   // Returns 1 (acquired), 0 (queued), -1 (rejected)
-  int attempt_block(int patient_id, int priority, double start_time, int amount = 1) {
+  int attempt_block(int patient_id, int64_t priority, double start_time, int amount = 1) {
     if (patient_queue_count.find(patient_id) != patient_queue_count.end() &&
         patient_queue_count[patient_id] >= MAX_QUEUE_ENTRIES_PER_PATIENT) {
       stop("Patient exceeds maximum queue entries limit");
@@ -188,13 +199,15 @@ public:
       return 1;
     }
 
-    // Dequeue-and-acquire: patient is next in line and capacity is available
-    if (n_free() >= amount && current_valid_entries > 0) {
+    // Dequeue-and-acquire: patient is first in line and capacity covers their queued amount.
+    // Capacity is checked against the QUEUED amount (immutable), not the retry call's amount.
+    if (current_valid_entries > 0) {
       cleanup_queue_top();
 
       if (!patient_queue.empty()) {
         QueuedPatient next_in_line = patient_queue.top();
-        if (next_in_line.patient_id == patient_id && is_entry_valid(next_in_line)) {
+        if (next_in_line.patient_id == patient_id && is_entry_valid(next_in_line) &&
+            n_free() >= next_in_line.amount_requested) {
 
           // Compute and store wait time before erasing queue data
           double queue_entry_time = 0.0;
@@ -224,6 +237,13 @@ public:
     }
 
     // Queue or reject
+    // Reject if allow_multiple_queue = FALSE and patient already has a queue entry
+    if (!allow_multiple_queue &&
+        patient_queue_count.find(patient_id) != patient_queue_count.end() &&
+        patient_queue_count[patient_id] > 0) {
+      return -1;
+    }
+
     if (max_queue_capacity >= 0 && current_valid_entries >= max_queue_capacity) {
       return -1;  // queue full — reject
     }
@@ -254,7 +274,10 @@ public:
     return 0;
   }
 
-  void attempt_free(int patient_id, bool remove_all = false, int amount = 1) {
+  void attempt_free(int patient_id, bool remove_all = false, int amount = NA_INTEGER) {
+    // NA_INTEGER sentinel means amount = 1 (matches release(amount = NULL) semantics)
+    if (amount == NA_INTEGER) amount = 1;
+
     bool found_in_using = false;
 
     if (remove_all) {
@@ -270,31 +293,51 @@ public:
       found_in_using = original_size != patients_using.size();
       if (found_in_using) current_total_used -= freed;
     } else {
+      // Indivisible model: find OLDEST entry with matching amount
       auto it = std::find_if(patients_using.begin(), patients_using.end(),
-                             [patient_id](const UsingPatient& p) { return p.patient_id == patient_id; });
+                             [patient_id, amount](const UsingPatient& p) {
+                               return p.patient_id == patient_id && p.amount == amount;
+                             });
       if (it != patients_using.end()) {
         current_total_used -= it->amount;
         patients_using.erase(it);
         found_in_using = true;
+      } else {
+        // Check if patient is using with a different amount → indivisible mismatch error
+        bool patient_is_using = std::any_of(patients_using.begin(), patients_using.end(),
+                                            [patient_id](const UsingPatient& p) {
+                                              return p.patient_id == patient_id;
+                                            });
+        if (patient_is_using) {
+          stop("release() amount mismatch: patient is using the resource but not with the specified amount (indivisible units)");
+        }
       }
     }
 
     if (found_in_using) return;
 
+    // Patient not in using list: target queue entries
     if (patient_queue_count.find(patient_id) != patient_queue_count.end() &&
         patient_queue_count[patient_id] > 0) {
 
-      patient_queue_count[patient_id]--;
-      current_valid_entries--;
-
-      if (!patient_queue_start_times[patient_id].empty()) {
-        patient_queue_start_times[patient_id].erase(patient_queue_start_times[patient_id].begin());
-      }
-
-      if (patient_queue_count[patient_id] == 0) {
+      if (remove_all) {
+        current_valid_entries -= patient_queue_count[patient_id];
         patient_queue_count.erase(patient_id);
         patient_queue_start_times.erase(patient_id);
         patient_current_version.erase(patient_id);
+      } else {
+        patient_queue_count[patient_id]--;
+        current_valid_entries--;
+
+        if (!patient_queue_start_times[patient_id].empty()) {
+          patient_queue_start_times[patient_id].erase(patient_queue_start_times[patient_id].begin());
+        }
+
+        if (patient_queue_count[patient_id] == 0) {
+          patient_queue_count.erase(patient_id);
+          patient_queue_start_times.erase(patient_id);
+          patient_current_version.erase(patient_id);
+        }
       }
 
       check_and_cleanup();
@@ -312,20 +355,66 @@ public:
     }
   }
 
-  bool release_full(int patient_id, int amount = 1) {
+  bool release_full(int patient_id, int amount = NA_INTEGER, bool purge_queue = true) {
     bool was_using = false;
-    auto it = std::find_if(patients_using.begin(), patients_using.end(),
-                           [patient_id](const UsingPatient& p) { return p.patient_id == patient_id; });
-    if (it != patients_using.end()) {
-      current_total_used -= it->amount;
-      patients_using.erase(it);
-      was_using = true;
+
+    if (amount == NA_INTEGER) {
+      // Release ALL usage entries for this patient
+      int freed = 0;
+      for (const auto& p : patients_using) {
+        if (p.patient_id == patient_id) freed += p.amount;
+      }
+      auto original_size = patients_using.size();
+      patients_using.erase(
+        std::remove_if(patients_using.begin(), patients_using.end(),
+                       [patient_id](const UsingPatient& p) { return p.patient_id == patient_id; }),
+        patients_using.end());
+      was_using = original_size != patients_using.size();
+      if (was_using) current_total_used -= freed;
+    } else {
+      // Release ONE matching entry (indivisible)
+      auto it = std::find_if(patients_using.begin(), patients_using.end(),
+                             [patient_id, amount](const UsingPatient& p) {
+                               return p.patient_id == patient_id && p.amount == amount;
+                             });
+      if (it != patients_using.end()) {
+        current_total_used -= it->amount;
+        patients_using.erase(it);
+        was_using = true;
+      } else {
+        bool patient_is_using = std::any_of(patients_using.begin(), patients_using.end(),
+                                            [patient_id](const UsingPatient& p) {
+                                              return p.patient_id == patient_id;
+                                            });
+        if (patient_is_using) {
+          stop("release_all() amount mismatch: patient is using the resource but not with the specified amount (indivisible units)");
+        }
+      }
     }
-    purge_from_queue(patient_id);
+
+    if (purge_queue) {
+      purge_from_queue(patient_id);
+    }
+
     return was_using;
   }
 
-  void attempt_free_if_using(int patient_id, bool remove_all = false) {
+  void attempt_free_if_using(int patient_id, bool remove_all = false, int amount = NA_INTEGER) {
+    // NA_INTEGER → release ALL usage entries for the patient
+    if (amount == NA_INTEGER) {
+      int freed = 0;
+      for (const auto& p : patients_using) {
+        if (p.patient_id == patient_id) freed += p.amount;
+      }
+      auto original_size = patients_using.size();
+      patients_using.erase(
+        std::remove_if(patients_using.begin(), patients_using.end(),
+                       [patient_id](const UsingPatient& p) { return p.patient_id == patient_id; }),
+        patients_using.end());
+      if (original_size != patients_using.size()) current_total_used -= freed;
+      return;
+    }
+
     if (remove_all) {
       int freed = 0;
       for (const auto& p : patients_using) {
@@ -338,11 +427,22 @@ public:
         patients_using.end());
       if (original_size != patients_using.size()) current_total_used -= freed;
     } else {
+      // Indivisible: find oldest entry matching exact amount
       auto it = std::find_if(patients_using.begin(), patients_using.end(),
-                             [patient_id](const UsingPatient& p) { return p.patient_id == patient_id; });
+                             [patient_id, amount](const UsingPatient& p) {
+                               return p.patient_id == patient_id && p.amount == amount;
+                             });
       if (it != patients_using.end()) {
         current_total_used -= it->amount;
         patients_using.erase(it);
+      } else {
+        bool patient_is_using = std::any_of(patients_using.begin(), patients_using.end(),
+                                            [patient_id](const UsingPatient& p) {
+                                              return p.patient_id == patient_id;
+                                            });
+        if (patient_is_using) {
+          stop("release_all_if_using() amount mismatch: patient is using the resource but not with the specified amount (indivisible units)");
+        }
       }
     }
   }
@@ -409,7 +509,7 @@ public:
       temp_queue.pop();
       checked++;
 
-      if (is_entry_valid(patient)) result.push_back(patient.priority);
+      if (is_entry_valid(patient)) result.push_back(static_cast<int>(patient.priority));
 
       if (temp_queue.empty() && static_cast<int>(result.size()) < count && !original_queue.empty()) {
         int additional_items = std::min(50, static_cast<int>(original_queue.size()));
@@ -456,7 +556,7 @@ public:
     return result;
   }
 
-  void modify_priority(int patient_id, int new_priority) {
+  void modify_priority(int patient_id, int64_t new_priority) {
     if (patient_queue_count.find(patient_id) == patient_queue_count.end() ||
         patient_queue_count[patient_id] == 0) {
       return;
@@ -491,6 +591,46 @@ public:
     check_and_cleanup();
   }
 
+  void move_to_front(int patient_id) {
+    if (patient_queue_count.find(patient_id) == patient_queue_count.end() ||
+        patient_queue_count[patient_id] == 0) {
+      return;
+    }
+
+    int count = patient_queue_count[patient_id];
+    std::vector<double> start_times = patient_queue_start_times[patient_id];
+
+    // Collect amounts from existing entries
+    std::vector<int> amounts;
+    {
+      std::priority_queue<QueuedPatient, std::vector<QueuedPatient>, QueueComparator> tmp = patient_queue;
+      while (!tmp.empty()) {
+        const QueuedPatient& top = tmp.top();
+        if (top.patient_id == patient_id && is_entry_valid(top)) {
+          amounts.push_back(top.amount_requested);
+        }
+        tmp.pop();
+      }
+    }
+    while (static_cast<int>(amounts.size()) < count) amounts.push_back(1);
+
+    // Use a priority above current max to jump to front
+    int64_t elevated_priority = current_max_priority + 1;
+    current_max_priority = elevated_priority;
+
+    // Bump version to invalidate old entries
+    patient_current_version[patient_id] = next_version++;
+    uint64_t new_version = patient_current_version[patient_id];
+
+    for (int j = 0; j < count; ++j) {
+      patient_queue.emplace(patient_id, elevated_priority, next_insertion_order++,
+                            start_times[j], new_version, amounts[j]);
+      total_entries_ever_added++;
+    }
+
+    check_and_cleanup();
+  }
+
   void add_resource(int n_to_add) {
     if (n_to_add <= 0) stop("n_to_add must be positive");
     total_capacity += n_to_add;
@@ -507,7 +647,7 @@ public:
       patients_using.pop_back();
       current_total_used -= patient.amount;
 
-      int new_priority = current_max_priority + 1;
+      int64_t new_priority = current_max_priority + 1;
       current_max_priority = new_priority;
 
       patient_current_version[patient.patient_id] = next_version++;
@@ -534,6 +674,7 @@ public:
   // Settings accessors (used by clone)
   bool get_is_lifo() const { return is_lifo; }
   int get_max_queue_capacity() const { return max_queue_capacity; }
+  bool get_allow_multiple_queue() const { return allow_multiple_queue; }
 
   // Statistics accessors
   double queue_wait_time(int patient_id) const {
@@ -571,8 +712,9 @@ public:
 // ─────────────────────────────────────────────────────────────────────────────
 
 // [[Rcpp::export]]
-SEXP create_discrete_resource_cpp(int n, bool lifo = false, int max_queue_capacity = -1) {
-  DiscreteResource* ptr = new DiscreteResource(n, lifo, max_queue_capacity);
+SEXP create_discrete_resource_cpp(int n, bool lifo = false, int max_queue_capacity = -1,
+                                   bool allow_multiple_queue = true) {
+  DiscreteResource* ptr = new DiscreteResource(n, lifo, max_queue_capacity, allow_multiple_queue);
   XPtr<DiscreteResource> xptr(ptr, true);
   return xptr;
 }
@@ -633,16 +775,17 @@ int discrete_resource_attempt_block_cpp(SEXP xptr, int patient_id, int priority,
 
 // [[Rcpp::export]]
 void discrete_resource_attempt_free_cpp(SEXP xptr, int patient_id,
-                                         bool remove_all = false, int amount = 1) {
+                                         bool remove_all = false, int amount = NA_INTEGER) {
   validate_xptr(xptr);
   XPtr<DiscreteResource>(xptr)->attempt_free(patient_id, remove_all, amount);
 }
 
 // [[Rcpp::export]]
 void discrete_resource_attempt_free_if_using_cpp(SEXP xptr, int patient_id,
-                                                   bool remove_all = false) {
+                                                   bool remove_all = false,
+                                                   int amount = NA_INTEGER) {
   validate_xptr(xptr);
-  XPtr<DiscreteResource>(xptr)->attempt_free_if_using(patient_id, remove_all);
+  XPtr<DiscreteResource>(xptr)->attempt_free_if_using(patient_id, remove_all, amount);
 }
 
 // [[Rcpp::export]]
@@ -739,26 +882,98 @@ IntegerVector discrete_resource_batch_seize_cpp(SEXP xptr, IntegerVector patient
 // [[Rcpp::export]]
 int discrete_resource_seize_all_cpp(List resource_xptrs, int patient_id,
                                      IntegerVector priorities, double start_time,
-                                     IntegerVector amounts, int policy) {
+                                     IntegerVector amounts, int policy,
+                                     bool force_unblock = false,
+                                     bool accum_queue = true) {
   int n = resource_xptrs.size();
 
   if (policy == 0) {  // all_or_none
-    // Phase 1: check all resources allow immediate acquire for this patient
+    // Phase 1: check what each resource would do for this patient
+    std::vector<bool> can_acquire(n);
     for (int i = 0; i < n; ++i) {
       XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
-      if (!ptr->can_patient_acquire(patient_id, amounts[i])) {
+      can_acquire[i] = ptr->can_patient_acquire(patient_id, amounts[i]);
+    }
+
+    // All can acquire: acquire all atomically
+    bool all_ok = true;
+    for (int i = 0; i < n; ++i) if (!can_acquire[i]) { all_ok = false; break; }
+    if (all_ok) {
+      for (int i = 0; i < n; ++i) {
+        XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
         ptr->attempt_block(patient_id, priorities[i], start_time, amounts[i]);
-        return 0;
+      }
+      return 1;
+    }
+
+    // Some cannot acquire: check for deadlock when force_unblock = TRUE
+    // Deadlock: all resources have sufficient capacity but patient is not first on some queues
+    if (force_unblock) {
+      bool all_have_capacity = true;
+      for (int i = 0; i < n; ++i) {
+        XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
+        if (ptr->n_free() < amounts[i]) { all_have_capacity = false; break; }
+      }
+      if (all_have_capacity) {
+        // Verify it is a true deadlock: patient must already be queued on every
+        // resource where they cannot directly acquire. If they are absent from any
+        // such queue, this is a first-call scenario (not a deadlock), so fall through.
+        bool is_true_deadlock = true;
+        for (int i = 0; i < n; ++i) {
+          if (!can_acquire[i]) {
+            XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
+            if (!ptr->is_patient_in_queue(patient_id)) { is_true_deadlock = false; break; }
+          }
+        }
+        if (is_true_deadlock) {
+          // Move patient to front on all resources where they are not already first
+          for (int i = 0; i < n; ++i) {
+            if (!can_acquire[i]) {
+              XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
+              ptr->move_to_front(patient_id);
+            }
+          }
+          // Now acquire all
+          for (int i = 0; i < n; ++i) {
+            XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
+            ptr->attempt_block(patient_id, priorities[i], start_time, amounts[i]);
+          }
+          return 1;
+        }
+        // Not a true deadlock: patient not yet queued on some resources, fall through
+      }
+      // Capacity insufficient even with force_unblock: fall through to normal queuing
+    }
+
+    // Queue on ALL bottleneck resources
+    // Determine which resources need a new queue entry
+    std::vector<bool> needs_new_entry(n, false);
+    for (int i = 0; i < n; ++i) {
+      if (!can_acquire[i]) {
+        XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
+        bool already_queued = ptr->is_patient_in_queue(patient_id);
+        if (already_queued) {
+          if (!accum_queue || !ptr->get_allow_multiple_queue()) {
+            needs_new_entry[i] = false;
+          } else {
+            needs_new_entry[i] = ptr->can_patient_queue(patient_id);
+          }
+        } else {
+          if (!ptr->can_patient_queue(patient_id)) return -1;
+          needs_new_entry[i] = true;
+        }
       }
     }
-    // Phase 2: acquire all atomically
-    for (int i = 0; i < n; ++i) {
-      XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
-      ptr->attempt_block(patient_id, priorities[i], start_time, amounts[i]);
-    }
-    return 1;
 
-  } else {  // sequential
+    for (int i = 0; i < n; ++i) {
+      if (needs_new_entry[i]) {
+        XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
+        ptr->attempt_block(patient_id, priorities[i], start_time, amounts[i]);
+      }
+    }
+    return 0;
+
+  } else {  // sequential (unchanged)
     for (int i = 0; i < n; ++i) {
       XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
       int result = ptr->attempt_block(patient_id, priorities[i], start_time, amounts[i]);
@@ -770,12 +985,13 @@ int discrete_resource_seize_all_cpp(List resource_xptrs, int patient_id,
 
 // [[Rcpp::export]]
 LogicalVector discrete_resource_release_all_cpp(List resource_xptrs, int patient_id,
-                                                 IntegerVector amounts) {
+                                                 IntegerVector amounts,
+                                                 bool purge_queues = true) {
   int n = resource_xptrs.size();
   LogicalVector was_using(n);
   for (int i = 0; i < n; ++i) {
     XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
-    was_using[i] = ptr->release_full(patient_id, amounts[i]);
+    was_using[i] = ptr->release_full(patient_id, amounts[i], purge_queues);
   }
   return was_using;
 }
@@ -788,7 +1004,7 @@ LogicalVector discrete_resource_release_all_if_using_cpp(List resource_xptrs, in
   for (int i = 0; i < n; ++i) {
     XPtr<DiscreteResource> ptr(VECTOR_ELT(resource_xptrs, i));
     bool had = ptr->is_patient_using(patient_id);
-    if (had) ptr->attempt_free_if_using(patient_id, false);
+    if (had) ptr->attempt_free_if_using(patient_id, false, amounts[i]);
     was_using[i] = had;
   }
   return was_using;
@@ -814,11 +1030,12 @@ Rcpp::List discrete_resource_clone_xptrs_cpp(SEXP wrapper_env, int n = 1) {
   const int capacity       = src->size();
   const bool lifo          = src->get_is_lifo();
   const int max_queue      = src->get_max_queue_capacity();
+  const bool allow_multi   = src->get_allow_multiple_queue();
 
   Rcpp::List out(n);
   try {
     for (int i = 0; i < n; ++i) {
-      auto* p = new DiscreteResource(capacity, lifo, max_queue);
+      auto* p = new DiscreteResource(capacity, lifo, max_queue, allow_multi);
       out[i] = Rcpp::XPtr<DiscreteResource>(p, true);
     }
   } catch (const std::bad_alloc&) {

@@ -13,14 +13,19 @@ release_all(resources, resume_event = NULL, amounts = NULL)
 for all resources' queues), or a character vector of length
 \code{length(resources)} (per-resource events, matched positionally).}
 
-\item{amounts}{Integer vector of units per resource (default \code{1L} for each).}
+\item{amounts}{Integer vector of units per resource, or \code{NULL} (default).
+\code{NULL} releases all entries and purges queue entries for the patient.
+Specified amounts perform exact indivisible releases without purging.}
 }
 \value{
 Invisibly \code{NULL}.
 }
 \description{
-Frees the current patient (\code{i}) from each resource via a single C++ call.
-Removes the patient from both the using list and the queue (all entries).
-Schedules resume events only for resources where the patient was actually
-using (i.e., where capacity was freed).
+Frees the current patient (\code{i}) from each resource. Applies an all_or_none
+policy: only acts if the patient is using ALL listed resources. Removes the
+patient from both the using list and the queue. When \code{amounts} is \code{NULL}
+(default), releases all entries and purges queue entries for the patient;
+when \code{amounts} is specified, performs an exact indivisible release without
+purging the queue. Schedules resume events only for resources where the
+patient was actually using (i.e., where capacity was freed).
 }

@@ -669,19 +669,29 @@ cond_dirichlet <- function(alpha, i, xi, full_output = FALSE) {
     NA
   }
 
-  env$attempt_free <- function(patient_id = NULL, remove_all = FALSE, amount = 1L) {
+  env$attempt_free <- function(patient_id = NULL, remove_all = FALSE, amount = NULL) {
     if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
     if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     if (!is.logical(remove_all) || length(remove_all) != 1) stop("remove_all must be a single logical value")
-    discrete_resource_attempt_free_cpp(env$.ptr, as.integer(patient_id), remove_all, as.integer(amount))
+    amount_int <- if (is.null(amount)) NA_integer_ else {
+      if (!is.numeric(amount) || length(amount) != 1 || amount <= 0 || amount != as.integer(amount))
+        stop("amount must be a single positive integer")
+      as.integer(amount)
+    }
+    discrete_resource_attempt_free_cpp(env$.ptr, as.integer(patient_id), remove_all, amount_int)
     invisible(NULL)
   }
 
-  env$attempt_free_if_using <- function(patient_id = NULL, remove_all = FALSE) {
+  env$attempt_free_if_using <- function(patient_id = NULL, remove_all = FALSE, amount = NULL) {
     if (is.null(patient_id)) patient_id <- get("i", envir = parent.frame(), inherits = TRUE)
     if (!is.numeric(patient_id) || length(patient_id) != 1) stop("patient_id must be a single number")
     if (!is.logical(remove_all) || length(remove_all) != 1) stop("remove_all must be a single logical value")
-    discrete_resource_attempt_free_if_using_cpp(env$.ptr, as.integer(patient_id), remove_all)
+    amount_int <- if (is.null(amount)) NA_integer_ else {
+      if (!is.numeric(amount) || length(amount) != 1 || amount <= 0 || amount != as.integer(amount))
+        stop("amount must be a single positive integer")
+      as.integer(amount)
+    }
+    discrete_resource_attempt_free_if_using_cpp(env$.ptr, as.integer(patient_id), remove_all, amount_int)
     invisible(NULL)
   }
 

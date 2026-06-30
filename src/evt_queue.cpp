@@ -305,8 +305,14 @@ std::pair<std::vector<std::string>, std::vector<double>>
     values.reserve(named_vec.size());
     
     for (int i = 0; i < named_vec.size(); ++i) {
+      double val = named_vec[i];
+      if (Rcpp::NumericVector::is_na(val) || (val != val)) {
+        throw std::runtime_error(
+          "Event time for '" + as<std::string>(vec_names[i]) +
+          "' is NA or NaN; event times must be finite or Inf");
+      }
       names.push_back(as<std::string>(vec_names[i]));
-      values.push_back(named_vec[i]);
+      values.push_back(val);
     }
     
     return std::make_pair(names, values);

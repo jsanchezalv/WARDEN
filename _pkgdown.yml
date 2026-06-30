@@ -89,6 +89,7 @@ reference:
       - discrete_resource_clone
       - seize
       - release
+      - release_if_using
       - seize_all
       - release_all
       - release_all_if_using
