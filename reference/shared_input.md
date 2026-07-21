@@ -63,7 +63,7 @@ controlled mutability semantics. It can operate in two distinct modes:
 - **Immutable (non-shared)**: every modification produces a fresh,
   independent copy of the object (safe for parallel or functional code).
 
-- **Shared (constrained)**: the object’s value is stored in a common
+- **Shared (constrained)**: the object's value is stored in a common
   environment shared across all aliases (by-reference semantics). This
   allows coordinated updates across multiple handles.
 
@@ -115,7 +115,7 @@ constrained <- TRUE
 b1 <- shared_input(10)
 b2 <- b1        # alias (same state)
 b1$modify(11)
-#> <environment: 0x5560ee0f7128>
+#> <environment: 0x555e82923390>
 #> attr(,"class")
 #> [1] "shared_input_env" "shared_input"    
 b1$value(); b2$value()  # both 11
@@ -124,7 +124,7 @@ b1$value(); b2$value()  # both 11
 
 b3 <- b1$clone()
 b1$modify(99)
-#> <environment: 0x5560edc89660>
+#> <environment: 0x555e843b49c0>
 #> attr(,"class")
 #> [1] "shared_input_env" "shared_input"    
 b1$value(); b3$value()  # 99, 11

@@ -6,7 +6,7 @@ to be drawn from
 ## Usage
 
 ``` r
-random_stream(stream_size = 100)
+random_stream(stream_size = 100, strict = FALSE)
 ```
 
 ## Arguments
@@ -14,6 +14,11 @@ random_stream(stream_size = 100)
 - stream_size:
 
   Length of the vector of random uniform values to initialize
+
+- strict:
+
+  Logical (default `FALSE`). When `TRUE`, `draw_n()` throws an error if
+  the stream is exhausted instead of regenerating with a warning.
 
 ## Value
 

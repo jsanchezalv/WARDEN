@@ -32,7 +32,7 @@ add_item(.data = NULL, ..., input)
 
 - ...:
 
-  Unevaluated arguments. Named → `name <- expr`; unnamed → raw expr.
+  Unevaluated arguments. Named -\> `name <- expr`; unnamed -\> raw expr.
 
 - input:
 

@@ -126,7 +126,7 @@ name runs one iteration per active parameter/group; other names
 iteration.
 
 When `dsa_names = NULL` (the default) every sensitivity name is treated
-as a scenario — all active parameters take their scenario value at once,
+as a scenario – all active parameters take their scenario value at once,
 one iteration per `sensitivity_names` entry. This is the correct default
 when there is no DSA.
 

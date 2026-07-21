@@ -36,6 +36,7 @@
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/disc_ongoing_v.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/discrete_resource_clone.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/dot-resource_discrete_from_xptr.html</loc></url>
+<url><loc>https://jsanchezalv.github.io/WARDEN/reference/draw_categorical.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/draw_tte.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/evpi_des.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/extract_elements_from_list.html</loc></url>
@@ -58,7 +59,9 @@
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/pop_and_return_event.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/pop_event.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/print.resource_discrete.html</loc></url>
+<url><loc>https://jsanchezalv.github.io/WARDEN/reference/print.warden_results.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/qbeta_mse.html</loc></url>
+<url><loc>https://jsanchezalv.github.io/WARDEN/reference/qcategorical.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/qcond_exp.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/qcond_gamma.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/qcond_gompertz.html</loc></url>
@@ -90,6 +93,7 @@
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/rpoisgamma_rcpp.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/run_sim.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/run_sim_parallel.html</loc></url>
+<url><loc>https://jsanchezalv.github.io/WARDEN/reference/scale_remaining_time.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/seize.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/seize_all.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/sens_iterator.html</loc></url>
@@ -100,6 +104,8 @@
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/summary_results_sens.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/summary_results_sim.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/tte.df.html</loc></url>
+<url><loc>https://jsanchezalv.github.io/WARDEN/reference/validate_model.html</loc></url>
+<url><loc>https://jsanchezalv.github.io/WARDEN/reference/waning_hr.html</loc></url>
 <url><loc>https://jsanchezalv.github.io/WARDEN/reference/with_write_flags_lang.html</loc></url>
 </urlset>
 

@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,31 @@
       <small>Source: <a href="https://github.com/jsanchezalv/WARDEN/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.0.6" id="warden-206">WARDEN 2.0.6<a class="anchor" aria-label="anchor" href="#warden-206"></a></h2>
+<ul><li>
+<code><a href="../reference/add_reactevt.html">add_reactevt()</a></code> now detects when a character string is accidentally passed as <code>.data</code> (the pipe-first argument) and errors with guidance to use <code>name_evt =</code> explicitly.</li>
+<li>
+<code><a href="../reference/draw_categorical.html">draw_categorical()</a></code> and <code><a href="../reference/qcategorical.html">qcategorical()</a></code> are new utility functions that return a 1-based integer index from a vector of probabilities, replacing the error-prone <code>findInterval(luck, cumsum(probs)) + 1L</code> pattern.</li>
+<li>
+<code><a href="../reference/print.warden_results.html">print.warden_results()</a></code> is a new print method for results objects returned by <code><a href="../reference/run_sim.html">run_sim()</a></code> and <code><a href="../reference/run_sim_parallel.html">run_sim_parallel()</a></code>, showing the number of analyses, simulations, arms, and access-pattern hints.</li>
+<li>
+<code><a href="../reference/random_stream.html">random_stream()</a></code> gains a <code>strict</code> argument (default <code>FALSE</code>). When <code>TRUE</code>, <code>draw_n()</code> throws an error on stream exhaustion instead of auto-regenerating with a warning.</li>
+<li>
+<code><a href="../reference/run_sim.html">run_sim()</a></code> and <code><a href="../reference/run_sim_parallel.html">run_sim_parallel()</a></code> now check for integer overflow in seed computation at call time, before the simulation starts.</li>
+<li>
+<code><a href="../reference/run_sim.html">run_sim()</a></code> and <code><a href="../reference/run_sim_parallel.html">run_sim_parallel()</a></code> now validate that outcome accumulator variables (e.g., <code>q_default</code>, <code>c_default</code>) are scalar (length 1, unnamed) at the start of the first patient-arm evaluation.</li>
+<li>
+<code><a href="../reference/scale_remaining_time.html">scale_remaining_time()</a></code> is a new utility that wraps the common <code>curtime + (get_event(x) - curtime) / hr</code> pattern for rescaling event times by a hazard ratio.</li>
+<li>
+<code><a href="../reference/seize.html">seize()</a></code> gains a <code>priority</code> argument (default <code>1L</code>) forwarded to <code>attempt_block()</code>. Passing <code><a href="../reference/seize_all.html">seize_all()</a></code>-specific arguments (e.g., <code>accum_queue</code>, <code>force_unblock</code>) now produces a clear error pointing to <code><a href="../reference/seize_all.html">seize_all()</a></code>.</li>
+<li>
+<code><a href="../reference/summary_results_det.html">summary_results_det()</a></code>, <code><a href="../reference/summary_results_sim.html">summary_results_sim()</a></code>, and <code><a href="../reference/summary_results_sens.html">summary_results_sens()</a></code> now auto-detect the nesting level of the results object and either auto-unwrap with a message or error with guidance.</li>
+<li>
+<code><a href="../reference/validate_model.html">validate_model()</a></code> is a new function that performs static checks on model inputs (arm coverage, event/reaction matching, seed overflow, dimensions) before running the simulation.</li>
+<li>
+<code><a href="../reference/waning_hr.html">waning_hr()</a></code> is a new utility function that computes an effective hazard ratio under linear, exponential, or instant treatment waning, implementing a common NICE submission pattern.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.5" id="warden-205">WARDEN 2.0.5<a class="anchor" aria-label="anchor" href="#warden-205"></a></h2>
 <ul><li>
@@ -251,7 +276,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

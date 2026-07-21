@@ -1,5 +1,65 @@
 # Changelog
 
+## WARDEN 2.0.6
+
+- [`add_reactevt()`](https://jsanchezalv.github.io/WARDEN/reference/add_reactevt.md)
+  now detects when a character string is accidentally passed as `.data`
+  (the pipe-first argument) and errors with guidance to use `name_evt =`
+  explicitly.
+- [`draw_categorical()`](https://jsanchezalv.github.io/WARDEN/reference/draw_categorical.md)
+  and
+  [`qcategorical()`](https://jsanchezalv.github.io/WARDEN/reference/qcategorical.md)
+  are new utility functions that return a 1-based integer index from a
+  vector of probabilities, replacing the error-prone
+  `findInterval(luck, cumsum(probs)) + 1L` pattern.
+- [`print.warden_results()`](https://jsanchezalv.github.io/WARDEN/reference/print.warden_results.md)
+  is a new print method for results objects returned by
+  [`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md)
+  and
+  [`run_sim_parallel()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim_parallel.md),
+  showing the number of analyses, simulations, arms, and access-pattern
+  hints.
+- [`random_stream()`](https://jsanchezalv.github.io/WARDEN/reference/random_stream.md)
+  gains a `strict` argument (default `FALSE`). When `TRUE`, `draw_n()`
+  throws an error on stream exhaustion instead of auto-regenerating with
+  a warning.
+- [`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md)
+  and
+  [`run_sim_parallel()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim_parallel.md)
+  now check for integer overflow in seed computation at call time,
+  before the simulation starts.
+- [`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md)
+  and
+  [`run_sim_parallel()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim_parallel.md)
+  now validate that outcome accumulator variables (e.g., `q_default`,
+  `c_default`) are scalar (length 1, unnamed) at the start of the first
+  patient-arm evaluation.
+- [`scale_remaining_time()`](https://jsanchezalv.github.io/WARDEN/reference/scale_remaining_time.md)
+  is a new utility that wraps the common
+  `curtime + (get_event(x) - curtime) / hr` pattern for rescaling event
+  times by a hazard ratio.
+- [`seize()`](https://jsanchezalv.github.io/WARDEN/reference/seize.md)
+  gains a `priority` argument (default `1L`) forwarded to
+  `attempt_block()`. Passing
+  [`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md)-specific
+  arguments (e.g., `accum_queue`, `force_unblock`) now produces a clear
+  error pointing to
+  [`seize_all()`](https://jsanchezalv.github.io/WARDEN/reference/seize_all.md).
+- [`summary_results_det()`](https://jsanchezalv.github.io/WARDEN/reference/summary_results_det.md),
+  [`summary_results_sim()`](https://jsanchezalv.github.io/WARDEN/reference/summary_results_sim.md),
+  and
+  [`summary_results_sens()`](https://jsanchezalv.github.io/WARDEN/reference/summary_results_sens.md)
+  now auto-detect the nesting level of the results object and either
+  auto-unwrap with a message or error with guidance.
+- [`validate_model()`](https://jsanchezalv.github.io/WARDEN/reference/validate_model.md)
+  is a new function that performs static checks on model inputs (arm
+  coverage, event/reaction matching, seed overflow, dimensions) before
+  running the simulation.
+- [`waning_hr()`](https://jsanchezalv.github.io/WARDEN/reference/waning_hr.md)
+  is a new utility function that computes an effective hazard ratio
+  under linear, exponential, or instant treatment waning, implementing a
+  common NICE submission pattern.
+
 ## WARDEN 2.0.5
 
 - [`release_all()`](https://jsanchezalv.github.io/WARDEN/reference/release_all.md)

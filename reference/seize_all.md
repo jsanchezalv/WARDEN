@@ -24,9 +24,9 @@ seize_all(
 
 - policy:
 
-  `"all_or_none"` (default) — acquires all only if all are available;
+  `"all_or_none"` (default) – acquires all only if all are available;
   queues for the first bottleneck without holding any others.
-  `"sequential"` — acquires in list order, holding partial acquisitions;
+  `"sequential"` – acquires in list order, holding partial acquisitions;
   user is responsible for avoiding deadlocks.
 
 - amounts:

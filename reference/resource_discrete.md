@@ -62,7 +62,7 @@ methods:
 
 - `utilization()`:
 
-  Fraction of capacity in use (0–1).
+  Fraction of capacity in use (0-1).
 
 - `patients_using()`:
 

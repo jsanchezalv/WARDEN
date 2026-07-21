@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">WARDEN</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,7 +113,7 @@ generating multiple isolated copies quickly.</p></dd>
     <p><code>shared_input()</code> produces a simple object that wraps a value with
 controlled mutability semantics. It can operate in two distinct modes:</p><ul><li><p><strong>Immutable (non-shared)</strong>: every modification produces a fresh, independent
 copy of the object (safe for parallel or functional code).</p></li>
-<li><p><strong>Shared (constrained)</strong>: the object’s value is stored in a common
+<li><p><strong>Shared (constrained)</strong>: the object's value is stored in a common
 environment shared across all aliases (by-reference semantics). This
 allows coordinated updates across multiple handles.</p></li>
 </ul><p>The mode is determined either by the explicit argument <code>constrained</code>, or
@@ -158,7 +158,7 @@ regardless of mode, following normal R semantics.</p>
 <span class="r-in"><span><span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu">shared_input</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">b2</span> <span class="op">&lt;-</span> <span class="va">b1</span>        <span class="co"># alias (same state)</span></span></span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">modify</span><span class="op">(</span><span class="fl">11</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x5560ee0f7128&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x555e82923390&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "shared_input_env" "shared_input"    </span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>; <span class="va">b2</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>  <span class="co"># both 11</span></span></span>
@@ -167,7 +167,7 @@ regardless of mode, following normal R semantics.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">b3</span> <span class="op">&lt;-</span> <span class="va">b1</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">modify</span><span class="op">(</span><span class="fl">99</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x5560edc89660&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x555e843b49c0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "shared_input_env" "shared_input"    </span>
 <span class="r-in"><span><span class="va">b1</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>; <span class="va">b3</span><span class="op">$</span><span class="fu">value</span><span class="op">(</span><span class="op">)</span>  <span class="co"># 99, 11</span></span></span>
@@ -190,7 +190,7 @@ regardless of mode, following normal R semantics.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

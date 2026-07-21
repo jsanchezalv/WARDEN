@@ -8,6 +8,8 @@
   : Run the simulation
 - [`run_sim_parallel()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim_parallel.md)
   : Run simulations in parallel mode (at the simulation level)
+- [`validate_model()`](https://jsanchezalv.github.io/WARDEN/reference/validate_model.md)
+  : Validate model inputs before running
 - [`add_item()`](https://jsanchezalv.github.io/WARDEN/reference/add_item.md)
   : Define or append model inputs
 - [`add_reactevt()`](https://jsanchezalv.github.io/WARDEN/reference/add_reactevt.md)
@@ -123,6 +125,14 @@
   adjustment
 - [`adj_val()`](https://jsanchezalv.github.io/WARDEN/reference/adj_val.md)
   : Adjusted Value Calculation
+- [`waning_hr()`](https://jsanchezalv.github.io/WARDEN/reference/waning_hr.md)
+  : Compute effective hazard ratio with treatment waning
+- [`draw_categorical()`](https://jsanchezalv.github.io/WARDEN/reference/draw_categorical.md)
+  : Draw a categorical index from probabilities
+- [`qcategorical()`](https://jsanchezalv.github.io/WARDEN/reference/qcategorical.md)
+  : Quantile function for categorical distribution
+- [`scale_remaining_time()`](https://jsanchezalv.github.io/WARDEN/reference/scale_remaining_time.md)
+  : Scale remaining time to an event by a hazard ratio
 
 ### Distributions Functions
 
