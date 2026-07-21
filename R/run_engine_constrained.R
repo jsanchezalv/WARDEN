@@ -248,11 +248,25 @@ run_engine_constrained <- function(arm_list,
             
           }
         }
-        
-        
+
+        if (i == 1L && arm == arm_list[1L] &&
+            length(input_list$categories_for_export) > 0L) {
+          for (.cat_nm in input_list$categories_for_export) {
+            .cat_val <- input_list_arm[[.cat_nm]]
+            if (!is.null(.cat_val) &&
+                (length(.cat_val) > 1L || !is.null(names(.cat_val)))) {
+              stop("run_sim(): outcome variable '", .cat_nm,
+                   "' must be a scalar (length 1, unnamed). Got length ",
+                   length(.cat_val),
+                   if (!is.null(names(.cat_val))) " with names" else "", ".",
+                   call. = FALSE)
+            }
+          }
+        }
+
         # Initialize events for this patient-arm
         set.seed(seed * (simulation * 1007 + i * 349))
-        
+
         .set_last_ctx("Error in setup:initiate_evt", sens=input_list$sens,
                       simulation=input_list$simulation, patient_id=i, arm=arm, .warden_ctx = .warden_ctx)
         

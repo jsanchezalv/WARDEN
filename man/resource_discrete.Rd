@@ -33,7 +33,7 @@ methods:
 \item{\code{queue_size()}}{Number of patients currently in the queue.}
 \item{\code{n_free()}}{Number of free resource units.}
 \item{\code{n_using()}}{Number of units currently in use.}
-\item{\code{utilization()}}{Fraction of capacity in use (0–1).}
+\item{\code{utilization()}}{Fraction of capacity in use (0-1).}
 \item{\code{patients_using()}}{Vector of patient IDs currently using the
 resource.}
 \item{\code{patients_using_times()}}{Vector of start times for patients

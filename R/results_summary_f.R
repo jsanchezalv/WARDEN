@@ -19,6 +19,15 @@ if(getRversion() >= "2.15.1") {
 }
 
 
+# Internal helper to detect results nesting level --------------------------
+.detect_results_level <- function(out) {
+  if (is.list(out) && !is.null(out$arm_list)) return("single_sim")
+  if (is.list(out) && is.list(out[[1]]) && !is.null(out[[1]]$arm_list)) return("sim_list")
+  if (is.list(out) && is.list(out[[1]]) && is.list(out[[1]][[1]]) &&
+      !is.null(out[[1]][[1]]$arm_list)) return("full_results")
+  "unknown"
+}
+
 # Summary for deterministic/last created output for specific treatment ---------------------------
 
 #' Deterministic results for a specific treatment
@@ -50,6 +59,17 @@ if(getRversion() >= "2.15.1") {
 #' 
 
 summary_results_det <- function(out = results[[1]][[1]], arm = NULL, wtp = 50000){
+  level <- .detect_results_level(out)
+  if (level == "full_results") {
+    message("summary_results_det(): received full results object; extracting results[[1]][[1]].")
+    out <- out[[1]][[1]]
+  } else if (level == "sim_list") {
+    message("summary_results_det(): received simulation list; extracting out[[1]].")
+    out <- out[[1]]
+  } else if (level == "unknown") {
+    stop("summary_results_det(): cannot detect results structure. ",
+         "Expected a single simulation list with $arm_list.", call. = FALSE)
+  }
   arm_ref <- ifelse(is.null(arm),1,match(arm,out$arm_list))
 
   remove_outputs_list <- c("total_lys", "total_qalys", "total_costs", "total_lys_undisc", 
@@ -158,6 +178,18 @@ summary_results_det <- function(out = results[[1]][[1]], arm = NULL, wtp = 50000
 #' summary_results_sim(res[[1]],arm="int")
 
 summary_results_sim <- function(out = results[[1]], arm=NULL, wtp = 50000){
+  level <- .detect_results_level(out)
+  if (level == "single_sim") {
+    stop("summary_results_sim(): received a single simulation result. ",
+         "Use summary_results_det() instead, or pass the full simulation list results[[1]].",
+         call. = FALSE)
+  } else if (level == "full_results") {
+    message("summary_results_sim(): received full results object; extracting results[[1]].")
+    out <- out[[1]]
+  } else if (level == "unknown") {
+    stop("summary_results_sim(): cannot detect results structure. ",
+         "Expected a list of simulations where out[[1]] has $arm_list.", call. = FALSE)
+  }
 
   arm_ref <- ifelse(is.null(arm),1,match(arm,out[[1]]$arm_list))
 
@@ -271,7 +303,20 @@ summary_results_sim <- function(out = results[[1]], arm=NULL, wtp = 50000){
 #' summary_results_sens(res,arm="int")
 
 summary_results_sens <- function(out = results, arm=NULL, wtp = 50000){
-  
+  level <- .detect_results_level(out)
+  if (level == "single_sim") {
+    stop("summary_results_sens(): received a single simulation result. ",
+         "Use summary_results_det() for a single simulation, or pass the full results object.",
+         call. = FALSE)
+  } else if (level == "sim_list") {
+    stop("summary_results_sens(): received a simulation list (results[[1]]). ",
+         "Use summary_results_sim() for PSA results, or pass the full results object.",
+         call. = FALSE)
+  } else if (level == "unknown") {
+    stop("summary_results_sens(): cannot detect results structure. ",
+         "Expected the full results object where out[[1]][[1]] has $arm_list.", call. = FALSE)
+  }
+
   arm_ref <- ifelse(is.null(arm),1,match(arm,out[[1]][[1]]$arm_list))
   
   remove_outputs_list <- c("total_lys", "total_qalys", "total_costs", "total_lys_undisc", 
@@ -553,4 +598,37 @@ evpi_des <- function(wtp, results, interventions = NULL, sensitivity_used = 1) {
 
 
   return(nmb)
+}
+
+# Print method for warden_results ------------------------------------------
+
+#' Print method for warden_results
+#'
+#' Displays a summary of the structure of a WARDEN simulation results object.
+#'
+#' @param x A `warden_results` object returned by [run_sim()] or
+#'   [run_sim_parallel()].
+#' @param ... Additional arguments (ignored).
+#'
+#' @return Invisibly returns `x`.
+#' @export
+print.warden_results <- function(x, ...) {
+  n_sens <- length(x)
+  n_sim  <- length(x[[1]])
+  arms   <- x[[1]][[1]]$arm_list
+  cat("WARDEN Simulation Results\n")
+  cat("-------------------------\n")
+
+  cat("  Analyses (sensitivities):", n_sens, "\n")
+  cat("  Simulations per analysis:", n_sim, "\n")
+  cat("  Arms:", paste(arms, collapse = ", "), "\n")
+  cat("\nAccess patterns:\n")
+  cat("  Single sim:  results[[sens]][[sim]]   (e.g., results[[1]][[1]])\n")
+  cat("  Sim list:    results[[sens]]           (e.g., results[[1]])\n")
+  cat("  Full object: results\n")
+  cat("\nSummary functions:\n")
+  cat("  summary_results_det(results[[1]][[1]])   # deterministic\n")
+  cat("  summary_results_sim(results[[1]])        # PSA\n")
+  cat("  summary_results_sens(results)            # sensitivity\n")
+  invisible(x)
 }

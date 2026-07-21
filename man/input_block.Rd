@@ -89,7 +89,7 @@ iteration per active parameter/group; other names (scenarios) apply all
 active parameters simultaneously in a single iteration.
 
 When \code{dsa_names = NULL} (the default) every sensitivity name is treated as a
-scenario — all active parameters take their scenario value at once, one
+scenario -- all active parameters take their scenario value at once, one
 iteration per \code{sensitivity_names} entry. This is the correct default when
 there is no DSA.
 }

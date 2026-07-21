@@ -1,3 +1,17 @@
+# WARDEN 2.0.6
+
+* `add_reactevt()` now detects when a character string is accidentally passed as `.data` (the pipe-first argument) and errors with guidance to use `name_evt =` explicitly.
+* `draw_categorical()` and `qcategorical()` are new utility functions that return a 1-based integer index from a vector of probabilities, replacing the error-prone `findInterval(luck, cumsum(probs)) + 1L` pattern.
+* `print.warden_results()` is a new print method for results objects returned by `run_sim()` and `run_sim_parallel()`, showing the number of analyses, simulations, arms, and access-pattern hints.
+* `random_stream()` gains a `strict` argument (default `FALSE`). When `TRUE`, `draw_n()` throws an error on stream exhaustion instead of auto-regenerating with a warning.
+* `run_sim()` and `run_sim_parallel()` now check for integer overflow in seed computation at call time, before the simulation starts.
+* `run_sim()` and `run_sim_parallel()` now validate that outcome accumulator variables (e.g., `q_default`, `c_default`) are scalar (length 1, unnamed) at the start of the first patient-arm evaluation.
+* `scale_remaining_time()` is a new utility that wraps the common `curtime + (get_event(x) - curtime) / hr` pattern for rescaling event times by a hazard ratio.
+* `seize()` gains a `priority` argument (default `1L`) forwarded to `attempt_block()`. Passing `seize_all()`-specific arguments (e.g., `accum_queue`, `force_unblock`) now produces a clear error pointing to `seize_all()`.
+* `summary_results_det()`, `summary_results_sim()`, and `summary_results_sens()` now auto-detect the nesting level of the results object and either auto-unwrap with a message or error with guidance.
+* `validate_model()` is a new function that performs static checks on model inputs (arm coverage, event/reaction matching, seed overflow, dimensions) before running the simulation.
+* `waning_hr()` is a new utility function that computes an effective hazard ratio under linear, exponential, or instant treatment waning, implementing a common NICE submission pattern.
+
 # WARDEN 2.0.5
 * `release_all()` and `release_all_if_using()` now deduplicate resume events: when the same patient is first in queue on multiple released resources, only one resume event is scheduled (prevents double-seize on retry).
 * `seize_all()` gains an `accum_queue` argument (default `TRUE`). When `FALSE`, retries do not accumulate phantom queue entries on bottleneck resources — existing entries serve as placeholders.

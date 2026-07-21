@@ -4,12 +4,18 @@
 \alias{seize}
 \title{Seize a discrete resource}
 \usage{
-seize(resource, amount = 1L)
+seize(resource, amount = 1L, priority = 1L, ...)
 }
 \arguments{
 \item{resource}{A \code{resource_discrete} object.}
 
 \item{amount}{Integer. Number of resource units to seize (default \code{1L}).}
+
+\item{priority}{Integer. Queue priority for the patient (default \code{1L}).
+Lower values are higher priority.}
+
+\item{...}{Not used. Passing \code{seize_all()}-specific arguments here
+(e.g., \code{accum_queue}, \code{force_unblock}, \code{policy}) will raise an error.}
 }
 \value{
 \code{TRUE} if acquired, \code{FALSE} if queued, \code{NA} if rejected (queue full,

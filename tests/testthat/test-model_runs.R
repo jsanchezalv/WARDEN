@@ -1076,9 +1076,75 @@ test_that("Test everything but with constrained = TRUE", {
                  2.5, 2.5, 2.5, 2.8, 2.8, 2.8, 2.8, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 
                  2, 2, 2, 1.9, 1.9, 1.9, 1.9, 1.9, 2.2, 2.1),
                tolerance = 0.01)
-  
+
 })
 
+})
+
+# Item 3: Summary function auto-detect nesting level
+test_that("summary_results_det auto-unwraps full results", {
+  res <- list(list(list(
+    sensitivity_name = "", arm_list = c("int", "noint"),
+    total_lys = c(int = 9, noint = 9),
+    total_qalys = c(int = 6.2, noint = 6.1),
+    total_costs = c(int = 50000, noint = 40000),
+    total_lys_undisc = c(int = 10, noint = 10),
+    total_qalys_undisc = c(int = 7.5, noint = 7.4),
+    total_costs_undisc = c(int = 60000, noint = 50000),
+    merged_df = list(simulation = 1L, sensitivity = 1L)
+  )))
+
+  expect_message(summary_results_det(res), "full results")
+  expect_message(summary_results_det(res[[1]]), "simulation list")
+})
+
+test_that("summary_results_sim errors on single sim", {
+  single_sim <- list(
+    sensitivity_name = "", arm_list = c("int", "noint"),
+    total_lys = c(int = 9, noint = 9),
+    total_qalys = c(int = 6.2, noint = 6.1),
+    total_costs = c(int = 50000, noint = 40000),
+    total_lys_undisc = c(int = 10, noint = 10),
+    total_qalys_undisc = c(int = 7.5, noint = 7.4),
+    total_costs_undisc = c(int = 60000, noint = 50000),
+    merged_df = list(simulation = 1L, sensitivity = 1L)
+  )
+
+  expect_error(summary_results_sim(single_sim), "single simulation result")
+})
+
+test_that("summary_results_sim auto-unwraps full results", {
+  res <- list(list(list(
+    sensitivity_name = "", arm_list = c("int", "noint"),
+    total_lys = c(int = 9, noint = 9),
+    total_qalys = c(int = 6.2, noint = 6.1),
+    total_costs = c(int = 50000, noint = 40000),
+    total_lys_undisc = c(int = 10, noint = 10),
+    total_qalys_undisc = c(int = 7.5, noint = 7.4),
+    total_costs_undisc = c(int = 60000, noint = 50000),
+    merged_df = list(simulation = 1L, sensitivity = 1L)
+  )))
+
+  expect_message(summary_results_sim(res), "full results")
+})
+
+# Item 11: print.warden_results
+test_that("warden_results class is set and print works", {
+  res <- list(list(list(
+    sensitivity_name = "", arm_list = c("int", "noint"),
+    total_lys = c(int = 9, noint = 9),
+    total_qalys = c(int = 6.2, noint = 6.1),
+    total_costs = c(int = 50000, noint = 40000),
+    total_lys_undisc = c(int = 10, noint = 10),
+    total_qalys_undisc = c(int = 7.5, noint = 7.4),
+    total_costs_undisc = c(int = 60000, noint = 50000),
+    merged_df = list(simulation = 1L, sensitivity = 1L)
+  )))
+  class(res) <- c("warden_results", "list")
+
+  expect_s3_class(res, "warden_results")
+  expect_output(print(res), "WARDEN Simulation Results")
+  expect_output(print(res), "int, noint")
 })
 
     

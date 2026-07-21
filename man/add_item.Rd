@@ -10,7 +10,7 @@ add_item(.data = NULL, ..., input)
 \item{.data}{Optional: an existing \code{{}} block (or list of expressions)
 to start from. Receives the LHS value when using \verb{|>} or \verb{\%>\%}.}
 
-\item{...}{Unevaluated arguments. Named → \code{name <- expr}; unnamed → raw expr.}
+\item{...}{Unevaluated arguments. Named -> \code{name <- expr}; unnamed -> raw expr.}
 
 \item{input}{Optional unevaluated expression or \code{{}} block to splice in.}
 }

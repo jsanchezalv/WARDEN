@@ -2308,3 +2308,43 @@ test_that("multi-level input_block(): n_sensitivity accumulated (grouped)", {
   expect_equal(results[[3]][[1]]$merged_df$p2[1], 0)   # iter 3: p2 at base
   expect_equal(results[[3]][[1]]$merged_df$p3[1], 77)  # iter 3: p3 at DSA
 })
+
+# Item 2: add_reactevt guards against string in .data
+test_that("add_reactevt errors when string passed as first argument", {
+  expect_error(
+    add_reactevt("my_event", input = {}),
+    "event name as the first argument"
+  )
+})
+
+test_that("add_reactevt works with named arguments", {
+  result <- add_reactevt(name_evt = "start", input = {})
+  expect_equal(names(result), "start")
+})
+
+test_that("add_reactevt works with piping", {
+  result <- add_reactevt(name_evt = "start", input = {}) |>
+    add_reactevt(name_evt = "death", input = {})
+  expect_equal(names(result), c("start", "death"))
+})
+
+# Item 6: random_stream strict mode
+test_that("random_stream with strict=FALSE warns on exhaustion", {
+  s <- random_stream(3, strict = FALSE)
+  s$draw_n(3)
+  expect_warning(s$draw_n(1), "smaller than the number")
+})
+
+test_that("random_stream with strict=TRUE errors on exhaustion", {
+  s <- random_stream(3, strict = TRUE)
+  s$draw_n(3)
+  expect_error(s$draw_n(1), "stream exhausted")
+})
+
+test_that("random_stream draws correctly within capacity", {
+  set.seed(42)
+  s <- random_stream(5)
+  vals <- s$draw_n(2)
+  expect_equal(length(vals), 2)
+  expect_equal(length(s$stream), 3)
+})

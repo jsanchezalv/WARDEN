@@ -85,7 +85,7 @@ The workflow will always follow the following steps: 1) design, with questions, 
 
 Do not add additional dependencies without explicitly asking me so. Speed is vital in this code, make sure your implementation tries to be as efficient as possible. 
 
-Write high quality code as if the code failing could imply human life losses. Code should be human readable and clear, avoid ai-ism and wrapping too many functions, make the code as simple and intuitive as possible while keeping the other criteria true.
+Write high quality, efficient code as if the code failing could imply human life losses. Code should be human readable and clear, avoid ai-ism and wrapping too many functions, make the code as simple and intuitive as possible while keeping the other criteria true.
 
 ---
 

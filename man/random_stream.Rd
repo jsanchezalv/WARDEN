@@ -4,10 +4,13 @@
 \alias{random_stream}
 \title{Creates an environment (similar to R6 class) of random uniform numbers to be drawn from}
 \usage{
-random_stream(stream_size = 100)
+random_stream(stream_size = 100, strict = FALSE)
 }
 \arguments{
 \item{stream_size}{Length of the vector of random uniform values to initialize}
+
+\item{strict}{Logical (default \code{FALSE}). When \code{TRUE}, \code{draw_n()} throws an
+error if the stream is exhausted instead of regenerating with a warning.}
 }
 \value{
 Self (environment) behaving similar to R6 class

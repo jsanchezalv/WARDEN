@@ -442,6 +442,16 @@ run_sim <- function(arm_list=c("int","noint"),
     if(is.null(seed)){
       seed <- 1
     }
+    max_seed_product <- as.double(n_sim) * 1007 * as.double(seed) +
+      as.double(npats) * 349 * as.double(seed)
+    if (max_seed_product > .Machine$integer.max) {
+      safe_max <- floor(.Machine$integer.max /
+                          (as.double(n_sim) * 1007 + as.double(npats) * 349))
+      stop("run_sim(): seed = ", seed, " will cause integer overflow when combined ",
+           "with n_sim = ", n_sim, " and npats = ", npats,
+           ". Use a smaller seed (max safe value: ", safe_max, ").",
+           call. = FALSE)
+    }
     set.seed(seed)
     
     
@@ -574,11 +584,12 @@ run_sim <- function(arm_list=c("int","noint"),
 
   
   results <- output_sim
-  
+  class(results) <- c("warden_results", "list")
+
    })
-    
+
     .set_last_ctx(stage="Simulation finalized", .warden_ctx = .warden_ctx)
-    
+
   return(results)
   
 

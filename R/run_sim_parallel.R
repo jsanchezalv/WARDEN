@@ -452,8 +452,18 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
     if(is.null(seed)){
       seed <- 1
     }
+    max_seed_product <- as.double(n_sim) * 1007 * as.double(seed) +
+      as.double(npats) * 349 * as.double(seed)
+    if (max_seed_product > .Machine$integer.max) {
+      safe_max <- floor(.Machine$integer.max /
+                          (as.double(n_sim) * 1007 + as.double(npats) * 349))
+      stop("run_sim(): seed = ", seed, " will cause integer overflow when combined ",
+           "with n_sim = ", n_sim, " and npats = ", npats,
+           ". Use a smaller seed (max safe value: ", safe_max, ").",
+           call. = FALSE)
+    }
     set.seed(seed)
-    
+
     # Draw Common parameters  -------------------------------
     input_list_sens <- as.environment(input_list_sens)
     parent.env(input_list_sens) <- environment()
@@ -606,12 +616,12 @@ run_sim_parallel <- function(arm_list=c("int","noint"),
   
 
   results <- output_sim
-    
-  }, enable=TRUE, cleanup = TRUE) 
-  
+  class(results) <- c("warden_results", "list")
+
+  }, enable=TRUE, cleanup = TRUE)
+
   .set_last_ctx(stage="Simulation finalized", .warden_ctx = .warden_ctx)
-  
-  
+
   return(results)
 
 }

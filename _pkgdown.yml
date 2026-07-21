@@ -65,6 +65,7 @@ reference:
     contents:
       - run_sim
       - run_sim_parallel
+      - validate_model
       - add_item
       - add_reactevt
       - add_tte
@@ -123,6 +124,10 @@ reference:
       - luck_adj
       - qtimecov
       - adj_val
+      - waning_hr
+      - draw_categorical
+      - qcategorical
+      - scale_remaining_time
       
   - subtitle: Distributions Functions
     contents:
@@ -175,4 +180,5 @@ reference:
     contents:
       - .resource_discrete_from_xptr
       - print.resource_discrete
+      - print.warden_results
       - with_write_flags_lang

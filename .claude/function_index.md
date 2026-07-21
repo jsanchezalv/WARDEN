@@ -97,12 +97,23 @@
 - Queue/resource C++ wrappers [L461–603]: `queue_create_cpp`, `new_event_cpp`, etc.
 
 **`R/results_summary_f.R`** — Results summarisation
-- `summary_results_det()` [L52–130]: Summarise deterministic simulation results
-- `summary_results_sim()` [L160–242]: Summarise PSA simulation results
-- `summary_results_sens()` [L273–371]: Summarise sensitivity/scenario analysis results
-- `extract_psa_result()` [L401–406]: Extract a specific element from PSA results list
-- `ceac_des()` [L445–482]: Compute cost-effectiveness acceptability curve (CEAC) data
-- `evpi_des()` [L518–558]: Compute expected value of perfect information (EVPI)
+- `.detect_results_level()` [L22–28]: Internal helper to detect results nesting level
+- `summary_results_det()` [L61–140]: Summarise deterministic simulation results (auto-unwraps)
+- `summary_results_sim()` [L170–255]: Summarise PSA simulation results (auto-unwraps)
+- `summary_results_sens()` [L287–385]: Summarise sensitivity/scenario analysis results
+- `extract_psa_result()` [~L415]: Extract a specific element from PSA results list
+- `ceac_des()` [~L460]: Compute cost-effectiveness acceptability curve (CEAC) data
+- `evpi_des()` [~L530]: Compute expected value of perfect information (EVPI)
+- `print.warden_results()` [~L615]: Print method for warden_results objects
+
+**`R/utilities.R`** — HTA utility functions
+- `waning_hr()` [L20–30]: Compute effective HR under linear/exponential/instant waning
+- `draw_categorical()` [L45–50]: Return 1-based index from uniform draw and probability vector
+- `qcategorical()` [L62–64]: Alias for draw_categorical() with quantile naming
+- `scale_remaining_time()` [L77–83]: Rescale remaining time to an event by a hazard ratio
+
+**`R/validate.R`** — Model validation
+- `validate_model()` [L29–120]: Static checks on model inputs before run_sim()
 
 **`R/old_R_nowincpp.R`** — Legacy R implementations (superseded by Rcpp, kept for reference)
 - `luck_adj_old()` [L74–98] / `disc_ongoing_v_old()` [L117–130] / `disc_instant_v_old()` [L146–152] / `disc_cycle_v_old()` [L196–243]: Old vectorised R versions

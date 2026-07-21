@@ -16,9 +16,9 @@ seize_all(
 \arguments{
 \item{resources}{A list of \code{resource_discrete} objects.}
 
-\item{policy}{\code{"all_or_none"} (default) — acquires all only if all are
+\item{policy}{\code{"all_or_none"} (default) -- acquires all only if all are
 available; queues for the first bottleneck without holding any others.
-\code{"sequential"} — acquires in list order, holding partial acquisitions;
+\code{"sequential"} -- acquires in list order, holding partial acquisitions;
 user is responsible for avoiding deadlocks.}
 
 \item{amounts}{Integer vector of units per resource (default \code{1L} for each).}

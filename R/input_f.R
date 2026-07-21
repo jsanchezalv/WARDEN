@@ -1489,15 +1489,31 @@ print.resource_discrete <- function(x, ...) {
 #'
 #' @param resource A `resource_discrete` object.
 #' @param amount Integer. Number of resource units to seize (default `1L`).
+#' @param priority Integer. Queue priority for the patient (default `1L`).
+#'   Lower values are higher priority.
+#' @param ... Not used. Passing `seize_all()`-specific arguments here
+#'   (e.g., `accum_queue`, `force_unblock`, `policy`) will raise an error.
 #'
 #' @return `TRUE` if acquired, `FALSE` if queued, `NA` if rejected (queue full,
 #'   only when `max_queue` is set on the resource).
 #'
 #' @export
-seize <- function(resource, amount = 1L) {
+seize <- function(resource, amount = 1L, priority = 1L, ...) {
+  dots <- list(...)
+  misplaced <- intersect(names(dots), c("priorities", "accum_queue", "force_unblock", "policy"))
+  if (length(misplaced) > 0L) {
+    stop("seize(): argument(s) ", paste0('"', misplaced, '"', collapse = ", "),
+         " are not supported by seize(). Use seize_all() for multi-resource operations.",
+         call. = FALSE)
+  }
+  if (length(dots) > 0L) {
+    stop("seize(): unexpected argument(s): ",
+         paste(names(dots), collapse = ", "), call. = FALSE)
+  }
   i       <- get("i",       envir = parent.frame(), inherits = TRUE)
   curtime <- get("curtime", envir = parent.frame(), inherits = TRUE)
-  resource$attempt_block(patient_id = i, start_time = curtime, amount = amount)
+  resource$attempt_block(patient_id = i, priority = priority,
+                         start_time = curtime, amount = amount)
 }
 
 #' Release a discrete resource
@@ -1978,9 +1994,16 @@ shared_input <- function(expr, constrained = NULL) {
 #' add_reactevt(name_evt = "start",input = {})
 #' add_reactevt(name_evt = "idfs",input = {modify_item(list("fl.idfs"= 0))})
 
-add_reactevt <- function(.data=NULL,name_evt,input){
+add_reactevt <- function(.data = NULL, name_evt, input) {
 
-  if (length(name_evt)>1 | !is.character(name_evt) | any(nchar(name_evt)<2)) {
+  if (is.character(.data) && length(.data) == 1L) {
+    stop('add_reactevt(): it looks like you passed the event name as the first ',
+         'argument. Use add_reactevt(name_evt = "', .data,
+         '", input = {...}) or pipe from a previous call.',
+         call. = FALSE)
+  }
+
+  if (length(name_evt) > 1 | !is.character(name_evt) | any(nchar(name_evt) < 2)) {
     stop("name_evt argument in add_reactevt should be a single string with at least 2 characters")
   }
   
@@ -2008,6 +2031,8 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 #' Creates an environment (similar to R6 class) of random uniform numbers to be drawn from
 #'
 #' @param stream_size Length of the vector of random uniform values to initialize
+#' @param strict Logical (default `FALSE`). When `TRUE`, `draw_n()` throws an
+#'   error if the stream is exhausted instead of regenerating with a warning.
 #'
 #' @return Self (environment) behaving similar to R6 class
 #'
@@ -2041,21 +2066,26 @@ add_reactevt <- function(.data=NULL,name_evt,input){
 #' number_2 <- stream_1$draw_n() #gets 1st index (considers previous)
 #' identical(number_2,stream_1$random_n) #same value
 
-random_stream <- function(stream_size = 100) {
+random_stream <- function(stream_size = 100, strict = FALSE) {
   self <- environment()
-  
-  # Initialize the stream with random numbers
+
   self$stream <- runif(stream_size)
   self$stream_size <- stream_size
+  self$strict <- strict
   self$random_n <- numeric()
-  
-  # Function to generate a new stream of random numbers
+
   self$generate_stream <- function(size = self$stream_size) {
     self$stream <- runif(size)
   }
-  # Function to draw a specified number of values from the stream and remove them
-  self$draw_n <- function(n=1) {
+
+  self$draw_n <- function(n = 1) {
     if (length(self$stream) < n) {
+      if (self$strict) {
+        stop("random_stream(): stream exhausted. Requested ", n,
+             " draw(s) but only ", length(self$stream), " remain (original size: ",
+             self$stream_size, "). Create a larger stream with random_stream(stream_size = ...).",
+             call. = FALSE)
+      }
       warning("Stream is smaller than the number of numbers drawn. Generating a new stream of the correct size.")
       self$generate_stream(n)
       self$stream_size <- n
@@ -2065,7 +2095,7 @@ random_stream <- function(stream_size = 100) {
     self$stream <- self$stream[-seq_index]
     return(self$random_n)
   }
-  
+
   return(self)
 }
 

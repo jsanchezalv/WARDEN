@@ -1277,3 +1277,36 @@ test_that("force_unblock works correctly after many priority bumps", {
     expect_true(result)
   }
 })
+
+# Item 1: seize() errors on seize_all()-specific arguments
+test_that("seize errors when accum_queue is passed", {
+  res <- resource_discrete(2)
+  i <- 1L; curtime <- 0.0
+  expect_error(seize(res, accum_queue = FALSE), "seize_all")
+})
+
+test_that("seize errors when force_unblock is passed", {
+  res <- resource_discrete(2)
+  i <- 1L; curtime <- 0.0
+  expect_error(seize(res, force_unblock = TRUE), "seize_all")
+})
+
+test_that("seize errors on unknown extra arguments", {
+  res <- resource_discrete(2)
+  i <- 1L; curtime <- 0.0
+  expect_error(seize(res, foo = 1), "unexpected argument")
+})
+
+test_that("seize works with priority argument", {
+  res <- resource_discrete(1)
+  i <- 1L; curtime <- 0.0
+  result <- seize(res, priority = 2L)
+  expect_true(result)
+})
+
+test_that("seize still works with default arguments", {
+  res <- resource_discrete(2)
+  i <- 1L; curtime <- 0.0
+  expect_true(seize(res))
+  expect_true(seize(res, amount = 1L))
+})

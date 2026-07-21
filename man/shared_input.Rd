@@ -46,7 +46,7 @@ controlled mutability semantics. It can operate in two distinct modes:
 \itemize{
 \item \strong{Immutable (non-shared)}: every modification produces a fresh, independent
 copy of the object (safe for parallel or functional code).
-\item \strong{Shared (constrained)}: the object’s value is stored in a common
+\item \strong{Shared (constrained)}: the object's value is stored in a common
 environment shared across all aliases (by-reference semantics). This
 allows coordinated updates across multiple handles.
 }
