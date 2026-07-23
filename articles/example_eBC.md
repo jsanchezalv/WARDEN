@@ -649,9 +649,9 @@ results <- run_sim(
           )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 3.05s
-#> Time to run analysis 1: 3.05s
-#> Total time to run: 3.06s
+#> Time to run simulation 1: 2.15s
+#> Time to run analysis 1: 2.15s
+#> Total time to run: 2.15s
 #> Simulation finalized;
 ```
 

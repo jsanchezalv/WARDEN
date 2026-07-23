@@ -336,9 +336,9 @@ psa_bool = FALSE,
 ipd = 1)
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.06s
+#> Time to run simulation 1: 0.05s
 #> Time to run analysis 1: 0.06s
-#> Total time to run: 0.07s
+#> Total time to run: 0.06s
 #> Simulation finalized; 
 #> WARDEN Simulation Results
 #> -------------------------
