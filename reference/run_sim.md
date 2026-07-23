@@ -338,7 +338,7 @@ ipd = 1)
 #> Simulation number: 1
 #> Time to run simulation 1: 0.06s
 #> Time to run analysis 1: 0.06s
-#> Total time to run: 0.06s
+#> Total time to run: 0.07s
 #> Simulation finalized; 
 #> WARDEN Simulation Results
 #> -------------------------
@@ -352,7 +352,7 @@ ipd = 1)
 #>   Full object: results
 #> 
 #> Summary functions:
-#>   summary_results_det(results[[1]][[1]])   # deterministic
-#>   summary_results_sim(results[[1]])        # PSA
-#>   summary_results_sens(results)            # sensitivity
+#>   summary_results_det(results, sens=1, sim=1)   # deterministic
+#>   summary_results_sim(results, sens=1)          # PSA
+#>   summary_results_sens(results)                 # sensitivity
 ```

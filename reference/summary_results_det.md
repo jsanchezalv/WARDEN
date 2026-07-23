@@ -5,15 +5,24 @@ Deterministic results for a specific treatment
 ## Usage
 
 ``` r
-summary_results_det(out = results[[1]][[1]], arm = NULL, wtp = 50000)
+summary_results_det(
+  out = results[[1]][[1]],
+  arm = NULL,
+  wtp = 50000,
+  sens = 1,
+  sim = 1
+)
 ```
 
 ## Arguments
 
 - out:
 
-  The final_output data frame from the list object returned by
-  [`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md)
+  The list object returned by
+  [`run_sim()`](https://jsanchezalv.github.io/WARDEN/reference/run_sim.md),
+  or a subset of it (e.g., `results[[1]][[1]]`). When the full results
+  object or a simulation list is passed, `sens` and `sim` are used to
+  select the appropriate element.
 
 - arm:
 
@@ -22,6 +31,16 @@ summary_results_det(out = results[[1]][[1]], arm = NULL, wtp = 50000)
 - wtp:
 
   Willingness to pay to have INMB
+
+- sens:
+
+  Integer indicating which sensitivity analysis to use when `out` is the
+  full results object or a simulation list. Defaults to 1.
+
+- sim:
+
+  Integer indicating which simulation to use when `out` is the full
+  results object or a simulation list. Defaults to 1.
 
 ## Value
 
@@ -46,7 +65,35 @@ res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
 ), merged_df = list(simulation = 1L, sensitivity = 1L))))
 
 
-summary_results_det(res[[1]][[1]],arm="int")
+summary_results_det(res[[1]][[1]], arm="int")
+#>                        int     noint
+#> costs             49921.64  41225.25
+#> dcosts                0.00   8696.38
+#> lys                   9.05      9.05
+#> dlys                  0.00      0.00
+#> qalys                 6.21      6.18
+#> dqalys                0.00      0.03
+#> ICER                    NA       Inf
+#> ICUR                    NA 330825.35
+#> INMB                    NA  -7382.03
+#> costs_undisc      59831.36  49293.10
+#> dcosts_undisc         0.00  10538.25
+#> lys_undisc           10.90     10.90
+#> dlys_undisc           0.00      0.00
+#> qalys_undisc          7.50      7.47
+#> dqalys_undisc         0.00      0.03
+#> ICER_undisc             NA       Inf
+#> ICUR_undisc             NA 389864.98
+#> INMB_undisc             NA  -9186.73
+#> c_default         49921.64  41225.25
+#> dc_default            0.00   8696.38
+#> c_default_undisc  59831.36  49293.10
+#> dc_default_undisc     0.00  10538.25
+#> q_default             6.21      6.18
+#> dq_default            0.00      0.03
+#> q_default_undisc      7.50      7.47
+#> dq_default_undisc     0.00      0.03
+summary_results_det(res, arm="int", sens=1, sim=1)
 #>                        int     noint
 #> costs             49921.64  41225.25
 #> dcosts                0.00   8696.38

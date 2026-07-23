@@ -42,20 +42,11 @@ if(!require(readxl)){
     library(readxl)
 }
 #> Loading required package: readxl
-#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-#> logical.return = TRUE, : there is no package called 'readxl'
-#> Installing package into '/home/runner/work/_temp/Library'
-#> (as 'lib' is unspecified)
-#> also installing the dependencies 'rematch', 'hms', 'prettyunits', 'cellranger', 'cpp11', 'progress'
 if(!require(here)){
     install.packages("here")
     library(here)
 }
 #> Loading required package: here
-#> Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-#> logical.return = TRUE, : there is no package called 'here'
-#> Installing package into '/home/runner/work/_temp/Library'
-#> (as 'lib' is unspecified)
 #> here() starts at /home/runner/work/WARDEN/WARDEN
 
 # Age in year (continuous)
@@ -779,9 +770,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 73.09s
-#> Time to run analysis 1: 73.09s
-#> Total time to run: 73.1s
+#> Time to run simulation 1: 74.89s
+#> Time to run analysis 1: 74.89s
+#> Total time to run: 74.89s
 #> Simulation finalized;
 ```
 

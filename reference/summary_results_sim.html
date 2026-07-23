@@ -60,7 +60,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">summary_results_sim</span><span class="op">(</span>out <span class="op">=</span> <span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, arm <span class="op">=</span> <span class="cn">NULL</span>, wtp <span class="op">=</span> <span class="fl">50000</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">summary_results_sim</span><span class="op">(</span>out <span class="op">=</span> <span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, arm <span class="op">=</span> <span class="cn">NULL</span>, wtp <span class="op">=</span> <span class="fl">50000</span>, sens <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -68,7 +68,9 @@
 
 
 <dl><dt id="arg-out">out<a class="anchor" aria-label="anchor" href="#arg-out"></a></dt>
-<dd><p>The output_sim data frame from the list object returned by <code><a href="run_sim.html">run_sim()</a></code></p></dd>
+<dd><p>The list object returned by <code><a href="run_sim.html">run_sim()</a></code>, or a subset of it
+(e.g., <code>results[[1]]</code>). When the full results object is passed, <code>sens</code>
+is used to select the appropriate sensitivity analysis.</p></dd>
 
 
 <dt id="arg-arm">arm<a class="anchor" aria-label="anchor" href="#arg-arm"></a></dt>
@@ -78,10 +80,16 @@
 <dt id="arg-wtp">wtp<a class="anchor" aria-label="anchor" href="#arg-wtp"></a></dt>
 <dd><p>Willingness to pay to have INMB</p></dd>
 
+
+<dt id="arg-sens">sens<a class="anchor" aria-label="anchor" href="#arg-sens"></a></dt>
+<dd><p>Integer indicating which sensitivity analysis to use when
+<code>out</code> is the full results object. Defaults to 1.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame with mean and 95% CI of absolute costs, LYs, QALYs, ICER and ICUR for each intervention from the PSA samples</p>
+    <p>A data frame with mean and 95% CI of absolute costs, LYs, QALYs,
+ICER and ICUR for each intervention from the PSA samples</p>
     </div>
 
     <div class="section level2">
@@ -100,7 +108,62 @@
 <span class="r-in"><span><span class="op">)</span>, merged_df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>simulation <span class="op">=</span> <span class="fl">1L</span>, sensitivity <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">summary_results_sim</span><span class="op">(</span><span class="va">res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,arm<span class="op">=</span><span class="st">"int"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">summary_results_sim</span><span class="op">(</span><span class="va">res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, arm<span class="op">=</span><span class="st">"int"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                int</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> costs                      49,922 (49,922; 49,922)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dcosts                                    0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lys                              9.05 (9.05; 9.05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dlys                                      0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> qalys                            6.21 (6.21; 6.21)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dqalys                                    0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ICER                                  NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ICUR                                  NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INMB                                  NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> costs_undisc               59,831 (59,831; 59,831)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dcosts_undisc                             0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lys_undisc                       10.9 (10.9; 10.9)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dlys_undisc                               0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> qalys_undisc                        7.5 (7.5; 7.5)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dqalys_undisc                             0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ICER_undisc                           NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ICUR_undisc                           NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INMB_undisc                           NaN (NA; NA)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> c_default         49,921.64 (49,921.64; 49,921.64)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dc_default                                0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> c_default_undisc  59,831.36 (59,831.36; 59,831.36)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dc_default_undisc                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> q_default                        6.21 (6.21; 6.21)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dq_default                                0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> q_default_undisc                    7.5 (7.5; 7.5)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dq_default_undisc                         0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                              noint</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> costs                      41,225 (41,225; 41,225)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dcosts                        8,696 (8,696; 8,696)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lys                              9.05 (9.05; 9.05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dlys                                      0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> qalys                            6.18 (6.18; 6.18)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dqalys                        0.026 (0.026; 0.026)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ICER                                Inf (Inf; Inf)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ICUR                    330,825 (330,825; 330,825)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INMB                       -7,382 (-7,382; -7,382)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> costs_undisc               49,293 (49,293; 49,293)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dcosts_undisc              10,538 (10,538; 10,538)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lys_undisc                       10.9 (10.9; 10.9)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dlys_undisc                               0 (0; 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> qalys_undisc                     7.47 (7.47; 7.47)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dqalys_undisc                 0.027 (0.027; 0.027)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ICER_undisc                         Inf (Inf; Inf)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ICUR_undisc             389,865 (389,865; 389,865)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INMB_undisc                -9,187 (-9,187; -9,187)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> c_default         41,225.25 (41,225.25; 41,225.25)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dc_default        8,696.381 (8,696.381; 8,696.381)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> c_default_undisc     49,293.1 (49,293.1; 49,293.1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dc_default_undisc 10,538.25 (10,538.25; 10,538.25)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> q_default                        6.18 (6.18; 6.18)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dq_default                    0.026 (0.026; 0.026)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> q_default_undisc                 7.47 (7.47; 7.47)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dq_default_undisc             0.027 (0.027; 0.027)</span>
+<span class="r-in"><span><span class="fu">summary_results_sim</span><span class="op">(</span><span class="va">res</span>, arm<span class="op">=</span><span class="st">"int"</span>, sens<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                int</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> costs                      49,922 (49,922; 49,922)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> dcosts                                    0 (0; 0)</span>
