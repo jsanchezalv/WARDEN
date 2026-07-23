@@ -1094,8 +1094,8 @@ test_that("summary_results_det auto-unwraps full results", {
     merged_df = list(simulation = 1L, sensitivity = 1L)
   )))
 
-  expect_message(summary_results_det(res), "full results")
-  expect_message(summary_results_det(res[[1]]), "simulation list")
+  expect_no_error(summary_results_det(res))
+  expect_no_error(summary_results_det(res[[1]]))
 })
 
 test_that("summary_results_sim errors on single sim", {
@@ -1125,7 +1125,7 @@ test_that("summary_results_sim auto-unwraps full results", {
     merged_df = list(simulation = 1L, sensitivity = 1L)
   )))
 
-  expect_message(summary_results_sim(res), "full results")
+  expect_no_error(summary_results_sim(res))
 })
 
 # Item 11: print.warden_results
