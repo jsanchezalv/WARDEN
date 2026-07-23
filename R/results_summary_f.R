@@ -32,15 +32,23 @@ if(getRversion() >= "2.15.1") {
 
 #' Deterministic results for a specific treatment
 #'
-#' @param out The final_output data frame from the list object returned by `run_sim()`
+#' @param out The list object returned by `run_sim()`, or a subset of it
+#'   (e.g., `results[[1]][[1]]`). When the full results object or a
+#'   simulation list is passed, `sens` and `sim` are used to select the
+#'   appropriate element.
 #' @param arm The reference treatment for calculation of incremental outcomes
 #' @param wtp Willingness to pay to have INMB
+#' @param sens Integer indicating which sensitivity analysis to use when
+#'   `out` is the full results object or a simulation list. Defaults to 1.
+#' @param sim Integer indicating which simulation to use when `out` is the
+#'   full results object or a simulation list. Defaults to 1.
 #'
-#' @return A dataframe with absolute costs, LYs, QALYs, and ICER and ICUR for each intervention
+#' @return A dataframe with absolute costs, LYs, QALYs, and ICER and ICUR
+#'   for each intervention
 #' @export
 #'
 #' @examples
-#' 
+#'
 #' res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
 #' ), total_lys = c(int = 9.04687362556945, noint = 9.04687362556945
 #' ), total_qalys = c(int = 6.20743830697466, noint = 6.18115138126336
@@ -53,19 +61,19 @@ if(getRversion() >= "2.15.1") {
 #' ), q_default = c(int = 6.20743830697466, noint = 6.18115138126336
 #' ), q_default_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
 #' ), merged_df = list(simulation = 1L, sensitivity = 1L))))
-#' 
-#' 
-#' summary_results_det(res[[1]][[1]],arm="int")
-#' 
+#'
+#'
+#' summary_results_det(res[[1]][[1]], arm="int")
+#' summary_results_det(res, arm="int", sens=1, sim=1)
+#'
 
-summary_results_det <- function(out = results[[1]][[1]], arm = NULL, wtp = 50000){
+summary_results_det <- function(out = results[[1]][[1]], arm = NULL, wtp = 50000,
+                                sens = 1, sim = 1) {
   level <- .detect_results_level(out)
   if (level == "full_results") {
-    message("summary_results_det(): received full results object; extracting results[[1]][[1]].")
-    out <- out[[1]][[1]]
+    out <- out[[sens]][[sim]]
   } else if (level == "sim_list") {
-    message("summary_results_det(): received simulation list; extracting out[[1]].")
-    out <- out[[1]]
+    out <- out[[sim]]
   } else if (level == "unknown") {
     stop("summary_results_det(): cannot detect results structure. ",
          "Expected a single simulation list with $arm_list.", call. = FALSE)
@@ -153,11 +161,16 @@ summary_results_det <- function(out = results[[1]][[1]], arm = NULL, wtp = 50000
 
 #' Summary of PSA outputs for a treatment
 #'
-#' @param out The output_sim data frame from the list object returned by `run_sim()`
+#' @param out The list object returned by `run_sim()`, or a subset of it
+#'   (e.g., `results[[1]]`). When the full results object is passed, `sens`
+#'   is used to select the appropriate sensitivity analysis.
 #' @param arm The reference treatment for calculation of incremental outcomes
 #' @param wtp Willingness to pay to have INMB
+#' @param sens Integer indicating which sensitivity analysis to use when
+#'   `out` is the full results object. Defaults to 1.
 #'
-#' @return A data frame with mean and 95% CI of absolute costs, LYs, QALYs, ICER and ICUR for each intervention from the PSA samples
+#' @return A data frame with mean and 95% CI of absolute costs, LYs, QALYs,
+#'   ICER and ICUR for each intervention from the PSA samples
 #' @export
 #'
 #' @examples
@@ -173,19 +186,20 @@ summary_results_det <- function(out = results[[1]][[1]], arm = NULL, wtp = 50000
 #' ), q_default = c(int = 6.20743830697466, noint = 6.18115138126336
 #' ), q_default_undisc = c(int = 7.50117621700097, noint = 7.47414569286751
 #' ), merged_df = list(simulation = 1L, sensitivity = 1L))))
-#' 
-#' 
-#' summary_results_sim(res[[1]],arm="int")
+#'
+#'
+#' summary_results_sim(res[[1]], arm="int")
+#' summary_results_sim(res, arm="int", sens=1)
 
-summary_results_sim <- function(out = results[[1]], arm=NULL, wtp = 50000){
+summary_results_sim <- function(out = results[[1]], arm = NULL, wtp = 50000,
+                                sens = 1) {
   level <- .detect_results_level(out)
   if (level == "single_sim") {
     stop("summary_results_sim(): received a single simulation result. ",
          "Use summary_results_det() instead, or pass the full simulation list results[[1]].",
          call. = FALSE)
   } else if (level == "full_results") {
-    message("summary_results_sim(): received full results object; extracting results[[1]].")
-    out <- out[[1]]
+    out <- out[[sens]]
   } else if (level == "unknown") {
     stop("summary_results_sim(): cannot detect results structure. ",
          "Expected a list of simulations where out[[1]] has $arm_list.", call. = FALSE)
@@ -627,8 +641,8 @@ print.warden_results <- function(x, ...) {
   cat("  Sim list:    results[[sens]]           (e.g., results[[1]])\n")
   cat("  Full object: results\n")
   cat("\nSummary functions:\n")
-  cat("  summary_results_det(results[[1]][[1]])   # deterministic\n")
-  cat("  summary_results_sim(results[[1]])        # PSA\n")
-  cat("  summary_results_sens(results)            # sensitivity\n")
+  cat("  summary_results_det(results, sens=1, sim=1)   # deterministic\n")
+  cat("  summary_results_sim(results, sens=1)          # PSA\n")
+  cat("  summary_results_sens(results)                 # sensitivity\n")
   invisible(x)
 }

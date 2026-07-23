@@ -4,17 +4,23 @@
 \alias{summary_results_sim}
 \title{Summary of PSA outputs for a treatment}
 \usage{
-summary_results_sim(out = results[[1]], arm = NULL, wtp = 50000)
+summary_results_sim(out = results[[1]], arm = NULL, wtp = 50000, sens = 1)
 }
 \arguments{
-\item{out}{The output_sim data frame from the list object returned by \code{run_sim()}}
+\item{out}{The list object returned by \code{run_sim()}, or a subset of it
+(e.g., \code{results[[1]]}). When the full results object is passed, \code{sens}
+is used to select the appropriate sensitivity analysis.}
 
 \item{arm}{The reference treatment for calculation of incremental outcomes}
 
 \item{wtp}{Willingness to pay to have INMB}
+
+\item{sens}{Integer indicating which sensitivity analysis to use when
+\code{out} is the full results object. Defaults to 1.}
 }
 \value{
-A data frame with mean and 95\% CI of absolute costs, LYs, QALYs, ICER and ICUR for each intervention from the PSA samples
+A data frame with mean and 95\% CI of absolute costs, LYs, QALYs,
+ICER and ICUR for each intervention from the PSA samples
 }
 \description{
 Summary of PSA outputs for a treatment
@@ -34,5 +40,6 @@ res <- list(list(list(sensitivity_name = "", arm_list = c("int", "noint"
 ), merged_df = list(simulation = 1L, sensitivity = 1L))))
 
 
-summary_results_sim(res[[1]],arm="int")
+summary_results_sim(res[[1]], arm="int")
+summary_results_sim(res, arm="int", sens=1)
 }

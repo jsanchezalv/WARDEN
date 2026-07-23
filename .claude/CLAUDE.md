@@ -1,6 +1,7 @@
 ## R package development
 
 ### Key commands
+Be careful with segfault errors when running bash or powershell and executing R code, likely caused by either Rcpp or by very long commands (you may want to create temporary scripts instead or similar).
 
 ```
 # To run code
