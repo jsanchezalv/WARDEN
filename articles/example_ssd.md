@@ -420,9 +420,9 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.69s
-#> Time to run analysis 1: 0.69s
-#> Total time to run: 0.7s
+#> Time to run simulation 1: 0.61s
+#> Time to run analysis 1: 0.61s
+#> Total time to run: 0.62s
 #> Simulation finalized;
 ```
 
@@ -698,69 +698,69 @@ results <- run_sim(
 #> n_sensitivity auto-detected as 8 from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 1: 0.13s
+#> Time to run simulation 1: 0.12s
+#> Time to run analysis 1: 0.12s
 #> Analysis number: 2
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 2: 0.14s
+#> Time to run simulation 1: 0.12s
+#> Time to run analysis 2: 0.13s
 #> Analysis number: 3
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 3: 0.14s
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 3: 0.13s
 #> Analysis number: 4
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 4: 0.13s
+#> Time to run simulation 1: 0.12s
+#> Time to run analysis 4: 0.12s
 #> Analysis number: 5
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 5: 0.14s
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 5: 0.13s
 #> Analysis number: 6
 #> Simulation number: 1
 #> Time to run simulation 1: 0.13s
 #> Time to run analysis 6: 0.13s
 #> Analysis number: 7
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 7: 0.13s
+#> Time to run simulation 1: 0.12s
+#> Time to run analysis 7: 0.12s
 #> Analysis number: 8
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 8: 0.14s
+#> Time to run simulation 1: 0.12s
+#> Time to run analysis 8: 0.12s
 #> Analysis number: 9
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 9: 0.14s
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 9: 0.13s
 #> Analysis number: 10
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 10: 0.14s
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 10: 0.13s
 #> Analysis number: 11
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 11: 0.14s
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 11: 0.13s
 #> Analysis number: 12
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 12: 0.14s
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 12: 0.13s
 #> Analysis number: 13
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 13: 0.14s
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 13: 0.13s
 #> Analysis number: 14
 #> Simulation number: 1
-#> Time to run simulation 1: 0.18s
-#> Time to run analysis 14: 0.18s
+#> Time to run simulation 1: 0.19s
+#> Time to run analysis 14: 0.19s
 #> Analysis number: 15
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Time to run analysis 15: 0.13s
+#> Time to run simulation 1: 0.12s
+#> Time to run analysis 15: 0.12s
 #> Analysis number: 16
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Time to run analysis 16: 0.14s
-#> Total time to run: 2.22s
+#> Time to run simulation 1: 0.13s
+#> Time to run analysis 16: 0.13s
+#> Total time to run: 2.09s
 #> Simulation finalized;
 ```
 
@@ -930,229 +930,229 @@ results <- run_sim(
 #> n_sensitivity auto-detected as 8 from input_block metadata
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
+#> Time to run simulation 1: 0.12s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.14s
+#> Time to run simulation 2: 0.13s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.14s
+#> Time to run simulation 3: 0.13s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.14s
+#> Time to run simulation 4: 0.13s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.14s
+#> Time to run simulation 5: 0.13s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.34s
-#> Time to run analysis 1: 1.04s
+#> Time to run simulation 6: 0.42s
+#> Time to run analysis 1: 1.08s
 #> Analysis number: 2
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
+#> Time to run simulation 1: 0.11s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.14s
+#> Time to run simulation 2: 0.16s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.12s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.13s
+#> Time to run simulation 4: 0.12s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.13s
+#> Time to run simulation 5: 0.12s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 2: 0.79s
+#> Time to run simulation 6: 0.12s
+#> Time to run analysis 2: 0.74s
 #> Analysis number: 3
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
+#> Time to run simulation 1: 0.11s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.13s
+#> Time to run simulation 2: 0.12s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.13s
+#> Time to run simulation 3: 0.11s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.13s
+#> Time to run simulation 4: 0.12s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.13s
+#> Time to run simulation 5: 0.12s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 3: 0.78s
+#> Time to run simulation 6: 0.12s
+#> Time to run analysis 3: 0.71s
 #> Analysis number: 4
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
+#> Time to run simulation 1: 0.11s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.13s
+#> Time to run simulation 2: 0.12s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.11s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.12s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.11s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.12s
+#> Time to run analysis 4: 0.71s
+#> Analysis number: 5
+#> Simulation number: 1
+#> Time to run simulation 1: 0.12s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.12s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.12s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.13s
+#> Time to run simulation 4: 0.11s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.13s
+#> Time to run simulation 5: 0.12s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 4: 0.78s
-#> Analysis number: 5
-#> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.13s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.13s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.13s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.13s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.12s
-#> Time to run analysis 5: 0.78s
+#> Time to run simulation 6: 0.11s
+#> Time to run analysis 5: 0.71s
 #> Analysis number: 6
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
+#> Time to run simulation 1: 0.12s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.13s
+#> Time to run simulation 2: 0.11s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.14s
+#> Time to run simulation 3: 0.12s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.14s
+#> Time to run simulation 4: 0.12s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.13s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 6: 0.81s
-#> Analysis number: 7
-#> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.13s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.13s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.13s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.13s
+#> Time to run simulation 5: 0.12s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.12s
-#> Time to run analysis 7: 0.78s
+#> Time to run analysis 6: 0.71s
+#> Analysis number: 7
+#> Simulation number: 1
+#> Time to run simulation 1: 0.12s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.12s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.12s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.12s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.12s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.11s
+#> Time to run analysis 7: 0.71s
 #> Analysis number: 8
 #> Simulation number: 1
 #> Time to run simulation 1: 0.16s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.13s
+#> Time to run simulation 2: 0.12s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.14s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.12s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.16s
+#> Time to run simulation 5: 0.15s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 8: 0.84s
+#> Time to run simulation 6: 0.12s
+#> Time to run analysis 8: 0.8s
 #> Analysis number: 9
 #> Simulation number: 1
-#> Time to run simulation 1: 0.14s
+#> Time to run simulation 1: 0.15s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.13s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.14s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.13s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.14s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.13s
-#> Time to run analysis 9: 0.82s
-#> Analysis number: 10
-#> Simulation number: 1
-#> Time to run simulation 1: 0.13s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.14s
+#> Time to run simulation 2: 0.12s
 #> Simulation number: 3
 #> Time to run simulation 3: 0.13s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.14s
+#> Time to run simulation 4: 0.12s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.13s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.14s
-#> Time to run analysis 10: 0.82s
-#> Analysis number: 11
+#> Time to run simulation 6: 0.12s
+#> Time to run analysis 9: 0.78s
+#> Analysis number: 10
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
+#> Time to run simulation 1: 0.12s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.14s
+#> Time to run simulation 2: 0.13s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.14s
+#> Time to run simulation 3: 0.12s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.13s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.14s
+#> Time to run simulation 5: 0.12s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.14s
-#> Time to run analysis 11: 0.82s
+#> Time to run simulation 6: 0.13s
+#> Time to run analysis 10: 0.76s
+#> Analysis number: 11
+#> Simulation number: 1
+#> Time to run simulation 1: 0.12s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.13s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.13s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.12s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.13s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.13s
+#> Time to run analysis 11: 0.77s
 #> Analysis number: 12
 #> Simulation number: 1
-#> Time to run simulation 1: 0.13s
+#> Time to run simulation 1: 0.12s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.14s
+#> Time to run simulation 2: 0.13s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.14s
+#> Time to run simulation 3: 0.13s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.14s
+#> Time to run simulation 4: 0.13s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.14s
+#> Time to run simulation 5: 0.12s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.15s
-#> Time to run analysis 12: 0.84s
+#> Time to run simulation 6: 0.16s
+#> Time to run analysis 12: 0.8s
 #> Analysis number: 13
 #> Simulation number: 1
 #> Time to run simulation 1: 0.14s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.13s
+#> Time to run simulation 2: 0.12s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.14s
+#> Time to run simulation 3: 0.13s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.14s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.16s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.17s
-#> Time to run analysis 13: 0.89s
-#> Analysis number: 14
-#> Simulation number: 1
-#> Time to run simulation 1: 0.16s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.15s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.16s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.17s
-#> Simulation number: 5
-#> Time to run simulation 5: 0.16s
-#> Simulation number: 6
-#> Time to run simulation 6: 0.15s
-#> Time to run analysis 14: 0.95s
-#> Analysis number: 15
-#> Simulation number: 1
-#> Time to run simulation 1: 0.14s
-#> Simulation number: 2
-#> Time to run simulation 2: 0.14s
-#> Simulation number: 3
-#> Time to run simulation 3: 0.15s
-#> Simulation number: 4
-#> Time to run simulation 4: 0.14s
+#> Time to run simulation 4: 0.12s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.14s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.15s
-#> Time to run analysis 15: 0.87s
-#> Analysis number: 16
+#> Time to run simulation 6: 0.14s
+#> Time to run analysis 13: 0.8s
+#> Analysis number: 14
 #> Simulation number: 1
-#> Time to run simulation 1: 0.16s
+#> Time to run simulation 1: 0.13s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.36s
+#> Time to run simulation 2: 0.15s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.13s
+#> Time to run simulation 3: 0.14s
 #> Simulation number: 4
 #> Time to run simulation 4: 0.14s
 #> Simulation number: 5
 #> Time to run simulation 5: 0.13s
 #> Simulation number: 6
 #> Time to run simulation 6: 0.14s
-#> Time to run analysis 16: 1.08s
-#> Total time to run: 13.71s
+#> Time to run analysis 14: 0.83s
+#> Analysis number: 15
+#> Simulation number: 1
+#> Time to run simulation 1: 0.12s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.14s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.14s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.13s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.13s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.14s
+#> Time to run analysis 15: 0.8s
+#> Analysis number: 16
+#> Simulation number: 1
+#> Time to run simulation 1: 0.14s
+#> Simulation number: 2
+#> Time to run simulation 2: 0.42s
+#> Simulation number: 3
+#> Time to run simulation 3: 0.11s
+#> Simulation number: 4
+#> Time to run simulation 4: 0.12s
+#> Simulation number: 5
+#> Time to run simulation 5: 0.13s
+#> Simulation number: 6
+#> Time to run simulation 6: 0.12s
+#> Time to run analysis 16: 1.04s
+#> Total time to run: 12.79s
 #> Simulation finalized;
 ```
 
@@ -1214,27 +1214,27 @@ results <- run_sim(
 )
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.16s
+#> Time to run simulation 1: 0.15s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.14s
+#> Time to run simulation 2: 0.11s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.14s
+#> Time to run simulation 3: 0.12s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.15s
+#> Time to run simulation 4: 0.12s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.13s
+#> Time to run simulation 5: 0.12s
 #> Simulation number: 6
-#> Time to run simulation 6: 0.13s
+#> Time to run simulation 6: 0.12s
 #> Simulation number: 7
-#> Time to run simulation 7: 0.14s
+#> Time to run simulation 7: 0.12s
 #> Simulation number: 8
-#> Time to run simulation 8: 0.13s
+#> Time to run simulation 8: 0.12s
 #> Simulation number: 9
-#> Time to run simulation 9: 0.14s
+#> Time to run simulation 9: 0.12s
 #> Simulation number: 10
-#> Time to run simulation 10: 0.13s
-#> Time to run analysis 1: 1.41s
-#> Total time to run: 1.41s
+#> Time to run simulation 10: 0.12s
+#> Time to run analysis 1: 1.23s
+#> Total time to run: 1.23s
 #> Simulation finalized;
 ```
 

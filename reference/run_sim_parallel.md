@@ -336,9 +336,9 @@ ipd = 1,
 ncores = 1)
 #> Analysis number: 1
 #> Simulation number: 1
-#> Time to run simulation 1: 0.05s
-#> Time to run analysis 1: 0.76s
-#> Total time to run: 0.77s
+#> Time to run simulation 1: 0.04s
+#> Time to run analysis 1: 0.67s
+#> Total time to run: 0.67s
 #> Simulation finalized; 
 #> WARDEN Simulation Results
 #> -------------------------

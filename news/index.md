@@ -1,5 +1,7 @@
 # Changelog
 
+## WARDEN (development version)
+
 ## WARDEN 2.0.6
 
 CRAN release: 2026-07-23
