@@ -1,3 +1,5 @@
+# WARDEN (development version)
+
 # WARDEN 2.0.6
 
 * `add_reactevt()` now detects when a character string is accidentally passed as `.data` (the pipe-first argument) and errors with guidance to use `name_evt =` explicitly.
