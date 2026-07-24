@@ -770,9 +770,9 @@ results <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 59.1s
-#> Time to run analysis 1: 59.1s
-#> Total time to run: 59.11s
+#> Time to run simulation 1: 74.84s
+#> Time to run analysis 1: 74.84s
+#> Total time to run: 74.84s
 #> Simulation finalized;
 ```
 
@@ -793,7 +793,7 @@ summary_results_det(results[[1]][[1]], arm ="int", wtp = 20000) #print first sim
 #> qalys               8.86     8.69
 #> dqalys              0.00     0.17
 #> ICER                  NA   905.60
-#> ICUR                  NA  1125.02
+#> ICUR                  NA  1125.03
 #> INMB                  NA  3267.88
 #> costs_undisc    31193.46 31010.77
 #> dcosts_undisc       0.00   182.69
@@ -803,7 +803,7 @@ summary_results_det(results[[1]][[1]], arm ="int", wtp = 20000) #print first sim
 #> dqalys_undisc       0.00     0.28
 #> ICER_undisc           NA   531.00
 #> ICUR_undisc           NA   654.73
-#> INMB_undisc           NA  5397.84
+#> INMB_undisc           NA  5397.83
 #> cost            20205.52 20010.74
 #> dcost               0.00   194.78
 #> cost_undisc     31193.46 31010.77

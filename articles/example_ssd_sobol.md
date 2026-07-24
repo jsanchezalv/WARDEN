@@ -213,17 +213,17 @@ results_unif <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.24s
+#> Time to run simulation 1: 0.33s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.25s
+#> Time to run simulation 2: 0.34s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.22s
+#> Time to run simulation 3: 0.32s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.22s
+#> Time to run simulation 4: 0.32s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.22s
-#> Time to run analysis 1: 1.15s
-#> Total time to run: 1.15s
+#> Time to run simulation 5: 0.32s
+#> Time to run analysis 1: 1.63s
+#> Total time to run: 1.64s
 #> Simulation finalized;
 
 results_sobol <- run_sim(  
@@ -244,17 +244,17 @@ results_sobol <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.22s
+#> Time to run simulation 1: 0.33s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.22s
+#> Time to run simulation 2: 0.33s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.22s
+#> Time to run simulation 3: 0.33s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.22s
+#> Time to run simulation 4: 0.33s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.27s
-#> Time to run analysis 1: 1.16s
-#> Total time to run: 1.16s
+#> Time to run simulation 5: 0.38s
+#> Time to run analysis 1: 1.69s
+#> Total time to run: 1.69s
 #> Simulation finalized;
 ```
 
@@ -412,17 +412,17 @@ results_unif_psa <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.22s
+#> Time to run simulation 1: 0.32s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.21s
+#> Time to run simulation 2: 0.3s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.21s
+#> Time to run simulation 3: 0.31s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.21s
+#> Time to run simulation 4: 0.31s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.21s
-#> Time to run analysis 1: 1.06s
-#> Total time to run: 1.07s
+#> Time to run simulation 5: 0.31s
+#> Time to run analysis 1: 1.56s
+#> Total time to run: 1.56s
 #> Simulation finalized;
 
 results_sobol_psa <- run_sim(
@@ -443,17 +443,17 @@ results_sobol_psa <- run_sim(
 #> Analysis number: 1
 #> Simulation number: 1
 #> Patient-arm data aggregated across events by selecting the last value for input_out items.
-#> Time to run simulation 1: 0.21s
+#> Time to run simulation 1: 0.31s
 #> Simulation number: 2
-#> Time to run simulation 2: 0.21s
+#> Time to run simulation 2: 0.31s
 #> Simulation number: 3
-#> Time to run simulation 3: 0.21s
+#> Time to run simulation 3: 0.31s
 #> Simulation number: 4
-#> Time to run simulation 4: 0.21s
+#> Time to run simulation 4: 0.32s
 #> Simulation number: 5
-#> Time to run simulation 5: 0.26s
-#> Time to run analysis 1: 1.11s
-#> Total time to run: 1.11s
+#> Time to run simulation 5: 0.37s
+#> Time to run analysis 1: 1.62s
+#> Total time to run: 1.62s
 #> Simulation finalized;
 ```
 

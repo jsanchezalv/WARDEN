@@ -2,6 +2,8 @@
 
 ## WARDEN 2.0.6
 
+CRAN release: 2026-07-23
+
 - [`add_reactevt()`](https://jsanchezalv.github.io/WARDEN/reference/add_reactevt.md)
   now detects when a character string is accidentally passed as `.data`
   (the pipe-first argument) and errors with guidance to use `name_evt =`
